@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type Badge {
+  badgeId String
+  tierId  String
+}
+type Achievement {
+  name       String    @default("")
+  game       Int?      @default(0)
+  difficulty Int       @default(0)
+  has        Boolean   @default(false)
+  achieved   DateTime?
+}
+
+model UserWallet {
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String        @unique
+  balance          Float         @default(100)
+  vault            Float         @default(0)
+  messagesSent     Int           @default(0)
+  staffCredits     Int           @default(0)
+  lemon            Int           @default(0)
+  claimed          Int?          @default(0)
+  hidden           Boolean       @default(false)
+  frameHidden      Boolean       @default(false)
+  frameUrl         String        @default("")
+  locked           Boolean?      @default(false)
+  elo              Int?          @default(1000)
+  triviaPoints     Int?          @default(0)
+  rankedUID        Int?          @default(0)
+  withdrawTimer    Int?          @default(0)
+  rankedRegion     Int?          @default(0)
+  backgroundHidden Boolean       @default(false)
+  backgroundUrl    String?       @default("")
+  rig              Int           @default(0)
+  yay              Boolean       @default(false)
+  pity             Int           @default(0)
+  wished           Boolean       @default(false)
+  daily            Int           @default(0)
+  dailyLimit       Int           @default(150000)
+  achievements     Achievement[]
+  collectables     Collectable[]
+  badges           Badge[]
+  rakeback         Rakeback?
+  balanceAdded     Int           @default(0)
+  balanceRemove    Int           @default(0)
+  cooldowns        Cooldown[]
+  active           Active?
+  dailyStats       DailyStats[]
+}
+
+type Cooldown {
+  ends    Int
+  command String
+}
+
+type Rakeback {
+  amount  Int @default(0)
+  claimed Int @default(0)
+}
+
+type Collectable {
+  name  String @default("")
+  count Int    @default(0)
+}
+
+model GamblingMachine {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  name              String    @unique
+  prizePool         Int
+  lastClaimedUserId String?
+  lastClaimedAt     DateTime?
+}
+
+type DailyStats {
+  date     DateTime @default(now())
+  messages Int      @default(0)
+}
+
+type Active {
+  last  DateTime
+  count Int      @default(0)
+}
