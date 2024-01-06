@@ -1,6 +1,13 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { SlashCommandBuilder } from "discord.js";
-import { checks, cooldowns, embedComment, locked, texts, userLockedData } from "../../utils";
+import {
+    checks,
+    cooldowns,
+    embedComment,
+    locked,
+    texts,
+    userLockedData,
+} from "../../utils";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId } from "../../services";
 import { battleMessages } from "../../utils/work";
@@ -13,7 +20,7 @@ export const work: SlashCommand = {
             channels.genshin,
             channels.starrail,
             channels.booster,
-        ]
+        ],
     },
     command: new SlashCommandBuilder()
         .setName(`work`)
@@ -36,16 +43,17 @@ export const work: SlashCommand = {
 
         const amount = Math.floor(Math.random() * 20) + 2;
         const getMsg = () =>
-            battleMessages[Math.floor(Math.random() * battleMessages.length)].replace(
-                /%AMOUNT%/gi,
-                formatNumber(amount),
-            );
+            battleMessages[
+                Math.floor(Math.random() * battleMessages.length)
+            ].replace(/%AMOUNT%/gi, formatNumber(amount));
         const msg = getMsg();
 
         if (checks.limit(data, amount)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(`This command could not be completed. This is not a bug.`),
+                embedComment(
+                    `This command could not be completed. This is not a bug.`,
+                ),
             );
         }
         const hasCooldown = cooldowns.get(data, "work");

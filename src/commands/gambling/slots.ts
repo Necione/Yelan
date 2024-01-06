@@ -2,8 +2,21 @@ import type { SlashCommand } from "@elara-services/botbuilder";
 import { get, sleep, time } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
-import { clearSlotsPrizePool, getProfileByUserId, getSlots, handleBets, removeBalance } from "../../services";
-import { addRakeback, checks, embedComment, locked, texts, userLockedData } from "../../utils";
+import {
+    clearSlotsPrizePool,
+    getProfileByUserId,
+    getSlots,
+    handleBets,
+    removeBalance,
+} from "../../services";
+import {
+    addRakeback,
+    checks,
+    embedComment,
+    locked,
+    texts,
+    userLockedData,
+} from "../../utils";
 import { embeds, playSlot, renderSlotDisplay } from "../../utils/slots";
 
 export const slots: SlashCommand = {
@@ -30,7 +43,7 @@ export const slots: SlashCommand = {
         channels: [
             ...channels.gamblingcommands,
             ...channels.testingbotcommands,
-        ]
+        ],
     },
     async execute(interaction, responder) {
         if (!interaction.deferred) {
@@ -43,9 +56,9 @@ export const slots: SlashCommand = {
             const slots = await getSlots();
             let lastWonBy = "Nobody";
             if (slots.lastClaimedUserId && slots.lastClaimedAt) {
-                lastWonBy = `<@${slots.lastClaimedUserId}> at ${time.short.dateTime(
-                    slots.lastClaimedAt,
-                )}`;
+                lastWonBy = `<@${
+                    slots.lastClaimedUserId
+                }> at ${time.short.dateTime(slots.lastClaimedAt)}`;
             }
             locked.del(interaction.user.id);
             return responder.edit({
@@ -61,12 +74,16 @@ export const slots: SlashCommand = {
         }
         if (profile.balance < bet) {
             locked.del(interaction.user.id);
-            return responder.edit({ embeds: [embeds.tooPoor(profile.balance)] });
+            return responder.edit({
+                embeds: [embeds.tooPoor(profile.balance)],
+            });
         }
         if (checks.limit(profile, bet)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(`This command could not be completed. This is not a bug.`),
+                embedComment(
+                    `This command could not be completed. This is not a bug.`,
+                ),
             );
         }
         await removeBalance(interaction.user.id, bet);
@@ -88,12 +105,20 @@ export const slots: SlashCommand = {
 
         if (slotResult.status === "jackpot") {
             await clearSlotsPrizePool(interaction.user.id);
-            await handleBets(interaction.user.id, slotResult.result.winAmount, bet);
+            await handleBets(
+                interaction.user.id,
+                slotResult.result.winAmount,
+                bet,
+            );
             await checks.set(profile, slotResult.result.winAmount);
         }
 
         if (slotResult.status === "win") {
-            await handleBets(interaction.user.id, slotResult.result.winAmount, bet);
+            await handleBets(
+                interaction.user.id,
+                slotResult.result.winAmount,
+                bet,
+            );
             await checks.set(profile, slotResult.result.winAmount);
         }
 

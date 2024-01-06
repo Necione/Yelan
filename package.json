@@ -1,7 +1,7 @@
 {
-  "name": "typescriptbot",
+  "name": "yelan",
   "version": "1.0.0",
-  "description": "Template for a TypeScript bot ",
+  "description": "It's like Guizhong but with gambling commands only",
   "main": "./dist/src/index.js",
   "scripts": {
     "prestart": "npx prisma db push",

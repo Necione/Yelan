@@ -204,9 +204,9 @@ function generateWinningsDescription(winsArray: WinItem[]): string {
     return winsArray
         .map(
             (win) =>
-                `${win.emoji} ${win.emoji} ${win.emoji} - \`${win.multiplier.toFixed(
-                    1,
-                )}x\``,
+                `${win.emoji} ${win.emoji} ${
+                    win.emoji
+                } - \`${win.multiplier.toFixed(1)}x\``,
         )
         .join("\n");
 }
@@ -243,14 +243,17 @@ export const embeds = {
         embeds
             .base()
             .setDescription(
-                `You are too poor to be gambling :(\n\nYour balance: ${customEmoji.a.z_coins
+                `You are too poor to be gambling :(\n\nYour balance: ${
+                    customEmoji.a.z_coins
                 } \`${formatNumber(balance)} ${texts.c.u}\``,
             ),
     play: (slotResult: string) =>
         embeds
             .base()
             .addFields({ name: "\u200B", value: slotResult })
-            .setDescription(`The slot machine is rolling ${customEmoji.a.loading}`),
+            .setDescription(
+                `The slot machine is rolling ${customEmoji.a.loading}`,
+            ),
     result: (slotResult: SlotResult, userId: string, balance: number) => {
         const base = () =>
             embeds.base().setFooter({
@@ -262,7 +265,9 @@ export const embeds = {
                     name: "\u200B",
                     value: renderSlotDisplay(slotResult.result.slotDisplay, 3),
                 })
-                .setDescription(`<@${userId}> didn't win or lose ${texts.c.u}!`);
+                .setDescription(
+                    `<@${userId}> didn't win or lose ${texts.c.u}!`,
+                );
         }
         if (slotResult.status === "win") {
             return base()
@@ -283,8 +288,11 @@ export const embeds = {
                     value: renderSlotDisplay(slotResult.result.slotDisplay, 3),
                 })
                 .setDescription(
-                    `<@${userId}> won the **jackpot** ! They have won ${customEmoji.a.z_coins
-                    } \`${formatNumber(slotResult.result.winAmount)} ${texts.c.u}\`!`,
+                    `<@${userId}> won the **jackpot** ! They have won ${
+                        customEmoji.a.z_coins
+                    } \`${formatNumber(slotResult.result.winAmount)} ${
+                        texts.c.u
+                    }\`!`,
                 );
         }
         if (slotResult.status === "lose") {
@@ -293,7 +301,9 @@ export const embeds = {
                     name: "\u200B",
                     value: renderSlotDisplay(slotResult.result.slotDisplay, 3),
                 })
-                .setDescription(`<@${userId}> didn't win, better luck next time.`);
+                .setDescription(
+                    `<@${userId}> didn't win, better luck next time.`,
+                );
         }
         return embeds.base().setDescription("Unknown error occured");
     },

@@ -1,7 +1,17 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { ButtonStyle, Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import {
+    ButtonStyle,
+    Colors,
+    EmbedBuilder,
+    SlashCommandBuilder,
+} from "discord.js";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
-import { addButtonRow, checkBelowBalance, customEmoji, locked } from "../../utils";
+import {
+    addButtonRow,
+    checkBelowBalance,
+    customEmoji,
+    locked,
+} from "../../utils";
 import { get } from "@elara-services/utils";
 
 export const blackjack: SlashCommand = {
@@ -46,7 +56,8 @@ export const blackjack: SlashCommand = {
             .setTitle("`🍀` Blackjack")
             .setColor("#FF9141")
             .setDescription(
-                `Your hand: **${playerCards.join(", ")}**\nDealer's hand: **${dealerCards[0]
+                `Your hand: **${playerCards.join(", ")}**\nDealer's hand: **${
+                    dealerCards[0]
                 }**\n\nDo you want to hit or stand?`,
             );
 
@@ -166,7 +177,10 @@ export const blackjack: SlashCommand = {
                         .setTitle("`🍀` Blackjack")
                         .setColor("#FF9141")
                         .setDescription(
-                            `Your cards: **${playerCards.join(", ")}**\nDealer's card: **${dealerCards[0]
+                            `Your cards: **${playerCards.join(
+                                ", ",
+                            )}**\nDealer's card: **${
+                                dealerCards[0]
                             }**\n\nDo you want to hit or stand?`,
                         );
 
@@ -204,8 +218,9 @@ export const blackjack: SlashCommand = {
             resultMessage = `You busted with ${playerTotal}. Dealer's hand: **${dealerHand}**.\nYou lost ${customEmoji.a.z_coins} \`${amount}\`.`;
         } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
             playerWon = true;
-            resultMessage = `You won against the dealer's \`${dealerTotal}\` with hand: **${dealerHand}**.\nYou earned ${customEmoji.a.z_coins
-                } \`${Math.floor(amount * 1.5)}\`!`;
+            resultMessage = `You won against the dealer's \`${dealerTotal}\` with hand: **${dealerHand}**.\nYou earned ${
+                customEmoji.a.z_coins
+            } \`${Math.floor(amount * 1.5)}\`!`;
         } else if (playerTotal === dealerTotal) {
             playerWon = true;
             resultMessage = `It's a push since the dealer drew \`${dealerTotal}\` with hand: **${dealerHand}**.\nYou get back your ${customEmoji.a.z_coins} \`${amount}\` bet.`;
@@ -233,7 +248,6 @@ export const blackjack: SlashCommand = {
         });
     },
 };
-
 
 function getRandomCard() {
     const cardValues = [

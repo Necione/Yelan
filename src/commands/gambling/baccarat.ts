@@ -1,63 +1,71 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
-import { checkBelowBalance, checks, commandLimitRep, customEmoji, embedComment, locked, userLockedData } from "../../utils";
+import {
+    checkBelowBalance,
+    checks,
+    commandLimitRep,
+    customEmoji,
+    embedComment,
+    locked,
+    userLockedData,
+} from "../../utils";
 import { channels } from "../../config";
 
 type CardKey =
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "9"
-  | "10"
-  | "J"
-  | "Q"
-  | "K"
-  | "A";
+    | "2"
+    | "3"
+    | "4"
+    | "5"
+    | "6"
+    | "7"
+    | "8"
+    | "9"
+    | "10"
+    | "J"
+    | "Q"
+    | "K"
+    | "A";
 
 const cardValues: Record<CardKey, number> = {
-  "2": 2,
-  "3": 3,
-  "4": 4,
-  "5": 5,
-  "6": 6,
-  "7": 7,
-  "8": 8,
-  "9": 9,
-  "10": 0,
-  J: 0,
-  Q: 0,
-  K: 0,
-  A: 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9,
+    "10": 0,
+    J: 0,
+    Q: 0,
+    K: 0,
+    A: 1,
 };
 
 const drawCard = (): CardKey => {
-  const cards: CardKey[] = [
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "J",
-    "Q",
-    "K",
-    "A",
-  ];
-  return cards[Math.floor(Math.random() * cards.length)];
+    const cards: CardKey[] = [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "J",
+        "Q",
+        "K",
+        "A",
+    ];
+    return cards[Math.floor(Math.random() * cards.length)];
 };
 
 const getCardValue = (card: CardKey) => cardValues[card];
 
 const getHandValue = (cards: CardKey[]) => {
-  return cards.map((c) => getCardValue(c)).reduce((a, b) => a + b, 0) % 10;
+    return cards.map((c) => getCardValue(c)).reduce((a, b) => a + b, 0) % 10;
 };
 
 export const baccarat: SlashCommand = {
@@ -65,7 +73,7 @@ export const baccarat: SlashCommand = {
         channels: [
             ...channels.gamblingcommands,
             ...channels.testingbotcommands,
-        ]
+        ],
     },
     command: new SlashCommandBuilder()
         .setName(`baccarat`)
@@ -113,7 +121,9 @@ export const baccarat: SlashCommand = {
         if (checks.limit(p1, betAmount)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(`This command could not be completed. This is not a bug.`),
+                embedComment(
+                    `This command could not be completed. This is not a bug.`,
+                ),
             );
         }
 
@@ -139,8 +149,8 @@ export const baccarat: SlashCommand = {
             finalPlayerValue === finalBankerValue
                 ? "Tie"
                 : finalPlayerValue > finalBankerValue
-                    ? "Player Wins"
-                    : "Banker Wins";
+                  ? "Player Wins"
+                  : "Banker Wins";
 
         const e = new EmbedBuilder()
             .setTitle("`🎩` Baccarat Game")
@@ -156,23 +166,26 @@ export const baccarat: SlashCommand = {
         if (didPlayerWin) {
             await addBalance(interaction.user.id, winnings);
             e.setDescription(
-                `Player hand: ${playerHand.join(", ")}\nBanker hand: ${bankerHand.join(
+                `Player hand: ${playerHand.join(
                     ", ",
-                )}\n\nYou won ${customEmoji.a.z_coins
+                )}\nBanker hand: ${bankerHand.join(", ")}\n\nYou won ${
+                    customEmoji.a.z_coins
                 } \`${theoreticalWinnings}\` Coins!`,
             );
         } else if (result === "Tie") {
             e.setDescription(
-                `Player hand: ${playerHand.join(", ")}\nBanker hand: ${bankerHand.join(
+                `Player hand: ${playerHand.join(
                     ", ",
-                )}\n\nIt's a tie!`,
+                )}\nBanker hand: ${bankerHand.join(", ")}\n\nIt's a tie!`,
             );
         } else {
             await removeBalance(interaction.user.id, betAmount);
             e.setDescription(
-                `Player hand: ${playerHand.join(", ")}\nBanker hand: ${bankerHand.join(
+                `Player hand: ${playerHand.join(
                     ", ",
-                )}\n\nYou lost ${customEmoji.a.z_coins} \`${betAmount}\` Coins!`,
+                )}\nBanker hand: ${bankerHand.join(", ")}\n\nYou lost ${
+                    customEmoji.a.z_coins
+                } \`${betAmount}\` Coins!`,
             );
         }
         locked.del(interaction.user.id);

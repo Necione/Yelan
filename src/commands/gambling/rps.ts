@@ -1,8 +1,34 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { formatNumber, get, getInteractionResponder, is } from "@elara-services/utils";
-import { APIEmbedField, ButtonStyle, Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { addBalance, getProfileByUserId, removeBalance, updateUserProfile } from "../../services";
-import { addButtonRow, checkBelowBalance, checks, commandLimitRep, customEmoji, embedComment, locked, texts, userLockedData } from "../../utils";
+import {
+    formatNumber,
+    get,
+    getInteractionResponder,
+    is,
+} from "@elara-services/utils";
+import {
+    APIEmbedField,
+    ButtonStyle,
+    Colors,
+    EmbedBuilder,
+    SlashCommandBuilder,
+} from "discord.js";
+import {
+    addBalance,
+    getProfileByUserId,
+    removeBalance,
+    updateUserProfile,
+} from "../../services";
+import {
+    addButtonRow,
+    checkBelowBalance,
+    checks,
+    commandLimitRep,
+    customEmoji,
+    embedComment,
+    locked,
+    texts,
+    userLockedData,
+} from "../../utils";
 const add = (label: string, emoji: string, extraId?: string) => ({
     id: `rps${extraId ? `:${extraId}` : ""}:${emoji}`,
     label,
@@ -18,7 +44,6 @@ export const winConditions = {
     "📃": "🪨",
     "✂️": "📃",
 };
-
 
 export const rps: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -90,13 +115,17 @@ export const rps: SlashCommand = {
         if (checks.limit(p1, amount)) {
             removeTimeout();
             return responder.edit(
-                embedComment(`This command could not be completed. This is not a bug.`),
+                embedComment(
+                    `This command could not be completed. This is not a bug.`,
+                ),
             );
         }
         if (checks.limit(p2, amount)) {
             removeTimeout();
             return responder.edit(
-                embedComment(`This command could not be completed. This is not a bug.`),
+                embedComment(
+                    `This command could not be completed. This is not a bug.`,
+                ),
             );
         }
 
@@ -109,8 +138,9 @@ export const rps: SlashCommand = {
             .setColor(Colors.Aqua)
             .addFields({
                 name: "\u200b",
-                value: `${customEmoji.a.z_coins} \`${formatNumber(amount)} ${texts.c.u
-                    }\``,
+                value: `${customEmoji.a.z_coins} \`${formatNumber(amount)} ${
+                    texts.c.u
+                }\``,
             });
         const message = await responder.edit(
             getMainEmbed(
@@ -142,7 +172,9 @@ export const rps: SlashCommand = {
             if (selects[i.user.id]) {
                 return void r.reply({
                     ephemeral: true,
-                    ...embedComment(`You've already selected, wait for your opponent`),
+                    ...embedComment(
+                        `You've already selected, wait for your opponent`,
+                    ),
                 });
             }
             selects[i.user.id] = i.customId.split(":")[1];
@@ -152,7 +184,9 @@ export const rps: SlashCommand = {
             getDisplayRes(interaction.user.id, user.id, e, undefined, selects);
             await responder.edit({ embeds: [e] });
             return void r.reply({
-                ...embedComment(`Choice selected, wait for your opponent to select!`),
+                ...embedComment(
+                    `Choice selected, wait for your opponent to select!`,
+                ),
                 ephemeral: true,
             });
         });
@@ -188,8 +222,11 @@ export const rps: SlashCommand = {
                         selects,
                     );
                     e.setAuthor(author(`: Game Over!`)).setFooter({
-                        text: `${interaction.user.username} got ${formatNumber(amount)} ${texts.c.u
-                            }, ${user.username} lost ${formatNumber(amount)} ${texts.c.u}`,
+                        text: `${interaction.user.username} got ${formatNumber(
+                            amount,
+                        )} ${texts.c.u}, ${user.username} lost ${formatNumber(
+                            amount,
+                        )} ${texts.c.u}`,
                     });
                     return void responder.edit({
                         embeds: [e],
@@ -198,10 +235,19 @@ export const rps: SlashCommand = {
                 } else {
                     await addBalance(user.id, amount, false);
                     await checks.set(p2, amount);
-                    getDisplayRes(interaction.user.id, user.id, e, user.id, selects);
+                    getDisplayRes(
+                        interaction.user.id,
+                        user.id,
+                        e,
+                        user.id,
+                        selects,
+                    );
                     e.setAuthor(author(`: Game over!`)).setFooter({
-                        text: `${user.username} got ${formatNumber(amount)} ${texts.c.u}, ${interaction.user.username
-                            } lost ${formatNumber(amount)} ${texts.c.u}`,
+                        text: `${user.username} got ${formatNumber(amount)} ${
+                            texts.c.u
+                        }, ${interaction.user.username} lost ${formatNumber(
+                            amount,
+                        )} ${texts.c.u}`,
                     });
                     return void responder.edit({
                         embeds: [e],
@@ -221,7 +267,6 @@ export const rps: SlashCommand = {
     },
 };
 
-
 export function getDisplayRes(
     one: string,
     two: string,
@@ -230,8 +275,15 @@ export function getDisplayRes(
     selects: Record<string, string | null> = {},
 ) {
     const getField = (u: string): string => {
-        return `**[${selects[u] ? (winner ? selects[u] : "✅") : customEmoji.a.questionMark
-            }]:** <@${u}>${winner === u ? " 👑" : winner === "tie" ? " (Tie)" : ""}`;
+        return `**[${
+            selects[u]
+                ? winner
+                    ? selects[u]
+                    : "✅"
+                : customEmoji.a.questionMark
+        }]:** <@${u}>${
+            winner === u ? " 👑" : winner === "tie" ? " (Tie)" : ""
+        }`;
     };
     return e.setDescription(`${getField(one)}\n${getField(two)}`);
 }

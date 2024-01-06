@@ -84,7 +84,8 @@ export function checkBelowBalance(
     if (p.balance < amount) {
         r.edit(
             embedComment(
-                `<@${p.userId}> is too poor to be gambling\n\n- <@${p.userId
+                `<@${p.userId}> is too poor to be gambling\n\n- <@${
+                    p.userId
                 }>'s balance: ${customEmoji.a.z_coins} \`${formatNumber(
                     p.balance,
                 )} ${texts.c.u}\``,

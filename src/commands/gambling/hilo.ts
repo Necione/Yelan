@@ -3,7 +3,15 @@ import { get } from "@elara-services/utils";
 import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
-import { addButtonRow, checkBelowBalance, checks, customEmoji, embedComment, locked, texts } from "../../utils";
+import {
+    addButtonRow,
+    checkBelowBalance,
+    checks,
+    customEmoji,
+    embedComment,
+    locked,
+    texts,
+} from "../../utils";
 
 export const hilo: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -24,7 +32,7 @@ export const hilo: SlashCommand = {
         channels: [
             ...channels.gamblingcommands,
             ...channels.testingbotcommands,
-        ]
+        ],
     },
     async execute(interaction, responder) {
         locked.set(interaction);
@@ -44,7 +52,9 @@ export const hilo: SlashCommand = {
         if (checks.limit(p1, amount)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(`This command could not be completed. This is not a bug.`),
+                embedComment(
+                    `This command could not be completed. This is not a bug.`,
+                ),
             );
         }
         await removeBalance(interaction.user.id, amount);
@@ -125,11 +135,12 @@ export const hilo: SlashCommand = {
             .setTitle("Hi-Lo Result")
             .setThumbnail("https://file.coffee/u/JbA-bjCCma7O45G-9ANSX.png")
             .setDescription(
-                `**Original Card:** ${currentCard}\n**Your Choice:** \`${userChoice}\`\n**Next Card:** ${nextCard}\n\n${isCorrect
-                    ? `You won and earned ${customEmoji.a.z_coins} \`${Math.floor(
-                        amount * 1.25,
-                    )} ${texts.c.u}\`!`
-                    : `You lost ${customEmoji.a.z_coins} \`${amount} ${texts.c.u}\`.`
+                `**Original Card:** ${currentCard}\n**Your Choice:** \`${userChoice}\`\n**Next Card:** ${nextCard}\n\n${
+                    isCorrect
+                        ? `You won and earned ${
+                              customEmoji.a.z_coins
+                          } \`${Math.floor(amount * 1.25)} ${texts.c.u}\`!`
+                        : `You lost ${customEmoji.a.z_coins} \`${amount} ${texts.c.u}\`.`
                 }`,
             )
             .setColor(isCorrect ? "#00FF00" : "#FF0000");
@@ -138,7 +149,7 @@ export const hilo: SlashCommand = {
             const increment = Math.floor(amount * 1.25);
             await Promise.all([
                 handleBets(interaction.user.id, increment, amount),
-                checks.set(p1, Math.floor(amount * 1.25))
+                checks.set(p1, Math.floor(amount * 1.25)),
             ]);
         }
         locked.del(interaction.user.id);
@@ -150,7 +161,6 @@ export const hilo: SlashCommand = {
             .catch(() => null);
     },
 };
-
 
 function getRandomCard() {
     const suits = ["♠️", "♥️", "♦️", "♣️"];
@@ -170,7 +180,8 @@ function getRandomCard() {
         "K",
     ];
     const randomSuit = suits[Math.floor(Math.random() * suits.length)];
-    const randomValue = cardValues[Math.floor(Math.random() * cardValues.length)];
+    const randomValue =
+        cardValues[Math.floor(Math.random() * cardValues.length)];
     return `${randomValue}${randomSuit}`;
 }
 

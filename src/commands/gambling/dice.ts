@@ -11,7 +11,7 @@ import {
     embedComment,
     locked,
     texts,
-    userLockedData
+    userLockedData,
 } from "../../utils";
 
 export const dice: SlashCommand = {
