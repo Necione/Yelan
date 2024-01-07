@@ -57,7 +57,12 @@ export const hilo: SlashCommand = {
                 ),
             );
         }
-        await removeBalance(interaction.user.id, amount);
+        await removeBalance(
+            interaction.user.id,
+            amount,
+            true,
+            `Via ${hilo.command.name}`,
+        );
 
         const embed = new EmbedBuilder()
             .setTitle("Higher or Lower")
@@ -148,7 +153,12 @@ export const hilo: SlashCommand = {
         if (isCorrect) {
             const increment = Math.floor(amount * 1.25);
             await Promise.all([
-                handleBets(interaction.user.id, increment, amount),
+                handleBets(
+                    interaction.user.id,
+                    increment,
+                    amount,
+                    `Via ${hilo.command.name}`,
+                ),
                 checks.set(p1, Math.floor(amount * 1.25)),
             ]);
         }

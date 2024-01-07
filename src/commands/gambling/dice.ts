@@ -140,7 +140,12 @@ export const dice: SlashCommand = {
                 ),
             );
         }
-        await removeBalance(interaction.user.id, Math.floor(betAmount));
+        await removeBalance(
+            interaction.user.id,
+            Math.floor(betAmount),
+            true,
+            `Via ${dice.command.name}`,
+        );
 
         const e = new EmbedBuilder()
             .setTitle("`🎲` The Dice Game")
@@ -159,6 +164,7 @@ export const dice: SlashCommand = {
                     interaction.user.id,
                     Math.floor(winnings),
                     Math.floor(betAmount),
+                    `Via ${dice.command.name}`,
                 ),
                 checks.set(p1, Math.floor(winnings)),
             ]);

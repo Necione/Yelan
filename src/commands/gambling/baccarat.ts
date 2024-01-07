@@ -164,7 +164,12 @@ export const baccarat: SlashCommand = {
         const theoreticalWinnings = Math.floor(winnings + betAmount);
 
         if (didPlayerWin) {
-            await addBalance(interaction.user.id, winnings);
+            await addBalance(
+                interaction.user.id,
+                winnings,
+                true,
+                `Via ${baccarat.command.name}`,
+            );
             e.setDescription(
                 `Player hand: ${playerHand.join(
                     ", ",
@@ -179,7 +184,12 @@ export const baccarat: SlashCommand = {
                 )}\nBanker hand: ${bankerHand.join(", ")}\n\nIt's a tie!`,
             );
         } else {
-            await removeBalance(interaction.user.id, betAmount);
+            await removeBalance(
+                interaction.user.id,
+                betAmount,
+                true,
+                `Via ${baccarat.command.name}`,
+            );
             e.setDescription(
                 `Player hand: ${playerHand.join(
                     ", ",

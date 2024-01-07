@@ -12,12 +12,7 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
 } from "discord.js";
-import {
-    addBalance,
-    getProfileByUserId,
-    removeBalance,
-    updateUserProfile,
-} from "../../services";
+import { addBalance, getProfileByUserId, removeBalance } from "../../services";
 import {
     addButtonRow,
     checkBelowBalance,
@@ -156,7 +151,12 @@ export const rps: SlashCommand = {
             removeTimeout();
             return;
         }
-        await removeBalance(interaction.user.id, amount, false);
+        await removeBalance(
+            interaction.user.id,
+            amount,
+            false,
+            `Via ${rps.command.name}`,
+        );
 
         const collector = message.createMessageComponentCollector({
             filter: (i) =>
@@ -197,11 +197,12 @@ export const rps: SlashCommand = {
                 const one = selects[interaction.user.id];
                 const two = selects[user.id];
                 if (one === two) {
-                    await updateUserProfile(interaction.user.id, {
-                        balance: {
-                            increment: amount,
-                        },
-                    });
+                    await addBalance(
+                        interaction.user.id,
+                        amount,
+                        false,
+                        `Via ${rps.command.name}`,
+                    );
                     await checks.set(p1, amount);
                     return void responder.edit(
                         embedComment(
@@ -211,9 +212,19 @@ export const rps: SlashCommand = {
                 }
 
                 if (winConditions[two as keyof typeof winConditions] !== one) {
-                    await addBalance(interaction.user.id, amount * 2, false);
+                    await addBalance(
+                        interaction.user.id,
+                        amount * 2,
+                        false,
+                        `Via ${rps.command.name}`,
+                    );
                     await checks.set(p1, amount * 2);
-                    await removeBalance(user.id, amount, false);
+                    await removeBalance(
+                        user.id,
+                        amount,
+                        false,
+                        `Via ${rps.command.name}`,
+                    );
                     getDisplayRes(
                         interaction.user.id,
                         user.id,
@@ -233,7 +244,12 @@ export const rps: SlashCommand = {
                         components: [],
                     });
                 } else {
-                    await addBalance(user.id, amount, false);
+                    await addBalance(
+                        user.id,
+                        amount,
+                        false,
+                        `Via ${rps.command.name}`,
+                    );
                     await checks.set(p2, amount);
                     getDisplayRes(
                         interaction.user.id,
@@ -255,7 +271,12 @@ export const rps: SlashCommand = {
                     });
                 }
             } else {
-                await addBalance(interaction.user.id, amount, false);
+                await addBalance(
+                    interaction.user.id,
+                    amount,
+                    false,
+                    `Via ${rps.command.name}`,
+                );
                 await checks.set(p1, amount);
                 return void responder.edit(
                     embedComment(

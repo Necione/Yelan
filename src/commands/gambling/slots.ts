@@ -86,7 +86,12 @@ export const slots: SlashCommand = {
                 ),
             );
         }
-        await removeBalance(interaction.user.id, bet);
+        await removeBalance(
+            interaction.user.id,
+            bet,
+            true,
+            `Via ${slots.command.name}`,
+        );
 
         const slotResult = await playSlot(bet);
         for await (const i of [0, 1, 2, 3]) {
@@ -109,6 +114,7 @@ export const slots: SlashCommand = {
                 interaction.user.id,
                 slotResult.result.winAmount,
                 bet,
+                `Via ${slots.command.name}`,
             );
             await checks.set(profile, slotResult.result.winAmount);
         }
@@ -118,12 +124,18 @@ export const slots: SlashCommand = {
                 interaction.user.id,
                 slotResult.result.winAmount,
                 bet,
+                `Via ${slots.command.name}`,
             );
             await checks.set(profile, slotResult.result.winAmount);
         }
 
         if (slotResult.status === "draw") {
-            await handleBets(interaction.user.id, bet, bet);
+            await handleBets(
+                interaction.user.id,
+                bet,
+                bet,
+                `Via ${slots.command.name}`,
+            );
             await checks.set(profile, bet);
         }
         await addRakeback(interaction.user.id, Math.floor(bet));

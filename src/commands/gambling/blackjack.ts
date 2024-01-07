@@ -47,7 +47,12 @@ export const blackjack: SlashCommand = {
             return;
         }
 
-        await removeBalance(interaction.user.id, amount);
+        await removeBalance(
+            interaction.user.id,
+            amount,
+            true,
+            `Via ${blackjack.command.name}`,
+        );
 
         const playerCards = [getRandomCard(), getRandomCard()];
         const dealerCards = [getRandomCard()];
@@ -238,7 +243,12 @@ export const blackjack: SlashCommand = {
                 playerWon && playerTotal !== dealerTotal
                     ? Math.floor(amount * 1.5)
                     : amount;
-            await handleBets(interaction.user.id, am, amount);
+            await handleBets(
+                interaction.user.id,
+                am,
+                amount,
+                `Via ${blackjack.command.name}`,
+            );
         }
 
         locked.del(interaction.user.id);

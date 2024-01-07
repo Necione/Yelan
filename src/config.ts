@@ -1,6 +1,11 @@
-import { get } from "@elara-services/utils";
+import { get, getClientIdFromToken } from "@elara-services/utils";
 
 const boostRoleId = "1073408957080674376";
+
+export const isMainBot =
+    getClientIdFromToken(process.env.TOKEN as string) === "1192911723057917962"
+        ? true
+        : false;
 
 export const economy = {
     channels: {

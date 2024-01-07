@@ -65,7 +65,12 @@ export const work: SlashCommand = {
         await Promise.all([
             responder.edit(embedComment(msg, "Aqua")),
             cooldowns.set(data, "work", get.hrs(1)),
-            addBalance(interaction.user.id, amount),
+            addBalance(
+                interaction.user.id,
+                amount,
+                true,
+                `Via ${work.command.name}`,
+            ),
             checks.set(data, amount),
         ]);
     },

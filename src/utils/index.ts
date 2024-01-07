@@ -3,11 +3,14 @@ import {
     get,
     getInteractionResponders,
     is,
+    proper,
     status,
     time,
 } from "@elara-services/utils";
+import { Webhook, sendOptions } from "@elara-services/webhooks";
 import type { Prisma, UserWallet } from "@prisma/client";
 import {
+    APIMessage,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
@@ -17,10 +20,12 @@ import {
     EmbedBuilder,
     InteractionReplyOptions,
     MessageActionRowComponentBuilder,
+    MessageCreateOptions,
     User,
 } from "discord.js";
+import { economy, isMainBot } from "../config";
 import { getProfileByUserId, updateUserProfile } from "../services";
-import { economy } from "../config";
+const webhook = new Webhook(process.env.TOKEN as string);
 
 export const mutableGlobals = {
     locked: [] as { id: string; name: string; added: number }[],
@@ -311,3 +316,77 @@ export const cooldowns = {
         });
     },
 };
+
+type logOpt = MessageCreateOptions;
+export const logs = {
+    handle: (options: sendOptions | logOpt, channelId: string) =>
+        send(channelId, options as sendOptions),
+    action: async (
+        userId: string,
+        amount: number,
+        type: "add" | "remove",
+        extra?: string,
+    ) => {
+        return logs.handle(
+            {
+                content: `>>> [${time.short.time(new Date())}]: ${
+                    type === "add"
+                        ? "<:plus:1103245217794117652>"
+                        : "<:minus:1103245214082142288>"
+                } ${proper(type)} <@${userId}> (${userId}) ${
+                    customEmoji.a.z_coins
+                } \`${formatNumber(amount)} ${texts.c.u}\`${
+                    extra ? `\n- Reason: ${extra}` : ""
+                }`,
+                allowed_mentions: {
+                    parse: [],
+                },
+            },
+            "1193425929230368858",
+        );
+    },
+};
+
+export async function send(
+    channelId: string,
+    options: sendOptions,
+): Promise<APIMessage | null> {
+    if (is.array(options.files)) {
+        options.files = options.files.map((c) => {
+            if ("attachment" in c && c.attachment) {
+                c.data = c.attachment as string | Buffer;
+            }
+            return c;
+        });
+    }
+    let name;
+    let icon;
+    if (is.object(options.webhook)) {
+        if (is.string(options.webhook.name)) {
+            name = options.webhook.name;
+        }
+        if (is.string(options.webhook.icon)) {
+            icon = options.webhook.icon;
+        }
+    }
+    if (!name) {
+        name = isMainBot ? `Yelan` : `Yelan Development`;
+    }
+    if (!icon) {
+        icon = isMainBot
+            ? `https://i.imgur.com/tyHMOSO.png`
+            : `https://cdn.discordapp.com/emojis/1168068419380314123.png`;
+    }
+    const res = (await webhook
+        .send(
+            channelId,
+            {
+                ...options,
+                webhook: { name, icon },
+            },
+            false,
+            false,
+        )
+        .catch(() => null)) as APIMessage | null;
+    return res;
+}

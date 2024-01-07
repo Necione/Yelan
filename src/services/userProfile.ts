@@ -1,6 +1,7 @@
 import { is, sleep } from "@elara-services/utils";
 import { Prisma, type UserWallet } from "@prisma/client";
 import { prisma } from "../prisma";
+import { logs } from "../utils";
 
 // This function is not atomic, be careful when calling
 export async function updateUserProfile(
@@ -38,6 +39,7 @@ export async function addBalance(
     userId: string,
     amount: number,
     addToAdded = true,
+    extra?: string,
 ) {
     const obj: Prisma.UserWalletUpdateInput = {
         balance: {
@@ -50,13 +52,16 @@ export async function addBalance(
         };
     }
     await updateUserProfile(userId, obj);
+    await logs.action(userId, amount, "add", extra);
 }
 
 export async function handleBets(
     userId: string,
     amountToAdd: number,
     amountToRemove: number,
+    extra?: string,
 ) {
+    await logs.action(userId, amountToAdd, "add", extra);
     return await updateUserProfile(userId, {
         balance: {
             increment: amountToAdd,
@@ -74,6 +79,7 @@ export async function removeBalance(
     userId: string,
     amount: number,
     addToRemove = true,
+    extra?: string,
 ) {
     const obj: Prisma.UserWalletUpdateInput = {
         balance: {
@@ -86,6 +92,7 @@ export async function removeBalance(
         };
     }
     await updateUserProfile(userId, obj);
+    await logs.action(userId, amount, "remove", extra);
 }
 
 export async function getProfileByUserId(userId: string) {
@@ -98,10 +105,4 @@ export async function getProfileByUserId(userId: string) {
             userId,
         },
     });
-}
-
-export async function getAllUserProfiles(
-    args: Prisma.UserWalletFindManyArgs = {},
-) {
-    return await prisma.userWallet.findMany(args);
 }
