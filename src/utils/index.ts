@@ -125,7 +125,6 @@ export function userLockedData(userId: string) {
 
 export const locked = {
     set: (i: CommandInteraction | User, cmdName?: string | null) => {
-        locked.scan();
         let user: User | null = null;
         if (i instanceof User) {
             user = i;
@@ -140,13 +139,15 @@ export const locked = {
             if (new Date().getTime() - find.added <= get.mins(1)) {
                 return;
             }
+            mutableGlobals.locked = mutableGlobals.locked.filter(
+                (c) => c.id !== user?.id,
+            );
         }
         const name = "commandName" in i ? i.commandName : cmdName || "any";
         mutableGlobals.locked.push({ id: user.id, name, added: Date.now() });
         return;
     },
     has: (userId: string) => {
-        locked.scan();
         const f = mutableGlobals.locked.find((c) => c.id === userId);
         if (f) {
             if (new Date().getTime() - f.added <= get.mins(1)) {
@@ -155,33 +156,13 @@ export const locked = {
         }
         return null;
     },
-    del: (userId: string) => {
+    del: (userId: string | string[]) => {
+        if (is.string(userId)) {
+            userId = [userId];
+        }
         mutableGlobals.locked = mutableGlobals.locked.filter(
-            (c) => c.id !== userId,
+            (c) => !userId.includes(c.id),
         );
-        locked.scan();
-    },
-    delMany: (users: string[]) => {
-        mutableGlobals.locked = mutableGlobals.locked.filter(
-            (c) => !users.includes(c.id),
-        );
-        locked.scan();
-        return true;
-    },
-    scan: () => {
-        if (!mutableGlobals.locked.length) {
-            return false;
-        }
-        const remove = [];
-        for (const user of mutableGlobals.locked) {
-            if (new Date().getTime() - user.added >= get.mins(1)) {
-                remove.push(user.id);
-            }
-        }
-
-        if (is.array(remove)) {
-            locked.delMany(remove);
-        }
     },
 };
 

@@ -81,7 +81,7 @@ export const rps: SlashCommand = {
 
         function removeTimeout() {
             if (user) {
-                locked.delMany([interaction.user.id, user.id]);
+                locked.del([interaction.user.id, user.id]);
             } else {
                 locked.del(interaction.user.id);
             }
