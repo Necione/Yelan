@@ -6,6 +6,7 @@ export const isMainBot =
     getClientIdFromToken(process.env.TOKEN as string) === "1192911723057917962"
         ? true
         : false;
+export const mainBotId = "1073141234815750195"; // Guizhong's ID (DO NOT CHANGE)
 
 export const economy = {
     channels: {

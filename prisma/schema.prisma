@@ -91,3 +91,16 @@ type Active {
   last  DateTime
   count Int      @default(0)
 }
+
+model bot {
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  clientId       String      @unique
+  eloLeaderboard String      @default("")
+  taxExempt      String[]    @default([])
+  colorRoles     ColorRole[]
+}
+type ColorRole {
+  roles     String[] @default([])
+  level     Int      @default(0)
+  exclusive String   @default("")
+}
