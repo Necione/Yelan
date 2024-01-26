@@ -63,7 +63,7 @@ export const economy = {
         role: boostRoleId,
         amount: 1,
         claim: {
-            amount: 300,
+            amount: 250,
             time: get.days(7),
         },
     },
@@ -74,7 +74,7 @@ export const economy = {
             percent: 0.0015, // x% amount taken from the betAmount for commands.
         },
         claim: {
-            highRoller: 2500, // 2.5k per-week
+            highRoller: 2000, // 2.5k per-week
         },
     },
     randomEvents: {
