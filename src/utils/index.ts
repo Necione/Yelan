@@ -29,6 +29,7 @@ const webhook = new Webhook(process.env.TOKEN as string);
 
 export const mutableGlobals = {
     locked: [] as { id: string; name: string; added: number }[],
+    fights: [] as { userId: string; createdAt: number }[],
 };
 
 export const texts = {
