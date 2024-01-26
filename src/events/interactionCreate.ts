@@ -3,10 +3,10 @@ import {
     type Event,
     type SlashCommand,
 } from "@elara-services/botbuilder";
-import { getFilesList, is } from "@elara-services/utils";
+import { getFilesList } from "@elara-services/utils";
 import { Events, Interaction, InteractionReplyOptions } from "discord.js";
 import * as Commands from "../commands";
-import { embedComment, locked } from "../utils";
+import { embedComment, isInActiveTrade, locked } from "../utils";
 
 export const interactionCreate: Event = {
     enabled: true,
@@ -15,7 +15,7 @@ export const interactionCreate: Event = {
         handleInteractionCommand(
             i,
             getFilesList<SlashCommand>(Commands),
-            (ii, cmd) => {
+            (ii) => {
                 if (!ii.isChatInputCommand()) {
                     return false;
                 }
@@ -31,16 +31,10 @@ export const interactionCreate: Event = {
                             .catch(() => null);
                     }
                 };
-                if (is.object(cmd.only)) {
-                    if (cmd.only.threads === true && !ii.channel?.isThread()) {
-                        send(
-                            embedComment(
-                                `You can only use this command in a threads channel!`,
-                            ),
-                        );
-                        return false;
-                    }
+                if (isInActiveTrade(ii)) {
+                    return false;
                 }
+
                 const busy = locked.has(i.user.id);
                 if (busy) {
                     send(

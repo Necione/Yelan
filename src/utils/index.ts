@@ -1,6 +1,7 @@
 import {
     formatNumber,
     get,
+    getInteractionResponder,
     getInteractionResponders,
     is,
     proper,
@@ -14,19 +15,24 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    ChatInputCommandInteraction,
     Colors,
     CommandInteraction,
     ComponentEmojiResolvable,
     EmbedBuilder,
+    GuildMember,
     InteractionReplyOptions,
     MessageActionRowComponentBuilder,
     MessageCreateOptions,
     User,
 } from "discord.js";
-import { economy, isMainBot } from "../config";
+import { channels, economy, isMainBot, mainBotId } from "../config";
 import { getProfileByUserId, updateUserProfile } from "../services";
+import { getBotFromId } from "../services/bot";
+import { images } from "./images";
 const webhook = new Webhook(process.env.TOKEN as string);
 
+export const tradeTimeout = new Set();
 export const mutableGlobals = {
     locked: [] as { id: string; name: string; added: number }[],
     fights: [] as { userId: string; createdAt: number }[],
@@ -63,6 +69,34 @@ export const customEmoji = {
     },
     na: {},
 };
+export function displayTradeInAction(user: User) {
+    return {
+        ...embedComment(
+            `${user.toString()} can't use any commands while in an active trade.`,
+        ),
+        ephemeral: true,
+    };
+}
+export function isInActiveTrade(interaction: ChatInputCommandInteraction) {
+    const r = getInteractionResponder(interaction);
+    if (!interaction.user) {
+        return false;
+    }
+    if (tradeTimeout.has(interaction.user.id)) {
+        r.reply(displayTradeInAction(interaction.user));
+        return true;
+    }
+    return false;
+}
+
+export async function getTax(amount: number, member: GuildMember) {
+    const db = await getBotFromId(mainBotId);
+    let fee = 0;
+    if (!member.roles.cache.hasAny(...(db?.taxExempt || []))) {
+        fee = Math.round(amount * 0.05);
+    }
+    return fee;
+}
 
 export function embedComment(
     str: string,
@@ -303,6 +337,7 @@ type logOpt = MessageCreateOptions;
 export const logs = {
     handle: (options: sendOptions | logOpt, channelId: string) =>
         send(channelId, options as sendOptions),
+    misc: (options: logOpt) => logs.handle(options, channels.logs.misc),
     action: async (
         userId: string,
         amount: number,
@@ -371,4 +406,12 @@ export async function send(
         )
         .catch(() => null)) as APIMessage | null;
     return res;
+}
+
+export function getRandomImage() {
+    const randomIndex = Math.floor(Math.random() * images.random.images.length);
+    return images.random.images[randomIndex];
+}
+export function percentage(num: number, total: number) {
+    return (100 * num) / total;
 }
