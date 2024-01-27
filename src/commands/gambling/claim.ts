@@ -1,5 +1,7 @@
-import { formatNumber, is, time } from "@elara-services/utils";
+import { SlashCommand } from "@elara-services/botbuilder";
+import { formatNumber, get, is, sleep, time } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
+import { economy, roles } from "../../config";
 import { addBalance, getProfileByUserId } from "../../services";
 import {
     cooldowns,
@@ -11,8 +13,6 @@ import {
     texts,
     userLockedData,
 } from "../../utils";
-import { SlashCommand } from "@elara-services/botbuilder";
-import { economy, roles } from "../../config";
 
 export const claim: SlashCommand = {
     locked: { roles: [economy.boost.role, roles.highRoller, ...roles.main] },
@@ -93,7 +93,6 @@ export const claim: SlashCommand = {
                 `Via: ${claim.command.name}`,
             ),
         ]);
-        locked.del(interaction.user.id);
         await logs.misc(
             embedComment(
                 `${interaction.user.toString()} (${
@@ -108,7 +107,7 @@ export const claim: SlashCommand = {
                 "Aqua",
             ),
         );
-        return responder.edit(
+        await responder.edit(
             embedComment(
                 `You've claimed ${customEmoji.a.z_coins} \`${formatNumber(
                     amount,
@@ -118,5 +117,7 @@ export const claim: SlashCommand = {
                 "Green",
             ),
         );
+        await sleep(get.secs(2)); // Wait 2s before removing their locked from the system.
+        locked.del(interaction.user.id);
     },
 };
