@@ -1,4 +1,10 @@
-import { embedComment, formatNumber, get, is } from "@elara-services/utils";
+import {
+    addButtonRow,
+    embedComment,
+    formatNumber,
+    get,
+    is,
+} from "@elara-services/utils";
 import { type UserWallet } from "@prisma/client";
 import {
     ButtonStyle,
@@ -12,7 +18,6 @@ import type { SlashCommand } from "@elara-services/botbuilder";
 import { economy } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
 import {
-    addButtonRow,
     checks,
     commandLimitRep,
     customEmoji,

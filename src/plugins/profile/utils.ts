@@ -1,5 +1,5 @@
 import { getData } from "@elara-services/leveling";
-import { embedComment } from "@elara-services/utils";
+import { addButton, embedComment } from "@elara-services/utils";
 import type { UserWallet } from "@prisma/client";
 import {
     ActionRowBuilder,
@@ -14,7 +14,7 @@ import { roles } from "../../config";
 import { getProfileByUserId } from "../../services";
 import { lb } from "../../services/bot";
 import { levels } from "../../services/levels";
-import { addButton, locked, userLockedData } from "../../utils";
+import { locked, userLockedData } from "../../utils";
 import { images } from "../../utils/images";
 import { createProfile } from "../canvas/profile";
 

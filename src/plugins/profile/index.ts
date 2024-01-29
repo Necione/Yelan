@@ -1,4 +1,8 @@
-import { embedComment, getInteractionResponder } from "@elara-services/utils";
+import {
+    addButtonRow,
+    embedComment,
+    getInteractionResponder,
+} from "@elara-services/utils";
 import {
     ActionRowBuilder,
     ButtonStyle,
@@ -9,7 +13,6 @@ import {
 } from "discord.js";
 import { loadImage } from "skia-canvas";
 import { getProfileByUserId, updateUserProfile } from "../../services";
-import { addButtonRow } from "../../utils";
 import { allowedDomains, createCanvasProfile } from "./utils";
 
 export async function onInteraction(interaction: RepliableInteraction) {

@@ -15,17 +15,10 @@ import type { Prisma, UserWallet } from "@prisma/client";
 import type {
     APIMessage,
     ChatInputCommandInteraction,
-    ComponentEmojiResolvable,
     GuildMember,
     MessageCreateOptions,
 } from "discord.js";
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    CommandInteraction,
-    User,
-} from "discord.js";
+import { CommandInteraction, User } from "discord.js";
 import { channels, economy, isMainBot, mainBotId } from "../config";
 import { getProfileByUserId, updateUserProfile } from "../services";
 import { getBotFromId } from "../services/bot";
@@ -236,51 +229,6 @@ export const checks = {
         return updateUserProfile(p.userId, data);
     },
 };
-export interface ButtonOptions {
-    label?: string;
-    style?: ButtonStyle;
-    emoji?: ComponentEmojiResolvable;
-    id?: string;
-    url?: string;
-    disabled?: boolean;
-}
-export function addButton(options: ButtonOptions) {
-    const button = new ButtonBuilder();
-    if (options.id) {
-        button.setCustomId(options.id);
-    }
-    if (options.url) {
-        button.setURL(options.url).setStyle(ButtonStyle.Link);
-    } else if (options.style) {
-        button.setStyle(options.style);
-    }
-
-    if (options.label) {
-        button.setLabel(options.label);
-    }
-    if (options.emoji) {
-        button.setEmoji(options.emoji);
-    }
-    if (is.boolean(options.disabled)) {
-        button.setDisabled(options.disabled);
-    }
-    if (!button.data.label && !button.data.emoji) {
-        button.setEmoji("🤔"); // This only happens if there is no label or emoji to avoid erroring out the command.
-    }
-    return button;
-}
-
-export function addButtonRow(options: ButtonOptions | ButtonOptions[]) {
-    const row = new ActionRowBuilder<ButtonBuilder>();
-    if (Array.isArray(options) && options.length) {
-        for (const option of options) {
-            row.addComponents(addButton(option));
-        }
-    } else if (is.object(options)) {
-        row.addComponents(addButton(options as ButtonOptions));
-    }
-    return row;
-}
 
 export const cooldowns = {
     get: (p: UserWallet, command: string, customMessage?: string) => {

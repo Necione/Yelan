@@ -1,10 +1,14 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get } from "@elara-services/utils";
+import {
+    addButtonRow,
+    awaitComponent,
+    embedComment,
+    get,
+} from "@elara-services/utils";
 import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
 import {
-    addButtonRow,
     checkBelowBalance,
     checks,
     customEmoji,
@@ -93,15 +97,11 @@ export const hilo: SlashCommand = {
             embeds: [embed],
             components: [row],
         });
-        const i = await message
-            .awaitMessageComponent({
-                filter: (ii) =>
-                    ii.isButton() &&
-                    ii.customId.startsWith("hilo|") &&
-                    ii.user.id === interaction.user.id,
-                time: get.secs(30),
-            })
-            .catch(() => null);
+        const i = await awaitComponent(message, {
+            custom_ids: [{ id: `hilo|`, includes: true }],
+            users: [{ allow: true, id: interaction.user.id }],
+            time: get.secs(30),
+        });
         if (!i) {
             locked.del(interaction.user.id);
             const resultEmbed = new EmbedBuilder()

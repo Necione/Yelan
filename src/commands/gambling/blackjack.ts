@@ -1,4 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
+import { addButtonRow, awaitComponent, get } from "@elara-services/utils";
 import {
     ButtonStyle,
     Colors,
@@ -6,13 +7,7 @@ import {
     SlashCommandBuilder,
 } from "discord.js";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
-import {
-    addButtonRow,
-    checkBelowBalance,
-    customEmoji,
-    locked,
-} from "../../utils";
-import { get } from "@elara-services/utils";
+import { checkBelowBalance, customEmoji, locked } from "../../utils";
 
 export const blackjack: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -90,18 +85,14 @@ export const blackjack: SlashCommand = {
                 embeds: [embed],
                 components: [insuranceRow],
             });
-
-            const insuranceInteraction = await message
-                .awaitMessageComponent({
-                    filter: (ii) =>
-                        ii.isButton() &&
-                        (ii.customId === "blackjack|insurance" ||
-                            ii.customId === "blackjack|noinsurance") &&
-                        ii.user.id === interaction.user.id,
-                    time: get.secs(30),
-                })
-                .catch(() => null);
-
+            const insuranceInteraction = await awaitComponent(message, {
+                time: get.secs(30),
+                custom_ids: [
+                    { id: `blackjack|insurance` },
+                    { id: `blackjack|noinsurance` },
+                ],
+                users: [{ allow: true, id: interaction.user.id }],
+            });
             if (!insuranceInteraction) {
                 locked.del(interaction.user.id);
                 const timeoutEmbed = new EmbedBuilder()
@@ -147,16 +138,11 @@ export const blackjack: SlashCommand = {
         let playerBusted = false;
 
         while (!gameEnded) {
-            const buttonInteraction = await message
-                .awaitMessageComponent({
-                    filter: (ii) =>
-                        ii.isButton() &&
-                        ii.customId.startsWith("blackjack|") &&
-                        ii.user.id === interaction.user.id,
-                    time: get.secs(30),
-                })
-                .catch(() => null);
-
+            const buttonInteraction = await awaitComponent(message, {
+                time: get.secs(30),
+                custom_ids: [{ id: `blackjack|`, includes: true }],
+                users: [{ allow: true, id: interaction.user.id }],
+            });
             if (!buttonInteraction) {
                 locked.del(interaction.user.id);
                 const timeoutEmbed = new EmbedBuilder()

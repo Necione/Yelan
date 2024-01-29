@@ -1,5 +1,6 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import {
+    addButtonRow,
     embedComment,
     formatNumber,
     get,
@@ -15,7 +16,6 @@ import {
 } from "discord.js";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
 import {
-    addButtonRow,
     checkBelowBalance,
     checks,
     commandLimitRep,
