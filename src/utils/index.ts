@@ -1,29 +1,29 @@
+import type { getInteractionResponders } from "@elara-services/utils";
 import {
+    embedComment,
     formatNumber,
     get,
     getInteractionResponder,
-    getInteractionResponders,
     is,
     proper,
     status,
     time,
 } from "@elara-services/utils";
-import { Webhook, sendOptions } from "@elara-services/webhooks";
+import type { sendOptions } from "@elara-services/webhooks";
+import { Webhook } from "@elara-services/webhooks";
 import type { Prisma, UserWallet } from "@prisma/client";
-import {
+import type {
     APIMessage,
+    ChatInputCommandInteraction,
+    ComponentEmojiResolvable,
+    GuildMember,
+    MessageCreateOptions,
+} from "discord.js";
+import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    ChatInputCommandInteraction,
-    Colors,
     CommandInteraction,
-    ComponentEmojiResolvable,
-    EmbedBuilder,
-    GuildMember,
-    InteractionReplyOptions,
-    MessageActionRowComponentBuilder,
-    MessageCreateOptions,
     User,
 } from "discord.js";
 import { channels, economy, isMainBot, mainBotId } from "../config";
@@ -96,24 +96,6 @@ export async function getTax(amount: number, member: GuildMember) {
         fee = Math.round(amount * 0.05);
     }
     return fee;
-}
-
-export function embedComment(
-    str: string,
-    color: keyof typeof Colors | number = "Red",
-    components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [],
-    files: InteractionReplyOptions["files"] = [],
-) {
-    return {
-        content: "",
-        embeds: [
-            new EmbedBuilder()
-                .setDescription(str)
-                .setColor(typeof color === "number" ? color : Colors[color]),
-        ],
-        components,
-        files,
-    };
 }
 
 export function checkBelowBalance(
@@ -394,7 +376,7 @@ export async function send(
             ? `https://i.imgur.com/tyHMOSO.png`
             : `https://cdn.discordapp.com/emojis/1168068419380314123.png`;
     }
-    const res = (await webhook
+    return (await webhook
         .send(
             channelId,
             {
@@ -405,7 +387,6 @@ export async function send(
             false,
         )
         .catch(() => null)) as APIMessage | null;
-    return res;
 }
 
 export function getRandomImage() {

@@ -1,5 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { get, sleep, time } from "@elara-services/utils";
+import { embedComment, get, sleep, time } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import {
@@ -12,7 +12,6 @@ import {
 import {
     addRakeback,
     checks,
-    embedComment,
     locked,
     texts,
     userLockedData,

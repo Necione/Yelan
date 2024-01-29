@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 config({ path: `${process.cwd()}/.env` });
-import { Shard, ShardingManager } from "discord.js";
+import type { Shard } from "discord.js";
+import { ShardingManager } from "discord.js";
 const time = Date.now();
 const manager = new ShardingManager(`./dist/client.js`, {
     token: process.env.TOKEN,

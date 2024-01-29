@@ -1,11 +1,14 @@
 import { Events, type Event } from "@elara-services/botbuilder";
-import { ActivityType, Client, PresenceData } from "discord.js";
+import type { Client, PresenceData } from "discord.js";
+import { ActivityType } from "discord.js";
 import { initializeGamblingMachines } from "../services";
+import { loadAllFonts } from "../plugins/canvas/common";
 
 export const ready: Event = {
     enabled: true,
     name: Events.ClientReady,
     async execute(client: Client<true>) {
+        loadAllFonts();
         initializeGamblingMachines();
         console.log(
             `[CLIENT]: ${client.user.tag} is now ready in ${client.guilds.cache.size} servers.`,

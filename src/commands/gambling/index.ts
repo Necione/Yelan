@@ -6,6 +6,7 @@ export * from "./econ";
 export * from "./fight";
 export * from "./hilo";
 export * from "./pay";
+export * from "./profile";
 export * from "./rakeback";
 export { rps } from "./rps";
 export * from "./slots";

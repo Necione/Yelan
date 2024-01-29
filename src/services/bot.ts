@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma, UserWallet } from "@prisma/client";
 import { prisma } from "../prisma";
 
 export async function getBotFromId(clientId: string) {
@@ -21,4 +21,29 @@ export async function updateBotData(
             data,
         })
         .catch(() => null);
+}
+
+export function sortLB(
+    unsorted: UserWallet[],
+    name: keyof UserWallet,
+    id: string,
+) {
+    return (
+        unsorted
+            .slice()
+            .sort((a: any, b: any) => (b[name] || 0) - (a[name] || 0))
+            .map((c) => c.userId)
+            .indexOf(id) + 1
+    );
+}
+
+export async function lb(id: string) {
+    const unsorted = await prisma.userWallet.findMany();
+    return [
+        sortLB(unsorted, "balance", id),
+        sortLB(unsorted, "messagesSent", id),
+        sortLB(unsorted, "staffCredits", id),
+        sortLB(unsorted, "lemon", id),
+        sortLB(unsorted, "elo", id),
+    ];
 }

@@ -1,12 +1,18 @@
-import { SlashCommand } from "@elara-services/botbuilder";
-import { formatNumber, get, is, sleep, time } from "@elara-services/utils";
+import type { SlashCommand } from "@elara-services/botbuilder";
+import {
+    embedComment,
+    formatNumber,
+    get,
+    is,
+    sleep,
+    time,
+} from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { economy, roles } from "../../config";
 import { addBalance, getProfileByUserId } from "../../services";
 import {
     cooldowns,
     customEmoji,
-    embedComment,
     isInActiveTrade,
     locked,
     logs,

@@ -1,8 +1,5 @@
-import {
-    PrefixCommand,
-    handleMessageCommand,
-    type Event,
-} from "@elara-services/botbuilder";
+import type { PrefixCommand } from "@elara-services/botbuilder";
+import { handleMessageCommand, type Event } from "@elara-services/botbuilder";
 import { getFilesList } from "@elara-services/utils";
 import { Events, type Message } from "discord.js";
 import * as Commands from "../prefix-commands";

@@ -1,4 +1,4 @@
-import { formatNumber, get, is } from "@elara-services/utils";
+import { embedComment, formatNumber, get, is } from "@elara-services/utils";
 import { type UserWallet } from "@prisma/client";
 import {
     ButtonStyle,
@@ -8,20 +8,19 @@ import {
     type User,
 } from "discord.js";
 
-import { SlashCommand } from "@elara-services/botbuilder";
+import type { SlashCommand } from "@elara-services/botbuilder";
+import { economy } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
 import {
     addButtonRow,
     checks,
     commandLimitRep,
     customEmoji,
-    embedComment,
     locked,
     mutableGlobals,
     texts,
     userLockedData,
 } from "../../utils";
-import { economy } from "../../config";
 
 /**
  * A adjustable chance of getting an accident

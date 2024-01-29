@@ -1,4 +1,4 @@
-import { SlashCommand } from "@elara-services/botbuilder";
+import type { SlashCommand } from "@elara-services/botbuilder";
 import { field, formatNumber } from "@elara-services/utils";
 import {
     EmbedBuilder,

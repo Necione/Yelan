@@ -1,12 +1,13 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import {
+    embedComment,
     formatNumber,
     get,
     getInteractionResponder,
     is,
 } from "@elara-services/utils";
+import type { APIEmbedField } from "discord.js";
 import {
-    APIEmbedField,
     ButtonStyle,
     Colors,
     EmbedBuilder,
@@ -19,7 +20,6 @@ import {
     checks,
     commandLimitRep,
     customEmoji,
-    embedComment,
     locked,
     texts,
     userLockedData,

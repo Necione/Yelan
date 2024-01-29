@@ -1,5 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { get } from "@elara-services/utils";
+import { embedComment, get } from "@elara-services/utils";
 import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
@@ -8,7 +8,6 @@ import {
     checkBelowBalance,
     checks,
     customEmoji,
-    embedComment,
     locked,
     texts,
 } from "../../utils";

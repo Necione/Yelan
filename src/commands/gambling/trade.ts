@@ -1,7 +1,8 @@
-import { SlashCommand } from "@elara-services/botbuilder";
+import type { SlashCommand } from "@elara-services/botbuilder";
 import {
     dis,
     discord,
+    embedComment,
     formatNumber,
     get,
     getInteractionResponder,
@@ -23,7 +24,6 @@ import { getProfileByUserId, updateUserProfile } from "../../services";
 import {
     addButtonRow,
     customEmoji,
-    embedComment,
     getTax,
     locked,
     texts,

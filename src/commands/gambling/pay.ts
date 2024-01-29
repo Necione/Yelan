@@ -1,5 +1,5 @@
-import { SlashCommand } from "@elara-services/botbuilder";
-import { discord, formatNumber } from "@elara-services/utils";
+import type { SlashCommand } from "@elara-services/botbuilder";
+import { discord, embedComment, formatNumber } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
@@ -8,7 +8,6 @@ import {
     commandLimitRep,
     customEmoji,
     displayTradeInAction,
-    embedComment,
     getTax,
     isInActiveTrade,
     locked,

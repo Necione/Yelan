@@ -1,51 +1,62 @@
 import {
     handleInteractionCommand,
     type Event,
-    type SlashCommand,
 } from "@elara-services/botbuilder";
-import { getFilesList } from "@elara-services/utils";
-import { Events, Interaction, InteractionReplyOptions } from "discord.js";
+import { embedComment, getFilesList } from "@elara-services/utils";
+import type { Interaction, InteractionReplyOptions } from "discord.js";
+import { Events } from "discord.js";
 import * as Commands from "../commands";
-import { embedComment, isInActiveTrade, locked } from "../utils";
+import * as context from "../plugins/context";
+import { onInteraction } from "../plugins/profile";
+import { isInActiveTrade, locked } from "../utils";
 
 export const interactionCreate: Event = {
     enabled: true,
     name: Events.InteractionCreate,
     async execute(i: Interaction) {
-        handleInteractionCommand(
-            i,
-            getFilesList<SlashCommand>(Commands),
-            (ii) => {
-                if (!ii.isChatInputCommand()) {
-                    return false;
-                }
-                const send = async (options: InteractionReplyOptions) => {
-                    if (ii.deferred) {
-                        return ii.editReply(options).catch(() => null);
-                    } else {
-                        return ii
-                            .reply({
-                                ...options,
-                                ephemeral: true,
-                            })
-                            .catch(() => null);
-                    }
-                };
-                if (isInActiveTrade(ii)) {
-                    return false;
-                }
-
-                const busy = locked.has(i.user.id);
-                if (busy) {
-                    send(
-                        embedComment(
-                            `⏱️ You're currently waiting for \`/${busy.name}\` command to finish, you can't use any other commands until then.`,
-                        ),
-                    );
-                    return false;
-                }
-                return true;
-            },
-        );
+        if (i.isRepliable()) {
+            onInteraction(i);
+        }
+        if (i.isChatInputCommand()) {
+            return handleCommands(i, Commands);
+        }
+        if (i.isContextMenuCommand()) {
+            return handleCommands(i, context);
+        }
     },
 };
+
+function handleCommands(i: Interaction, commands: object) {
+    return handleInteractionCommand(i, getFilesList<any>(commands), (ii) => {
+        if (!ii.isCommand()) {
+            return false;
+        }
+        const send = async (options: InteractionReplyOptions) => {
+            if (ii.deferred) {
+                return ii.editReply(options).catch(() => null);
+            } else {
+                return ii
+                    .reply({
+                        ...options,
+                        ephemeral: true,
+                    })
+                    .catch(() => null);
+            }
+        };
+        // @ts-ignore
+        if (isInActiveTrade(ii)) {
+            return false;
+        }
+
+        const busy = locked.has(i.user.id);
+        if (busy) {
+            send(
+                embedComment(
+                    `⏱️ You're currently waiting for \`/${busy.name}\` command to finish, you can't use any other commands until then.`,
+                ),
+            );
+            return false;
+        }
+        return true;
+    });
+}

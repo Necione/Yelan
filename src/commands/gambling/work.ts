@@ -1,17 +1,10 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
+import { embedComment, formatNumber, get } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import {
-    checks,
-    cooldowns,
-    embedComment,
-    locked,
-    texts,
-    userLockedData,
-} from "../../utils";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId } from "../../services";
+import { checks, cooldowns, locked, texts, userLockedData } from "../../utils";
 import { battleMessages } from "../../utils/work";
-import { formatNumber, get } from "@elara-services/utils";
 
 export const work: SlashCommand = {
     disabled: {
