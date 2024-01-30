@@ -1,6 +1,6 @@
 import {
+    createEvent,
     handleInteractionCommand,
-    type Event,
 } from "@elara-services/botbuilder";
 import { embedComment, getFilesList } from "@elara-services/utils";
 import type { Interaction, InteractionReplyOptions } from "discord.js";
@@ -10,8 +10,7 @@ import * as context from "../plugins/context";
 import { onInteraction } from "../plugins/profile";
 import { isInActiveTrade, locked } from "../utils";
 
-export const interactionCreate: Event = {
-    enabled: true,
+export const interactionCreate = createEvent({
     name: Events.InteractionCreate,
     async execute(i: Interaction) {
         if (i.isRepliable()) {
@@ -24,7 +23,7 @@ export const interactionCreate: Event = {
             return handleCommands(i, context);
         }
     },
-};
+});
 
 function handleCommands(i: Interaction, commands: object) {
     return handleInteractionCommand(i, getFilesList<any>(commands), (ii) => {

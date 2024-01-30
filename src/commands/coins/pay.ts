@@ -5,7 +5,6 @@ import { channels } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
 import {
     checks,
-    commandLimitRep,
     customEmoji,
     displayTradeInAction,
     getTax,
@@ -113,10 +112,6 @@ export const pay: SlashCommand = {
         if (o.locked) {
             locked.del([interaction.user.id, user.id]);
             return responder.edit(userLockedData(interaction.user.id));
-        }
-        if (!commandLimitRep(responder, o)) {
-            locked.del([interaction.user.id, user.id]);
-            return;
         }
         const userP = await getProfileByUserId(user.id);
         if (userP.locked) {

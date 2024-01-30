@@ -18,7 +18,6 @@ import { addBalance, getProfileByUserId, removeBalance } from "../../services";
 import {
     checkBelowBalance,
     checks,
-    commandLimitRep,
     customEmoji,
     locked,
     texts,
@@ -101,9 +100,7 @@ export const rps: SlashCommand = {
 
         if (
             !checkBelowBalance(responder, p1, amount) ||
-            !checkBelowBalance(responder, p2, amount) ||
-            !commandLimitRep(responder, p1) ||
-            !commandLimitRep(responder, p2)
+            !checkBelowBalance(responder, p2, amount)
         ) {
             return removeTimeout();
         }

@@ -10,10 +10,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum BoosterType {
+  BALANCE
+}
+
+model ServerStore {
+  id      String            @id @default(auto()) @map("_id") @db.ObjectId
+  guildId String            @unique
+  items   ServerStoreItem[]
+}
+
+type ServerStoreItem {
+  name        String               @default("")
+  cost        Int                  @default(0)
+  original    Int                  @default(0)
+  available   Boolean              @default(false)
+  thumbnail   String               @default("")
+  emoji       String               @default("")
+  priceChange String               @default("same")
+  context     ServerStoreContext[]
+}
+
+type ServerStoreContext {
+  name     String  @default("")
+  required Boolean @default(true)
+  style    Int     @default(0)
+}
+
+model GlobalBooster {
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  type              BoosterType
+  expiredAt         DateTime
+  multiplier        Float
+  purchasedByUserId String
+}
+
 type Badge {
   badgeId String
   tierId  String
 }
+
 type Achievement {
   name       String    @default("")
   game       Int?      @default(0)
@@ -22,10 +58,41 @@ type Achievement {
   achieved   DateTime?
 }
 
+model rankedData {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String       @unique
+  matches       Int          @default(0)
+  wins          Int          @default(0)
+  loses         Int          @default(0)
+  streak        Int          @default(0)
+  highestStreak Int          @default(0)
+  games         RankedGame[]
+}
+
+model Collectables {
+  id      String            @id @default(auto()) @map("_id") @db.ObjectId
+  guildId String            @unique
+  items   CollectableItem[]
+}
+
+type CollectableItem {
+  name   String @default("")
+  image  String @default("")
+  rarity String @default("Normal")
+  price  Int    @default(50)
+  weight Int    @default(5)
+}
+
+type RankedGame {
+  userId String
+  win    Boolean
+  date   String
+}
+
 model UserWallet {
   id               String        @id @default(auto()) @map("_id") @db.ObjectId
   userId           String        @unique
-  balance          Float         @default(100)
+  balance          Float         @default(0)
   vault            Float         @default(0)
   messagesSent     Int           @default(0)
   staffCredits     Int           @default(0)
@@ -99,6 +166,7 @@ model bot {
   taxExempt      String[]    @default([])
   colorRoles     ColorRole[]
 }
+
 type ColorRole {
   roles     String[] @default([])
   level     Int      @default(0)

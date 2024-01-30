@@ -1,45 +1,24 @@
-import { Events, type Event } from "@elara-services/botbuilder";
-import type { Client, PresenceData } from "discord.js";
-import { ActivityType } from "discord.js";
-import { initializeGamblingMachines } from "../services";
+import { Events, createEvent, setPresence } from "@elara-services/botbuilder";
+import { log } from "@elara-services/utils";
+import type { ActivityType, Client, PresenceData } from "discord.js";
 import { loadAllFonts } from "../plugins/canvas/common";
+import { initializeGamblingMachines } from "../services";
 
-export const ready: Event = {
-    enabled: true,
+export const ready = createEvent({
     name: Events.ClientReady,
     async execute(client: Client<true>) {
-        loadAllFonts();
-        initializeGamblingMachines();
-        console.log(
+        await Promise.all([
+            loadAllFonts(),
+            initializeGamblingMachines(),
+            setPresence(client, {
+                name: process.env.ACTIVITY_NAME,
+                status: process.env.STATUS as PresenceData["status"],
+                type: process.env.ACTIVITY_TYPE as keyof typeof ActivityType,
+                stream_url: process.env.STREAM_URL,
+            }),
+        ]);
+        log(
             `[CLIENT]: ${client.user.tag} is now ready in ${client.guilds.cache.size} servers.`,
         );
-        const obj: PresenceData = {
-            status: "online",
-            activities: [
-                {
-                    type: ActivityType.Custom,
-                    name: "commands",
-                },
-            ],
-        };
-        if (process.env.STATUS) {
-            obj.status = process.env.STATUS as PresenceData["status"];
-        }
-        if (process.env.ACTIVITY_TYPE) {
-            // @ts-ignore
-            obj.activities[0].type =
-                ActivityType[
-                    process.env.ACTIVITY_TYPE as keyof typeof ActivityType
-                ];
-        }
-        if (process.env.STREAM_URL) {
-            // @ts-ignore
-            obj.activities[0].url = process.env.STREAM_URL;
-        }
-        if (process.env.ACTIVITY_NAME) {
-            // @ts-ignore
-            obj.activities[0].name = process.env.ACTIVITY_NAME;
-        }
-        client.user.setPresence(obj);
     },
-};
+});

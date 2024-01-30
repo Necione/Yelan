@@ -12,13 +12,17 @@ import {
 import type { sendOptions } from "@elara-services/webhooks";
 import { Webhook } from "@elara-services/webhooks";
 import type { Prisma, UserWallet } from "@prisma/client";
+import {
+    PaginatedMessage,
+    type PaginatedMessageOptions,
+} from "@sapphire/discord.js-utilities";
 import type {
     APIMessage,
     ChatInputCommandInteraction,
     GuildMember,
     MessageCreateOptions,
 } from "discord.js";
-import { CommandInteraction, User } from "discord.js";
+import { CommandInteraction, ComponentType, User } from "discord.js";
 import { channels, economy, isMainBot, mainBotId } from "../config";
 import { getProfileByUserId, updateUserProfile } from "../services";
 import { getBotFromId } from "../services/bot";
@@ -104,22 +108,6 @@ export function checkBelowBalance(
                 }>'s balance: ${customEmoji.a.z_coins} \`${formatNumber(
                     p.balance,
                 )} ${texts.c.u}\``,
-            ),
-        );
-        return false;
-    }
-    return true;
-}
-
-export function commandLimitRep(
-    r: getInteractionResponders,
-    p: UserWallet,
-    amount = 3,
-) {
-    if (p.staffCredits < amount) {
-        r.edit(
-            embedComment(
-                `<@${p.userId}> doesn't have enough user reputation.\nGain reputation through quests in </quests:1091189719875977282>\n- Required Reputation: +${amount}\n- <@${p.userId}>'s Reputation: ${p.staffCredits}`,
             ),
         );
         return false;
@@ -263,11 +251,28 @@ export const cooldowns = {
     },
 };
 
+export function getPaginatedMessage(
+    options?: PaginatedMessageOptions,
+    removeSelectMenu = true,
+) {
+    const pager = new PaginatedMessage(options);
+    if (removeSelectMenu) {
+        pager.setActions(
+            PaginatedMessage.defaultActions.filter(
+                (c) => c.type !== ComponentType.StringSelect,
+            ),
+        );
+    }
+    return pager;
+}
+
 type logOpt = MessageCreateOptions;
 export const logs = {
     handle: (options: sendOptions | logOpt, channelId: string) =>
         send(channelId, options as sendOptions),
     misc: (options: logOpt) => logs.handle(options, channels.logs.misc),
+    collectables: (options: logOpt) =>
+        logs.handle(options, channels.logs.collectables),
     action: async (
         userId: string,
         amount: number,

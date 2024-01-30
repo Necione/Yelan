@@ -106,3 +106,9 @@ export async function getProfileByUserId(userId: string) {
         },
     });
 }
+
+export async function getAllUserProfiles(
+    args: Prisma.UserWalletFindManyArgs = {},
+) {
+    return await prisma.userWallet.findMany(args);
+}

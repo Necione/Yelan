@@ -6,7 +6,6 @@ import { addBalance, getProfileByUserId, removeBalance } from "../../services";
 import {
     checkBelowBalance,
     checks,
-    commandLimitRep,
     customEmoji,
     locked,
     userLockedData,
@@ -112,10 +111,7 @@ export const baccarat: SlashCommand = {
             return responder.edit(userLockedData(interaction.user.id));
         }
 
-        if (
-            !checkBelowBalance(responder, p1, betAmount) ||
-            !commandLimitRep(responder, p1)
-        ) {
+        if (!checkBelowBalance(responder, p1, betAmount)) {
             return locked.del(interaction.user.id);
         }
         if (checks.limit(p1, betAmount)) {

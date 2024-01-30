@@ -47,3 +47,23 @@ export async function lb(id: string) {
         sortLB(unsorted, "elo", id),
     ];
 }
+
+export async function getStore(guildId: string) {
+    return await prisma.serverStore
+        .upsert({
+            where: { guildId },
+            create: { guildId },
+            update: {},
+        })
+        .catch(() => null);
+}
+
+export async function getCollectables(guildId: string) {
+    return await prisma.collectables
+        .upsert({
+            where: { guildId },
+            create: { guildId },
+            update: {},
+        })
+        .catch(() => null);
+}

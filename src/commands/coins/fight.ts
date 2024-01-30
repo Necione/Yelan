@@ -19,7 +19,6 @@ import { economy } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
 import {
     checks,
-    commandLimitRep,
     customEmoji,
     locked,
     mutableGlobals,
@@ -354,15 +353,6 @@ export const fight: SlashCommand = {
         if (user2.balance <= flooredAmount) {
             endFight();
             return responder.edit(embeds.INSUFFICIENT_BAL(user2, true));
-        }
-
-        if (!commandLimitRep(responder, user1)) {
-            endFight();
-            return;
-        }
-        if (!commandLimitRep(responder, user2)) {
-            endFight();
-            return;
         }
 
         // Functions for starting and ending fights
