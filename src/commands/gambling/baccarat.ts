@@ -1,5 +1,6 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { channels } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
 import {
     checkBelowBalance,
@@ -10,7 +11,6 @@ import {
     locked,
     userLockedData,
 } from "../../utils";
-import { channels } from "../../config";
 
 type CardKey =
     | "2"
@@ -94,7 +94,7 @@ export const baccarat: SlashCommand = {
                 .setRequired(true)
                 .setName("bet")
                 .setDescription("The bet amount")
-                .setMinValue(1)
+                .setMinValue(5)
                 .setMaxValue(1000),
         ),
     defer: { silent: false },

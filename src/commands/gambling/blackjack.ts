@@ -1,4 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
+import { get } from "@elara-services/utils";
 import {
     ButtonStyle,
     Colors,
@@ -12,7 +13,6 @@ import {
     customEmoji,
     locked,
 } from "../../utils";
-import { get } from "@elara-services/utils";
 
 export const blackjack: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -24,7 +24,7 @@ export const blackjack: SlashCommand = {
                 .setRequired(true)
                 .setName("bet")
                 .setDescription("The amount to bet")
-                .setMinValue(10)
+                .setMinValue(5)
                 .setMaxValue(10000),
         ),
     defer: { silent: false },
