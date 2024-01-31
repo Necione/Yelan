@@ -33,6 +33,11 @@ export const tradeTimeout = new Set();
 export const mutableGlobals = {
     locked: [] as { id: string; name: string; added: number }[],
     fights: [] as { userId: string; createdAt: number }[],
+    rr: {
+        reward: 0 as number,
+        active: false as boolean,
+        players: [] as string[],
+    },
 };
 
 export const texts = {
