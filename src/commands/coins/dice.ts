@@ -53,7 +53,7 @@ export const dice: SlashCommand = {
                 .setRequired(true)
                 .setName("bet")
                 .setDescription("The bet amount")
-                .setMinValue(1)
+                .setMinValue(5)
                 .setMaxValue(2000),
         ),
     defer: { silent: false },

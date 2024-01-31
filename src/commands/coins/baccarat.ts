@@ -93,7 +93,7 @@ export const baccarat: SlashCommand = {
                 .setRequired(true)
                 .setName("bet")
                 .setDescription("The bet amount")
-                .setMinValue(1)
+                .setMinValue(5)
                 .setMaxValue(1000),
         ),
     defer: { silent: false },
