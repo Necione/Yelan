@@ -7,6 +7,7 @@ import type { Interaction, InteractionReplyOptions } from "discord.js";
 import { Events } from "discord.js";
 import * as Commands from "../commands";
 import * as context from "../plugins/context";
+import { handleInteractions } from "../plugins/pets";
 import { onInteraction } from "../plugins/profile";
 import { isInActiveTrade, locked } from "../utils";
 
@@ -14,7 +15,17 @@ export const interactionCreate = createEvent({
     name: Events.InteractionCreate,
     async execute(i: Interaction) {
         if (i.isRepliable()) {
-            onInteraction(i);
+            if ("customId" in i) {
+                if (i.customId.startsWith("profile|")) {
+                    return onInteraction(i);
+                }
+            }
+        }
+        if (
+            "customId" in i &&
+            ["pet:", "pets:"].some((c) => i.customId.startsWith(c))
+        ) {
+            return handleInteractions(i);
         }
         if (i.isChatInputCommand()) {
             return handleCommands(i, Commands);

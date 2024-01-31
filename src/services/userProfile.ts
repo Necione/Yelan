@@ -112,3 +112,18 @@ export async function getAllUserProfiles(
 ) {
     return await prisma.userWallet.findMany(args);
 }
+
+export async function getPets(userId: string) {
+    return await prisma.pets.upsert({
+        where: { userId },
+        create: { userId },
+        update: { userId },
+    });
+}
+
+export async function updatePets(userId: string, data: Prisma.PetsUpdateInput) {
+    return await prisma.pets.update({
+        where: { userId },
+        data,
+    });
+}

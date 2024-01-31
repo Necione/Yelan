@@ -19,10 +19,13 @@ export async function onInteraction(interaction: RepliableInteraction) {
     if (!interaction.inCachedGuild()) {
         return;
     }
-    const responder = getInteractionResponder(interaction);
     if (!("customId" in interaction)) {
         return;
     }
+    if (interaction.customId.startsWith("profile|")) {
+        return;
+    }
+    const responder = getInteractionResponder(interaction);
     const [, type, deferType] = interaction.customId.split("|");
     switch (type) {
         case "reset_background": {

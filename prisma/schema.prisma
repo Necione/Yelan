@@ -69,6 +69,40 @@ model rankedData {
   games         RankedGame[]
 }
 
+type GameAchievement {
+  id   Int
+  game Int
+  diff Int
+  name String
+}
+
+model Pets {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique
+  pets   Pet[]
+}
+
+type Pet {
+  id         String        @default(uuid())
+  name       String        @default("")
+  type       String        @default("cat") // Animal type (cat, dog, bird, etc)
+  rarity     Int           @default(0) // Animal rarity type (normal, epic, legendary, mythic)
+  multiplier Float         @default(0)
+  cooldowns  PetCooldown[]
+}
+
+type PetCooldown {
+  type String
+  ends Int
+}
+
+model gameAchievements {
+  id           String            @id @default(auto()) @map("_id") @db.ObjectId
+  client       String            @unique
+  count        Int               @default(1)
+  achievements GameAchievement[]
+}
+
 model Collectables {
   id      String            @id @default(auto()) @map("_id") @db.ObjectId
   guildId String            @unique

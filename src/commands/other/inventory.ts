@@ -17,20 +17,12 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from "discord.js";
-import { channels, mainServerId } from "../../config";
+import { mainServerId } from "../../config";
 import { getProfileByUserId, updateUserProfile } from "../../services";
 import { getCollectables } from "../../services/bot";
 import { customEmoji, getPaginatedMessage, logs, texts } from "../../utils";
 
 export const inventory = buildCommand<SlashCommand>({
-    disabled: {
-        channels: [
-            channels.general,
-            channels.genshin,
-            channels.starrail,
-            channels.booster,
-        ],
-    },
     command: new SlashCommandBuilder()
         .setName(`inventory`)
         .setDescription(`View your inventory of cards`)
@@ -57,7 +49,7 @@ export const inventory = buildCommand<SlashCommand>({
         if (!is.array(p.collectables)) {
             return r.edit(
                 embedComment(
-                    `You've got nothing in your inventory...\nWait for a Card to drop and pick it up!`,
+                    `You've got nothing in your inventory...\nWait for a card to drop and pick it up!`,
                 ),
             );
         }

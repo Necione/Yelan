@@ -271,6 +271,8 @@ export const logs = {
     handle: (options: sendOptions | logOpt, channelId: string) =>
         send(channelId, options as sendOptions),
     misc: (options: logOpt) => logs.handle(options, channels.logs.misc),
+    fines: (options: logOpt) => logs.handle(options, channels.fines),
+    payments: (options: logOpt) => logs.handle(options, channels.logs.payments),
     collectables: (options: logOpt) =>
         logs.handle(options, channels.logs.collectables),
     action: async (
