@@ -88,6 +88,10 @@ export const petr: PrefixCommand = {
                 embedComment(`Unable to find/create their pets data.`),
             );
         }
+        const find = db.pets.find((c) => c.id === data.id);
+        if (find) {
+            return r.reply(embedComment(`That pet is already restored!`));
+        }
         const pet = data;
         pet.cooldowns = [
             { type: "claim", ends: Date.now() + get.days(1) },
@@ -97,7 +101,10 @@ export const petr: PrefixCommand = {
         db.pets.push(pet);
         await updatePets(user.id, { pets: { set: db.pets } });
         return r.reply(
-            embedComment(`I've restored the pet info with ${message.url}`),
+            embedComment(
+                `I've restored the pet info with ${message.url}`,
+                "Green",
+            ),
         );
     },
 };
