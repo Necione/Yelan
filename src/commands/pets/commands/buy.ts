@@ -112,7 +112,12 @@ export const buy = buildCommand<SubCommand>({
             rarity: getPetRarity(rarity) as number,
             multiplier: 0,
             type: animal,
-            cooldowns: [{ type: "claim", ends: Date.now() + get.days(1) }],
+            cooldowns: [
+                { type: "claim", ends: Date.now() + get.days(1) },
+                { type: "alive", ends: Date.now() + get.days(3) },
+                // If they don't feed the pet within 3 days then the pet dies, every feed resets the timer.
+                // If no timer is found then one will be set for 3 days.
+            ],
         });
         await updatePets(i.user.id, {
             pets: { set: pets.pets },

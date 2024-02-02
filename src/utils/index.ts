@@ -356,3 +356,7 @@ export function getRandomImage() {
 export function percentage(num: number, total: number) {
     return (100 * num) / total;
 }
+
+export function pricePerc(num: number, perc: number) {
+    return (num / 100) * perc;
+}

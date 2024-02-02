@@ -2,6 +2,7 @@ import { randomWeight } from "@elara-services/packages";
 import {
     addButtonRow,
     embedComment,
+    field,
     formatNumber,
     get,
     getConfirmPrompt,
@@ -9,6 +10,7 @@ import {
     is,
     proper,
     time,
+    type XOR,
     type getInteractionResponders,
 } from "@elara-services/utils";
 import type { Pet } from "@prisma/client";
@@ -32,12 +34,13 @@ import {
     removeBalance,
     updatePets,
 } from "../../services";
-import { customEmoji, getPaginatedMessage, texts } from "../../utils";
+import { customEmoji, getPaginatedMessage, logs, texts } from "../../utils";
 
 export type PetTypes = "common" | "epic" | "legendary" | "mythic";
 export const prices: Record<Pets | string, Record<PetTypes, number>> = {};
 export const claims: Record<Pets | string, Record<PetTypes, number>> = {};
 export const rarities: PetTypes[] = ["common", "epic", "legendary", "mythic"];
+export type PetRarityNums = 0 | 1 | 2 | 3;
 
 export const petNameFilters: RegExp[] | string[] = [
     "chink",
@@ -119,7 +122,8 @@ export type Pets =
     | "bird"
     | "hamster"
     | "cow"
-    | "fish";
+    | "fish"
+    | "monkey";
 
 export const pets: Pets[] = [
     "cat",
@@ -133,6 +137,7 @@ export const pets: Pets[] = [
     "cow",
     "hamster",
     "fish",
+    "monkey",
 ];
 for (const pet of pets) {
     prices[pet] = {
@@ -150,25 +155,25 @@ for (const pet of pets) {
 }
 export function getPetRarity(
     type: number | string,
-): PetTypes | (0 | 1 | 2 | 3) {
+): XOR<PetTypes, PetRarityNums> {
     switch (type) {
         case 0:
         default:
-            return "common";
+            return "common" as PetTypes;
         case 1:
-            return "epic";
+            return "epic" as PetTypes;
         case 2:
-            return "legendary";
+            return "legendary" as PetTypes;
         case 3:
-            return "mythic";
+            return "mythic" as PetTypes;
         case "common":
-            return 0;
+            return 0 as PetRarityNums;
         case "epic":
-            return 1;
+            return 1 as PetRarityNums;
         case "legendary":
-            return 2;
+            return 2 as PetRarityNums;
         case "mythic":
-            return 3;
+            return 3 as PetRarityNums;
     }
 }
 
@@ -220,19 +225,96 @@ export async function displayData(
     interaction: RepliableInteraction,
     responder: getInteractionResponders,
 ) {
-    const [pets, p] = await Promise.all([
-        getPets(interaction.user.id),
-        getProfileByUserId(interaction.user.id),
-    ]);
-    if (!pets || !is.array(pets.pets)) {
+    let pets = await getPets(interaction.user.id);
+    const p = await getProfileByUserId(interaction.user.id);
+    if (!pets || !is.array(pets.pets) || !p) {
         return responder.edit(embedComment(`You don't have any pets.`));
     }
+    let update = false;
+    const status: { id: string; message: string }[] = [];
+    for await (const pet of pets.pets) {
+        const alive = pet.cooldowns.find((c) => c.type === "alive");
+        if (!alive) {
+            const ends = Date.now() + get.days(3);
+            pet.cooldowns.push({ type: "alive", ends });
+            update = true;
+        } else {
+            if (Date.now() >= alive.ends) {
+                update = true;
+                pets.pets = pets.pets.filter((c) => c.id !== pet.id);
+                status.push({
+                    id: pet.id,
+                    message: `\`${pet.name}\` (**${proper(pet.type)}, ${proper(
+                        getPetRarity(pet.rarity) as string,
+                    )}**) has died, due to you not feeding it.`,
+                });
+                logs.misc({
+                    content: `\`${interaction.user.username}\` (${
+                        interaction.user.id
+                    })'s pet \`${pet.name}\` (**${proper(pet.type)}, ${proper(
+                        getPetRarity(pet.rarity) as string,
+                    )}**) died.`,
+                    files: [
+                        {
+                            name: "data.json",
+                            attachment: Buffer.from(
+                                JSON.stringify(pet, undefined, 2),
+                            ),
+                        },
+                    ],
+                    allowedMentions: { parse: [] },
+                });
+            } else {
+                status.push({
+                    id: pet.id,
+                    message: `\`${pet.name}\` has ${time.relative(
+                        new Date(alive.ends),
+                    )} left, make sure to feed it!`,
+                });
+            }
+        }
+    }
+    if (update) {
+        pets = await updatePets(interaction.user.id, {
+            pets: {
+                set: pets.pets,
+            },
+        });
+    }
+    if (!pets || !is.array(pets.pets)) {
+        return responder.edit(
+            embedComment(
+                `You don't have any pets.${
+                    status.length
+                        ? `\n\n# Status:\n${status
+                              .map((c) => `- ${c.message}`)
+                              .join("\n")}`
+                        : ""
+                }`,
+            ),
+        );
+    }
     const pager = getPaginatedMessage();
-
+    const deadPets = status.filter(
+        (c) => !pets.pets.find((r) => r.id === c.id),
+    );
+    if (is.array(deadPets)) {
+        pager.pages.push({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(Colors.Red)
+                    .setTitle(`Pet Status`)
+                    .setDescription(
+                        deadPets.map((c) => `- ${c.message}`).join("\n"),
+                    ),
+            ],
+        });
+    }
     for (const pet of pets.pets) {
         const actions: PaginatedMessageAction[] = [];
         const claim = pet.cooldowns.find((c) => c.type === "claim");
         const feed = pet.cooldowns.find((c) => c.type === "feed");
+        const message = status.find((c) => c.id === pet.id);
 
         const addClaim = () =>
             actions.push({
@@ -295,49 +377,49 @@ export async function displayData(
                 },
             });
         }
-
+        const embed = new EmbedBuilder()
+            .setAuthor({
+                name: interaction.user.displayName,
+                iconURL: interaction.user.displayAvatarURL(),
+            })
+            .setTitle(`Pet`)
+            .setColor(Colors.Aqua)
+            .setDescription(
+                [
+                    `Name: ${pet.name}`,
+                    `Animal: ${proper(pet.type)}`,
+                    `Rarity: ${proper(getPetRarity(pet.rarity) as string)}`,
+                    `Multiplier ${pet.multiplier.toFixed(2)}`,
+                    `Claim Amount: ${formatNumber(getPetClaim(pet))}`,
+                    `Cooldowns: ${
+                        pet.cooldowns.length
+                            ? `\n${pet.cooldowns
+                                  .filter((c) => c.type !== "alive")
+                                  .map((c) => {
+                                      const t = c.ends - Date.now();
+                                      return ` - ${proper(c.type)}: ${
+                                          t <= 0
+                                              ? "Can claim!"
+                                              : c.type === "feed"
+                                                ? pet.multiplier >= 2.4
+                                                    ? `Full`
+                                                    : time.countdown(t)
+                                                : time.countdown(t)
+                                      }`;
+                                  })
+                                  .join("\n")}`
+                            : "None"
+                    }`,
+                ]
+                    .map((c) => `- ${c}`)
+                    .join("\n"),
+            )
+            .setFooter({ text: `ID: ${pet.id}` });
+        if (message) {
+            embed.addFields(field(`Status`, message.message));
+        }
         pager.pages.push({
-            embeds: [
-                new EmbedBuilder()
-                    .setAuthor({
-                        name: interaction.user.displayName,
-                        iconURL: interaction.user.displayAvatarURL(),
-                    })
-                    .setTitle(`Pet`)
-                    .setColor(Colors.Aqua)
-                    .setDescription(
-                        [
-                            `Name: ${pet.name}`,
-                            `Animal: ${proper(pet.type)}`,
-                            `Rarity: ${proper(
-                                getPetRarity(pet.rarity) as string,
-                            )}`,
-                            `Multiplier ${pet.multiplier.toFixed(2)}`,
-                            `Claim Amount: ${formatNumber(getPetClaim(pet))}`,
-                            `Cooldowns: ${
-                                pet.cooldowns.length
-                                    ? `\n${pet.cooldowns
-                                          .map((c) => {
-                                              const t = c.ends - Date.now();
-                                              return ` - ${proper(c.type)}: ${
-                                                  t <= 0
-                                                      ? "Can claim!"
-                                                      : c.type === "feed"
-                                                        ? pet.multiplier >= 2.4
-                                                            ? `Full`
-                                                            : time.countdown(t)
-                                                        : time.countdown(t)
-                                              }`;
-                                          })
-                                          .join("\n")}`
-                                    : "None"
-                            }`,
-                        ]
-                            .map((c) => `- ${c}`)
-                            .join("\n"),
-                    )
-                    .setFooter({ text: `ID: ${pet.id}` }),
-            ],
+            embeds: [embed],
             actions,
         });
     }
@@ -382,6 +464,7 @@ export async function handleInteractions(interaction: Interaction) {
             );
         }
         const f = pe.cooldowns.find((c) => c.type === "feed");
+        const alive = pe.cooldowns.find((c) => c.type === "alive");
         if (f) {
             if (Date.now() < f.ends) {
                 return await send(
@@ -400,7 +483,14 @@ export async function handleInteractions(interaction: Interaction) {
                 ),
             );
         }
-
+        if (alive) {
+            alive.ends = Date.now() + get.days(3);
+        } else {
+            pe.cooldowns.push({
+                type: "alive",
+                ends: Date.now() + get.days(3),
+            });
+        }
         const amount = getFeedAmount(pe);
         pe.multiplier = pe.multiplier + 0.3;
         if (f) {
