@@ -7,6 +7,7 @@ export const isMainBot =
         ? true
         : false;
 export const mainBotId = "1073141234815750195"; // Guizhong's ID (DO NOT CHANGE)
+export const mainServerId = "1073116154798809098"; // DO NOT CHANGE
 
 export const economy = {
     channels: {
@@ -42,7 +43,7 @@ export const economy = {
         special: {
             day: 5, // 5: Friday
             min: 3,
-            max: 8,
+            max: 5,
         },
         dailyLimit: 150000,
         messagesInAMinute: 2,
@@ -84,7 +85,7 @@ export const economy = {
 };
 
 export const channels = {
-    general: "1078889213015113788",
+    general: "835328759577313302", // "1078889213015113788",
     genshin: "1083251462072709150",
     starrail: "1102064258914721862",
     booster: "1088722755249262623",

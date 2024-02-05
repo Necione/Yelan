@@ -10,10 +10,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum BoosterType {
+  BALANCE
+}
+
+model ServerStore {
+  id      String            @id @default(auto()) @map("_id") @db.ObjectId
+  guildId String            @unique
+  items   ServerStoreItem[]
+}
+
+type ServerStoreItem {
+  name        String               @default("")
+  cost        Int                  @default(0)
+  original    Int                  @default(0)
+  available   Boolean              @default(false)
+  thumbnail   String               @default("")
+  emoji       String               @default("")
+  priceChange String               @default("same")
+  context     ServerStoreContext[]
+}
+
+type ServerStoreContext {
+  name     String  @default("")
+  required Boolean @default(true)
+  style    Int     @default(0)
+}
+
+model GlobalBooster {
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  type              BoosterType
+  expiredAt         DateTime
+  multiplier        Float
+  purchasedByUserId String
+}
+
 type Badge {
   badgeId String
   tierId  String
 }
+
 type Achievement {
   name       String    @default("")
   game       Int?      @default(0)
@@ -22,10 +58,76 @@ type Achievement {
   achieved   DateTime?
 }
 
+model rankedData {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String       @unique
+  matches       Int          @default(0)
+  wins          Int          @default(0)
+  loses         Int          @default(0)
+  streak        Int          @default(0)
+  highestStreak Int          @default(0)
+  games         RankedGame[]
+}
+
+type GameAchievement {
+  id   Int
+  game Int
+  diff Int
+  name String
+}
+
+model Pets {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique
+  pets   Pet[]
+}
+
+type Pet {
+  id         String        @default(uuid())
+  name       String        @default("")
+  type       String        @default("cat") // Animal type (cat, dog, bird, etc)
+  rarity     Int           @default(0) // Animal rarity type (normal, epic, legendary, mythic)
+  multiplier Float         @default(0)
+  cooldowns  PetCooldown[]
+}
+
+type PetCooldown {
+  type String
+  ends Int
+}
+
+model gameAchievements {
+  id           String            @id @default(auto()) @map("_id") @db.ObjectId
+  client       String            @unique
+  count        Int               @default(1)
+  achievements GameAchievement[]
+}
+
+model Collectables {
+  id      String            @id @default(auto()) @map("_id") @db.ObjectId
+  guildId String            @unique
+  items   CollectableItem[]
+}
+
+type CollectableItem {
+  name   String @default("")
+  image  String @default("")
+  rarity String @default("Normal")
+  price  Int    @default(50) // Price is the current price for the item. (automatically changed based on the base cost)
+  cost   Int    @default(50) // Cost is the base cost for the item. (does not change)
+  weight Int    @default(5)
+}
+
+type RankedGame {
+  userId String
+  win    Boolean
+  date   String
+}
+
 model UserWallet {
   id               String        @id @default(auto()) @map("_id") @db.ObjectId
   userId           String        @unique
-  balance          Float         @default(100)
+  balance          Float         @default(0)
   vault            Float         @default(0)
   messagesSent     Int           @default(0)
   staffCredits     Int           @default(0)
@@ -99,6 +201,7 @@ model bot {
   taxExempt      String[]    @default([])
   colorRoles     ColorRole[]
 }
+
 type ColorRole {
   roles     String[] @default([])
   level     Int      @default(0)
