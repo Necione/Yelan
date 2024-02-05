@@ -123,19 +123,19 @@ export const dice: SlashCommand = {
         let roll = Math.floor(Math.random() * 100) + 1;
         const winChanceInt = parseInt(winChance);
         
-        if (betAmount === 2000) {
-            if ((rollType === "under" && winChanceInt <= 70) || (rollType === "over" && winChanceInt >= 30)) {
-                roll += rollType === "under" ? -1 : 1;
-                roll = Math.max(1, Math.min(100, roll));
-            } else {
+        if (betAmount >= 1900) {
+            const lowRiskThreshold = 20;
+            const highRiskAdjustment = 5;
+        
+            if (!((rollType === "over" && winChanceInt <= lowRiskThreshold) || 
+                  (rollType === "under" && winChanceInt >= (100 - lowRiskThreshold)))) {
                 if (rollType === "under") {
-                    roll = Math.max(winChanceInt + 1, roll + 10);
-                    roll = Math.min(roll, 100);
+                    roll = roll > winChanceInt ? roll : Math.min(100, roll + highRiskAdjustment);
                 } else {
-                    roll = Math.min(winChanceInt - 1, roll - 10);
-                    roll = Math.max(roll, 1); 
+                    roll = roll < winChanceInt ? roll : Math.max(1, roll - highRiskAdjustment);
                 }
             }
+            roll = Math.max(1, Math.min(100, roll));
         }
         
         roll = Math.max(1, Math.min(100, roll));
