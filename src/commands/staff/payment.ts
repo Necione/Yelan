@@ -41,7 +41,7 @@ export const payment = buildCommand<SlashCommand>({
             return r.edit(embedComment(`Bots don't have a user profile.`));
         }
         if (user.id === i.user.id) {
-            return r.edit(embedComment(`You can't fine yourself.`));
+            return r.edit(embedComment(`You can't pay yourself.`));
         }
         if (!is.number(amount)) {
             return r.edit(embedComment(`The amount you provided is invalid.`));

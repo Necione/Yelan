@@ -1,8 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, is } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
+import { roles } from "../../config";
 import { updateUserProfile } from "../../services";
-import { customEmoji, texts } from "../../utils";
+import { customEmoji, logs, texts } from "../../utils";
 
 export const coins = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -31,6 +32,9 @@ export const coins = buildCommand<SlashCommand>({
                 ),
         ),
     defer: { silent: true },
+    locked: {
+        roles: roles.main,
+    },
     async execute(i, r) {
         const user = i.options.getUser("user", true);
         const amount = i.options.getInteger("amount", true);
@@ -43,9 +47,20 @@ export const coins = buildCommand<SlashCommand>({
         if (user.bot) {
             return r.edit(embedComment(`Bots don't have a user profile.`));
         }
+        if (i.user.id === user.id) {
+            return r.edit(
+                embedComment(`You can't give/remove coins from yourself.`),
+            );
+        }
         if (!is.number(amount)) {
             return r.edit(embedComment(`You provided an invalid amount.`));
         }
+        await logs.action(
+            user.id,
+            amount,
+            type === "increment" ? "add" : "remove",
+            `Via /coins by \`@${i.user.username}\` (${i.user.id})`,
+        );
         await updateUserProfile(user.id, {
             balance: {
                 [type]: amount,
