@@ -11,6 +11,7 @@ import {
 import { type PaginatedMessagePage } from "@sapphire/discord.js-utilities";
 import {
     ButtonStyle,
+    Colors,
     ComponentType,
     EmbedBuilder,
     SlashCommandBuilder,
@@ -297,6 +298,7 @@ export const inventory = buildCommand<SlashCommand>({
                             iconURL: i.user.displayAvatarURL(),
                         })
                         .setTitle(`💰 Sold Collectable 💰`)
+                        .setColor(Colors.Aqua)
                         .addFields(
                             { name: "Name", value: name, inline: true },
                             {
