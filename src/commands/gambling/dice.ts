@@ -125,20 +125,11 @@ export const dice: SlashCommand = {
             );
         }
 
-        let roll = Math.floor(Math.random() * 100) + 1;
-        const winChanceInt = parseInt(winChance);
-        
-        if (betAmount === 2000) {
-            if (rollType === "under") {
-                roll = Math.floor(Math.random() * (100 - winChanceInt) + winChanceInt + 1);
-            } else if (rollType === "over") {
-                roll = Math.floor(Math.random() * winChanceInt) + 1;
-            }
-        }
-        
-        const isWin = rollType === "over"
-            ? roll > winChanceInt
-            : roll < winChanceInt;
+        const roll = Math.floor(Math.random() * 100) + 1;
+        const isWin =
+            rollType === "over"
+                ? roll > parseInt(winChance)
+                : roll < parseInt(winChance);
 
         const winnings = isWin ? Math.round(betAmount * multiplier) : 0;
         if (winnings && checks.limit(p1, winnings)) {
