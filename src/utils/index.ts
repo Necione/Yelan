@@ -1,31 +1,28 @@
+import type { getInteractionResponders } from "@elara-services/utils";
 import {
+    embedComment,
     formatNumber,
     get,
     getInteractionResponder,
-    getInteractionResponders,
     is,
     proper,
     status,
     time,
 } from "@elara-services/utils";
-import { Webhook, sendOptions } from "@elara-services/webhooks";
+import type { sendOptions } from "@elara-services/webhooks";
+import { Webhook } from "@elara-services/webhooks";
 import type { Prisma, UserWallet } from "@prisma/client";
 import {
+    PaginatedMessage,
+    type PaginatedMessageOptions,
+} from "@sapphire/discord.js-utilities";
+import type {
     APIMessage,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
     ChatInputCommandInteraction,
-    Colors,
-    CommandInteraction,
-    ComponentEmojiResolvable,
-    EmbedBuilder,
     GuildMember,
-    InteractionReplyOptions,
-    MessageActionRowComponentBuilder,
     MessageCreateOptions,
-    User,
 } from "discord.js";
+import { CommandInteraction, ComponentType, User } from "discord.js";
 import { channels, economy, isMainBot, mainBotId } from "../config";
 import { getProfileByUserId, updateUserProfile } from "../services";
 import { getBotFromId } from "../services/bot";
@@ -36,6 +33,11 @@ export const tradeTimeout = new Set();
 export const mutableGlobals = {
     locked: [] as { id: string; name: string; added: number }[],
     fights: [] as { userId: string; createdAt: number }[],
+    rr: {
+        reward: 0 as number,
+        active: false as boolean,
+        players: [] as string[],
+    },
 };
 
 export const texts = {
@@ -98,24 +100,6 @@ export async function getTax(amount: number, member: GuildMember) {
     return fee;
 }
 
-export function embedComment(
-    str: string,
-    color: keyof typeof Colors | number = "Red",
-    components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [],
-    files: InteractionReplyOptions["files"] = [],
-) {
-    return {
-        content: "",
-        embeds: [
-            new EmbedBuilder()
-                .setDescription(str)
-                .setColor(typeof color === "number" ? color : Colors[color]),
-        ],
-        components,
-        files,
-    };
-}
-
 export function checkBelowBalance(
     r: getInteractionResponders,
     p: UserWallet,
@@ -129,22 +113,6 @@ export function checkBelowBalance(
                 }>'s balance: ${customEmoji.a.z_coins} \`${formatNumber(
                     p.balance,
                 )} ${texts.c.u}\``,
-            ),
-        );
-        return false;
-    }
-    return true;
-}
-
-export function commandLimitRep(
-    r: getInteractionResponders,
-    p: UserWallet,
-    amount = 3,
-) {
-    if (p.staffCredits < amount) {
-        r.edit(
-            embedComment(
-                `<@${p.userId}> doesn't have enough user reputation.\nGain reputation through quests in </quests:1091189719875977282>\n- Required Reputation: +${amount}\n- <@${p.userId}>'s Reputation: ${p.staffCredits}`,
             ),
         );
         return false;
@@ -254,51 +222,6 @@ export const checks = {
         return updateUserProfile(p.userId, data);
     },
 };
-export interface ButtonOptions {
-    label?: string;
-    style?: ButtonStyle;
-    emoji?: ComponentEmojiResolvable;
-    id?: string;
-    url?: string;
-    disabled?: boolean;
-}
-export function addButton(options: ButtonOptions) {
-    const button = new ButtonBuilder();
-    if (options.id) {
-        button.setCustomId(options.id);
-    }
-    if (options.url) {
-        button.setURL(options.url).setStyle(ButtonStyle.Link);
-    } else if (options.style) {
-        button.setStyle(options.style);
-    }
-
-    if (options.label) {
-        button.setLabel(options.label);
-    }
-    if (options.emoji) {
-        button.setEmoji(options.emoji);
-    }
-    if (is.boolean(options.disabled)) {
-        button.setDisabled(options.disabled);
-    }
-    if (!button.data.label && !button.data.emoji) {
-        button.setEmoji("🤔"); // This only happens if there is no label or emoji to avoid erroring out the command.
-    }
-    return button;
-}
-
-export function addButtonRow(options: ButtonOptions | ButtonOptions[]) {
-    const row = new ActionRowBuilder<ButtonBuilder>();
-    if (Array.isArray(options) && options.length) {
-        for (const option of options) {
-            row.addComponents(addButton(option));
-        }
-    } else if (is.object(options)) {
-        row.addComponents(addButton(options as ButtonOptions));
-    }
-    return row;
-}
 
 export const cooldowns = {
     get: (p: UserWallet, command: string, customMessage?: string) => {
@@ -333,11 +256,30 @@ export const cooldowns = {
     },
 };
 
+export function getPaginatedMessage(
+    options?: PaginatedMessageOptions,
+    removeSelectMenu = true,
+) {
+    const pager = new PaginatedMessage(options);
+    if (removeSelectMenu) {
+        pager.setActions(
+            PaginatedMessage.defaultActions.filter(
+                (c) => c.type !== ComponentType.StringSelect,
+            ),
+        );
+    }
+    return pager;
+}
+
 type logOpt = MessageCreateOptions;
 export const logs = {
     handle: (options: sendOptions | logOpt, channelId: string) =>
         send(channelId, options as sendOptions),
     misc: (options: logOpt) => logs.handle(options, channels.logs.misc),
+    fines: (options: logOpt) => logs.handle(options, channels.fines),
+    payments: (options: logOpt) => logs.handle(options, channels.logs.payments),
+    collectables: (options: logOpt) =>
+        logs.handle(options, channels.logs.collectables),
     action: async (
         userId: string,
         amount: number,
@@ -394,7 +336,7 @@ export async function send(
             ? `https://i.imgur.com/tyHMOSO.png`
             : `https://cdn.discordapp.com/emojis/1168068419380314123.png`;
     }
-    const res = (await webhook
+    return (await webhook
         .send(
             channelId,
             {
@@ -405,7 +347,6 @@ export async function send(
             false,
         )
         .catch(() => null)) as APIMessage | null;
-    return res;
 }
 
 export function getRandomImage() {
@@ -414,4 +355,8 @@ export function getRandomImage() {
 }
 export function percentage(num: number, total: number) {
     return (100 * num) / total;
+}
+
+export function pricePerc(num: number, perc: number) {
+    return (num / 100) * perc;
 }
