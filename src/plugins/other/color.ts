@@ -1,6 +1,6 @@
 import { is } from "@elara-services/utils";
 import { type GuildMember } from "discord.js";
-import { roles as Roles } from "../../config";
+import { roles as Roles, mainBotId } from "../../config";
 import { getBotFromId } from "../../services/bot";
 import { levels } from "../../services/levels";
 
@@ -12,7 +12,7 @@ export async function getColorRoles(member: GuildMember) {
     if (!p.status) {
         return [];
     }
-    const db = await getBotFromId(member.client.user.id);
+    const db = await getBotFromId(mainBotId);
     if (!db || !is.array(db?.colorRoles)) {
         return [];
     }
