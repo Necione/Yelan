@@ -29,8 +29,8 @@ export async function getColorRoles(member: GuildMember) {
     return roles;
 }
 
-export async function getAllColorRoles(member: GuildMember) {
-    const db = await getBotFromId(member.client.user.id);
+export async function getAllColorRoles() {
+    const db = await getBotFromId(mainBotId);
     if (!db || !is.array(db?.colorRoles)) {
         return [];
     }

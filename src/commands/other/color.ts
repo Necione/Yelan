@@ -103,7 +103,7 @@ export const color = buildCommand<SlashCommand>({
         const removedRoles: Role[] = [];
 
         // Remove all colored roles, apply the one user selected
-        const allColorRoles = await getAllColorRoles(i.member);
+        const allColorRoles = await getAllColorRoles();
         if (is.array(allColorRoles)) {
             for (const role of i.member.roles.cache.values()) {
                 if (allColorRoles.includes(role.id)) {
