@@ -1,3 +1,4 @@
+export * from "./acc";
 export * from "./button";
 export * from "./coins";
 export * from "./fine";

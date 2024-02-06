@@ -17,10 +17,17 @@ import {
     type PaginatedMessageOptions,
 } from "@sapphire/discord.js-utilities";
 import type {
+    APIApplicationCommandOptionChoice,
     APIMessage,
     ChatInputCommandInteraction,
     GuildMember,
+    InteractionEditReplyOptions,
     MessageCreateOptions,
+    SlashCommandBooleanOption,
+    SlashCommandIntegerOption,
+    SlashCommandRoleOption,
+    SlashCommandStringOption,
+    SlashCommandUserOption,
 } from "discord.js";
 import { CommandInteraction, ComponentType, User } from "discord.js";
 import { channels, economy, isMainBot, mainBotId } from "../config";
@@ -276,6 +283,7 @@ export const logs = {
     handle: (options: sendOptions | logOpt, channelId: string) =>
         send(channelId, options as sendOptions),
     misc: (options: logOpt) => logs.handle(options, channels.logs.misc),
+    backup: (options: logOpt) => logs.handle(options, channels.logs.backups),
     fines: (options: logOpt) => logs.handle(options, channels.fines),
     payments: (options: logOpt) => logs.handle(options, channels.logs.payments),
     collectables: (options: logOpt) =>
@@ -359,4 +367,138 @@ export function percentage(num: number, total: number) {
 
 export function pricePerc(num: number, perc: number) {
     return (num / 100) * perc;
+}
+
+export function getUser(
+    o: SlashCommandUserOption,
+    options?: {
+        name?: string;
+        description?: string;
+        required?: boolean;
+    },
+) {
+    return o
+        .setName(options?.name ?? `user`)
+        .setDescription(options?.description ?? `What's the user?`)
+        .setRequired(is.boolean(options?.required) ? options.required : true);
+}
+
+export function getReason(
+    o: SlashCommandStringOption,
+    required: boolean = true,
+) {
+    return o
+        .setName(`reason`)
+        .setDescription(`What's the reason?`)
+        .setRequired(required);
+}
+
+export function getRole(
+    o: SlashCommandRoleOption,
+    options?: {
+        name?: string;
+        description?: string;
+        required?: boolean;
+    },
+) {
+    return o
+        .setName(options?.name || "role")
+        .setDescription(options?.description || "What role?")
+        .setRequired(
+            is.boolean(options?.required)
+                ? options?.required === false
+                    ? false
+                    : true
+                : true,
+        );
+}
+
+export function getStr(
+    o: SlashCommandStringOption,
+    options: {
+        name: string;
+        description: string;
+        required?: boolean;
+        min?: number;
+        max?: number;
+        choices?: APIApplicationCommandOptionChoice<string>[];
+    },
+) {
+    if (is.number(options.min)) {
+        o.setMinLength(options.min);
+    }
+    if (is.number(options.max)) {
+        o.setMaxLength(options.max);
+    }
+    if (is.array(options.choices)) {
+        o.addChoices(...options.choices);
+    }
+    return o
+        .setName(options.name)
+        .setDescription(options.description)
+        .setRequired(is.boolean(options.required) ? options.required : true);
+}
+
+export function getBool(
+    o: SlashCommandBooleanOption,
+    options: { name: string; description: string; required?: boolean },
+) {
+    return o
+        .setName(options.name)
+        .setDescription(options.description)
+        .setRequired(options.required ?? false);
+}
+
+export function getInt(
+    o: SlashCommandIntegerOption,
+    options: {
+        name: string;
+        description?: string;
+        required?: boolean;
+        min?: number;
+        max?: number;
+        choices?: SlashCommandIntegerOption["choices"];
+    },
+) {
+    if (is.number(options.min)) {
+        o.setMinValue(options.min);
+    }
+    if (is.number(options.max)) {
+        o.setMaxValue(options.max);
+    }
+    if (is.array(options.choices)) {
+        o.addChoices(...options.choices);
+    }
+    return o
+        .setName(options.name)
+        .setDescription(options.description || "What's the amount?")
+        .setRequired(options.required ?? true);
+}
+
+export function sendFile(
+    name: string,
+    data: object | object[],
+): InteractionEditReplyOptions {
+    return {
+        files: [
+            {
+                name: `${name}.json`,
+                attachment: Buffer.from(JSON.stringify(data, undefined, 2)),
+            },
+        ],
+    };
+}
+
+export function getAmount(
+    amount: number,
+    showEmoji: boolean = true,
+    showBacktics: boolean = true,
+) {
+    return showBacktics
+        ? `${showEmoji ? `${customEmoji.a.z_coins} ` : ""}\`${formatNumber(
+              amount,
+          )} ${texts.c.u}\``
+        : `${showEmoji ? `${customEmoji.a.z_coins} ` : ""}${formatNumber(
+              amount,
+          )} ${texts.c.u}`;
 }

@@ -137,7 +137,7 @@ export const dice: SlashCommand = {
                     );
                 }
             } else {
-                let biasRoll = Math.random();
+                const biasRoll = Math.random();
 
                 if (
                     !(
