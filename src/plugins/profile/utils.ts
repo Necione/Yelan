@@ -167,15 +167,7 @@ export async function fetchData(
             return profileHidden();
         }
     }
-    const row = new ActionRowBuilder<ButtonBuilder>()
-        .addComponents
-        // addButton({
-        //     id: `ranked|stats|profile|${user.id}`,
-        //     emoji: { name: "⚔️" },
-        //     style: ButtonStyle.Secondary,
-        //     label: "Ranked TCG",
-        // }),
-        ();
+    const row = new ActionRowBuilder<ButtonBuilder>();
 
     if (requestingMember?.id === user.id && !locked.has(user.id)) {
         row.addComponents(

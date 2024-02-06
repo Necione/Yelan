@@ -35,6 +35,19 @@ export async function updateUserProfile(
     });
 }
 
+export async function updateRankedUID(userId: string, uid: number | null) {
+    let rankedUID = null;
+    let rankedRegion = null;
+    if (uid && !isNaN(uid)) {
+        rankedUID = uid;
+        rankedRegion = parseInt(uid.toString().slice(0, 1));
+    }
+    await updateUserProfile(userId, {
+        rankedUID,
+        rankedRegion,
+    });
+}
+
 export async function addBalance(
     userId: string,
     amount: number,
