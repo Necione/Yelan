@@ -5,7 +5,7 @@
   "main": "./dist/src/index.js",
   "scripts": {
     "prestart": "npx prisma db push",
-    "start": "npm run pf && npm run build && npm run deploy && node ./dist/index.js",
+    "start": "npm run build && npm run deploy && node ./dist/index.js",
     "ds": "npm run build && node ./dist/index.js",
     "build": "tsc",
     "deploy": "ts-node ./src/scripts/deploy.ts",

@@ -25,20 +25,20 @@ export const uid = buildCommand<SlashCommand>({
         .setName(`uid`)
         .setDescription(`Set your Genshin UID`)
         .setDMPermission(false)
-        .addIntegerOption((o) =>
+        .addStringOption((o) =>
             o
                 .setName(`id`)
                 .setDescription(`What's your Genshin UID?`)
                 .setRequired(true)
-                .setMinValue(5)
-                .setMaxValue(10),
+                .setMinLength(5)
+                .setMaxLength(9),
         ),
     defer: { silent: true },
     async execute(i, r) {
         if (!i.inCachedGuild()) {
             return;
         }
-        const uid = i.options.getInteger("id", true);
+        const uid = parseInt(i.options.getString("id", true));
         if (!isValidRegion(uid)) {
             return r.edit(
                 embedComment(`The Genshin UID you provided isn't valid.`),
