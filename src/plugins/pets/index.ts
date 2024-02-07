@@ -141,16 +141,16 @@ export const pets: Pets[] = [
 ];
 for (const pet of pets) {
     prices[pet] = {
-        common: 200,
-        epic: 300,
-        legendary: 400,
-        mythic: 500,
+        common: 250,
+        epic: 400,
+        legendary: 500,
+        mythic: 600,
     };
     claims[pet] = {
-        common: 20,
-        epic: 30,
-        legendary: 40,
-        mythic: 50,
+        common: 30,
+        epic: 40,
+        legendary: 50,
+        mythic: 60,
     };
 }
 export function getPetRarity(
@@ -192,7 +192,7 @@ export function getFeedAmount(db: Pet) {
     switch (rarity) {
         case "common":
         default:
-            return 8;
+            return 10;
         case "epic":
             return 12;
         case "legendary":
