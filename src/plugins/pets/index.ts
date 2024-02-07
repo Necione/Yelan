@@ -196,7 +196,7 @@ export function getFeedAmount(db: Pet) {
         case "epic":
             return 12;
         case "legendary":
-            return 17;
+            return 16;
         case "mythic":
             return 21;
     }
