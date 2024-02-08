@@ -396,15 +396,17 @@ export async function displayData(
                             ? `\n${pet.cooldowns
                                   .filter((c) => c.type !== "alive")
                                   .map((c) => {
+                                      if (
+                                          c.type === "feed" &&
+                                          pet.multiplier >= 2.4
+                                      ) {
+                                          return `Full`;
+                                      }
                                       const t = c.ends - Date.now();
                                       return ` - ${proper(c.type)}: ${
                                           t <= 0
-                                              ? "Can claim!"
-                                              : c.type === "feed"
-                                                ? pet.multiplier >= 2.4
-                                                    ? `Full`
-                                                    : time.countdown(t)
-                                                : time.countdown(t)
+                                              ? "Can use!"
+                                              : time.countdown(t)
                                       }`;
                                   })
                                   .join("\n")}`

@@ -118,6 +118,7 @@ export const channels = {
 
 export const roles = {
     admin: "1073408549075570779",
+    coadmin: "1193411532831338638",
     flashRole: "1188707025790701668",
     levels: [
         "1073123463725854720",
@@ -148,4 +149,4 @@ export const roles = {
     restrictedColors: ["1089061615133016074"],
     main: ["1090489182994038864", "835328759128260626"], // Role IDs is for the testing servers, do not remove or replace it.
 };
-roles.main.push(roles.admin, roles.devs); // This inserts the 'admin' role ID for the main server.
+roles.main.push(roles.admin, roles.coadmin, roles.devs); // This inserts the 'admin' role ID for the main server.
