@@ -85,7 +85,7 @@ export const economy = {
 };
 
 export const channels = {
-    general: "835328759577313302", // "1078889213015113788",
+    general: "1078889213015113788",
     genshin: "1083251462072709150",
     starrail: "1102064258914721862",
     booster: "1088722755249262623",
