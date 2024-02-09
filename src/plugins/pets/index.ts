@@ -389,7 +389,13 @@ export async function displayData(
                     `Name: ${pet.name}`,
                     `Animal: ${proper(pet.type)}`,
                     `Rarity: ${proper(getPetRarity(pet.rarity) as string)}`,
-                    `Multiplier ${pet.multiplier.toFixed(2)}`,
+                    `Multiplier ${pet.multiplier.toFixed(2)}${
+                        is.number(pet.multiplierReset)
+                            ? ` (Resets: ${time.relative(
+                                  new Date(pet.multiplierReset),
+                              )})`
+                            : ""
+                    }`,
                     `Claim Amount: ${formatNumber(getPetClaim(pet))}`,
                     `Cooldowns: ${
                         pet.cooldowns.length
