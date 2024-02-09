@@ -111,6 +111,7 @@ export const buy = buildCommand<SubCommand>({
             id: generate(10),
             rarity: getPetRarity(rarity) as number,
             multiplier: 0,
+            multiplierReset: Date.now() + get.days(1),
             type: animal,
             cooldowns: [
                 { type: "claim", ends: Date.now() + get.days(1) },
