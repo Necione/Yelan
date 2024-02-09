@@ -501,6 +501,9 @@ export async function handleInteractions(interaction: Interaction) {
         }
         const amount = getFeedAmount(pe);
         pe.multiplier = pe.multiplier + 0.3;
+        if (!is.number(pe.multiplierReset)) {
+            pe.multiplierReset = Date.now() + (get.days(1) + get.hrs(2)); // Make it have a 2h offset so it's not exactly the same as the claim amount.
+        }
         if (f) {
             f.ends = Date.now() + get.hrs(3);
         } else {
@@ -539,7 +542,7 @@ export async function handleInteractions(interaction: Interaction) {
             );
         }
         pe.multiplier = 0;
-        pe.multiplierReset = Date.now() + get.days(1); // After 1 day reset the multiplier timer.
+        pe.multiplierReset = Date.now() + (get.days(1) + get.hrs(2));
         const f = pe.cooldowns.find((c) => c.type === "claim");
         if (f) {
             f.ends = Date.now() + get.days(1);
