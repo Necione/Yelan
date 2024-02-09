@@ -533,6 +533,7 @@ export async function handleInteractions(interaction: Interaction) {
             );
         }
         pe.multiplier = 0;
+        pe.multiplierReset = Date.now() + get.days(1); // After 1 day reset the multiplier timer.
         const f = pe.cooldowns.find((c) => c.type === "claim");
         if (f) {
             f.ends = Date.now() + get.days(1);

@@ -83,12 +83,13 @@ model Pets {
 }
 
 type Pet {
-  id         String        @default(uuid())
-  name       String        @default("")
-  type       String        @default("cat") // Animal type (cat, dog, bird, etc)
-  rarity     Int           @default(0) // Animal rarity type (normal, epic, legendary, mythic)
-  multiplier Float         @default(0)
-  cooldowns  PetCooldown[]
+  id              String        @default(uuid())
+  name            String        @default("")
+  type            String        @default("cat") // Animal type (cat, dog, bird, etc)
+  rarity          Int           @default(0) // Animal rarity type (normal, epic, legendary, mythic)
+  multiplier      Float         @default(0)
+  multiplierReset Int           @default(0)
+  cooldowns       PetCooldown[]
 }
 
 type PetCooldown {
