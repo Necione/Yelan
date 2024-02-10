@@ -244,13 +244,13 @@ export const buy = buildCommand<SubCommand>({
                     m.user.id,
                     removeFrom,
                     false,
-                    `Via booster ${buy.subCommand} (tip)`,
+                    `Via booster ${buy.subCommand.name} (tip)`,
                 ),
                 addBalance(
                     i.user.id,
                     amount,
                     false,
-                    `Via booster ${buy.subCommand} (tip)`,
+                    `Via booster ${buy.subCommand.name} (tip)`,
                 ),
             ]);
             totalTip += amount;
