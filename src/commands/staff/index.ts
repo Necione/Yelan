@@ -1,5 +1,7 @@
 export * from "./acc";
 export * from "./button";
+export * from "./card";
 export * from "./coins";
+export * from "./dm";
 export * from "./fine";
 export * from "./payment";
