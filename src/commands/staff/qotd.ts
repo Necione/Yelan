@@ -28,6 +28,9 @@ export const qotd = buildCommand<SlashCommand>({
                 .setRequired(true),
         ),
     defer: { silent: true },
+    locked: {
+        roles: [...roles.main, roles.headmod],
+    },
     async execute(i) {
         if (!i.inCachedGuild()) {
             return;
