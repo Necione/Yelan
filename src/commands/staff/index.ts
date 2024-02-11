@@ -5,3 +5,6 @@ export * from "./coins";
 export * from "./dm";
 export * from "./fine";
 export * from "./payment";
+export * from "./qotd";
+export * from "./rename";
+export * from "./slowmode";

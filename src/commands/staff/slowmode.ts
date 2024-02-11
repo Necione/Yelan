@@ -1,0 +1,162 @@
+import {
+    buildCommand,
+    getStr,
+    type SlashCommand,
+} from "@elara-services/botbuilder";
+import { Duration } from "@elara-services/packages";
+import { embedComment, error, is, log, ms } from "@elara-services/utils";
+import { ChannelType, SlashCommandBuilder } from "discord.js";
+import { roles } from "../../config";
+
+const channelTypes = [
+    ChannelType.AnnouncementThread,
+    ChannelType.GuildText,
+    ChannelType.GuildVoice,
+    ChannelType.PrivateThread,
+    ChannelType.PublicThread,
+    ChannelType.GuildStageVoice,
+];
+
+export const slowmode = buildCommand<SlashCommand>({
+    command: new SlashCommandBuilder()
+        .setName(`slowmode`)
+        .setDescription(`Enable/Disable slowmode for a channel`)
+        .setDMPermission(false)
+        .addStringOption((o) =>
+            getStr(o, {
+                name: "duration",
+                description: `How long? (ex: 5s, 10s, 1m, ...etc)`,
+                required: false,
+            }),
+        )
+        .addChannelOption((o) =>
+            o
+                .setName("channel")
+                .setDescription(`Which channel?`)
+                .setRequired(false)
+                .addChannelTypes(
+                    ChannelType.AnnouncementThread,
+                    ChannelType.GuildText,
+                    ChannelType.GuildVoice,
+                    ChannelType.PrivateThread,
+                    ChannelType.PublicThread,
+                    ChannelType.GuildStageVoice,
+                ),
+        ),
+    locked: {
+        roles: [roles.moderator, roles.trainee, roles.headmod, ...roles.main],
+    },
+    defer: { silent: true },
+    async execute(i) {
+        if (!i.inCachedGuild() || !i.channel) {
+            return;
+        }
+        const channel =
+            i.options.getChannel("channel", false, channelTypes) || i.channel;
+        if (!("rateLimitPerUser" in channel)) {
+            return i
+                .editReply(
+                    embedComment(`Channel provided doesn't support slowmode?`),
+                )
+                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+        }
+        const duration = i.options.getString("duration", false) || null;
+        if (is.null(duration)) {
+            if (!channel.rateLimitPerUser) {
+                return i
+                    .editReply(
+                        embedComment(
+                            `${channel.toString()} doesn't have a slowmode set.`,
+                        ),
+                    )
+                    .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            }
+            return channel
+                .edit({
+                    rateLimitPerUser: 0,
+                    reason: `Slowmode turned off by: @${i.user.username} (${i.user.id})`,
+                })
+                .then(() => {
+                    return i
+                        .editReply(
+                            embedComment(
+                                `Slowmode has been turned off for ${channel.toString()}`,
+                                "Green",
+                            ),
+                        )
+                        .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+                })
+                .catch((err) => {
+                    error(
+                        `Unable to remove the slowmode for ${channel.name} (${channel.id})`,
+                        err,
+                    );
+                    return i
+                        .editReply(
+                            embedComment(
+                                `Unable to remove the slowmode for the channel, try again later?`,
+                            ),
+                        )
+                        .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+                });
+        }
+        if (!Duration.validate(duration)) {
+            return i
+                .editReply(
+                    embedComment(
+                        `The custom duration (${duration}) isn't valid.`,
+                    ),
+                )
+                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+        }
+        let time = Duration.parse(duration);
+        if (!is.number(time)) {
+            return i
+                .editReply(
+                    embedComment(`Unable to parse the duration provided.`),
+                )
+                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+        }
+        if (time > 2332800000) {
+            time = 2332800000;
+        }
+        let slowmode = Math.floor(time / 1000);
+        if (isNaN(slowmode) || slowmode < 0) {
+            slowmode = 0;
+        }
+        if (slowmode > 21600) {
+            return i
+                .editReply(embedComment(`The max slowmode is 6 hours (21600)`))
+                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+        }
+        const format = ms.get(time, true);
+        return channel
+            .edit({
+                rateLimitPerUser: slowmode,
+                reason: `Added slowmode by: @${i.user.username} (${i.user.id})`,
+            })
+            .then(() =>
+                i
+                    .editReply(
+                        embedComment(
+                            `I've set slowmode for ${channel.toString()} to ${format}`,
+                            "Green",
+                        ),
+                    )
+                    .catch((e) => log(`[${this.command.name}]: ERROR`, e)),
+            )
+            .catch((err) => {
+                error(
+                    `Unable to set the slowmode in #${channel.name} (${channel.id}) by: ${i.user.tag} (${i.user.id})`,
+                    err,
+                );
+                return i
+                    .editReply(
+                        embedComment(
+                            `Unable to set the slowmode for ${channel.toString()}`,
+                        ),
+                    )
+                    .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            });
+    },
+});
