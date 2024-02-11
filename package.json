@@ -36,7 +36,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@elara-services/botbuilder": "^2.1.15",
+    "@elara-services/botbuilder": "^3.0.2",
     "@elara-services/fetch": "^2.0.2",
     "@elara-services/leveling": "^1.1.4",
     "@elara-services/packages": "^6.0.8",

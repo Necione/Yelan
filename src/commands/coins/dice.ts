@@ -120,61 +120,11 @@ export const dice: SlashCommand = {
             );
         }
 
-        let roll = Math.floor(Math.random() * 100) + 1;
-        const winChanceInt = parseInt(winChance);
-
-        if (betAmount === 2000) {
-            if (
-                (rollType === "over" && winChanceInt >= 80) ||
-                (rollType === "under" && winChanceInt <= 20)
-            ) {
-                if (rollType === "over") {
-                    roll = Math.min(79, Math.floor(Math.random() * 80));
-                } else {
-                    roll = Math.max(
-                        21,
-                        Math.floor(Math.random() * (100 - 20) + 21),
-                    );
-                }
-            } else {
-                const biasRoll = Math.random();
-
-                if (
-                    !(
-                        (rollType === "over" && winChanceInt === 10) ||
-                        (rollType === "under" && winChanceInt === 90)
-                    )
-                ) {
-                    if (biasRoll < 0.75) {
-                        if (rollType === "over") {
-                            roll = Math.floor(Math.random() * winChanceInt);
-                        } else {
-                            roll = Math.floor(
-                                Math.random() * (100 - winChanceInt) +
-                                    winChanceInt +
-                                    1,
-                            );
-                        }
-                    }
-                } else {
-                    if (biasRoll < 0.3) {
-                        if (rollType === "over" && winChanceInt === 10) {
-                            roll = Math.floor(Math.random() * 9) + 1;
-                        } else if (
-                            rollType === "under" &&
-                            winChanceInt === 90
-                        ) {
-                            roll = Math.floor(Math.random() * 10) + 91;
-                        }
-                    }
-                }
-            }
-        } else {
-            roll = Math.max(1, Math.min(100, roll));
-        }
-
+        const roll = Math.floor(Math.random() * 100) + 1;
         const isWin =
-            rollType === "over" ? roll > winChanceInt : roll < winChanceInt;
+            rollType === "over"
+                ? roll > parseInt(winChance)
+                : roll < parseInt(winChance);
 
         const winnings = isWin ? Math.round(betAmount * multiplier) : 0;
         if (winnings && checks.limit(p1, winnings)) {

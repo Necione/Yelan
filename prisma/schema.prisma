@@ -111,12 +111,13 @@ model Collectables {
 }
 
 type CollectableItem {
+  id     String @default(uuid())
   name   String @default("")
   image  String @default("")
   rarity String @default("Normal")
   price  Int    @default(50) // Price is the current price for the item. (automatically changed based on the base cost)
   cost   Int    @default(50) // Cost is the base cost for the item. (does not change)
-  weight Int    @default(5)
+  weight Int    @default(80)
 }
 
 type RankedGame {
