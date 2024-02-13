@@ -64,14 +64,15 @@ export const left = buildCommand({
         if (!co) {
             return;
         }
+        await co.deferUpdate().catch(() => null);
         await co
-            .update(
+            .editReply(
                 embedComment(
                     `Purging the left users profiles, one moment...`,
                     "Orange",
                 ),
             )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            .catch(() => null);
         const list = profiles
             .map(
                 (c) =>
