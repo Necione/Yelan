@@ -24,15 +24,16 @@ export async function addCoinBooster(
         Prisma.GlobalBoosterCreateInput,
         "multiplier" | "purchasedByUserId"
     >,
+    boostExpireTime = boosterExpiryDuration,
 ) {
-    let expiredAt = new Date(Date.now() + boosterExpiryDuration);
+    let expiredAt = new Date(Date.now() + boostExpireTime);
 
     const activeCoinBoosters = await getActiveCoinBoosters();
 
     if (activeCoinBoosters.length >= 1) {
         expiredAt = new Date(
             activeCoinBoosters.slice(-1)[0].expiredAt.getTime() +
-                boosterExpiryDuration,
+                boostExpireTime,
         );
     }
 

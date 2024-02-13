@@ -7,9 +7,9 @@ import {
 } from "@elara-services/botbuilder";
 import { embedComment, is, log, proper } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { roles } from "../../config";
-import { getCollectables } from "../../services/bot";
+import { mainServerId, roles } from "../../config";
 import { getProfileByUserId, updateUserProfile } from "../../services";
+import { getCollectables } from "../../services/bot";
 
 export const card = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -64,7 +64,7 @@ export const card = buildCommand<SlashCommand>({
                 .editReply(embedComment(`Bots don't have a user profile.`))
                 .catch((e) => log(`[${this.command.name}]: ERROR`, e));
         }
-        const db = await getCollectables(i.guildId);
+        const db = await getCollectables(mainServerId);
         if (!db || !is.array(db.items)) {
             return i
                 .editReply(
@@ -88,7 +88,7 @@ export const card = buildCommand<SlashCommand>({
                 )
                 .catch((e) => log(`[${this.command.name}]: ERROR`, e));
         }
-        let str: string | undefined;
+        let str = "";
         const f = p.collectables.find((c) => c.name === find.name);
         if (f) {
             if (type === "add") {
