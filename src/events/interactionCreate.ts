@@ -20,11 +20,9 @@ export const interactionCreate = createEvent({
                 return onRickRoll(i);
             }
         }
-        if (i.isRepliable()) {
-            if ("customId" in i) {
-                if (i.customId.startsWith("profile|")) {
-                    return onInteraction(i);
-                }
+        if ("customId" in i) {
+            if (i.customId.startsWith("profile|")) {
+                return onInteraction(i);
             }
         }
         if (
