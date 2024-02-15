@@ -1,12 +1,13 @@
-import { config } from "dotenv";
-config({ path: `${process.cwd()}/.env` });
+import "dotenv/config";
 
 import { loadEvents } from "@elara-services/botbuilder";
 import { getFilesList, log, times } from "@elara-services/utils";
 import { ActivityType, Client, IntentsBitField, Options } from "discord.js";
+import moment from "moment-timezone";
 import * as events from "./events";
 import { checkIfDeploy } from "./scripts/checks";
 if (process.env.timeZone) {
+    moment.tz.setDefault(process.env.timeZone);
     times.timeZone = process.env.timeZone;
 }
 

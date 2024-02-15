@@ -7,7 +7,7 @@ import {
     time,
 } from "@elara-services/utils";
 import { EmbedBuilder, type GuildMember, type User } from "discord.js";
-import moment from "moment";
+import moment from "moment-timezone";
 import { economy, mainServerId } from "../../config";
 import { getAllUserProfiles } from "../../services";
 import { getStore, sortLB } from "../../services/bot";
@@ -114,6 +114,7 @@ export async function fetchData(
     const nearestMessages = getNearest(messages === 0 ? 1 : messages, 100);
     const activeTime = profile.active?.count || 0;
     const nearestTime = getNearest(activeTime === 0 ? 1 : activeTime, 60);
+    const todayISO = moment().endOf("day").toISOString(true);
 
     embed
         .addFields(
@@ -122,7 +123,7 @@ export async function fetchData(
                 value: `>>> \`${messages}/${nearestMessages}\` | ${
                     customEmoji.a.z_coins
                 } **+75 Bonus Coins**\n*Message Quests reset ${time.relative(
-                    moment().endOf("day").toISOString(),
+                    todayISO,
                 )}*`,
             },
             {
