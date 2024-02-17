@@ -12,6 +12,7 @@ export const petr: PrefixCommand = {
         users: [
             // Only main admins and devs have access to restore pets.
             "288450828837322764", // SUPERCHIEFYT
+            "476812566530883604", // Kurasad
             "525171507324911637", // Neci
             "664601516220350494", // Hythen
         ],

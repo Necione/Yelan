@@ -87,6 +87,9 @@ export const economy = {
 export const channels = {
     general: "1078889213015113788",
     genshin: "1083251462072709150",
+    achievementSubmit: isMainBot
+        ? "1201375594189967410"
+        : "1169502827392020510",
     starrail: "1102064258914721862",
     booster: "1088722755249262623",
     fines: "1191860591439126668",
