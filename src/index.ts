@@ -2,7 +2,9 @@ import "dotenv/config";
 
 import { log, times } from "@elara-services/utils";
 import { ShardingManager, type Shard } from "discord.js";
+import moment from "moment-timezone";
 if (process.env.timeZone) {
+    moment.tz.setDefault(process.env.timeZone);
     times.timeZone = process.env.timeZone;
 }
 const time = Date.now();

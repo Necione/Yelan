@@ -4,8 +4,10 @@ import {
     getAverage,
     getNearest,
     is,
+    time,
 } from "@elara-services/utils";
 import { EmbedBuilder, type GuildMember, type User } from "discord.js";
+import moment from "moment-timezone";
 import { economy, mainServerId } from "../../config";
 import { getAllUserProfiles } from "../../services";
 import { getStore, sortLB } from "../../services/bot";
@@ -56,6 +58,9 @@ export async function fetchData(
     }
     // store.find((c) => c.name === "Welkin Moon");
     const dailyStats = profile.dailyStats || [];
+    const today = dailyStats.find(
+        (c) => c.date.toISOString() === moment().endOf("day").toISOString(),
+    );
     const average =
         dailyStats.length > 0
             ? getAverage(dailyStats.map((c) => c.messages || 0))
@@ -105,66 +110,25 @@ export async function fetchData(
         .setDescription(description.join("\n"))
         .setImage(getRandomImage());
 
-    const minutes: string[] = [];
-    const messages: string[] = [];
-    let minutesEmpty = false;
-    let messagesEmpty = false;
-    for (let i = 0; i < 3; i++) {
-        const ex = i === 0 ? 0 : parseInt(`${i}00`);
-        const ex2 = i === 0 ? 0 : 60 * i;
-        const hundred = getNearest(profile.messagesSent + ex, 100);
-        const multi = i === 0 ? 1 : i === 1 ? 2 : 3;
-        if (hundred === 0) {
-            messagesEmpty = true;
-        }
-        if (
-            hundred !== 0 &&
-            getNearest(profile.messagesSent + ex, 1000) === hundred
-        ) {
-            messages.push(
-                `\`${formatNumber(hundred)} Messages\` | ${
-                    customEmoji.a.z_coins
-                } **+250 Bonus ${texts.c.u}**, **+1 Reputation**`,
-            );
-        } else {
-            messages.push(
-                `\`${formatNumber(
-                    messagesEmpty ? 100 * multi : hundred,
-                )} Messages\` | ${customEmoji.a.z_coins} **+75 Bonus ${
-                    texts.c.u
-                }**`,
-            );
-        }
-        const hundred2 = getNearest((profile.active?.count || 0) + ex2, 60);
-        const OT = getNearest((profile.active?.count || 0) + ex2, 120);
-        if (hundred2 === 0) {
-            minutesEmpty = true;
-        }
-        if (hundred2 !== 0 && OT === hundred2) {
-            minutes.push(
-                `\`${formatNumber(OT)} Minutes\` | ${
-                    customEmoji.a.z_coins
-                } **+150 ${texts.c.u}**, **+1 Reputation**`,
-            );
-        } else {
-            minutes.push(
-                `\`${formatNumber(
-                    minutesEmpty ? 60 * multi : hundred2,
-                )} Minutes\` | ${customEmoji.a.z_coins} **+100 Bonus ${
-                    texts.c.u
-                }**`,
-            );
-        }
-    }
+    const messages = today?.messages || 0;
+    const nearestMessages = getNearest(messages === 0 ? 1 : messages, 100);
+    const activeTime = profile.active?.count || 0;
+    const nearestTime = getNearest(activeTime === 0 ? 1 : activeTime, 60);
+    const todayISO = moment().endOf("day").toISOString(true);
+
     embed
         .addFields(
             {
                 name: "✦ Message Rewards",
-                value: messages.map((c) => `> ${c}`).join("\n"),
+                value: `>>> \`${messages}/${nearestMessages}\` | ${
+                    customEmoji.a.z_coins
+                } **+75 Bonus Coins**\n*Message Quests reset ${time.relative(
+                    todayISO,
+                )}*`,
             },
             {
                 name: "✦ Activity Rewards",
-                value: minutes.map((c) => `> ${c}`).join("\n"),
+                value: `>>> \`${activeTime}/${nearestTime} Minutes\` | ${customEmoji.a.z_coins} **+100 Bonus Coins**\n *Activity Quests never reset*`,
             },
         )
         .setFooter({
