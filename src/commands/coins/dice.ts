@@ -53,7 +53,7 @@ export const dice: SlashCommand = {
                 .setRequired(true)
                 .setName("bet")
                 .setDescription("The bet amount")
-                .setMinValue(5)
+                .setMinValue(10)
                 .setMaxValue(2000),
         ),
     defer: { silent: false },
@@ -115,7 +115,7 @@ export const dice: SlashCommand = {
             locked.del(interaction.user.id);
             return responder.edit(
                 embedComment(
-                    `This command could not be completed. This is not a bug.`,
+                    `You've reached your daily gambling limit.`,
                 ),
             );
         }
@@ -131,7 +131,7 @@ export const dice: SlashCommand = {
             locked.del(interaction.user.id);
             return responder.edit(
                 embedComment(
-                    `This command could not be completed. This is not a bug.`,
+                    `You've reached your daily gambling limit.`,
                 ),
             );
         }

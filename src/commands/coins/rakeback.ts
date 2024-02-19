@@ -57,7 +57,7 @@ export const rakeback: SlashCommand = {
             locked.del(interaction.user.id);
             return responder.edit(
                 embedComment(
-                    `This command could not be completed. This is not a bug.`,
+                    `You've reached your daily gambling limit.`,
                 ),
             );
         }

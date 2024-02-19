@@ -108,7 +108,7 @@ export const rps: SlashCommand = {
             removeTimeout();
             return responder.edit(
                 embedComment(
-                    `This command could not be completed. This is not a bug.`,
+                    `You've reached your daily gambling limit.`,
                 ),
             );
         }
@@ -116,7 +116,7 @@ export const rps: SlashCommand = {
             removeTimeout();
             return responder.edit(
                 embedComment(
-                    `This command could not be completed. This is not a bug.`,
+                    `You've reached your daily gambling limit.`,
                 ),
             );
         }
