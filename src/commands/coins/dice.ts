@@ -114,9 +114,7 @@ export const dice: SlashCommand = {
         if (checks.limit(p1, betAmount)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(
-                    `You've reached your daily gambling limit.`,
-                ),
+                embedComment(`You've reached your daily gambling limit.`),
             );
         }
 
@@ -130,9 +128,7 @@ export const dice: SlashCommand = {
         if (winnings && checks.limit(p1, winnings)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(
-                    `You've reached your daily gambling limit.`,
-                ),
+                embedComment(`You've reached your daily gambling limit.`),
             );
         }
         await removeBalance(

@@ -80,9 +80,7 @@ export const slots: SlashCommand = {
         if (checks.limit(profile, bet)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(
-                    `You've reached your daily gambling limit.`,
-                ),
+                embedComment(`You've reached your daily gambling limit.`),
             );
         }
         await removeBalance(

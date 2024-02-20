@@ -44,9 +44,7 @@ export const work: SlashCommand = {
         if (checks.limit(data, amount)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(
-                    `You've reached your daily gambling limit.`,
-                ),
+                embedComment(`You've reached your daily gambling limit.`),
             );
         }
         const hasCooldown = cooldowns.get(data, "work");

@@ -137,9 +137,7 @@ export const pay: SlashCommand = {
         if (checks.limit(userP, Math.floor(amount))) {
             locked.del([interaction.user.id, user.id]);
             return responder.edit(
-                embedComment(
-                    `You've reached your daily gambling limit.`,
-                ),
+                embedComment(`You've reached your daily gambling limit.`),
             );
         }
 

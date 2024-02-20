@@ -4,10 +4,8 @@ import {
     getAverage,
     getNearest,
     is,
-    time,
 } from "@elara-services/utils";
 import { EmbedBuilder, type GuildMember, type User } from "discord.js";
-import moment from "moment-timezone";
 import { economy, mainServerId } from "../../config";
 import { getAllUserProfiles } from "../../services";
 import { getStore, sortLB } from "../../services/bot";
@@ -58,9 +56,6 @@ export async function fetchData(
     }
     // store.find((c) => c.name === "Welkin Moon");
     const dailyStats = profile.dailyStats || [];
-    const today = dailyStats.find(
-        (c) => c.date.toISOString() === moment().endOf("day").toISOString(),
-    );
     const average =
         dailyStats.length > 0
             ? getAverage(dailyStats.map((c) => c.messages || 0))
@@ -110,25 +105,20 @@ export async function fetchData(
         .setDescription(description.join("\n"))
         .setImage(getRandomImage());
 
-    const messages = today?.messages || 0;
+    const messages = profile.messagesSent || 0;
     const nearestMessages = getNearest(messages === 0 ? 1 : messages, 100);
     const activeTime = profile.active?.count || 0;
     const nearestTime = getNearest(activeTime === 0 ? 1 : activeTime, 60);
-    const todayISO = moment().endOf("day").toISOString(true);
 
     embed
         .addFields(
             {
                 name: "✦ Message Rewards",
-                value: `>>> \`${messages}/${nearestMessages}\` | ${
-                    customEmoji.a.z_coins
-                } **+75 Bonus Coins**\n*Message Quests reset ${time.relative(
-                    todayISO,
-                )}*`,
+                value: `>>> \`${messages}/${nearestMessages}\` | ${customEmoji.a.z_coins} **+75 Bonus Coins**`,
             },
             {
                 name: "✦ Activity Rewards",
-                value: `>>> \`${activeTime}/${nearestTime} Minutes\` | ${customEmoji.a.z_coins} **+100 Bonus Coins**\n *Activity Quests never reset*`,
+                value: `>>> \`${activeTime}/${nearestTime} Minutes\` | ${customEmoji.a.z_coins} **+100 Bonus Coins**`,
             },
         )
         .setFooter({
