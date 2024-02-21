@@ -44,7 +44,7 @@ export const slowmode = buildCommand<SlashCommand>({
                 ),
         ),
     locked: {
-        roles: [roles.moderator, roles.trainee, roles.headmod, ...roles.main],
+        roles: [roles.moderator, roles.moderator, ...roles.main],
     },
     defer: { silent: true },
     async execute(i) {

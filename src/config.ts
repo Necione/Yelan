@@ -121,7 +121,6 @@ export const channels = {
 
 export const roles = {
     admin: "1073408549075570779",
-    coadmin: "1193411532831338638",
     flashRole: "1188707025790701668",
     levels: [
         "1073123463725854720",
@@ -137,19 +136,17 @@ export const roles = {
     ],
     storekeeper: "1185422127235596288",
     mafia: "1132216942158155827",
-    headmod: "1073454353190486076",
+    moderator: "1085781606465286236",
     management: {
         econ: "1188120160402407544",
         corners: "1188119808353509436",
     },
-    trainee: "1175591481789124658",
     highRoller: "1157951644978393098",
     devs: "1073443736807284806",
-    moderator: "1085781606465286236",
     staff: "1103906017340821624",
     graders: "1142915623400243350",
     qotd: "1114590871212523540",
     restrictedColors: ["1089061615133016074"],
     main: ["1090489182994038864", "835328759128260626"], // Role IDs is for the testing servers, do not remove or replace it.
 };
-roles.main.push(roles.admin, roles.coadmin, roles.devs); // This inserts the 'admin' role ID for the main server.
+roles.main.push(roles.admin, roles.devs); // This inserts the 'admin' role ID for the main server.
