@@ -137,6 +137,7 @@ model UserWallet {
   claimed          Int?          @default(0)
   hidden           Boolean       @default(false)
   frameHidden      Boolean       @default(false)
+  muteMentions     Boolean       @default(false)
   frameUrl         String        @default("")
   locked           Boolean?      @default(false)
   elo              Int?          @default(1000)

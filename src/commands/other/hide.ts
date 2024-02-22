@@ -1,5 +1,11 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { awaitComponent, embedComment, get, time } from "@elara-services/utils";
+import {
+    awaitComponent,
+    embedComment,
+    get,
+    is,
+    time,
+} from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import {
     ComponentType,
@@ -7,7 +13,7 @@ import {
     type StringSelectMenuInteraction,
 } from "discord.js";
 import { getProfileByUserId, updateUserProfile } from "../../services";
-type FieldType = "hidden" | "backgroundHidden" | "frameHidden";
+type FieldType = "hidden" | "backgroundHidden" | "frameHidden" | "muteMentions";
 
 export const hide = buildCommand<SlashCommand>({
     aliases: ["toggle"],
@@ -58,6 +64,15 @@ export const hide = buildCommand<SlashCommand>({
                                     label: "Hide Profile",
                                     value: "hidden",
                                     emoji: emoji(userProfile.hidden),
+                                },
+                                {
+                                    label: "Mute Mentions",
+                                    value: "muteMentions",
+                                    emoji: emoji(
+                                        is.boolean(userProfile.muteMentions)
+                                            ? userProfile.muteMentions
+                                            : false,
+                                    ),
                                 },
                             ],
                         },
