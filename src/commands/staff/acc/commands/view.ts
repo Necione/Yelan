@@ -3,6 +3,7 @@ import {
     discord,
     embedComment,
     formatNumber,
+    is,
     log,
     time,
 } from "@elara-services/utils";
@@ -89,6 +90,9 @@ export const view = buildCommand({
                         `Genshin UID: ${p.rankedUID || "NOT SET"}`,
                         `Frame URL: ${p.frameUrl || "NOT_SET"}`,
                         `Profile Background: ${p.backgroundUrl || "NOT SET"}`,
+                        `Mute Mentions: ${toggle(
+                            is.boolean(p.muteMentions) ? p.muteMentions : false,
+                        )}`,
                         `Hidden:\n- Profile: ${toggle(
                             p.hidden || false,
                         )}\n- Background: ${toggle(
