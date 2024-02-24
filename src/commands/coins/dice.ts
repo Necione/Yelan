@@ -118,7 +118,16 @@ export const dice: SlashCommand = {
             );
         }
 
-        const roll = Math.floor(Math.random() * 100) + 1;
+        let roll = Math.floor(Math.random() * 100) + 1;
+
+        if (checks.rig(p1) >= 100 && betAmount > checks.rig(p1)) {
+            if (rollType === "over") {
+                roll = Math.floor(Math.random() * parseInt(winChance));
+            } else if (rollType === "under") {
+                roll = Math.floor(Math.random() * (100 - parseInt(winChance) + 1)) + parseInt(winChance);
+            }
+        }
+
         const isWin =
             rollType === "over"
                 ? roll > parseInt(winChance)

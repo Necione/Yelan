@@ -209,6 +209,10 @@ export const checks = {
         return economy.mora.dailyLimit;
     },
 
+    rig: (p: UserWallet) => {
+        return p.rig;
+    },
+
     limit: (p: UserWallet, amount: number) => {
         if (p.daily >= checks.amount(p)) {
             return true;
