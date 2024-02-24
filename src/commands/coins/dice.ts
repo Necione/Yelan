@@ -124,7 +124,10 @@ export const dice: SlashCommand = {
             if (rollType === "over") {
                 roll = Math.floor(Math.random() * parseInt(winChance));
             } else if (rollType === "under") {
-                roll = Math.floor(Math.random() * (100 - parseInt(winChance) + 1)) + parseInt(winChance);
+                roll =
+                    Math.floor(
+                        Math.random() * (100 - parseInt(winChance) + 1),
+                    ) + parseInt(winChance);
             }
         }
 

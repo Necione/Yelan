@@ -1,7 +1,7 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { formatNumber } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { channels } from "../../config";
+import { channels, economy } from "../../config";
 import { prisma } from "../../prisma";
 import { customEmoji, texts } from "../../utils";
 
@@ -51,7 +51,7 @@ export const econ: SlashCommand = {
                         (T10C / TC) *
                         100
                     ).toFixed(2)}%\` of total ${texts.c.u}\n` +
-                    `${customEmoji.a.z_repute} | You currently earn \`3 - 7 ${texts.c.u} Per Minute\``,
+                    `${customEmoji.a.z_repute} | You currently earn \`${economy.mora.min} - ${economy.mora.max} ${texts.c.u} Per Minute\``,
             );
 
         await responder.edit({ embeds: [embed] });

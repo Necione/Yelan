@@ -38,12 +38,16 @@ export const economy = {
         ],
     },
     mora: {
-        min: 2,
-        max: 5,
+        quests: {
+            messages: 85,
+            activity: 100,
+        },
+        min: 5,
+        max: 10,
         special: {
             day: 5, // 5: Friday
-            min: 3,
-            max: 5,
+            min: 6,
+            max: 12,
         },
         dailyLimit: 150000,
         messagesInAMinute: 2,

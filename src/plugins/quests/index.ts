@@ -114,11 +114,11 @@ export async function fetchData(
         .addFields(
             {
                 name: "✦ Message Rewards",
-                value: `>>> \`${messages}/${nearestMessages}\` | ${customEmoji.a.z_coins} **+75 Bonus Coins**`,
+                value: `>>> \`${messages}/${nearestMessages}\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.messages} Bonus Coins**`,
             },
             {
                 name: "✦ Activity Rewards",
-                value: `>>> \`${activeTime}/${nearestTime} Minutes\` | ${customEmoji.a.z_coins} **+100 Bonus Coins**`,
+                value: `>>> \`${activeTime}/${nearestTime} Minutes\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.activity} Bonus Coins**`,
             },
         )
         .setFooter({
