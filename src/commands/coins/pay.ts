@@ -1,5 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { discord, embedComment, formatNumber } from "@elara-services/utils";
+import { discord, embedComment, field } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
@@ -7,6 +7,7 @@ import {
     checks,
     customEmoji,
     displayTradeInAction,
+    getAmount,
     getTax,
     isInActiveTrade,
     locked,
@@ -141,68 +142,70 @@ export const pay: SlashCommand = {
             );
         }
 
-        // Deduct the payment amount (including the fee) from the sender's balance
-        await removeBalance(
-            interaction.user.id,
-            Math.floor(amount + fee),
-            false,
-            `Via ${pay.command.name}`,
-        );
-
-        // Add the payment amount to the receiver's balance
-        await addBalance(user.id, amount, false, `Via ${pay.command.name}`);
-        await checks.set(userP, amount);
-
-        const total = amount + fee;
-
         const transactionEmbed = new EmbedBuilder()
             .setColor(0x0099ff)
             .setTitle("New Completed Transaction")
             .setDescription(
-                `${interaction.user.username} (${interaction.user.id}) paid \`${total} ${texts.c.u}\` to ${user.username} (${user.id})`,
+                `${interaction.user.username} (${
+                    interaction.user.id
+                }) paid ${getAmount(amount + fee)} to ${user.username} (${
+                    user.id
+                })`,
             )
             .addFields(
-                {
-                    name: "Amount",
-                    value: `${amount} ${texts.c.u}`,
-                    inline: true,
-                },
-                { name: "Fee", value: `${fee} ${texts.c.u}`, inline: true },
+                field(`Amount`, getAmount(amount), true),
+                field(`Fee`, getAmount(fee), true),
             )
             .setTimestamp();
-
-        await discord.messages.send({
-            client: interaction.client,
-            channelId: channels.transactions.log,
-            options: {
-                embeds: [transactionEmbed],
-            },
-        });
-
-        const embed = new EmbedBuilder()
-            .setColor(0x57f288)
-            .setTitle("Transaction Completed!")
-            .setDescription(
-                `${customEmoji.a.z_check} | You paid \`${amount} ${texts.c.u}\` to <@${user.id}>.\nA fee of \`${fee} ${texts.c.u}\` was deducted from your account.`,
-            );
-
-        const displayMessage =
-            interaction.options.getString("message", false) ||
-            "No Additional Message";
+        await Promise.all([
+            removeBalance(
+                interaction.user.id,
+                Math.floor(amount + fee),
+                false,
+                `Via ${pay.command.name}`,
+            ),
+            addBalance(user.id, amount, false, `Via ${pay.command.name}`),
+            checks.set(userP, amount),
+            discord.messages.send({
+                client: interaction.client,
+                channelId: channels.transactions.log,
+                options: {
+                    embeds: [transactionEmbed],
+                },
+            }),
+        ]);
 
         const dmEmbed = new EmbedBuilder()
             .setColor(0x57f288)
             .setTitle(`Completed Transaction`)
             .setDescription(
-                `${customEmoji.a.z_check} You were paid \`${formatNumber(
+                `${customEmoji.a.z_check} You were paid ${getAmount(
                     amount,
-                )} ${texts.c.u}\` by <@${interaction.user.id}> (\`${
+                )} by <@${interaction.user.id}> (\`${
                     interaction.user.username
-                }\`)\n\n**Message Left:** *${displayMessage}*`,
+                }\`)\n\n**Message Left:** *${
+                    interaction.options.getString("message", false) ||
+                    "No Additional Message"
+                }*`,
             );
 
-        await user.send({ embeds: [dmEmbed] }).catch(() => null);
         locked.del([interaction.user.id, user.id]);
-        await responder.edit({ embeds: [embed] });
+        await Promise.all([
+            user.send({ embeds: [dmEmbed] }).catch(() => null),
+            responder.edit({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(0x57f288)
+                        .setTitle("Transaction Completed!")
+                        .setDescription(
+                            `${customEmoji.a.z_check} | You paid ${getAmount(
+                                amount,
+                            )} to <@${user.id}>.\nA fee of ${getAmount(
+                                fee,
+                            )} was deducted from your account.`,
+                        ),
+                ],
+            }),
+        ]);
     },
 };

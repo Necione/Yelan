@@ -1,4 +1,8 @@
-import { buildCommand, type SubCommand } from "@elara-services/botbuilder";
+import {
+    buildCommand,
+    getUser,
+    type SubCommand,
+} from "@elara-services/botbuilder";
 import { awaitComponent, embedComment, log } from "@elara-services/utils";
 import {
     ActionRowBuilder,
@@ -8,7 +12,6 @@ import {
 import { roles } from "../../../../config";
 import { badges as B } from "../../../../plugins/other/badges";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
-import { getUser } from "../../../../utils";
 
 export const badges = buildCommand<SubCommand>({
     subCommand: (b) =>

@@ -1,4 +1,4 @@
-import { buildCommand } from "@elara-services/botbuilder";
+import { buildCommand, getUser } from "@elara-services/botbuilder";
 import {
     embedComment,
     get,
@@ -9,7 +9,7 @@ import { mainServerId, roles } from "../../../../config";
 import { prisma } from "../../../../prisma";
 import { getProfileByUserId } from "../../../../services";
 import { levels } from "../../../../services/levels";
-import { getUser, logs } from "../../../../utils";
+import { logs } from "../../../../utils";
 import type { Response } from "./restore";
 
 export const transfer = buildCommand({

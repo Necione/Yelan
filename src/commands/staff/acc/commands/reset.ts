@@ -1,4 +1,4 @@
-import { buildCommand } from "@elara-services/botbuilder";
+import { buildCommand, getStr, getUser } from "@elara-services/botbuilder";
 import {
     embedComment,
     get,
@@ -8,7 +8,6 @@ import {
 import type { Prisma } from "@prisma/client";
 import { roles } from "../../../../config";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
-import { getStr, getUser } from "../../../../utils";
 
 const choices = [
     "elo",

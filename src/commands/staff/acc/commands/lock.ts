@@ -1,9 +1,14 @@
-import { buildCommand } from "@elara-services/botbuilder";
+import {
+    buildCommand,
+    getBool,
+    getReason,
+    getUser,
+} from "@elara-services/botbuilder";
 import { embedComment, is, log, proper } from "@elara-services/utils";
 import { EmbedBuilder } from "discord.js";
 import { roles } from "../../../../config";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
-import { getBool, getReason, getUser, logs } from "../../../../utils";
+import { logs } from "../../../../utils";
 
 export const lock = buildCommand({
     subCommand: (b) =>

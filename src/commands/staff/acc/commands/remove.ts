@@ -1,4 +1,4 @@
-import { buildCommand } from "@elara-services/botbuilder";
+import { buildCommand, getUser } from "@elara-services/botbuilder";
 import {
     embedComment,
     get,
@@ -7,7 +7,7 @@ import {
 } from "@elara-services/utils";
 import { prisma } from "../../../../prisma";
 import { getProfileByUserId } from "../../../../services";
-import { getUser, logs } from "../../../../utils";
+import { logs } from "../../../../utils";
 
 export const remove = buildCommand({
     subCommand: (b) =>

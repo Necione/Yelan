@@ -1,4 +1,9 @@
-import { buildCommand } from "@elara-services/botbuilder";
+import {
+    buildCommand,
+    getBool,
+    getUser,
+    sendFile,
+} from "@elara-services/botbuilder";
 import {
     discord,
     embedComment,
@@ -9,13 +14,7 @@ import {
 } from "@elara-services/utils";
 import { mainServerId, roles } from "../../../../config";
 import { getProfileByUserId } from "../../../../services";
-import {
-    customEmoji,
-    getBool,
-    getUser,
-    sendFile,
-    texts,
-} from "../../../../utils";
+import { customEmoji, texts } from "../../../../utils";
 
 export const view = buildCommand({
     subCommand: (b) =>
