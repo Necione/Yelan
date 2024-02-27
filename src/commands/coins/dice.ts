@@ -63,24 +63,24 @@ export const dice: SlashCommand = {
         }
         locked.set(interaction);
         const winMultis: { [key: string]: number } = {
-            over10: 1.04,
-            under90: 1.04,
-            over20: 1.13,
-            under80: 1.13,
-            over30: 1.34,
-            under70: 1.34,
-            over40: 1.57,
-            under60: 1.57,
-            over50: 1.88,
-            under50: 1.88,
-            over60: 2.35,
-            under40: 2.35,
-            over70: 3.12,
-            under30: 3.12,
-            over80: 4.7,
-            under20: 4.7,
-            over90: 6.1,
-            under10: 6.1,
+            over10: 1.06,
+            under90: 1.06,
+            over20: 1.15,
+            under80: 1.15,
+            over30: 1.36,
+            under70: 1.36,
+            over40: 1.6,
+            under60: 1.6,
+            over50: 1.9,
+            under50: 1.9,
+            over60: 2.39,
+            under40: 2.39,
+            over70: 3.18,
+            under30: 3.18,
+            over80: 4.76,
+            under20: 4.76,
+            over90: 6.2,
+            under10: 6.2,
         };
 
         const betAmount = interaction.options.getInteger("bet", true);
@@ -152,7 +152,7 @@ export const dice: SlashCommand = {
 
         const e = new EmbedBuilder()
             .setTitle("`🎲` The Dice Game")
-            .setColor(Colors.Green)
+            .setColor(isWin ? Colors.Green : Colors.Red)
             .setDescription(`Rolling the dice ${customEmoji.a.loading} 🎲`);
 
         await responder.edit({ embeds: [e] });
