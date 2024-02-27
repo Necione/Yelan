@@ -19,7 +19,7 @@ export const limbo: SlashCommand = {
              .setDescription("The bet amount")
              .setRequired(true)
              .setMinValue(10)
-             .setMaxValue(1000)),
+             .setMaxValue(500)),
 
     defer: { silent: false },
     async execute(interaction, responder) {
