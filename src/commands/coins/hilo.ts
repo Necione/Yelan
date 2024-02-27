@@ -30,7 +30,6 @@ export const hilo: SlashCommand = {
                 .setMaxValue(1000),
         ),
     defer: { silent: false },
-    only: { threads: true },
     locked: {
         channels: [
             ...channels.gamblingcommands,

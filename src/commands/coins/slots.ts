@@ -36,7 +36,6 @@ export const slots: SlashCommand = {
                 )
                 .setDescription(`Amount of ${texts.c.l} to play the slots`),
         ),
-    only: { threads: true },
     defer: { silent: false },
     locked: {
         channels: [

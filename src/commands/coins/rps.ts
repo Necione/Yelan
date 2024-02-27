@@ -56,7 +56,6 @@ export const rps: SlashCommand = {
                 .setMaxValue(250),
         ),
     defer: { silent: false },
-    only: { threads: true },
     async execute(interaction, responder) {
         if (!interaction.deferred) {
             return;

@@ -238,7 +238,6 @@ Both of you ${loss < 0 ? "won?" : "lost"} ${customEmoji.a.z_coins} \`${
 };
 
 export const fight: SlashCommand = {
-    only: { threads: true },
     command: new SlashCommandBuilder()
         .setName(`fight`)
         .setDescription(
