@@ -1,8 +1,8 @@
-import type { SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, sleep } from "@elara-services/utils";
+import { getInt, type SlashCommand } from "@elara-services/botbuilder";
+import { embedComment, formatNumber, get, sleep } from "@elara-services/utils";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
-import { customEmoji, locked, texts } from "../../utils";
+import { addRakeback, customEmoji, locked, texts } from "../../utils";
 
 export const limbo: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -10,17 +10,21 @@ export const limbo: SlashCommand = {
         .setDescription(`Guess the multiplier for a chance to win.`)
         .setDMPermission(false)
         .addNumberOption((o) =>
-            o.setName("guess")
-             .setDescription("Your guess multiplier (must be above 1.05)")
-             .setRequired(true)
-             .setMinValue(1.05))
+            o
+                .setName("guess")
+                .setDescription("Your guess multiplier (must be above 1.05)")
+                .setRequired(true)
+                .setMinValue(1.05),
+        )
         .addIntegerOption((o) =>
-            o.setName("bet")
-             .setDescription("The bet amount")
-             .setRequired(true)
-             .setMinValue(10)
-             .setMaxValue(500)),
-
+            getInt(o, {
+                name: "bet",
+                description: `The bet amount`,
+                required: true,
+                min: 10,
+                max: 500,
+            }),
+        ),
     defer: { silent: false },
     async execute(interaction, responder) {
         if (!interaction.deferred) {
@@ -30,49 +34,79 @@ export const limbo: SlashCommand = {
 
         const guessMultiplier = interaction.options.getNumber("guess", true);
         const betAmount = interaction.options.getInteger("bet", true);
-        const userId = interaction.user.id;
-
         let profit = 0;
 
         // Check user's balance
-        const userProfile = await getProfileByUserId(userId);
-        if (!userProfile || userProfile.balance < betAmount) {
-            locked.del(userId);
-            return responder.edit(embedComment(`You do not have enough balance.`));
+        const p = await getProfileByUserId(interaction.user.id);
+        if (!p) {
+            locked.del(interaction.user.id);
+            return responder.edit(
+                embedComment(`Unable to find/create your user profile.`),
+            );
+        }
+        if (p.locked) {
+            locked.del(interaction.user.id);
+            return responder.edit(
+                embedComment(
+                    `Your profile is locked, you cannot use any commands until it's unlocked.`,
+                ),
+            );
+        }
+        if (p.balance < betAmount) {
+            locked.del(interaction.user.id);
+            return responder.edit(
+                embedComment(`You don't have enough balance.`),
+            );
         }
 
         // Initial Embed
-        let embed = new EmbedBuilder()
+        const embed = new EmbedBuilder()
             .setTitle("`🔮` Limbo")
             .setColor(Colors.Yellow)
-            .setDescription(`The gods of luck choose upon your fate ${customEmoji.a.loading}`);
+            .setDescription(
+                `The gods of luck choose upon your fate ${customEmoji.a.loading}`,
+            );
         await responder.edit({ embeds: [embed] });
+        await sleep(get.secs(1));
 
-        await sleep(500);
-
-        let crashPoint = getCrashPoint();
+        const crashPoint = getCrashPoint();
         const win = crashPoint >= guessMultiplier;
 
         if (win) {
             profit = Math.floor(betAmount * (guessMultiplier - 1));
-            await addBalance(userId, profit);
+            await addBalance(interaction.user.id, profit);
         } else {
-            await removeBalance(userId, betAmount);
+            await Promise.all([
+                removeBalance(interaction.user.id, betAmount),
+                addRakeback(interaction.user.id, betAmount),
+            ]);
         }
-        
-        embed = embed
-            .setColor(win ? Colors.Green : Colors.Red)
-            .setDescription(`- Multiplier: **${crashPoint.toFixed(2)}x**\n- Your Guess: **${guessMultiplier.toFixed(2)}x**`)
-            .setFooter({ text: `Bet: ${betAmount} ${texts.c.u}. Your new balance: ${win ? userProfile.balance + profit : userProfile.balance - betAmount}` });        
 
-        locked.del(userId);
+        embed
+            .setColor(Colors[win ? "Green" : "Red"])
+            .setDescription(
+                `- Multiplier: **${crashPoint.toFixed(
+                    2,
+                )}x**\n- Your Guess: **${guessMultiplier.toFixed(2)}x**`,
+            )
+            .setFooter({
+                text: `Bet: ${betAmount} ${
+                    texts.c.u
+                }. Your new balance: ${formatNumber(
+                    win ? p.balance + profit : p.balance - betAmount,
+                )}`,
+            });
+
+        locked.del(interaction.user.id);
         return responder.edit({ embeds: [embed] });
     },
 };
 
 function getCrashPoint() {
-    const e = 2**32;
+    const e = 2 ** 32;
     const h = crypto.getRandomValues(new Uint32Array(1))[0];
-    if (h % 50 === 0) return 1;
+    if (h % 50 === 0) {
+        return 1;
+    }
     return Math.floor((100 * e - h) / (e - h)) / 100;
 }
