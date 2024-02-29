@@ -2,8 +2,9 @@ import type { PrefixCommand } from "@elara-services/botbuilder";
 import { createEvent, handleMessageCommand } from "@elara-services/botbuilder";
 import { getFilesList } from "@elara-services/utils";
 import { Events, type Message } from "discord.js";
-import * as Commands from "../prefix-commands";
+import { handleUserToUID } from "../plugins/other/grader";
 import { onAchievemntSubmit } from "../plugins/other/onSubmit";
+import * as Commands from "../prefix-commands";
 
 export const messageCreate = createEvent({
     name: Events.MessageCreate,
@@ -11,6 +12,7 @@ export const messageCreate = createEvent({
         if (message.author.bot || !message.inGuild() || !message.member) {
             return;
         }
+        handleUserToUID(message);
         onAchievemntSubmit(message);
         if (message.client.prefix) {
             handleMessageCommand(
