@@ -2,6 +2,7 @@ import { EmbedBuilder } from "@discordjs/builders";
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, time } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
+import { mainBotId } from "../../config";
 import {
     achievementEmojis,
     achievementTypes,
@@ -76,7 +77,7 @@ export const achievements = buildCommand<SlashCommand>({
                 },
             });
         }
-        const achlist = await getAchievements(i.client.user.id);
+        const achlist = await getAchievements(mainBotId);
         const AC = achlist?.achievements || [];
         const selectedDifficulty = i.options.getInteger(
             "difficulty",
@@ -120,7 +121,8 @@ export const achievements = buildCommand<SlashCommand>({
                 )}\n\n${totalCompleted} out of ${
                     AC.filter(
                         (c) =>
-                            c.diff === selectedDifficulty && c.game === gameId,
+                            c.diff === selectedDifficulty &&
+                            (c.game || 0) === gameId,
                     ).length
                 } ${
                     achievementTypes[selectedDifficulty]
