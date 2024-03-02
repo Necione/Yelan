@@ -42,12 +42,12 @@ export const economy = {
             messages: 85,
             activity: 100,
         },
-        min: 5,
-        max: 10,
+        min: 3,
+        max: 8,
         special: {
             day: 5, // 5: Friday
-            min: 6,
-            max: 12,
+            min: 5,
+            max: 10,
         },
         dailyLimit: 150000,
         messagesInAMinute: 2,
