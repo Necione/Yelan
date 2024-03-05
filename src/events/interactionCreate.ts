@@ -1,13 +1,13 @@
 import {
     createEvent,
     handleInteractionCommand,
+    handlePostInteraction,
 } from "@elara-services/botbuilder";
 import { embedComment, getFilesList } from "@elara-services/utils";
 import type { Interaction, InteractionReplyOptions } from "discord.js";
 import { Events } from "discord.js";
 import * as Commands from "../commands";
 import * as context from "../plugins/context";
-import { onRickRoll } from "../plugins/other/rickroll";
 import { handleInteractions } from "../plugins/pets";
 import { onInteraction } from "../plugins/profile";
 import { isInActiveTrade, locked } from "../utils";
@@ -15,11 +15,7 @@ import { isInActiveTrade, locked } from "../utils";
 export const interactionCreate = createEvent({
     name: Events.InteractionCreate,
     async execute(i: Interaction) {
-        if (i.isModalSubmit()) {
-            if (i.customId.startsWith("rickroll:")) {
-                return onRickRoll(i);
-            }
-        }
+        handlePostInteraction(i);
         if ("customId" in i) {
             if (i.customId.startsWith("profile|")) {
                 return onInteraction(i);
