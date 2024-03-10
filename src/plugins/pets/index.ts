@@ -2,6 +2,7 @@ import { randomWeight } from "@elara-services/packages";
 import {
     addButtonRow,
     embedComment,
+    error,
     field,
     formatNumber,
     get,
@@ -439,7 +440,7 @@ export async function handleInteractions(interaction: Interaction) {
     if (!("customId" in interaction)) {
         return;
     }
-    const responder = getInteractionResponder(interaction);
+    const responder = getInteractionResponder(interaction, error);
     const [, id, action] = interaction.customId.split(":");
     const user = interaction.user;
     const send = async (
@@ -458,6 +459,53 @@ export async function handleInteractions(interaction: Interaction) {
         }
         return await responder.edit(options);
     };
+    if (action === "rename_modal" && interaction.isModalSubmit()) {
+        const name = interaction.fields.getTextInputValue("name");
+        await interaction.deferUpdate().catch(console.log);
+        if (!checkName(name)) {
+            return await send(
+                embedComment(
+                    `The name you provided can't be used, pick a different one.`,
+                ),
+            );
+        }
+        const [p, d] = await Promise.all([
+            getPets(user.id),
+            getProfileByUserId(user.id),
+        ]);
+        const pe = p.pets.find((c) => c.id === id);
+        if (!pe) {
+            return await send(
+                embedComment(`Unable to find the pet in your invetory....`),
+            );
+        }
+        if (d.balance < 10) {
+            return await send(
+                embedComment(
+                    `You need ${customEmoji.a.z_coins} \`10 ${texts.c.u}\` to rename`,
+                ),
+            );
+        }
+        const confirm = await getConfirmPrompt(
+            interaction,
+            user,
+            `Are you 100% sure you want to rename your pet for ${customEmoji.a.z_coins} \`10 ${texts.c.u}\`?`,
+            get.secs(10),
+        );
+        if (!confirm) {
+            return;
+        }
+        pe.name = name;
+        await Promise.all([
+            updatePets(user.id, {
+                pets: {
+                    set: p.pets,
+                },
+            }),
+            removeBalance(user.id, 10, false, `Rename pet to \`${name}\``),
+        ]);
+        return await send(embedComment(`I've renamed your pet!`, "Green"));
+    }
     if (id === "view") {
         await responder.deferUpdate();
         return displayData(interaction, responder);
@@ -567,7 +615,7 @@ export async function handleInteractions(interaction: Interaction) {
     }
 
     if (action === "rename" && "showModal" in interaction) {
-        await interaction
+        return await interaction
             .showModal({
                 customId: `pet:${id}:rename_modal`,
                 title: `Rename Pet`,
@@ -588,65 +636,7 @@ export async function handleInteractions(interaction: Interaction) {
                     },
                 ],
             })
-            .catch(() => null);
-        const prompt = await interaction
-            .awaitModalSubmit({
-                filter: (i) =>
-                    i.user.id === interaction.user.id &&
-                    i.customId === `pet:${id}:rename_modal`,
-                time: get.secs(30),
-            })
-            .catch(() => null);
-        if (!prompt) {
-            return await send(
-                embedComment(`You failed to provide a new name after 30s`),
-            );
-        }
-        const name = prompt.fields.getTextInputValue("name");
-        await prompt.deferUpdate().catch(() => null);
-        if (!checkName(name)) {
-            return await send(
-                embedComment(
-                    `The name you provided can't be used, pick a different one.`,
-                ),
-            );
-        }
-        const [p, d] = await Promise.all([
-            getPets(user.id),
-            getProfileByUserId(user.id),
-        ]);
-        const pe = p.pets.find((c) => c.id === id);
-        if (!pe) {
-            return await send(
-                embedComment(`Unable to find the pet in your invetory....`),
-            );
-        }
-        if (d.balance < 10) {
-            return await send(
-                embedComment(
-                    `You need ${customEmoji.a.z_coins} \`10 ${texts.c.u}\` to rename`,
-                ),
-            );
-        }
-        const confirm = await getConfirmPrompt(
-            interaction,
-            user,
-            `Are you 100% sure you want to rename your pet for ${customEmoji.a.z_coins} \`10 ${texts.c.u}\`?`,
-            get.secs(10),
-        );
-        if (!confirm) {
-            return;
-        }
-        pe.name = name;
-        await Promise.all([
-            updatePets(user.id, {
-                pets: {
-                    set: p.pets,
-                },
-            }),
-            removeBalance(user.id, 10, false, `Rename pet to \`${name}\``),
-        ]);
-        return await send(embedComment(`I've renamed your pet!`, "Green"));
+            .catch(console.log);
     }
 
     if (action === "disown") {
