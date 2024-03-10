@@ -22,7 +22,7 @@ export async function onInteraction(interaction: RepliableInteraction) {
     if (!("customId" in interaction)) {
         return;
     }
-    if (interaction.customId.startsWith("profile|")) {
+    if (!interaction.customId.startsWith("profile|")) {
         return;
     }
     const responder = getInteractionResponder(interaction);
