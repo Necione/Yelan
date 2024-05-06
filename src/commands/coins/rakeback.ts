@@ -56,7 +56,7 @@ export const rakeback: SlashCommand = {
         if (checks.limit(data, data.rakeback.amount)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(`You've reached your daily gambling limit.`),
+                embedComment(`You've reached your daily coin earning limit.`),
             );
         }
         await Promise.all([

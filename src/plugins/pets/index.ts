@@ -247,7 +247,7 @@ export async function displayData(
                     id: pet.id,
                     message: `\`${pet.name}\` (**${proper(pet.type)}, ${proper(
                         getPetRarity(pet.rarity) as string,
-                    )}**) has died, due to you not feeding it.`,
+                    )}**) has starved to death :(.`,
                 });
                 logs.misc({
                     content: `\`${interaction.user.username}\` (${
@@ -268,9 +268,9 @@ export async function displayData(
             } else {
                 status.push({
                     id: pet.id,
-                    message: `\`${pet.name}\` has ${time.relative(
+                    message: `\`${pet.name}\` will starve ${time.relative(
                         new Date(alive.ends),
-                    )} left, make sure to feed it!`,
+                    )}, make sure to feed it!`,
                 });
             }
         }
@@ -383,7 +383,7 @@ export async function displayData(
                 name: interaction.user.displayName,
                 iconURL: interaction.user.displayAvatarURL(),
             })
-            .setTitle(`Pet`)
+            .setTitle(`Your Current Pet(s)`)
             .setColor(Colors.Aqua)
             .setDescription(
                 [

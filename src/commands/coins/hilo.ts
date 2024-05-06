@@ -54,7 +54,7 @@ export const hilo: SlashCommand = {
         if (checks.limit(p1, amount)) {
             locked.del(interaction.user.id);
             return responder.edit(
-                embedComment(`You've reached your daily gambling limit.`),
+                embedComment(`You've reached your daily coin earning limit.`),
             );
         }
         await removeBalance(

@@ -234,7 +234,7 @@ export const cooldowns = {
             if (Date.now() < find.ends) {
                 const msg =
                     customMessage ||
-                    `You can't use (\`${command}\`) command again until:\n> %DATELONG% (%DURATION%)`;
+                    `You can't use (\`${command}\`) command again until:\n%DATELONG% (%DURATION%)`;
                 const date = new Date(find.ends);
                 return status.error(
                     msg

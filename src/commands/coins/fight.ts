@@ -331,13 +331,13 @@ export const fight: SlashCommand = {
         if (checks.limit(user1, flooredAmount)) {
             endFight();
             return responder.edit(
-                embedComment(`You've reached your daily gambling limit.`),
+                embedComment(`You've reached your daily coin earning limit.`),
             );
         }
         if (checks.limit(user2, flooredAmount)) {
             endFight();
             return responder.edit(
-                embedComment(`You've reached your daily gambling limit.`),
+                embedComment(`You've reached your daily coin earning limit.`),
             );
         }
 

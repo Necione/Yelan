@@ -106,13 +106,13 @@ export const rps: SlashCommand = {
         if (checks.limit(p1, amount)) {
             removeTimeout();
             return responder.edit(
-                embedComment(`You've reached your daily gambling limit.`),
+                embedComment(`You've reached your daily coin earning limit.`),
             );
         }
         if (checks.limit(p2, amount)) {
             removeTimeout();
             return responder.edit(
-                embedComment(`You've reached your daily gambling limit.`),
+                embedComment(`You've reached your daily coin earning limit.`),
             );
         }
 
