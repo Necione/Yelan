@@ -134,7 +134,7 @@ export const hilo: SlashCommand = {
 
         const resultEmbed = new EmbedBuilder()
             .setTitle("Hi-Lo Result")
-            .setThumbnail("https://file.coffee/u/JbA-bjCCma7O45G-9ANSX.png")
+            .setThumbnail("https://cdn.discordapp.com/attachments/1219591114848210968/1238356694254223380/blackjack_1.png?ex=663efd0b&is=663dab8b&hm=a89bbb6958fc1a6ef901134447e423ffa3f8e61e43ea4805ce683fe725d64c1d&")
             .setDescription(
                 `**Original Card:** ${currentCard}\n**Your Choice:** \`${userChoice}\`\n**Next Card:** ${nextCard}\n\n${
                     isCorrect
