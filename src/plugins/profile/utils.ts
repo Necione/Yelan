@@ -17,6 +17,7 @@ import { levels } from "../../services/levels";
 import { locked, userLockedData } from "../../utils";
 import { images } from "../../utils/images";
 import { createProfile } from "../canvas/profile";
+import { profile } from "../context";
 
 export function getBackgroundUrl(backgroundUrl?: string | null | undefined) {
     if (backgroundUrl && backgroundUrl.match(/https:\/\//gi)) {
@@ -191,6 +192,7 @@ export async function fetchData(
 
     return {
         embeds: [],
+        content: `> Genshin UID: ${profile.rankedUID || "NOT_SET"}`,
         files: [{ name: "profile.png", attachment: data }],
         components: row.components.length ? [row] : [],
     };
