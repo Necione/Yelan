@@ -175,6 +175,10 @@ export async function fetchData(
                 id: `profile|custom_background`,
                 label: `Edit Background`,
                 style: ButtonStyle.Secondary,
+                emoji: {
+                    id: '1240497023971496026',
+                    name: 'Pencil',
+                },
             }),
         );
 
@@ -189,8 +193,15 @@ export async function fetchData(
         }
     }
 
+    const regionNames: { [key: number]: string } = { 8: "Asia", 7: "Europe", 6: "America" };
+    const regionName = p.rankedRegion != null && regionNames[p.rankedRegion] ? regionNames[p.rankedRegion] : "Other";
+    const uidContent = p.rankedUID
+        ? `> UID: \`${p.rankedUID}\` (${regionName})`
+        : "> UID: Not Set, use </uid:1204385940231950397>";
+    
     return {
         embeds: [],
+        content: uidContent,
         files: [{ name: "profile.png", attachment: data }],
         components: row.components.length ? [row] : [],
     };

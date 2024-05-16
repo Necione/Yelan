@@ -42,7 +42,7 @@ export const images = {
         },
         profile: {
             frame: "https://file.coffee/u/IBpIXAsuircRiaoXs0T1j.png",
-            background: `https://i.imgur.com/TS9igDv.png`,
+            background: `https://i.imgur.com/3RacEf0.png`,
             hidden: "https://i.imgur.com/KCjkSXw.png",
             bots: [
                 "https://media.tenor.com/Hirj-cwKT0oAAAAd/roll-rick.gif",

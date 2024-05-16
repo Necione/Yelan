@@ -1,10 +1,10 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, get } from "@elara-services/utils";
-import { SlashCommandBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId } from "../../services";
 import { checks, cooldowns, locked, texts, userLockedData } from "../../utils";
-import { battleMessages } from "../../utils/work";
+import { workMessages } from "../../utils/work";
 
 export const work: SlashCommand = {
     disabled: {
@@ -35,11 +35,11 @@ export const work: SlashCommand = {
         }
 
         const amount = Math.floor(Math.random() * 20) + 2;
-        const getMsg = () =>
-            battleMessages[
-                Math.floor(Math.random() * battleMessages.length)
-            ].replace(/%AMOUNT%/gi, formatNumber(amount));
-        const msg = getMsg();
+        const getMsg = () => workMessages[
+            Math.floor(Math.random() * workMessages.length)
+        ];
+        const { message, image, title, footer } = getMsg();
+        const msg = message.replace(/%AMOUNT%/gi, formatNumber(amount));
 
         if (checks.limit(data, amount)) {
             locked.del(interaction.user.id);
@@ -52,9 +52,19 @@ export const work: SlashCommand = {
             locked.del(interaction.user.id);
             return responder.edit(embedComment(hasCooldown.message));
         }
+
         locked.del(interaction.user.id);
         await Promise.all([
-            responder.edit(embedComment(msg, "Aqua")),
+            responder.edit({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("Aqua")
+                        .setTitle(title)
+                        .setDescription(msg)
+                        .setThumbnail(image)
+                        .setFooter({ text: footer }),
+                ],
+            }),
             cooldowns.set(data, "work", get.hrs(1)),
             addBalance(
                 interaction.user.id,
