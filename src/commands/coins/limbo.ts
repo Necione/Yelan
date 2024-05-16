@@ -109,5 +109,6 @@ function getCrashPoint() {
     if (h % 50 === 0) {
         return 1;
     }
-    return Math.floor((100 * e - h) / (e - h)) / 100;
+    let crashPoint = Math.floor((100 * e - h) / (e - h)) / 100;
+    return crashPoint > 1000 ? 1000 : crashPoint; // Cap the crash point at 1000
 }
