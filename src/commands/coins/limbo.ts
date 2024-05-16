@@ -12,9 +12,9 @@ export const limbo: SlashCommand = {
         .addNumberOption((o) =>
             o
                 .setName("guess")
-                .setDescription("Your guess multiplier (must be above 1.05)")
+                .setDescription("Your guess multiplier (must be above 1.1)")
                 .setRequired(true)
-                .setMinValue(1.05),
+                .setMinValue(1.1),
         )
         .addIntegerOption((o) =>
             getInt(o, {
@@ -110,5 +110,8 @@ function getCrashPoint() {
         return 1;
     }
     let crashPoint = Math.floor((100 * e - h) / (e - h)) / 100;
-    return crashPoint > 1000 ? 1000 : crashPoint; // Cap the crash point at 1000
+    if (crashPoint > 1000) {
+        crashPoint = Math.random() * 9 + 1;
+    }
+    return crashPoint;
 }

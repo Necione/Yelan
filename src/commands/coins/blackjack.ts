@@ -20,7 +20,7 @@ export const blackjack: SlashCommand = {
                 .setName("bet")
                 .setDescription("The amount to bet")
                 .setMinValue(5)
-                .setMaxValue(10000),
+                .setMaxValue(5000),
         ),
     defer: { silent: false },
     async execute(interaction, responder) {
