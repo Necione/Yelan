@@ -1,7 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { getProfileByUserId, updateRankedUID } from "../../services";
+import { getProfileByUserId } from "../../services";
 
 const regions = {
     asia: [1, 2, 5, 8],
@@ -18,6 +18,10 @@ function isValidRegion(uid: number) {
         }
     }
     return false;
+}
+
+function generateOTP() {
+    return Math.floor(10000 + Math.random() * 90000).toString();
 }
 
 export const uid = buildCommand<SlashCommand>({
@@ -64,9 +68,18 @@ export const uid = buildCommand<SlashCommand>({
                 ),
             );
         }
-        await updateRankedUID(i.user.id, uid);
-        return r.edit(
-            embedComment(`Your Genshin UID is now set to \`${uid}\``, "Green"),
+
+        const otp = generateOTP();
+
+        await r.edit(
+            embedComment(`Thank you! Please set your Genshin Impact status to "${otp}" in order to verify your UID. Staff will check and get back to you within 24 hours.`, "Green"),
         );
+
+        const channel = await i.client.channels.fetch('1240509113650380922');
+        if (channel && channel.isTextBased()) {
+            await channel.send({
+                content: `User **${i.user.tag}** *(ID: ${i.user.id})* has requested to set their UID to \`${uid}\`. Please verify their status within 24 hours.\n> OTP \`${otp}\`.\n> https://enka.network/u/${uid}/`,
+            });
+        }
     },
 });
