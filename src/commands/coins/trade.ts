@@ -1,6 +1,7 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import {
     addButtonRow,
+    convertiOSShit,
     dis,
     discord,
     embedComment,
@@ -390,10 +391,11 @@ export const trade: SlashCommand = {
                             );
                         }
                         if (value === "collectable") {
-                            const name =
+                            const name = convertiOSShit(
                                 c.fields.fields.find(
                                     (c) => c.customId === "name",
-                                )?.value || null;
+                                )?.value || "",
+                            );
                             if (!name) {
                                 return void rr.edit(
                                     embedComment(

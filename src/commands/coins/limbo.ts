@@ -63,7 +63,9 @@ export const limbo: SlashCommand = {
         const embed = new EmbedBuilder()
             .setTitle("`🔮` Limbo")
             .setColor(Colors.Yellow)
-            .setThumbnail('https://cdn.discordapp.com/attachments/1219591114848210968/1238356671814963260/weight-bar.png?ex=663efd06&is=663dab86&hm=6b1f396902ed3614dd8e94638efd184cdbee76dc9cd7f2673634604f3377fcd1&')
+            .setThumbnail(
+                "https://cdn.discordapp.com/attachments/1219591114848210968/1238356671814963260/weight-bar.png?ex=663efd06&is=663dab86&hm=6b1f396902ed3614dd8e94638efd184cdbee76dc9cd7f2673634604f3377fcd1&",
+            )
             .setDescription(
                 `The gods of luck choose upon your fate ${customEmoji.a.loading}`,
             );

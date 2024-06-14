@@ -17,6 +17,7 @@ export const interactionCreate = createEvent({
     async execute(i: Interaction) {
         handlePostInteraction(i);
         if ("customId" in i) {
+            i.client.enka.onInteraction(i);
             if (i.customId.startsWith("profile|")) {
                 return onInteraction(i);
             }

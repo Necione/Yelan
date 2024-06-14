@@ -1,7 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, is } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { getProfileByUserId } from "../../services";
+import { getAllUserProfiles, getProfileByUserId } from "../../services";
+import { logs } from "../../utils";
 
 const regions = {
     asia: [1, 2, 5, 8],
@@ -18,10 +19,6 @@ function isValidRegion(uid: number) {
         }
     }
     return false;
-}
-
-function generateOTP() {
-    return Math.floor(10000 + Math.random() * 90000).toString();
 }
 
 export const uid = buildCommand<SlashCommand>({
@@ -68,18 +65,42 @@ export const uid = buildCommand<SlashCommand>({
                 ),
             );
         }
-
-        const otp = generateOTP();
-
-        await r.edit(
-            embedComment(`Thank you! Please set your Genshin Impact status to "${otp}" in order to verify your UID. Staff will check and get back to you within 24 hours.`, "Green"),
-        );
-
-        const channel = await i.client.channels.fetch('1240509113650380922');
-        if (channel && channel.isTextBased()) {
-            await channel.send({
-                content: `User **${i.user.tag}** *(ID: ${i.user.id})* has requested to set their UID to \`${uid}\`. Please verify their status within 24 hours.\n> OTP \`${otp}\`.\n> https://enka.network/u/${uid}/`,
-            });
+        const isValid = await i.client.enka.enka.isValidUID(uid);
+        if (!isValid) {
+            return r.edit(
+                embedComment(
+                    `The UID you provided isn't registered with https://enka.network`,
+                ),
+            );
         }
+
+        const others = (
+            await getAllUserProfiles({
+                where: {
+                    rankedUID: uid,
+                },
+            })
+        ).filter((c) => c.userId !== i.user.id);
+        if (is.array(others)) {
+            await logs.handle(
+                {
+                    content: `${i.user.toString()} (\`${
+                        i.user.id
+                    }\`) has tried using an already taken Genshin UID \`${uid}\`\n> Other user(s): ${others
+                        .map((c) => `<@${c.userId}>`)
+                        .join(", ")}`,
+                    allowed_mentions: { parse: [] },
+                    allowedMentions: { parse: [] },
+                },
+                "1079648430743363704",
+            );
+            return r.edit(
+                embedComment(
+                    `UID (${uid}) is already registered to another user.`,
+                ),
+            );
+        }
+
+        return await i.client.enka.sendVerificationMessage(i, uid);
     },
 });

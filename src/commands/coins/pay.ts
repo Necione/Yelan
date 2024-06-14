@@ -2,7 +2,12 @@ import type { SlashCommand } from "@elara-services/botbuilder";
 import { discord, embedComment, field } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
-import { addBalance, getProfileByUserId, removeBalance } from "../../services";
+import {
+    addBalance,
+    checkBalanceForLimit,
+    getProfileByUserId,
+    removeBalance,
+} from "../../services";
 import {
     checks,
     customEmoji,
@@ -118,6 +123,11 @@ export const pay: SlashCommand = {
         if (userP.locked) {
             locked.del([interaction.user.id, user.id]);
             return responder.edit(userLockedData(user.id));
+        }
+        const r = checkBalanceForLimit(userP, amount);
+        if (!r.status) {
+            locked.del([interaction.user.id, user.id]);
+            return responder.edit(embedComment(r.message));
         }
         const member = interaction.member;
         const fee = await getTax(amount, member);

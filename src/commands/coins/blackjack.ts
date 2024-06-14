@@ -55,7 +55,9 @@ export const blackjack: SlashCommand = {
         const embed = new EmbedBuilder()
             .setTitle("`🍀` Blackjack")
             .setColor("#FF9141")
-            .setThumbnail('https://cdn.discordapp.com/attachments/1219591114848210968/1238356713191510066/blackjack.png?ex=663efd0f&is=663dab8f&hm=8b86f2c10a4b6d41ae9d23ea61235d8551ccea1decde6bf93486da1425e2ceac&')
+            .setThumbnail(
+                "https://cdn.discordapp.com/attachments/1219591114848210968/1238356713191510066/blackjack.png?ex=663efd0f&is=663dab8f&hm=8b86f2c10a4b6d41ae9d23ea61235d8551ccea1decde6bf93486da1425e2ceac&",
+            )
             .setDescription(
                 `Your hand: **${playerCards.join(", ")}**\nDealer's hand: **${
                     dealerCards[0]
