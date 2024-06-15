@@ -3,6 +3,7 @@ import { embedComment, formatNumber, is, time } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { channels, economy } from "../../config";
 import {
+    addBalance,
     checkBalanceForLimit,
     getProfileByUserId,
     updateUserProfile,
@@ -76,10 +77,8 @@ export const rakeback: SlashCommand = {
                 "add",
                 `Via ${rakeback.command.name}`,
             ),
+            addBalance(interaction.user.id, data.rakeback.amount),
             updateUserProfile(interaction.user.id, {
-                balance: {
-                    increment: data.rakeback.amount,
-                },
                 rakeback: {
                     amount: 0,
                     claimed: 0,
