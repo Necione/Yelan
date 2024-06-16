@@ -1,7 +1,12 @@
-import { is, sleep } from "@elara-services/utils";
+import { is, sleep, status } from "@elara-services/utils";
+import {
+    getDifference,
+    isAtBalanceLimit,
+    willBeAtBalanceLimit,
+} from "@liyueharbor/econ";
 import { Prisma, type UserWallet } from "@prisma/client";
 import { prisma } from "../prisma";
-import { logs } from "../utils";
+import { logs, texts } from "../utils";
 
 // This function is not atomic, be careful when calling
 export async function updateUserProfile(
@@ -54,6 +59,30 @@ export async function addBalance(
     addToAdded = true,
     extra?: string,
 ) {
+    const res = await getProfileByUserId(userId);
+    if (!res) {
+        return;
+    }
+    if (isAtBalanceLimit(res.staffCredits, res.balance || 0, res.vault || 0)) {
+        return;
+    }
+    if (
+        willBeAtBalanceLimit(
+            res.staffCredits,
+            res.balance || 0,
+            res.vault || 0,
+            amount,
+        )
+    ) {
+        const amountTOAdd = getDifference(
+            res.staffCredits,
+            Math.floor((res.balance || 0) + (res.vault || 0)),
+        );
+        if (!is.number(amountTOAdd)) {
+            return;
+        }
+        amount = amountTOAdd;
+    }
     const obj: Prisma.UserWalletUpdateInput = {
         balance: {
             increment: amount,
@@ -74,8 +103,31 @@ export async function handleBets(
     amountToRemove: number,
     extra?: string,
 ) {
-    await logs.action(userId, amountToAdd, "add", extra);
-    return await updateUserProfile(userId, {
+    const res = await getProfileByUserId(userId);
+    if (!res) {
+        return null;
+    }
+    if (isAtBalanceLimit(res.staffCredits, res.balance || 0, res.vault || 0)) {
+        return;
+    }
+    if (
+        willBeAtBalanceLimit(
+            res.staffCredits,
+            res.balance || 0,
+            res.vault || 0,
+            amountToAdd,
+        )
+    ) {
+        const amountTOAdd = getDifference(
+            res.staffCredits,
+            Math.floor((res.balance || 0) + (res.vault || 0)),
+        );
+        if (!is.number(amountTOAdd)) {
+            return;
+        }
+        amountToAdd = amountTOAdd;
+    }
+    const obj: Prisma.UserWalletUpdateInput = {
         balance: {
             increment: amountToAdd,
         },
@@ -85,7 +137,9 @@ export async function handleBets(
         balanceRemove: {
             decrement: amountToRemove,
         },
-    });
+    };
+    await logs.action(userId, amountToAdd, "add", extra);
+    return await updateUserProfile(userId, obj);
 }
 
 export async function removeBalance(
@@ -106,6 +160,23 @@ export async function removeBalance(
     }
     await updateUserProfile(userId, obj);
     await logs.action(userId, amount, "remove", extra);
+}
+
+export function checkBalanceForLimit(p: UserWallet, amount?: number) {
+    const rep = p.staffCredits || 0;
+    const balance = p.balance || 0;
+    const vault = p.vault || 0;
+    if (isAtBalanceLimit(rep, balance, vault)) {
+        return status.error(`User <@${p.userId}> is at the max balance limit`);
+    }
+    if (is.number(amount)) {
+        if (willBeAtBalanceLimit(rep, balance, vault, amount)) {
+            return status.error(
+                `User <@${p.userId}> can't earn anymore ${texts.c.u} until they get more reputation.`,
+            );
+        }
+    }
+    return status.success(`Good to go!`);
 }
 
 export async function getProfileByUserId(userId: string) {

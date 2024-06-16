@@ -152,7 +152,9 @@ export const dice: SlashCommand = {
 
         const e = new EmbedBuilder()
             .setTitle("`🎲` The Dice Game")
-            .setThumbnail('https://cdn.discordapp.com/attachments/1219591114848210968/1238356681906458675/dice.png?ex=663efd08&is=663dab88&hm=9340d5bf549aa55897cd0d03a800a42347645508c915b2746fa9b2913727bd73&')
+            .setThumbnail(
+                "https://cdn.discordapp.com/attachments/1219591114848210968/1238356681906458675/dice.png?ex=663efd08&is=663dab88&hm=9340d5bf549aa55897cd0d03a800a42347645508c915b2746fa9b2913727bd73&",
+            )
             .setColor(isWin ? Colors.Green : Colors.Red)
             .setDescription(`Rolling the dice ${customEmoji.a.loading} 🎲`);
 

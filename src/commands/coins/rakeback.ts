@@ -2,7 +2,12 @@ import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, is, time } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { channels, economy } from "../../config";
-import { getProfileByUserId, updateUserProfile } from "../../services";
+import {
+    addBalance,
+    checkBalanceForLimit,
+    getProfileByUserId,
+    updateUserProfile,
+} from "../../services";
 import {
     checks,
     cooldowns,
@@ -59,6 +64,11 @@ export const rakeback: SlashCommand = {
                 embedComment(`You've reached your daily coin earning limit.`),
             );
         }
+        const r = checkBalanceForLimit(data, data.rakeback.amount);
+        if (!r.status) {
+            locked.del(interaction.user.id);
+            return responder.edit(embedComment(r.message));
+        }
         await Promise.all([
             cooldowns.set(data, "rakeback", economy.commands.rakeback.time),
             logs.action(
@@ -67,10 +77,8 @@ export const rakeback: SlashCommand = {
                 "add",
                 `Via ${rakeback.command.name}`,
             ),
+            addBalance(interaction.user.id, data.rakeback.amount),
             updateUserProfile(interaction.user.id, {
-                balance: {
-                    increment: data.rakeback.amount,
-                },
                 rakeback: {
                     amount: 0,
                     claimed: 0,

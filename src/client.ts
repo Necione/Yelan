@@ -1,11 +1,13 @@
 import "dotenv/config";
 
 import { loadEvents } from "@elara-services/botbuilder";
+import { EnkaVerificationClient } from "@elara-services/enka/dist/verification";
 import { getFilesList, log, times } from "@elara-services/utils";
 import { ActivityType, Client, IntentsBitField, Options } from "discord.js";
 import moment from "moment-timezone";
 import * as events from "./events";
 import { checkIfDeploy } from "./scripts/checks";
+import { getProfileByUserId, updateRankedUID } from "./services";
 if (process.env.timeZone) {
     moment.tz.setDefault(process.env.timeZone);
     times.timeZone = process.env.timeZone;
@@ -14,6 +16,7 @@ if (process.env.timeZone) {
 declare module "discord.js" {
     export interface Client {
         prefix?: string;
+        enka: EnkaVerificationClient;
     }
 }
 
@@ -46,6 +49,18 @@ class BotClient extends Client {
             },
         });
         if (!checkIfDeploy()) {
+            this.enka = new EnkaVerificationClient(this);
+            this.enka.onVerificationFinish(async (data, user) => {
+                const r = await getProfileByUserId(user.id);
+                if (!r) {
+                    return;
+                }
+                log(
+                    `[UID: FINISH]: ${user.tag} (${user.id}) set as ${data.uid}`,
+                );
+                await updateRankedUID(user.id, parseInt(data.uid));
+                return;
+            });
             loadEvents(this, getFilesList(events));
             this.login(process.env.TOKEN).catch(console.error);
         }

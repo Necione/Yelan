@@ -35,9 +35,8 @@ export const work: SlashCommand = {
         }
 
         const amount = Math.floor(Math.random() * 20) + 2;
-        const getMsg = () => workMessages[
-            Math.floor(Math.random() * workMessages.length)
-        ];
+        const getMsg = () =>
+            workMessages[Math.floor(Math.random() * workMessages.length)];
         const { message, image, title, footer } = getMsg();
         const msg = message.replace(/%AMOUNT%/gi, formatNumber(amount));
 

@@ -19,7 +19,11 @@ import {
     TextInputStyle,
 } from "discord.js";
 import { mainServerId } from "../../config";
-import { getProfileByUserId, updateUserProfile } from "../../services";
+import {
+    checkBalanceForLimit,
+    getProfileByUserId,
+    updateUserProfile,
+} from "../../services";
 import { getCollectables } from "../../services/bot";
 import { customEmoji, getPaginatedMessage, logs, texts } from "../../utils";
 
@@ -269,6 +273,10 @@ export const inventory = buildCommand<SlashCommand>({
             const find = profile.collectables.find((c) => c.name === name);
             if (!find) {
                 return;
+            }
+            const r = checkBalanceForLimit(profile, total);
+            if (!r.status) {
+                return c.editReply(embedComment(r.message)).catch(() => null);
             }
             find.count = Math.floor(find.count - amount);
             if (find.count <= 0) {

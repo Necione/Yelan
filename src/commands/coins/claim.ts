@@ -9,7 +9,11 @@ import {
 } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { economy, roles } from "../../config";
-import { addBalance, getProfileByUserId } from "../../services";
+import {
+    addBalance,
+    checkBalanceForLimit,
+    getProfileByUserId,
+} from "../../services";
 import {
     cooldowns,
     customEmoji,
@@ -89,7 +93,11 @@ export const claim: SlashCommand = {
                 ),
             );
         }
-
+        const r = checkBalanceForLimit(data, amount);
+        if (!r.status) {
+            locked.del(interaction.user.id);
+            return responder.edit(embedComment(r.message));
+        }
         await Promise.all([
             ...promises,
             addBalance(
