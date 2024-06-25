@@ -6,9 +6,9 @@ import {
     is,
 } from "@elara-services/utils";
 import { EmbedBuilder, type GuildMember, type User } from "discord.js";
-import { economy, mainServerId } from "../../config";
+import { economy } from "../../config";
 import { getAllUserProfiles } from "../../services";
-import { getStore, sortLB } from "../../services/bot";
+import { sortLB } from "../../services/bot";
 import {
     customEmoji,
     getRandomImage,
@@ -49,12 +49,7 @@ export async function fetchData(
             }
         }
     }
-    const store = await getStore(mainServerId);
-    let welkin = null;
-    if (store && is.array(store.items)) {
-        welkin = store.items.find((c) => c.name === "Welkin Moon");
-    }
-    // store.find((c) => c.name === "Welkin Moon");
+
     const dailyStats = profile.dailyStats || [];
     const average =
         dailyStats.length > 0
@@ -71,26 +66,6 @@ export async function fetchData(
             profile.active?.count ?? 0,
         )}**\n`,
     ];
-    if (welkin) {
-        const percent = Math.floor((profile.balance * 100) / welkin.cost);
-        if (profile.balance >= welkin.cost) {
-            description.push(
-                `${
-                    customEmoji.a.z_diamond
-                } Progress to Welkin: \`${formatNumber(
-                    welkin.cost,
-                )} / ${formatNumber(welkin.cost)}\` (**100%**)`,
-            );
-        } else {
-            description.push(
-                `${
-                    customEmoji.a.z_diamond
-                } Progress to Welkin: \`${formatNumber(
-                    profile.balance,
-                )} / ${formatNumber(welkin.cost)}\` (**${percent}%**)`,
-            );
-        }
-    }
     const embed = new EmbedBuilder()
         .setColor(0xc0f6fb)
         .setTitle(
@@ -114,15 +89,15 @@ export async function fetchData(
         .addFields(
             {
                 name: "✦ Message Rewards",
-                value: `>>> \`${messages}/${nearestMessages}\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.messages} Bonus Coins**`,
+                value: `\`${messages}/${nearestMessages}\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.messages} Coins**, +1 Reputation`,
             },
             {
                 name: "✦ Activity Rewards",
-                value: `>>> \`${activeTime}/${nearestTime} Minutes\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.activity} Bonus Coins**`,
+                value: `\`${activeTime}/${nearestTime} Minutes\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.activity} Coins**, +1 Reputation`,
             },
         )
         .setFooter({
-            text: `You currently earn ${economy.mora.min} - ${economy.mora.max} ${texts.c.u} per minute`,
+            text: `You earn ${economy.mora.min} - ${economy.mora.max} ${texts.c.u} per minute from talking`,
             iconURL: images.commands.quests.footer,
         });
 
