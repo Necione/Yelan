@@ -1,5 +1,6 @@
-import { is, sleep, status } from "@elara-services/utils";
+import { formatNumber, is, sleep, status } from "@elara-services/utils";
 import {
+    getBalanceLimit,
     getDifference,
     isAtBalanceLimit,
     willBeAtBalanceLimit,
@@ -167,7 +168,11 @@ export function checkBalanceForLimit(p: UserWallet, amount?: number) {
     const balance = p.balance || 0;
     const vault = p.vault || 0;
     if (isAtBalanceLimit(rep, balance, vault)) {
-        return status.error(`User <@${p.userId}> is at the max balance limit`);
+        return status.error(
+            `<@${p.userId}> has hit their maximum balance of \`${formatNumber(
+                getBalanceLimit(rep),
+            )} Coins\`\nYou can increase this with reputation (see \`/quests\`)`,
+        );
     }
     if (is.number(amount)) {
         if (willBeAtBalanceLimit(rep, balance, vault, amount)) {
