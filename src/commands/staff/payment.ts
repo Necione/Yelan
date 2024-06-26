@@ -51,7 +51,9 @@ export const payment = buildCommand<SlashCommand>({
             amount,
             false,
             `Via admin pay: \`@${i.user.username}\` (${i.user.id})\nReason: ${reason}`,
+            false,
         );
+
         await logs.payments(
             embedComment(
                 `### Payment\n- From: \`${i.user.username}\` (${

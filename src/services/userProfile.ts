@@ -59,30 +59,35 @@ export async function addBalance(
     amount: number,
     addToAdded = true,
     extra?: string,
+    checkBalanceLimits = true,
 ) {
     const res = await getProfileByUserId(userId);
     if (!res) {
         return;
     }
-    if (isAtBalanceLimit(res.staffCredits, res.balance || 0, res.vault || 0)) {
-        return;
-    }
-    if (
-        willBeAtBalanceLimit(
-            res.staffCredits,
-            res.balance || 0,
-            res.vault || 0,
-            amount,
-        )
-    ) {
-        const amountTOAdd = getDifference(
-            res.staffCredits,
-            Math.floor((res.balance || 0) + (res.vault || 0)),
-        );
-        if (!is.number(amountTOAdd)) {
+    if (checkBalanceLimits) {
+        if (
+            isAtBalanceLimit(res.staffCredits, res.balance || 0, res.vault || 0)
+        ) {
             return;
         }
-        amount = amountTOAdd;
+        if (
+            willBeAtBalanceLimit(
+                res.staffCredits,
+                res.balance || 0,
+                res.vault || 0,
+                amount,
+            )
+        ) {
+            const amountTOAdd = getDifference(
+                res.staffCredits,
+                Math.floor((res.balance || 0) + (res.vault || 0)),
+            );
+            if (!is.number(amountTOAdd)) {
+                return;
+            }
+            amount = amountTOAdd;
+        }
     }
     const obj: Prisma.UserWalletUpdateInput = {
         balance: {
