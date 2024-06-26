@@ -330,6 +330,10 @@ export const inventory = buildCommand<SlashCommand>({
                 )
                 .catch(() => null);
         }
+        const dupes = p.collectables
+            .filter((c) => c.count > 1)
+            .map((c) => c.count - 1)
+            .reduce((a, b) => a + b, 0);
         pager.pages.push(
             {
                 embeds: [
@@ -345,13 +349,12 @@ export const inventory = buildCommand<SlashCommand>({
                                 p.collectables
                                     .map((c) => c.count)
                                     .reduce((a, b) => a + b, 0),
-                            )}\n- Unique: ${formatNumber(
+                            )}\n- Collected: ${formatNumber(
                                 p.collectables.length,
+                            )}/${formatNumber(
+                                collectable?.items?.length || 0,
                             )}\n- Duplicates: ${formatNumber(
-                                p.collectables
-                                    .filter((c) => c.count > 1)
-                                    .map((c) => c.count - 1)
-                                    .reduce((a, b) => a + b, 0),
+                                dupes,
                             )}\n- Net Worth: ${
                                 customEmoji.a.z_coins
                             } \`${formatNumber(networth)} ${texts.c.u}\`${
