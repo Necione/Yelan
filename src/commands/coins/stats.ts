@@ -96,7 +96,7 @@ export const stats: SlashCommand = {
                     .setFooter({ text: `ID: ${user.id}` })
                     .addFields(
                         {
-                            name: "✦ Coins",
+                            name: "✦ Mora",
                             value: map([
                                 `Earned: ${formatNumber(
                                     data.balanceAdded || 0,

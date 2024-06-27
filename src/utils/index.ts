@@ -43,9 +43,9 @@ export const mutableGlobals = {
 export const texts = {
     c: {
         // Currency
-        l: "coins", // Lowercase
-        u: "Coins", // Propercase
-        s: "Coin", // Single version of the currency name.
+        l: "mora", // Lowercase
+        u: "Mora", // Propercase
+        s: "Mora", // Single version of the currency name.
     },
 } as const;
 
