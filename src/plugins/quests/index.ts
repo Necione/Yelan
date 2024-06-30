@@ -89,11 +89,11 @@ export async function fetchData(
         .addFields(
             {
                 name: "✦ Message Rewards",
-                value: `\`${messages}/${nearestMessages}\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.messages} Coins**, +1 Reputation`,
+                value: `\`${messages}/${nearestMessages}\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.messages} ${texts.c.u}**, +1 Reputation`,
             },
             {
                 name: "✦ Activity Rewards",
-                value: `\`${activeTime}/${nearestTime} Minutes\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.activity} Coins**, +1 Reputation`,
+                value: `\`${activeTime}/${nearestTime} Minutes\` | ${customEmoji.a.z_coins} **+${economy.mora.quests.activity} ${texts.c.u}**, +1 Reputation`,
             },
         )
         .setFooter({

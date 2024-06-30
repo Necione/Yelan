@@ -169,7 +169,7 @@ export const baccarat: SlashCommand = {
                     ", ",
                 )}\nBanker hand: ${bankerHand.join(", ")}\n\nYou won ${
                     customEmoji.a.z_coins
-                } \`${theoreticalWinnings}\` Coins!`,
+                } \`${theoreticalWinnings}\` Mora!`,
             );
         } else if (result === "Tie") {
             e.setDescription(
@@ -189,7 +189,7 @@ export const baccarat: SlashCommand = {
                     ", ",
                 )}\nBanker hand: ${bankerHand.join(", ")}\n\nYou lost ${
                     customEmoji.a.z_coins
-                } \`${betAmount}\` Coins!`,
+                } \`${betAmount}\` Mora!`,
             );
         }
         locked.del(interaction.user.id);
