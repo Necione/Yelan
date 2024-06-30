@@ -240,7 +240,20 @@ export async function displayData(
             pet.cooldowns.push({ type: "alive", ends });
             update = true;
         } else {
-            if (Date.now() >= alive.ends) {
+            const current = new Date().getFullYear();
+            const next = current + 1;
+            const ey = new Date(alive.ends).getFullYear();
+            if (![current, next].includes(ey)) {
+                // If the current (or next) years don't match the alive.ends year then reset the alive.ends date.
+                alive.ends = Date.now() + get.days(3);
+                update = true;
+                status.push({
+                    id: pet.id,
+                    message: `\`${pet.name}\` will starve ${time.relative(
+                        new Date(alive.ends),
+                    )}, make sure to feed it!`,
+                });
+            } else if (Date.now() >= alive.ends) {
                 update = true;
                 pets.pets = pets.pets.filter((c) => c.id !== pet.id);
                 status.push({
