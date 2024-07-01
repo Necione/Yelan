@@ -190,6 +190,7 @@ model GamblingMachine {
 type DailyStats {
   date     DateTime @default(now())
   messages Int      @default(0)
+  achieved String[] @default([])
 }
 
 type Active {
