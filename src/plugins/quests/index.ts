@@ -157,13 +157,16 @@ export function getCurrentDailys(p: UserWallet) {
     const c = p.dailyStats.find(
         (c) => c.date.toISOString() === def.toISOString(),
     );
+    if (c && !is.array(c.achieved)) {
+        c.achieved = [];
+    }
     const tier = (num: keyof typeof amounts = 100) => ({
         user: c?.messages || 0,
         date: c?.date || def.toDate(),
         tier: parseInt(num as any),
         got: (c?.messages || 0) >= num,
         amount: amounts[num],
-        achieved: c?.achieved.includes(`${num}`) ? true : false,
+        achieved: (c?.achieved || []).includes(`${num}`) ? true : false,
     });
     if (!c) {
         return tier();
@@ -179,7 +182,7 @@ export function getCurrentDailys(p: UserWallet) {
         };
     }
     for (const num of getKeys(amounts)) {
-        if (c.achieved.includes(`${num}`)) {
+        if ((c.achieved || []).includes(`${num}`)) {
             continue;
         }
         if (c.messages >= num) {
