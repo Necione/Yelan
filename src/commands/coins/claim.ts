@@ -9,15 +9,10 @@ import {
 } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { economy, roles } from "../../config";
-import {
-    addBalance,
-    checkBalanceForLimit,
-    getProfileByUserId,
-} from "../../services";
+import { addBalance, getProfileByUserId } from "../../services";
 import {
     cooldowns,
     customEmoji,
-    isInActiveTrade,
     locked,
     logs,
     texts,
@@ -35,9 +30,6 @@ export const claim: SlashCommand = {
     },
     execute: async (interaction, responder) => {
         if (!interaction.inCachedGuild()) {
-            return;
-        }
-        if (isInActiveTrade(interaction)) {
             return;
         }
         const has = (ids: string[]) =>
@@ -93,11 +85,6 @@ export const claim: SlashCommand = {
                 ),
             );
         }
-        const r = checkBalanceForLimit(data, amount);
-        if (!r.status) {
-            locked.del(interaction.user.id);
-            return responder.edit(embedComment(r.message));
-        }
         await Promise.all([
             ...promises,
             addBalance(
@@ -105,6 +92,7 @@ export const claim: SlashCommand = {
                 amount,
                 true,
                 `Via: ${claim.command.name}`,
+                false,
             ),
         ]);
         await logs.misc(
