@@ -88,10 +88,10 @@ export async function createProfile(user: CanvasProfile) {
     ctx.globalAlpha = 1;
 
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(canvas.width - 550 + 180, 260, 180, 0, Math.PI * 2, true);
-    ctx.closePath();
-    ctx.clip();
+    // ctx.beginPath();
+    // ctx.arc(canvas.width - 550 + 180, 260, 180, 0, Math.PI * 2, true);
+    // ctx.closePath();
+    // ctx.clip();
     await draw(ctx, canvas.width - 550, 80, 360, 360, 0, user.pfp);
     // ctx.drawImage(image, 35, 50, 200, 200)
     ctx.restore();

@@ -41,7 +41,7 @@ export const images = {
             author: `https://cdn.discordapp.com/emojis/1090830675210420274.gif`,
         },
         profile: {
-            frame: "https://file.coffee/u/IBpIXAsuircRiaoXs0T1j.png",
+            frame: "https://lh.elara.workers.dev/frames/main.png",
             background: `https://i.imgur.com/3RacEf0.png`,
             hidden: "https://i.imgur.com/KCjkSXw.png",
             bots: [
