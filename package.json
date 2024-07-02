@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@elara-services/botbuilder": "^3.0.6",
-    "@elara-services/enka": "^1.0.6",
+    "@elara-services/enka": "^1.0.7",
     "@elara-services/fetch": "^2.0.2",
     "@elara-services/leveling": "^1.1.11",
     "@elara-services/packages": "^6.0.8",
