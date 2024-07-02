@@ -26,7 +26,6 @@ import { CommandInteraction, ComponentType, User } from "discord.js";
 import { channels, economy, isMainBot, mainBotId } from "../config";
 import { getProfileByUserId, updateUserProfile } from "../services";
 import { getBotFromId } from "../services/bot";
-import { images } from "./images";
 const webhook = new Webhook(process.env.TOKEN as string);
 
 export const tradeTimeout = new Set();
@@ -355,8 +354,9 @@ export async function send(
 }
 
 export function getRandomImage() {
-    const randomIndex = Math.floor(Math.random() * images.random.images.length);
-    return images.random.images[randomIndex];
+    return `https://lh.elara.workers.dev/random/images/${Math.floor(
+        Math.random() * 6,
+    )}.png`;
 }
 export function percentage(num: number, total: number) {
     return (100 * num) / total;

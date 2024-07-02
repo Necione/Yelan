@@ -138,7 +138,6 @@ export async function fetchData(
         )
         .setFooter({
             text: `You earn ${economy.mora.min} - ${economy.mora.max} ${texts.c.u} per minute from talking`,
-            // iconURL: images.commands.quests.footer,
         });
 
     return {
