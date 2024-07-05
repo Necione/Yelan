@@ -33,7 +33,6 @@ export const view = buildCommand({
             ...roles.main,
             roles.graders,
             roles.moderator,
-            roles.moderator,
             roles.management.econ,
         ],
     },
