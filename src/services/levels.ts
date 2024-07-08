@@ -1,6 +1,5 @@
-if (process.env.NODE_ENV !== "production") {
-    require("dotenv").config();
-}
+import "dotenv/config";
+
 import { Leveling } from "@elara-services/leveling";
 import { error, is } from "@elara-services/utils";
 import client from "../client";
