@@ -1,8 +1,9 @@
 import { buildCommand, type SubCommand } from "@elara-services/botbuilder";
 import { embedComment, get } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder } from "discord.js";
 import { addBalance, removeBalance } from "../../../../services";
-import { customEmoji, locked, mutableGlobals, texts } from "../../../../utils";
+import { locked, mutableGlobals } from "../../../../utils";
 
 export const start = buildCommand<SubCommand>({
     subCommand: (b) => b.setName(`start`).setDescription(`Start the game`),

@@ -1,9 +1,10 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, is } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
 import { addBalance } from "../../services";
-import { customEmoji, logs, texts } from "../../utils";
+import { logs } from "../../utils";
 
 export const payment = buildCommand<SlashCommand>({
     locked: {

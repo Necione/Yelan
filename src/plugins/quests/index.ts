@@ -12,14 +12,10 @@ import { EmbedBuilder, type GuildMember, type User } from "discord.js";
 import { economy } from "../../config";
 import { /* getAllUserProfiles, */ getProfileByUserId } from "../../services";
 // import { sortLB } from "../../services/bot";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserWallet } from "@prisma/client";
 import moment from "moment-timezone";
-import {
-    customEmoji,
-    getRandomImage,
-    texts,
-    userLockedData,
-} from "../../utils";
+import { getRandomImage, userLockedData } from "../../utils";
 // import { images } from "../../utils/images";
 // import { badges } from "../other/badges";
 

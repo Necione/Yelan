@@ -1,15 +1,10 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
+import { customEmoji } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
-import {
-    checkBelowBalance,
-    checks,
-    customEmoji,
-    locked,
-    userLockedData,
-} from "../../utils";
+import { checkBelowBalance, checks, locked, userLockedData } from "../../utils";
 
 type CardKey =
     | "2"

@@ -1,8 +1,8 @@
 import { randomNumber } from "@elara-services/packages";
 import { formatNumber } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder } from "discord.js";
 import { addSlotsPrizePool, getSlots } from "../services";
-import { customEmoji, texts } from ".";
 
 const transpose = <T>(array: T[][]) => {
     return array[0].map((_: T, colIndex: number) =>

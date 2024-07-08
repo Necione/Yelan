@@ -5,16 +5,11 @@ import {
     embedComment,
     get,
 } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
-import {
-    checkBelowBalance,
-    checks,
-    customEmoji,
-    locked,
-    texts,
-} from "../../utils";
+import { checkBelowBalance, checks, locked } from "../../utils";
 
 export const hilo: SlashCommand = {
     command: new SlashCommandBuilder()

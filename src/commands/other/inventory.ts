@@ -8,6 +8,7 @@ import {
     is,
     time,
 } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { type PaginatedMessagePage } from "@sapphire/discord.js-utilities";
 import {
     ButtonStyle,
@@ -25,7 +26,7 @@ import {
     updateUserProfile,
 } from "../../services";
 import { getCollectables } from "../../services/bot";
-import { customEmoji, getPaginatedMessage, logs, texts } from "../../utils";
+import { getPaginatedMessage, logs } from "../../utils";
 
 export const inventory = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

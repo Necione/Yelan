@@ -1,4 +1,4 @@
-import { customEmoji, texts } from "./index";
+import { customEmoji, texts } from "@liyueharbor/econ";
 
 const r = `${customEmoji.a.z_coins} \`%AMOUNT% ${texts.c.u}\``;
 

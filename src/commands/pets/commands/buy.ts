@@ -8,6 +8,7 @@ import {
     is,
     proper,
 } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import {
     checkName,
     getPetLimit,
@@ -23,7 +24,7 @@ import {
     removeBalance,
     updatePets,
 } from "../../../services";
-import { customEmoji, locked, texts } from "../../../utils";
+import { locked } from "../../../utils";
 
 export const buy = buildCommand<SubCommand>({
     subCommand: (b) =>

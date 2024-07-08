@@ -10,6 +10,7 @@ import {
     getInteractionResponder,
     is,
 } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserWallet } from "@prisma/client";
 import {
     ButtonStyle,
@@ -23,7 +24,8 @@ import {
 } from "discord.js";
 import { channels, economy } from "../../config";
 import { getProfileByUserId, updateUserProfile } from "../../services";
-import { customEmoji, getTax, locked, texts, tradeTimeout } from "../../utils";
+import { getTax, locked, tradeTimeout } from "../../utils";
+
 const prefix = "trade|";
 const emojis = {
     completed: "✅",

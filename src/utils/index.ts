@@ -11,6 +11,7 @@ import {
 } from "@elara-services/utils";
 import type { sendOptions } from "@elara-services/webhooks";
 import { Webhook } from "@elara-services/webhooks";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import type { Prisma, UserWallet } from "@prisma/client";
 import {
     PaginatedMessage,
@@ -39,37 +40,6 @@ export const mutableGlobals = {
     },
 };
 
-export const texts = {
-    c: {
-        // Currency
-        l: "coins", // Lowercase
-        u: "Coins", // Propercase
-        s: "Coin", // Single version of the currency name.
-    },
-} as const;
-
-export const customEmoji = {
-    a: {
-        loading: "<a:loading:1184700865303552031>",
-        seven: "<a:seven:1107185113403494443>",
-        z_lemon: "<a:z_lemon:1091219658973138995>",
-        questionMark: "<a:questionMark:1091216008364171344>",
-        z_diamond: "<a:z_diamond:1090830675210420274>",
-        z_tokens: "<a:z_tokens:1090831147824586852>",
-        z_repute: "<a:z_repute:1090831334735347802>",
-        z_coins: "<a:z_coins:1090830835516702850>",
-        z_elo: "<a:z_elo:1121633552019243028>",
-        z_info: "<a:z_info:1090837991808839680>",
-        z_check: "<a:z_check:1090852465546637422>",
-        slotSpinAnimation: "<a:spin_animation:1112480565967470592>",
-        z_lemon_id: "1091219658973138995",
-        z_mail: "<a:mail:1172701817877049455>",
-        z_arrow_blue: "<a:950183798463672351:1119087306867998750>",
-        z_bell: "<a:z_bell:1093235143185018961>",
-        z_arrow_branch: "<:Arrow:1090792035411316736>",
-    },
-    na: {},
-};
 export function displayTradeInAction(user: User) {
     return {
         ...embedComment(

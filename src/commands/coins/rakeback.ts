@@ -1,5 +1,6 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, is, time } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { channels, economy } from "../../config";
 import {
@@ -11,11 +12,9 @@ import {
 import {
     checks,
     cooldowns,
-    customEmoji,
     isInActiveTrade,
     locked,
     logs,
-    texts,
     userLockedData,
 } from "../../utils";
 

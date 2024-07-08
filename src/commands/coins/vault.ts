@@ -1,8 +1,9 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, get, is } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, updateUserProfile } from "../../services";
-import { cooldowns, customEmoji, logs, texts } from "../../utils";
+import { cooldowns, logs } from "../../utils";
 
 export const vault: SlashCommand = {
     command: new SlashCommandBuilder()

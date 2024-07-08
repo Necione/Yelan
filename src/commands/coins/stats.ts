@@ -1,5 +1,6 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { field, formatNumber } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import {
     EmbedBuilder,
     SlashCommandBuilder,
@@ -7,13 +8,7 @@ import {
 } from "discord.js";
 import { roles } from "../../config";
 import { getProfileByUserId } from "../../services";
-import {
-    customEmoji,
-    getRandomImage,
-    percentage,
-    texts,
-    userLockedData,
-} from "../../utils";
+import { getRandomImage, percentage, userLockedData } from "../../utils";
 
 const highRollerRequirement = 1_000_000;
 

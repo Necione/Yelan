@@ -7,6 +7,7 @@ import {
     getInteractionResponder,
     is,
 } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import {
     ActionRowBuilder,
     GuildScheduledEventEntityType,
@@ -28,13 +29,7 @@ import {
     boosterExpiryDuration,
     getActiveCoinBoosters,
 } from "../../../services/booster";
-import {
-    customEmoji,
-    getTax,
-    locked,
-    texts,
-    userLockedData,
-} from "../../../utils";
+import { getTax, locked, userLockedData } from "../../../utils";
 import {
     boosterPrices,
     boostersLimitExceeded,

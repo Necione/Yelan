@@ -1,5 +1,6 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { addButtonRow, awaitComponent, get } from "@elara-services/utils";
+import { customEmoji } from "@liyueharbor/econ";
 import {
     ButtonStyle,
     Colors,
@@ -7,7 +8,7 @@ import {
     SlashCommandBuilder,
 } from "discord.js";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
-import { checkBelowBalance, customEmoji, locked } from "../../utils";
+import { checkBelowBalance, locked } from "../../utils";
 
 export const blackjack: SlashCommand = {
     command: new SlashCommandBuilder()

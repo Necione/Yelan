@@ -15,16 +15,10 @@ import {
 } from "discord.js";
 
 import type { SlashCommand } from "@elara-services/botbuilder";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { economy } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
-import {
-    checks,
-    customEmoji,
-    locked,
-    mutableGlobals,
-    texts,
-    userLockedData,
-} from "../../utils";
+import { checks, locked, mutableGlobals, userLockedData } from "../../utils";
 
 /**
  * A adjustable chance of getting an accident

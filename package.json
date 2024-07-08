@@ -5,7 +5,7 @@
   "main": "./dist/src/index.js",
   "scripts": {
     "prestart": "npx prisma db push",
-    "start": "npm run build && npm run deploy && node ./dist/index.js",
+    "start": "npm i && npm run build && npm run deploy && node ./dist/index.js",
     "ds": "npm run build && node ./dist/index.js",
     "build": "rm -rf dist && tsc",
     "deploy": "ts-node ./src/scripts/deploy.ts",
@@ -44,7 +44,7 @@
     "@elara-services/packages": "^6.0.8",
     "@elara-services/utils": "^1.6.8",
     "@elara-services/webhooks": "^2.1.18",
-    "@liyueharbor/econ": "^1.0.4",
+    "@liyueharbor/econ": "^1.0.5",
     "@prisma/client": "5.7.1",
     "@sapphire/discord.js-utilities": "7.1.3",
     "async-mutex": "0.4.0",

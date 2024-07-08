@@ -1,8 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
+import { customEmoji } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
-import { customEmoji } from "../../utils";
 
 export const access = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

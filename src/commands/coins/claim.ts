@@ -7,17 +7,11 @@ import {
     sleep,
     time,
 } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { economy, roles } from "../../config";
 import { addBalance, getProfileByUserId } from "../../services";
-import {
-    cooldowns,
-    customEmoji,
-    locked,
-    logs,
-    texts,
-    userLockedData,
-} from "../../utils";
+import { cooldowns, locked, logs, userLockedData } from "../../utils";
 
 export const claim: SlashCommand = {
     locked: { roles: [economy.boost.role, roles.highRoller, ...roles.main] },

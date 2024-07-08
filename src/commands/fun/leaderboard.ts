@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber } from "@elara-services/utils";
+import { customEmoji } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import {
     configurationByType,
@@ -7,7 +8,6 @@ import {
     type LeaderboardType,
 } from "../../plugins/other/leaderboard";
 import { levels } from "../../services/levels";
-import { customEmoji } from "../../utils";
 
 export const leaderboard = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

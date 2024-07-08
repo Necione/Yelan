@@ -7,6 +7,7 @@ import {
     getInteractionResponder,
     is,
 } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import type { APIEmbedField } from "discord.js";
 import {
     ButtonStyle,
@@ -15,14 +16,8 @@ import {
     SlashCommandBuilder,
 } from "discord.js";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
-import {
-    checkBelowBalance,
-    checks,
-    customEmoji,
-    locked,
-    texts,
-    userLockedData,
-} from "../../utils";
+import { checkBelowBalance, checks, locked, userLockedData } from "../../utils";
+
 const add = (label: string, emoji: string, extraId?: string) => ({
     id: `rps${extraId ? `:${extraId}` : ""}:${emoji}`,
     label,

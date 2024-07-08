@@ -1,6 +1,6 @@
 import { buildCommand, type SubCommand } from "@elara-services/botbuilder";
 import { formatNumber } from "@elara-services/utils";
-import { customEmoji, texts } from "../../../utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { baseEmbed, boosterPrices } from "../common";
 
 export const prices = buildCommand<SubCommand>({

@@ -12,9 +12,9 @@ import {
     log,
     time,
 } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { mainServerId, roles } from "../../../../config";
 import { getProfileByUserId } from "../../../../services";
-import { customEmoji, texts } from "../../../../utils";
 
 export const view = buildCommand({
     subCommand: (b) =>

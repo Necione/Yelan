@@ -1,8 +1,9 @@
 import { chunk, embedComment, formatNumber, is } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserWallet } from "@prisma/client";
 import { EmbedBuilder, type RepliableInteraction, type User } from "discord.js";
 import { getAllUserProfiles } from "../../services";
-import { customEmoji, getPaginatedMessage, texts } from "../../utils";
+import { getPaginatedMessage } from "../../utils";
 
 export const emojis = {
     1: "🥇",

@@ -1,9 +1,9 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { formatNumber } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels, economy } from "../../config";
 import { prisma } from "../../prisma";
-import { customEmoji, texts } from "../../utils";
 
 export const econ: SlashCommand = {
     disabled: {

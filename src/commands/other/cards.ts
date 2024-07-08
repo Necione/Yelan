@@ -1,16 +1,12 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { chunk, embedComment, formatNumber, is } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserWallet } from "@prisma/client";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getAllUserProfiles, getProfileByUserId } from "../../services";
-import {
-    customEmoji,
-    getPaginatedMessage,
-    getRandomImage,
-    texts,
-} from "../../utils";
-import { getCollectables } from "../../services/bot";
 import { mainServerId } from "../../config";
+import { getAllUserProfiles, getProfileByUserId } from "../../services";
+import { getCollectables } from "../../services/bot";
+import { getPaginatedMessage, getRandomImage } from "../../utils";
 
 export const cards = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

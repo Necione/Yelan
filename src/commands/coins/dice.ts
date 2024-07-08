@@ -1,14 +1,13 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, get, sleep } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
 import {
     addRakeback,
     checkBelowBalance,
     checks,
-    customEmoji,
     locked,
-    texts,
     userLockedData,
 } from "../../utils";
 

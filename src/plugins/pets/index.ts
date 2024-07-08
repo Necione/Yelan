@@ -14,6 +14,7 @@ import {
     type XOR,
     type getInteractionResponders,
 } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import type { Pet } from "@prisma/client";
 import type { PaginatedMessageAction } from "@sapphire/discord.js-utilities";
 import {
@@ -35,7 +36,7 @@ import {
     removeBalance,
     updatePets,
 } from "../../services";
-import { customEmoji, getPaginatedMessage, logs, texts } from "../../utils";
+import { getPaginatedMessage, logs } from "../../utils";
 
 export type PetTypes = "common" | "epic" | "legendary" | "mythic";
 export const prices: Record<Pets | string, Record<PetTypes, number>> = {};

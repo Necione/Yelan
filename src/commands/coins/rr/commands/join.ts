@@ -1,14 +1,9 @@
 import { buildCommand, type SubCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder } from "discord.js";
 import { getProfileByUserId } from "../../../../services";
-import {
-    customEmoji,
-    locked,
-    mutableGlobals,
-    texts,
-    userLockedData,
-} from "../../../../utils";
+import { locked, mutableGlobals, userLockedData } from "../../../../utils";
 import { images } from "../../../../utils/images";
 
 export const join = buildCommand<SubCommand>({
