@@ -1,7 +1,7 @@
 /* eslint-disable no-async-promise-executor */
 import { formatNumber } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import { Canvas, loadImage, type CanvasRenderingContext2D } from "skia-canvas";
-import { texts } from "../../utils";
 import { images } from "../../utils/images";
 import {
     curved,

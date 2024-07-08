@@ -1,9 +1,10 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, get } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId } from "../../services";
-import { checks, cooldowns, locked, texts, userLockedData } from "../../utils";
+import { checks, cooldowns, locked, userLockedData } from "../../utils";
 import { workMessages } from "../../utils/work";
 
 export const work: SlashCommand = {

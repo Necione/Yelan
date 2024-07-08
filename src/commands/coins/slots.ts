@@ -1,5 +1,6 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, get, sleep, time } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import {
@@ -9,13 +10,7 @@ import {
     handleBets,
     removeBalance,
 } from "../../services";
-import {
-    addRakeback,
-    checks,
-    locked,
-    texts,
-    userLockedData,
-} from "../../utils";
+import { addRakeback, checks, locked, userLockedData } from "../../utils";
 import { embeds, playSlot, renderSlotDisplay } from "../../utils/slots";
 
 export const slots: SlashCommand = {

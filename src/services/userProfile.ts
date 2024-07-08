@@ -3,11 +3,12 @@ import {
     getBalanceLimit,
     getDifference,
     isAtBalanceLimit,
+    texts,
     willBeAtBalanceLimit,
 } from "@liyueharbor/econ";
 import { Prisma, type UserWallet } from "@prisma/client";
 import { prisma } from "../prisma";
-import { logs, texts } from "../utils";
+import { logs } from "../utils";
 
 // This function is not atomic, be careful when calling
 export async function updateUserProfile(
