@@ -26,7 +26,6 @@
     "@types/node-fetch": "^2.6.11",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
     "@typescript-eslint/parser": "^6.9.1",
-    "dotenv": "^16.3.1",
     "eslint": "^8.52.0",
     "eslint-plugin-sonarjs": "^0.23.0",
     "nodemon": "^3.0.1",
@@ -37,6 +36,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "dotenv": "^16.3.1",
     "@elara-services/botbuilder": "^3.0.6",
     "@elara-services/enka": "^1.0.7",
     "@elara-services/fetch": "^2.0.2",
