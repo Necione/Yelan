@@ -39,8 +39,8 @@ export const economy = {
     },
     mora: {
         quests: {
-            messages: 85,
-            activity: 100,
+            messages: 50,
+            activity: 755,
         },
         min: 3,
         max: 8,
@@ -50,7 +50,7 @@ export const economy = {
             max: 10,
         },
         dailyLimit: 150000,
-        messagesInAMinute: 2,
+        messagesInAMinute: 3,
         taxExempt: [
             boostRoleId, // Server Booster
             "1103906017340821624", // Council
