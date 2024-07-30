@@ -40,7 +40,7 @@ export const economy = {
     mora: {
         quests: {
             messages: 50,
-            activity: 755,
+            activity: 75,
         },
         min: 3,
         max: 8,
