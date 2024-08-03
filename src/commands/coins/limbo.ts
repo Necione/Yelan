@@ -113,6 +113,12 @@ function getCrashPoint(betAmount: number) {
         return 1;
     }
     let crashPoint = Math.floor((100 * e - h) / (e - h)) / 100;
+
+    const increaseLowMultiplierChance = Math.random();
+    if (increaseLowMultiplierChance < 0.2) {
+        crashPoint = 1 + Math.random();
+    }
+
     if (betAmount >= 100 && crashPoint >= 100) {
         crashPoint = 99.99 * Math.random();
     } else if (crashPoint > 1000) {
