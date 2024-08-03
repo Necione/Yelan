@@ -113,10 +113,10 @@ function getCrashPoint(betAmount: number) {
         return 1;
     }
     let crashPoint = Math.floor((100 * e - h) / (e - h)) / 100;
-    if (betAmount > 100 && crashPoint > 98) {
-        crashPoint = 98;
+    if (betAmount >= 100 && crashPoint >= 100) {
+        crashPoint = 99.99 * Math.random();
     } else if (crashPoint > 1000) {
         crashPoint = Math.random() * 9 + 1;
     }
-    return crashPoint;
+    return Math.floor(crashPoint * 100) / 100;
 }
