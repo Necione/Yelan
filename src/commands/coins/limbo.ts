@@ -73,7 +73,7 @@ export const limbo: SlashCommand = {
         await responder.edit({ embeds: [embed] });
         await sleep(get.secs(1));
 
-        const crashPoint = getCrashPoint();
+        const crashPoint = getCrashPoint(betAmount);
         const win = crashPoint >= guessMultiplier;
 
         if (win) {
@@ -106,14 +106,16 @@ export const limbo: SlashCommand = {
     },
 };
 
-function getCrashPoint() {
+function getCrashPoint(betAmount: number) {
     const e = 2 ** 32;
     const h = crypto.getRandomValues(new Uint32Array(1))[0];
     if (h % 50 === 0) {
         return 1;
     }
     let crashPoint = Math.floor((100 * e - h) / (e - h)) / 100;
-    if (crashPoint > 1000) {
+    if (betAmount > 100 && crashPoint > 98) {
+        crashPoint = 98;
+    } else if (crashPoint > 1000) {
         crashPoint = Math.random() * 9 + 1;
     }
     return crashPoint;
