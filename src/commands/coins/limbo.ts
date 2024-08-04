@@ -130,5 +130,9 @@ async function getCrashPoint(player: any, betAmount: number, guessMultiplier: nu
         crashPoint = parseFloat((Math.random() * (guessMultiplier - 0.01)).toFixed(2));
     }
 
+    if (crashPoint < 1) {
+        crashPoint = 1;
+    }
+
     return Math.floor(crashPoint * 100) / 100;
 }
