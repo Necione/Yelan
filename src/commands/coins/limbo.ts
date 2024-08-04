@@ -111,6 +111,23 @@ async function getCrashPoint(player: any, betAmount: number, guessMultiplier: nu
 
     let crashPoint = parseFloat((Math.random() * 100).toFixed(2));
 
+    const e = 2 ** 32;
+    const h = crypto.getRandomValues(new Uint32Array(1))[0];
+    if (h % 50 === 0) {
+        crashPoint = 1;
+    } else {
+        crashPoint = Math.floor((100 * e - h) / (e - h)) / 100;
+
+        const increaseLowMultiplierChance = Math.random();
+        if (increaseLowMultiplierChance < 0.2) {
+            crashPoint = 1 + Math.random();
+        }
+
+        if (crashPoint > 1000) {
+            crashPoint = Math.random() * 9 + 1;
+        }
+    }
+
     if (rigNumber >= 50 && betAmount > rigNumber) {
         crashPoint = parseFloat((Math.random() * (guessMultiplier - 0.01)).toFixed(2));
     }
