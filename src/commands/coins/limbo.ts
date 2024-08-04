@@ -3,7 +3,7 @@ import { embedComment, formatNumber, get, sleep } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
-import { addRakeback, locked } from "../../utils";
+import { addRakeback, checks, locked } from "../../utils";
 
 export const limbo: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -73,7 +73,7 @@ export const limbo: SlashCommand = {
         await responder.edit({ embeds: [embed] });
         await sleep(get.secs(1));
 
-        const crashPoint = getCrashPoint(betAmount);
+        const crashPoint = await getCrashPoint(p, betAmount, guessMultiplier);
         const win = crashPoint >= guessMultiplier;
 
         if (win) {
@@ -106,23 +106,14 @@ export const limbo: SlashCommand = {
     },
 };
 
-function getCrashPoint(betAmount: number) {
-    const e = 2 ** 32;
-    const h = crypto.getRandomValues(new Uint32Array(1))[0];
-    if (h % 50 === 0) {
-        return 1;
-    }
-    let crashPoint = Math.floor((100 * e - h) / (e - h)) / 100;
+async function getCrashPoint(player: any, betAmount: number, guessMultiplier: number) {
+    const rigNumber = await checks.rig(player);
 
-    const increaseLowMultiplierChance = Math.random();
-    if (increaseLowMultiplierChance < 0.2) {
-        crashPoint = 1 + Math.random();
+    let crashPoint = parseFloat((Math.random() * 100).toFixed(2));
+
+    if (rigNumber >= 50 && betAmount > rigNumber) {
+        crashPoint = parseFloat((Math.random() * (guessMultiplier - 0.01)).toFixed(2));
     }
 
-    if (betAmount >= 100 && crashPoint >= 100) {
-        crashPoint = 99.99 * Math.random();
-    } else if (crashPoint > 1000) {
-        crashPoint = Math.random() * 9 + 1;
-    }
-    return Math.floor(crashPoint * 100) / 100;
+    return crashPoint;
 }
