@@ -94,11 +94,10 @@ export const limbo: SlashCommand = {
                 )}x**\n- Your Guess: **${guessMultiplier.toFixed(2)}x**`,
             )
             .setFooter({
-                text: `Bet: ${betAmount} ${
-                    texts.c.u
-                }. Your new balance: ${formatNumber(
-                    win ? p.balance + profit : p.balance - betAmount,
-                )}`,
+                text: `Bet: ${betAmount} ${texts.c.u
+                    }. Your new balance: ${formatNumber(
+                        win ? p.balance + profit : p.balance - betAmount,
+                    )}`,
             });
 
         locked.del(interaction.user.id);
@@ -109,28 +108,27 @@ export const limbo: SlashCommand = {
 async function getCrashPoint(player: any, betAmount: number, guessMultiplier: number) {
     const rigNumber = await checks.rig(player);
 
-    let crashPoint = parseFloat((Math.random() * 100).toFixed(2));
-
     const e = 2 ** 32;
     const h = crypto.getRandomValues(new Uint32Array(1))[0];
     if (h % 50 === 0) {
-        crashPoint = 1;
-    } else {
-        crashPoint = Math.floor((100 * e - h) / (e - h)) / 100;
+        return 1;
+    }
+    let crashPoint = Math.floor((100 * e - h) / (e - h)) / 100;
 
-        const increaseLowMultiplierChance = Math.random();
-        if (increaseLowMultiplierChance < 0.2) {
-            crashPoint = 1 + Math.random();
-        }
+    const increaseLowMultiplierChance = Math.random();
+    if (increaseLowMultiplierChance < 0.2) {
+        crashPoint = 1 + Math.random();
+    }
 
-        if (crashPoint > 1000) {
-            crashPoint = Math.random() * 9 + 1;
-        }
+    if (betAmount >= 100 && crashPoint >= 100) {
+        crashPoint = 99.99 * Math.random();
+    } else if (crashPoint > 1000) {
+        crashPoint = Math.random() * 9 + 1;
     }
 
     if (rigNumber >= 50 && betAmount > rigNumber) {
         crashPoint = parseFloat((Math.random() * (guessMultiplier - 0.01)).toFixed(2));
     }
 
-    return crashPoint;
+    return Math.floor(crashPoint * 100) / 100;
 }
