@@ -34,9 +34,10 @@ export const mutableGlobals = {
     locked: [] as { id: string; name: string; added: number }[],
     fights: [] as { userId: string; createdAt: number }[],
     rr: {
-        reward: 0 as number,
-        active: false as boolean,
+        reward: 0,
+        active: false,
         players: [] as string[],
+        date: 0,
     },
 };
 
@@ -225,6 +226,30 @@ export const cooldowns = {
             cooldowns: {
                 set: p.cooldowns,
             },
+        });
+    },
+
+    setMany: async (
+        p: UserWallet,
+        commands: { command: string; ms: number }[],
+        extra: Exclude<Prisma.UserWalletUpdateInput, "cooldowns"> = {},
+    ) => {
+        for await (const cmd of commands) {
+            const find = p.cooldowns.find((c) => c.command === cmd.command);
+            if (find) {
+                find.ends = Date.now() + cmd.ms;
+            } else {
+                p.cooldowns.push({
+                    command: cmd.command,
+                    ends: Date.now() + cmd.ms,
+                });
+            }
+        }
+        return await updateUserProfile(p.userId, {
+            cooldowns: {
+                set: p.cooldowns,
+            },
+            ...extra,
         });
     },
 };

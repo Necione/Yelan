@@ -10,7 +10,7 @@ import {
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { economy, roles } from "../../config";
-import { addBalance, getProfileByUserId } from "../../services";
+import { getProfileByUserId } from "../../services";
 import { cooldowns, locked, logs, userLockedData } from "../../utils";
 
 export const claim: SlashCommand = {
@@ -37,7 +37,7 @@ export const claim: SlashCommand = {
         const isHighRoller = has([roles.highRoller, ...roles.main]);
         const isBooster = has([economy.boost.role, ...roles.main]);
         const messages = [];
-        const promises = [];
+        const list: { command: string; ms: number }[] = [];
         let amount = 0;
         if (isHighRoller) {
             const hasCooldown = cooldowns.get(
@@ -49,9 +49,10 @@ export const claim: SlashCommand = {
                 messages.push(hasCooldown.message);
             } else {
                 amount += economy.commands.claim.highRoller;
-                promises.push(
-                    cooldowns.set(data, "highroller", economy.boost.claim.time),
-                );
+                list.push({
+                    command: "highroller",
+                    ms: economy.boost.claim.time,
+                });
             }
         }
         if (isBooster) {
@@ -64,9 +65,7 @@ export const claim: SlashCommand = {
                 messages.push(hasCooldown.message);
             } else {
                 amount += economy.boost.claim.amount;
-                promises.push(
-                    cooldowns.set(data, "claim", economy.boost.claim.time),
-                );
+                list.push({ command: "claim", ms: economy.boost.claim.time });
             }
         }
         if (!is.number(amount)) {
@@ -80,29 +79,34 @@ export const claim: SlashCommand = {
             );
         }
         await Promise.all([
-            ...promises,
-            addBalance(
+            cooldowns.setMany(data, list, {
+                balance: {
+                    increment: amount,
+                },
+            }),
+            logs.action(
                 interaction.user.id,
                 amount,
-                true,
+                "add",
                 `Via: ${claim.command.name}`,
-                false,
+            ),
+            logs.misc(
+                embedComment(
+                    `${interaction.user.toString()} (${
+                        interaction.user.id
+                    }) claimed \`${formatNumber(amount)} ${
+                        texts.c.u
+                    }\` via \`/claim\`\n- Perks: ${
+                        isBooster ? "\n - Booster" : ""
+                    }${
+                        isHighRoller ? "\n - High Roller" : ""
+                    }\n> Next claim: ${time.countdown(
+                        economy.boost.claim.time,
+                    )}`,
+                    "Aqua",
+                ),
             ),
         ]);
-        await logs.misc(
-            embedComment(
-                `${interaction.user.toString()} (${
-                    interaction.user.id
-                }) claimed \`${formatNumber(amount)} ${
-                    texts.c.u
-                }\` via \`/claim\`\n- Perks: ${
-                    isBooster ? "\n - Booster" : ""
-                }${
-                    isHighRoller ? "\n - High Roller" : ""
-                }\n> Next claim: ${time.countdown(economy.boost.claim.time)}`,
-                "Aqua",
-            ),
-        );
         await responder.edit(
             embedComment(
                 `You've claimed ${customEmoji.a.z_coins} \`${formatNumber(
@@ -113,7 +117,7 @@ export const claim: SlashCommand = {
                 "Green",
             ),
         );
-        await sleep(get.secs(2)); // Wait 2s before removing their locked from the system.
+        await sleep(get.secs(5)); // Wait 5s before removing their locked from the system.
         locked.del(interaction.user.id);
     },
 };
