@@ -51,9 +51,7 @@ export const lock = buildCommand({
             await user
                 .send(
                     embedComment(
-                        `You're user profile has been ${
-                            type ? "" : "un"
-                        }locked.${
+                        `Your user profile has been ${type ? "" : "un"}locked.${
                             reason.length ? `\n\n### Reason: ${reason}` : ""
                         }`,
                         type ? "Red" : "Green",

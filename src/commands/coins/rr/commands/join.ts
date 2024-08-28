@@ -15,12 +15,18 @@ export const join = buildCommand<SubCommand>({
         }
         // Check if the game is currently active, before fetching from the database.
         if (mutableGlobals.rr.active) {
-            locked.del(i.user.id);
-            return r.edit(
-                embedComment(
-                    "A Russian Roulette game is already in progress, please wait for it to end.",
-                ),
-            );
+            if (Date.now() < mutableGlobals.rr.date) {
+                locked.del(i.user.id);
+                return r.edit(
+                    embedComment(
+                        "A Russian Roulette game is already in progress, please wait for it to end.",
+                    ),
+                );
+            }
+            mutableGlobals.rr.active = false;
+            mutableGlobals.rr.date = 0;
+            mutableGlobals.rr.players.length = 0;
+            mutableGlobals.rr.reward = 0;
         }
 
         // Check if they're already part of the game, if so don't fetch them from the database.

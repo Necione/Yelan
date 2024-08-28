@@ -14,12 +14,18 @@ export const start = buildCommand<SubCommand>({
         }
         // Check if the game is currently active
         if (mutableGlobals.rr.active) {
-            locked.del(i.user.id);
-            return r.edit(
-                embedComment(
-                    "A Russian Roulette game is already in progress. Please wait for it to end.",
-                ),
-            );
+            if (Date.now() < mutableGlobals.rr.date) {
+                locked.del(i.user.id);
+                return r.edit(
+                    embedComment(
+                        "A Russian Roulette game is already in progress, please wait for it to end.",
+                    ),
+                );
+            }
+            mutableGlobals.rr.active = false;
+            mutableGlobals.rr.date = 0;
+            mutableGlobals.rr.players.length = 0;
+            mutableGlobals.rr.reward = 0;
         }
 
         // Check if there are enough rrPlayers to start the game
@@ -34,28 +40,39 @@ export const start = buildCommand<SubCommand>({
 
         // Start the game
         mutableGlobals.rr.active = true;
+        mutableGlobals.rr.date = Date.now() + get.mins(2); // Set the date to 2 minutes in the future, as a backup just in case something bugs out.
 
         // Declare variable to store winning player ID
-        let winner;
-        mutableGlobals.rr.reward = 100 * mutableGlobals.rr.players.length;
+        const reward = 100 * mutableGlobals.rr.players.length;
+        mutableGlobals.rr.reward = reward;
+        const allUsers = new Array(...mutableGlobals.rr.players);
 
         // Start the elimination timer
         const eliminationTimer = setInterval(async () => {
             if (!i.channel) {
                 return;
             }
-
-            // Choose a random player to eliminate
-            const index = Math.floor(
-                Math.random() * mutableGlobals.rr.players.length,
-            );
-            const eliminatedPlayer = mutableGlobals.rr.players[index];
+            if (!mutableGlobals.rr.players.length) {
+                // If for some reason it reaches 0 users then just reset everything
+                clearInterval(eliminationTimer);
+                mutableGlobals.rr.players.length = 0;
+                mutableGlobals.rr.reward = 0;
+                mutableGlobals.rr.active = false;
+                mutableGlobals.rr.date = 0;
+                return;
+            }
+            const eliminatedPlayer =
+                mutableGlobals.rr.players[
+                    Math.floor(Math.random() * mutableGlobals.rr.players.length)
+                ];
             if (!eliminatedPlayer) {
                 return;
             }
 
             // Remove the eliminated player from the rrPlayers array
-            mutableGlobals.rr.players.splice(index, 1);
+            mutableGlobals.rr.players = mutableGlobals.rr.players.filter(
+                (c) => c !== eliminatedPlayer,
+            );
             await removeBalance(
                 eliminatedPlayer,
                 100,
@@ -65,32 +82,23 @@ export const start = buildCommand<SubCommand>({
             locked.del(eliminatedPlayer);
             // Check if there is only one player left
             if (mutableGlobals.rr.players.length === 1) {
-                const allUsers = new Array(...mutableGlobals.rr.players);
                 // Stop the elimination timer
                 clearInterval(eliminationTimer);
+                const winner = mutableGlobals.rr.players[0];
 
                 // End the game
                 mutableGlobals.rr.active = false;
-
-                // Calculate the final rrReward
-                await addBalance(
-                    mutableGlobals.rr.players[0],
-                    mutableGlobals.rr.reward,
-                    true,
-                    `Via rr start (winner)`,
-                ); // Add the accumulated rrReward to the winning player's balance
-
-                // Store winning player ID
-                winner = mutableGlobals.rr.players[0];
-
-                // Clear the rrPlayers array
+                mutableGlobals.rr.reward = 0;
+                mutableGlobals.rr.date = 0;
                 mutableGlobals.rr.players.length = 0;
 
+                // Calculate the final rrReward
+                await addBalance(winner, reward, true, `Via rr start (winner)`);
                 // Send game end message
                 const embed = new EmbedBuilder()
                     .setTitle("Game Over")
                     .setDescription(
-                        `The game has ended! <@${winner}> has won and earned ${customEmoji.a.z_coins} \`${mutableGlobals.rr.reward} ${texts.c.u}\`!`,
+                        `The game has ended! <@${winner}> has won and earned ${customEmoji.a.z_coins} \`${reward} ${texts.c.u}\`!`,
                     );
                 await r.send({ embeds: [embed] });
                 locked.del(allUsers);

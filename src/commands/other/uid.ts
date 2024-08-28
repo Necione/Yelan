@@ -32,7 +32,7 @@ export const uid = buildCommand<SlashCommand>({
                 .setDescription(`What's your Genshin UID?`)
                 .setRequired(true)
                 .setMinLength(5)
-                .setMaxLength(9),
+                .setMaxLength(10),
         ),
     defer: { silent: true },
     async execute(i, r) {
