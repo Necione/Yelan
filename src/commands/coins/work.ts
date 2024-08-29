@@ -40,7 +40,9 @@ export const work: SlashCommand = {
                     new EmbedBuilder()
                         .setColor("Aqua")
                         .setTitle("`/work` is being depreciated")
-                        .setDescription("We're working on a new system to replace this command, sorry!")
+                        .setDescription(
+                            "We're working on a new system to replace this command, sorry!",
+                        ),
                 ],
             }),
         ]);

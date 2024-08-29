@@ -94,10 +94,11 @@ export const limbo: SlashCommand = {
                 )}x**\n- Your Guess: **${guessMultiplier.toFixed(2)}x**`,
             )
             .setFooter({
-                text: `Bet: ${betAmount} ${texts.c.u
-                    }. Your new balance: ${formatNumber(
-                        win ? p.balance + profit : p.balance - betAmount,
-                    )}`,
+                text: `Bet: ${betAmount} ${
+                    texts.c.u
+                }. Your new balance: ${formatNumber(
+                    win ? p.balance + profit : p.balance - betAmount,
+                )}`,
             });
 
         locked.del(interaction.user.id);
@@ -105,7 +106,11 @@ export const limbo: SlashCommand = {
     },
 };
 
-async function getCrashPoint(player: any, betAmount: number, guessMultiplier: number) {
+async function getCrashPoint(
+    player: any,
+    betAmount: number,
+    guessMultiplier: number,
+) {
     const rigNumber = await checks.rig(player);
 
     const e = 2 ** 32;
@@ -127,7 +132,9 @@ async function getCrashPoint(player: any, betAmount: number, guessMultiplier: nu
     }
 
     if (rigNumber >= 10 && betAmount > rigNumber) {
-        crashPoint = parseFloat((Math.random() * (guessMultiplier - 0.01)).toFixed(2));
+        crashPoint = parseFloat(
+            (Math.random() * (guessMultiplier - 0.01)).toFixed(2),
+        );
     }
 
     if (crashPoint < 1) {

@@ -29,7 +29,7 @@ export const start = buildCommand<SubCommand>({
         }
 
         // Check if there are enough rrPlayers to start the game
-        if (mutableGlobals.rr.players.length < 3) {
+        if (mutableGlobals.rr.players.length <= 3) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
