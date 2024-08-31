@@ -28,9 +28,17 @@ export const strikes = buildCommand<SlashCommand>({
         const maxStrikes = 5;
         const strikes = p.strikes || 0;
         const strikeBar = Array(maxStrikes)
-            .fill("🔥")
-            .map((s, index) => (index < strikes ? s : " - "))
-            .join("");
+            .fill(null)
+            .map((_, index) => {
+                if (index < strikes) {
+                    return index < 2
+                        ? `<:YellowDot:1110059185397317763>`
+                        : `<:RedDot:1110059185397317763>`;
+                } else {
+                    return `<:GreenDot:1110059185397317763>`;
+                }
+            })
+            .join(" ");
 
         const embed = new EmbedBuilder()
             .setColor(0xff5856)
