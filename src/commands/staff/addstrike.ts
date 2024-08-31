@@ -1,13 +1,14 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, log } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
 import {
     getProfileByUserId,
     removeBalance,
     updateUserProfile,
 } from "../../services";
+import { logs } from "../../utils";
 
 export const addStrike = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -35,6 +36,7 @@ export const addStrike = buildCommand<SlashCommand>({
 
         const user = i.options.getUser("user", true);
         const reason = i.options.getString("reason", true);
+        const initiator = i.user;
 
         const profile = await getProfileByUserId(user.id);
         if (!profile) {
@@ -57,18 +59,34 @@ export const addStrike = buildCommand<SlashCommand>({
         try {
             const dmEmbed = new EmbedBuilder()
                 .setColor(0xff5856)
-                .setTitle("You have received a strike")
+                .setTitle("`🔥` You have received a strike!")
                 .setDescription(
-                    `You have been given a strike by a staff member for the following reason:\n\n**${reason}**\n\nAs a result, you have been fined ${customEmoji.a.z_coins} \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
+                    `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${customEmoji.a.z_coins} \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
                 )
                 .setFooter({
-                    text: "This strike was issued anonymously by a staff member.",
+                    text: `⚠️ You will be banned permanently at 5 Strikes`,
                 });
 
             await user.send({ embeds: [dmEmbed] });
         } catch (error) {
             log("Failed to send a DM to the user", error);
         }
+
+        await logs.strikes({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(Colors.Red)
+                    .setTitle("Strike Issued")
+                    .setDescription(
+                        `**User:** ${user.tag} (${user.id})\n**Total Strikes:** ${updatedStrikes}\n**Reason:** ${reason}\n**Fine:** ${customEmoji.a.z_coins} \`${formatNumber(fineAmount)} ${texts.c.u}\``,
+                    )
+                    .setFooter({
+                        text: `Issued by: ${initiator.username} (${initiator.id})`,
+                        iconURL: initiator.displayAvatarURL(),
+                    })
+                    .setTimestamp(),
+            ],
+        });
 
         return i.editReply(
             embedComment(

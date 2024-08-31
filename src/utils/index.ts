@@ -279,6 +279,7 @@ export const logs = {
     payments: (options: logOpt) => logs.handle(options, channels.logs.payments),
     collectables: (options: logOpt) =>
         logs.handle(options, channels.logs.collectables),
+    strikes: (options: logOpt) => logs.handle(options, channels.logs.strikes),
     action: async (
         userId: string,
         amount: number,
