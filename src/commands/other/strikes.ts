@@ -27,16 +27,18 @@ export const strikes = buildCommand<SlashCommand>({
 
         const maxStrikes = 5;
         const strikes = p.strikes || 0;
+
+        const yellowDot = "<:YellowDot:1110059185397317763>";
+        const redDot = "<:RedDot:1110059185397317763>";
+        const greenDot = "<:GreenDot:1110059185397317763>";
+
         const strikeBar = Array(maxStrikes)
-            .fill(null)
+            .fill(greenDot)
             .map((_, index) => {
                 if (index < strikes) {
-                    return index < 2
-                        ? `<:YellowDot:1110059185397317763>`
-                        : `<:RedDot:1110059185397317763>`;
-                } else {
-                    return `<:GreenDot:1110059185397317763>`;
+                    return index < 2 ? yellowDot : redDot;
                 }
+                return greenDot;
             })
             .join(" ");
 
