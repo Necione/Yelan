@@ -48,7 +48,9 @@ export async function updateStrikes(userId: string, strikes: number) {
 
 export async function getStrikes(userId: string): Promise<number | null> {
     const profile = await getProfileByUserId(userId);
-    if (!profile) return null;
+    if (!profile) {
+        return null;
+    }
     return profile.strikes;
 }
 

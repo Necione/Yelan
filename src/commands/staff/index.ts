@@ -9,4 +9,3 @@ export * from "./payment";
 export * from "./qotd";
 export * from "./rename";
 export * from "./slowmode";
-
