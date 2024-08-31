@@ -61,7 +61,9 @@ export const addStrike = buildCommand<SlashCommand>({
                 .setColor(0xff5856)
                 .setTitle("`🔥` You have received a strike!")
                 .setDescription(
-                    `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${customEmoji.a.z_coins} \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
+                    `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${
+                        customEmoji.a.z_coins
+                    } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
                 )
                 .setFooter({
                     text: `⚠️ You will be banned permanently at 5 Strikes`,
@@ -78,7 +80,11 @@ export const addStrike = buildCommand<SlashCommand>({
                     .setColor(Colors.Red)
                     .setTitle("Strike Issued")
                     .setDescription(
-                        `**User:** ${user.tag} (${user.id})\n**Total Strikes:** ${updatedStrikes}\n**Reason:** ${reason}\n**Fine:** ${customEmoji.a.z_coins} \`${formatNumber(fineAmount)} ${texts.c.u}\``,
+                        `**User:** ${user.tag} (${
+                            user.id
+                        })\n**Total Strikes:** ${updatedStrikes}\n**Reason:** ${reason}\n**Fine:** ${
+                            customEmoji.a.z_coins
+                        } \`${formatNumber(fineAmount)} ${texts.c.u}\``,
                     )
                     .setFooter({
                         text: `Issued by: ${initiator.username} (${initiator.id})`,
@@ -90,7 +96,9 @@ export const addStrike = buildCommand<SlashCommand>({
 
         return i.editReply(
             embedComment(
-                `${user.toString()} has been given a strike and fined ${customEmoji.a.z_coins} \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
+                `${user.toString()} has been given a strike and fined ${
+                    customEmoji.a.z_coins
+                } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
             ),
         );
     },

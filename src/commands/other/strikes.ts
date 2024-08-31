@@ -39,12 +39,16 @@ export const strikes = buildCommand<SlashCommand>({
         const embed = new EmbedBuilder()
             .setColor(0xff5856)
             .setTitle(`${user.username}'s Moderation Strikes`)
-            .setDescription(`${user.toString()} has \`🔥\` **${strikes} Strike(s)**.\n-# Strikes will reset monthly on the 1st`)
+            .setDescription(
+                `${user.toString()} has \`🔥\` **${strikes} Strike(s)**.\n-# Strikes will reset monthly on the 1st`,
+            )
             .setAuthor({
                 name: user.username,
                 iconURL: user.displayAvatarURL(),
             })
-            .setFooter({ text: `⚠️ You will be banned permanently at 5 Strikes` });
+            .setFooter({
+                text: `⚠️ You will be banned permanently at 5 Strikes`,
+            });
 
         return r.edit({
             embeds: [embed],
