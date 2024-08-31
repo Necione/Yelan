@@ -1,10 +1,15 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
-import { SlashCommandBuilder } from "discord.js";
+import { embedComment, formatNumber, log } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
-import { getProfileByUserId, updateUserProfile } from "../../services";
+import {
+    getProfileByUserId,
+    removeBalance,
+    updateUserProfile,
+} from "../../services";
 
-export const addstrike = buildCommand<SlashCommand>({
+export const addStrike = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("addstrike")
         .setDescription("[STAFF] Add a strike to a user")
@@ -12,7 +17,13 @@ export const addstrike = buildCommand<SlashCommand>({
         .addUserOption((option) =>
             option
                 .setName("user")
-                .setDescription("The user to add a strike to")
+                .setDescription("The user you want to strike")
+                .setRequired(true),
+        )
+        .addStringOption((option) =>
+            option
+                .setName("reason")
+                .setDescription("The reason for the strike")
                 .setRequired(true),
         ),
     defer: { silent: true },
@@ -20,34 +31,49 @@ export const addstrike = buildCommand<SlashCommand>({
         roles: [roles.moderator],
     },
     async execute(i) {
-        if (!i.inCachedGuild()) {
-            return;
-        }
+        if (!i.inCachedGuild()) return;
+
         const user = i.options.getUser("user", true);
-        if (user.bot) {
-            return i.editReply(embedComment(`Bots can't receive strikes.`));
+        const reason = i.options.getString("reason", true);
+
+        const profile = await getProfileByUserId(user.id);
+        if (!profile) {
+            return i.editReply(
+                embedComment("Unable to find/create user profile."),
+            );
         }
 
-        const p = await getProfileByUserId(user.id);
-        if (!p) {
-            return i.editReply(embedComment(`Unable to find/create user profile.`));
-        }
-        if (p.locked) {
-            return i.editReply(embedComment(`${user.toString()}'s user profile is locked.`));
-        }
+        const updatedStrikes = (profile.strikes || 0) + 1;
+        const fineAmount = updatedStrikes * 200;
+        await updateUserProfile(user.id, { strikes: updatedStrikes });
 
-        const newStrikes = (p.strikes || 0) + 1;
+        await removeBalance(
+            user.id,
+            fineAmount,
+            false,
+            `Fine for strike ${updatedStrikes} issued by staff. Reason: ${reason}`,
+        );
 
-        const updateResult = await updateUserProfile(user.id, {
-            strikes: newStrikes,
-        });
+        try {
+            const dmEmbed = new EmbedBuilder()
+                .setColor(0xff5856)
+                .setTitle("You have received a strike")
+                .setDescription(
+                    `You have been given a strike by a staff member for the following reason:\n\n**${reason}**\n\nAs a result, you have been fined ${customEmoji.a.z_coins} \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
+                )
+                .setFooter({
+                    text: "This strike was issued anonymously by a staff member.",
+                });
 
-        if (!updateResult) {
-            return i.editReply(embedComment(`Failed to update strikes for ${user.toString()}.`));
+            await user.send({ embeds: [dmEmbed] });
+        } catch (error) {
+            log("Failed to send a DM to the user", error);
         }
 
         return i.editReply(
-            embedComment(`Added a strike to ${user.toString()}.\nThey now have ${newStrikes} strike(s).`, "Red"),
+            embedComment(
+                `${user.toString()} has been given a strike and fined ${customEmoji.a.z_coins} \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
+            ),
         );
     },
 });
