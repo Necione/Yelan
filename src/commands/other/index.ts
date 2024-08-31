@@ -9,4 +9,6 @@ export * from "./promise";
 export * from "./quests";
 export * from "./ranked";
 export * from "./selfmute";
+export * from "./strikes";
 export * from "./uid";
+

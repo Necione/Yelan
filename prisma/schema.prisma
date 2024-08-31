@@ -129,6 +129,7 @@ type RankedGame {
 model UserWallet {
   id               String        @id @default(auto()) @map("_id") @db.ObjectId
   userId           String        @unique
+  strikes          Int           @default(0)
   balance          Float         @default(0)
   vault            Float         @default(0)
   messagesSent     Int           @default(0)

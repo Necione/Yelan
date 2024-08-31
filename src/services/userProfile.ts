@@ -42,6 +42,16 @@ export async function updateUserProfile(
     });
 }
 
+export async function updateStrikes(userId: string, strikes: number) {
+    return await updateUserProfile(userId, { strikes });
+}
+
+export async function getStrikes(userId: string): Promise<number | null> {
+    const profile = await getProfileByUserId(userId);
+    if (!profile) return null;
+    return profile.strikes;
+}
+
 export async function updateRankedUID(userId: string, uid: number | null) {
     let rankedUID = null;
     let rankedRegion = null;

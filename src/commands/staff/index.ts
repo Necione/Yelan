@@ -1,4 +1,5 @@
 export * from "./acc";
+export * from "./addstrike";
 export * from "./button";
 export * from "./card";
 export * from "./coins";
@@ -8,3 +9,4 @@ export * from "./payment";
 export * from "./qotd";
 export * from "./rename";
 export * from "./slowmode";
+
