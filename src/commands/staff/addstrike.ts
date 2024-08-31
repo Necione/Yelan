@@ -32,7 +32,9 @@ export const addStrike = buildCommand<SlashCommand>({
         roles: [roles.moderator],
     },
     async execute(i) {
-        if (!i.inCachedGuild()) return;
+        if (!i.inCachedGuild()) {
+            return;
+        }
 
         const user = i.options.getUser("user", true);
         const reason = i.options.getString("reason", true);
