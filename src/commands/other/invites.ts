@@ -22,16 +22,8 @@ import { cooldowns, logs } from "../../utils";
 const conf = {
     rewards: [
         {
-            role: "1174956945745137714",
-            invites: 20,
-        },
-        {
             role: "1278919375377793055",
             invites: 10,
-        },
-        {
-            role: "1119805219660910633",
-            invites: 100,
         },
     ] as {
         role: string;
