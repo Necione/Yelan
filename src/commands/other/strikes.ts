@@ -25,22 +25,36 @@ export const strikes = buildCommand<SlashCommand>({
             );
         }
 
-        const maxStrikes = 5;
         const strikes = p.strikes || 0;
 
         const yellowDot = "<:YellowDot:1110059185397317763>";
         const redDot = "<:RedDot:1110059185397317763>";
         const greenDot = "<:GreenDot:1110059185397317763>";
 
-        const strikeBar = Array(maxStrikes)
-            .fill(greenDot)
-            .map((_, index) => {
-                if (index < strikes) {
-                    return index < 2 ? yellowDot : redDot;
-                }
-                return greenDot;
-            })
-            .join(" ");
+        let strikeBar = "";
+
+        switch (strikes) {
+            case 0:
+                strikeBar = `${greenDot} ${greenDot} ${greenDot} ${greenDot} ${greenDot}`;
+                break;
+            case 1:
+                strikeBar = `${yellowDot} ${greenDot} ${greenDot} ${greenDot} ${greenDot}`;
+                break;
+            case 2:
+                strikeBar = `${yellowDot} ${yellowDot} ${greenDot} ${greenDot} ${greenDot}`;
+                break;
+            case 3:
+                strikeBar = `${redDot} ${redDot} ${redDot} ${greenDot} ${greenDot}`;
+                break;
+            case 4:
+                strikeBar = `${redDot} ${redDot} ${redDot} ${redDot} ${greenDot}`;
+                break;
+            case 5:
+                strikeBar = `${redDot} ${redDot} ${redDot} ${redDot} ${redDot}`;
+                break;
+            default:
+                strikeBar = `${greenDot} ${greenDot} ${greenDot} ${greenDot} ${greenDot}`;
+        }
 
         const embed = new EmbedBuilder()
             .setColor(0xff5856)
