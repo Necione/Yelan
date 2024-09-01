@@ -48,6 +48,10 @@ const draw = (
         resolve(ctx);
     });
 
+// For this only use the raw.githubusercontent.com domain, the redirect isn't needed since this isn't being displayed to the user.
+const icon = (path: string, ext = "png") =>
+    `https://raw.githubusercontent.com/LiyueHarbor/cdn/main/profiles/icons/${path}.${ext}`;
+
 /**
  * A function to create the canvas image, convert to command class.
  */
@@ -117,7 +121,7 @@ export async function createProfile(user: CanvasProfile) {
     );
     const [msgs, msgstext] = getValue(`${formatNumber(user.msgs)} | Messages`);
     const [rep, reptext] = getValue(`${formatNumber(user.rep)} | Reputation`);
-    const [lemon, lemontext] = getValue(`${formatNumber(user.lemon)} | Lemons`);
+    // const [lemon, lemontext] = getValue(`${formatNumber(user.lemon)} | Lemons`);
 
     // Write user stats.
     // Count for the user
@@ -166,72 +170,78 @@ export async function createProfile(user: CanvasProfile) {
     // ctx.fillStyle = `#000`;
     // curved(ctx, 60, 620, canvas.width - 120, 120, 20, true, false);
 
-
     // Draw the user badges.
-    ctx.fillStyle = user.icons.messages ? '#fefefe' : '#c0c0c0';
+    ctx.fillStyle = user.icons.messages ? "#fefefe" : "#c0c0c0";
     ctx.beginPath();
     ctx.arc(130, 515, 20, 0, Math.PI * 2);
     ctx.fill();
-    if (user.icons.messages) await rectangle(ctx, 95, 460, 75, 75, 0, './icons/messages.png', false);
+    if (user.icons.messages) {
+        await rectangle(ctx, 95, 460, 75, 75, 0, icon(`messages`), false);
+    }
 
-    ctx.fillStyle = user.icons.staff ? '#fefefe' : '#c0c0c0';
+    ctx.fillStyle = user.icons.staff ? "#fefefe" : "#c0c0c0";
     ctx.beginPath();
     ctx.arc(220, 515, 20, 0, Math.PI * 2);
     ctx.fill();
-    if (user.icons.staff) await rectangle(ctx, 185, 460, 75, 75, 0, './icons/staff.png', false);
+    if (user.icons.staff) {
+        await rectangle(ctx, 185, 460, 75, 75, 0, icon("staff"), false);
+    }
 
-    ctx.fillStyle = user.icons.sage ? '#fefefe' : '#c0c0c0';
+    ctx.fillStyle = user.icons.sage ? "#fefefe" : "#c0c0c0";
     ctx.beginPath();
     ctx.arc(310, 515, 20, 0, Math.PI * 2);
     ctx.fill();
-    if (user.icons.sage) await rectangle(ctx, 275, 460, 75, 75, 0, './icons/sage.png', false);
+    if (user.icons.sage) {
+        await rectangle(ctx, 275, 460, 75, 75, 0, icon("sage"), false);
+    }
 
-    ctx.fillStyle = user.icons.winner ? '#fefefe' : '#c0c0c0';
+    ctx.fillStyle = user.icons.winner ? "#fefefe" : "#c0c0c0";
     ctx.beginPath();
     ctx.arc(400, 515, 20, 0, Math.PI * 2);
     ctx.fill();
-    if (user.icons.winner) await rectangle(ctx, 365, 460, 75, 75, 0, './icons/winner.png', false);
+    if (user.icons.winner) {
+        await rectangle(ctx, 365, 460, 75, 75, 0, icon("winner"), false);
+    }
 
-    ctx.fillStyle = user.icons.booster ? '#fefefe' : '#c0c0c0';
+    ctx.fillStyle = user.icons.booster ? "#fefefe" : "#c0c0c0";
     ctx.beginPath();
     ctx.arc(490, 515, 20, 0, Math.PI * 2);
     ctx.fill();
-    if (user.icons.booster) await rectangle(ctx, 455, 460, 75, 75, 0, './icons/booster.png', false);
+    if (user.icons.booster) {
+        await rectangle(ctx, 455, 460, 75, 75, 0, icon("booster"), false);
+    }
 
-    ctx.fillStyle = user.icons.achievements ? '#fefefe' : '#c0c0c0';
+    ctx.fillStyle = user.icons.achievements ? "#fefefe" : "#c0c0c0";
     ctx.beginPath();
     ctx.arc(580, 515, 20, 0, Math.PI * 2);
     ctx.fill();
-    if (user.icons.achievements) await rectangle(ctx, 545, 460, 75, 75, 0, './icons/achievements.png', false);
+    if (user.icons.achievements) {
+        await rectangle(ctx, 545, 460, 75, 75, 0, icon("achievements"), false);
+    }
 
-    ctx.fillStyle = user.icons.cards ? '#fefefe' : '#c0c0c0';
+    ctx.fillStyle = user.icons.cards ? "#fefefe" : "#c0c0c0";
     ctx.beginPath();
     ctx.arc(670, 515, 20, 0, Math.PI * 2);
     ctx.fill();
-    if (user.icons.cards) await rectangle(ctx, 635, 460, 75, 75, 0, './icons/cards.png', false);
+    if (user.icons.cards) {
+        await rectangle(ctx, 635, 460, 75, 75, 0, icon("cards"), false);
+    }
 
-    ctx.fillStyle = user.icons.contributor ? '#fefefe' : '#c0c0c0';
+    ctx.fillStyle = user.icons.contributor ? "#fefefe" : "#c0c0c0";
     ctx.beginPath();
     ctx.arc(760, 515, 20, 0, Math.PI * 2);
     ctx.fill();
-    if (user.icons.contributor) await rectangle(ctx, 725, 460, 75, 75, 0, './icons/contributor.png', false);
-
+    if (user.icons.contributor) {
+        await rectangle(ctx, 725, 460, 75, 75, 0, icon("contributor"), false);
+    }
 
     // Draw progress bar on the sub cell.
     ctx.fillStyle = "#fefefe";
     await rectangle(ctx, 60, 615, canvas.width - 120, 80, 15, true, false);
     ctx.fillStyle = "#ffd966";
-    let l = (user.progress.current * (canvas.width - 120)) / user.progress.total;
-    await rectangle(
-        ctx,
-        60,
-        615,
-        l < 20 ? 20 : l,
-        80,
-        15,
-        true,
-        false,
-    );
+    const l =
+        (user.progress.current * (canvas.width - 120)) / user.progress.total;
+    await rectangle(ctx, 60, 615, l < 20 ? 20 : l, 80, 15, true, false);
 
     // Write the progress bar text.
     ctx.shadowBlur = 10;

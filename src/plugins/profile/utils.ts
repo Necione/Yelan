@@ -1,5 +1,5 @@
 import { getData } from "@elara-services/leveling";
-import { addButton, embedComment } from "@elara-services/utils";
+import { addButton, discord, embedComment, is } from "@elara-services/utils";
 import type { UserWallet } from "@prisma/client";
 import {
     ActionRowBuilder,
@@ -10,7 +10,7 @@ import {
     type GuildMember,
     type User,
 } from "discord.js";
-import { roles } from "../../config";
+import { mainServerId, roles } from "../../config";
 import { getProfileByUserId } from "../../services";
 import { lb } from "../../services/bot";
 import { levels } from "../../services/levels";
@@ -45,6 +45,18 @@ export function profileHidden() {
 
 export const allowedDomains = ["https://i.imgur.com/"];
 
+const cpro = {
+    messages: 50_000,
+    achievements: 100,
+    cards: 100,
+    roles: {
+        staff: "1099766553362313287",
+        sage: "1200214926065680404",
+        buyWinner: "1083205157082365992",
+        contributor: "1093982886438391818",
+    },
+};
+
 export async function createCanvasProfile(
     user: User,
     p: UserWallet,
@@ -62,6 +74,22 @@ export async function createCanvasProfile(
                   level: 0,
               },
     );
+    const g = user.client.guilds.resolve(mainServerId);
+    let member: GuildMember | null = null;
+    if (g && g.available) {
+        member = await discord.member(g, user.id, true, true);
+    }
+    const hasRole = (roles: (string | undefined)[]) =>
+        member?.roles.cache.hasAny(
+            // @ts-ignore
+            ...(roles || []).filter((c) => is.string(c)),
+        ) || false;
+
+    const bypass = hasRole([
+        roles.devs,
+        ...roles.main.filter((c) => c !== roles.admin),
+    ]);
+
     return createProfile({
         pfp: user.displayAvatarURL({ extension: "png" }),
         mora: p.balance,
@@ -78,6 +106,16 @@ export async function createCanvasProfile(
             msgs: messages || 0,
             rep: rep || 0,
             elo: elo || 0,
+        },
+        icons: {
+            messages: bypass || (messages || 0) >= cpro.messages,
+            achievements: bypass || p.achievements.length >= cpro.achievements,
+            booster: bypass || hasRole([g?.roles.premiumSubscriberRole?.id]),
+            cards: bypass || p.collectables.length >= cpro.cards,
+            contributor: bypass || hasRole([cpro.roles.contributor]),
+            sage: bypass || hasRole([cpro.roles.sage]),
+            staff: bypass || hasRole([cpro.roles.staff]),
+            winner: bypass || hasRole([cpro.roles.buyWinner]),
         },
         toggles: {
             background: p.backgroundHidden,
