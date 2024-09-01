@@ -148,7 +148,7 @@ export const monsters = [
         minExp: 4,
         maxExp: 7,
         minWorldLevel: 2,
-        image: "https://lh.elara.workers.dev/rpg/monsters/pyro_hilichurl_berserker",
+        image: "https://lh.elara.workers.dev/rpg/monsters/pyro_hilichurl_berserker.png",
         drops: [
             { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 100 },
             { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 75 },
