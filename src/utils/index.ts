@@ -375,5 +375,3 @@ export function getAmount(
               amount,
           )} ${texts.c.u}`;
 }
-
-export { texts };
