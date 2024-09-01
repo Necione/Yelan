@@ -11,6 +11,8 @@ export const getUserStats = async (userId: string) => {
                 hp: 100,
                 attackPower: 5,
                 inventory: [],
+                exp: 0,
+                worldLevel: 1,
             },
             update: {},
         })
@@ -21,12 +23,17 @@ export const updateUserStats = async (
     userId: string,
     data: Prisma.UserStatsUpdateInput,
 ) => {
-    return await prisma.userStats
-        .update({
+    try {
+        const result = await prisma.userStats.update({
             where: { userId },
             data,
-        })
-        .catch(log);
+        });
+        log(`Successfully updated user stats for user ${userId}`, result);
+        return result;
+    } catch (error) {
+        log(`Error updating user stats for user ${userId}: ${error}`);
+        throw error;
+    }
 };
 
 export const addItemToInventory = async (

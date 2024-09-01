@@ -8,7 +8,13 @@ import {
     updateUserStats,
 } from "../../services";
 import { cooldowns, locked } from "../../utils";
-import { calculateDrop, getRandomValue, monsters } from "../../utils/hunt";
+import {
+    calculateDrop,
+    calculateExp,
+    getLiyueEncounterDescription,
+    getRandomMonster,
+    getRandomValue,
+} from "../../utils/hunt";
 
 export const hunt = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -54,9 +60,22 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
-        const monster = monsters[Math.floor(Math.random() * monsters.length)];
+        if (stats.hp <= 0) {
+            locked.del(i.user.id);
+            return r.edit(
+                embedComment(
+                    `You don't have enough HP to go on a hunt. Visit a Statue of the Seven first!`,
+                ),
+            );
+        }
+
+        const monster = getRandomMonster(stats.worldLevel);
+        const selectedDescription = getLiyueEncounterDescription(monster.name);
         let currentPlayerHp = stats.hp;
-        let currentMonsterHp = getRandomValue(monster.minHp, monster.maxHp);
+        let currentMonsterHp = Math.floor(
+            getRandomValue(monster.minHp, monster.maxHp) *
+                Math.pow(1.2, stats.worldLevel - 1),
+        );
         const initialMonsterHp = currentMonsterHp;
 
         const createHealthBar = (
@@ -73,9 +92,7 @@ export const hunt = buildCommand<SlashCommand>({
         const battleEmbed = new EmbedBuilder()
             .setColor("Aqua")
             .setTitle(`You encountered a ${monster.name}!`)
-            .setDescription(
-                `**Battle Start!**\nYou encountered a ${monster.name} with ${initialMonsterHp} HP!`,
-            )
+            .setDescription(selectedDescription)
             .setThumbnail(monster.image)
             .addFields(
                 {
@@ -109,10 +126,30 @@ export const hunt = buildCommand<SlashCommand>({
 
                 const finalEmbed = new EmbedBuilder();
                 if (currentPlayerHp > 0) {
+                    const expGained = calculateExp(
+                        monster.minExp,
+                        monster.maxExp,
+                    );
+                    let newExp = stats.exp + expGained;
+                    let expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
+
+                    while (newExp >= expRequired) {
+                        newExp -= expRequired;
+                        stats.worldLevel += 1;
+                        expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
+                    }
+
+                    await updateUserStats(i.user.id, {
+                        exp: newExp,
+                        worldLevel: stats.worldLevel,
+                    });
+
                     finalEmbed
                         .setColor("Green")
                         .setTitle(`Victory!`)
-                        .setDescription(`You defeated the ${monster.name}!`)
+                        .setDescription(
+                            `You defeated the ${monster.name}!\n-# \`⭐\` \`+${expGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
+                        )
                         .setThumbnail(
                             `https://lh.elara.workers.dev/rpg/aexp.png`,
                         );

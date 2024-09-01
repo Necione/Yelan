@@ -177,6 +177,8 @@ model UserStats {
   hp          Int            @default(100)
   attackPower Int            @default(1)
   inventory   UserStatsInv[]
+  exp         Int            @default(0)
+  worldLevel  Int            @default(1)
 }
 
 type UserStatsInv {
