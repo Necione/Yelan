@@ -1,4 +1,4 @@
-import { is } from "@elara-services/utils";
+import { is, log } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 
@@ -21,17 +21,12 @@ export const updateUserStats = async (
     userId: string,
     data: Prisma.UserStatsUpdateInput,
 ) => {
-    if (!is.array(data.inventory)) {
-        data.inventory = {
-            set: [],
-        };
-    }
     return await prisma.userStats
         .update({
             where: { userId },
             data,
         })
-        .catch(() => null);
+        .catch(log);
 };
 
 export const addItemToInventory = async (
@@ -42,7 +37,7 @@ export const addItemToInventory = async (
     if (!stats) {
         return null;
     }
-    if (!is.array(stats.inventory)) {
+    if (!is.array(stats.inventory, false)) {
         stats.inventory = [];
     }
 
@@ -73,7 +68,7 @@ export const removeItemFromInventory = async (
     if (!stats) {
         return null;
     }
-    if (!is.array(stats.inventory)) {
+    if (!is.array(stats.inventory, false)) {
         stats.inventory = [];
     }
     const item = stats.inventory.find((c) => c.item === itemName);

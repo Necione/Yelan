@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, sleep } from "@elara-services/utils";
+import { embedComment, get, is, sleep } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     addItemToInventory,
@@ -131,10 +131,11 @@ export const hunt = buildCommand<SlashCommand>({
                 await updateUserStats(i.user.id, {
                     hp: Math.max(currentPlayerHp, 0),
                 });
+                await sleep(get.secs(2));
 
                 if (currentMonsterHp <= 0) {
                     const drops = calculateDrop(monster.drops);
-                    if (drops.length > 0) {
+                    if (is.array(drops)) {
                         await addItemToInventory(i.user.id, drops);
 
                         const dropsDescription = drops
@@ -197,6 +198,6 @@ export const hunt = buildCommand<SlashCommand>({
             );
 
             await r.edit({ embeds: [battleEmbed] }).catch(() => null);
-        }, get.secs(2));
+        }, get.secs(4)); // Don't put this below 4-5s otherwise it will cause the bot to get ratelimited 💀
     },
 });
