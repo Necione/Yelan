@@ -163,16 +163,6 @@ model UserWallet {
   cooldowns        Cooldown[]
   active           Active?
   dailyStats       DailyStats[]
-  stats            UserStats?    @relation("UserWalletToUserStats")
-}
-
-model UserStats {
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String     @unique
-  hp            Int 
-  attackPower   Int
-  inventory     Json       @default("[]")
-  UserWallet    UserWallet @relation(fields: [userId], references: [userId], name: "UserWalletToUserStats")
 }
 
 type Cooldown {
