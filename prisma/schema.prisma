@@ -163,6 +163,25 @@ model UserWallet {
   cooldowns        Cooldown[]
   active           Active?
   dailyStats       DailyStats[]
+  roles            Roles[]
+}
+
+type Roles {
+  type String
+  role String
+}
+
+model UserStats {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String         @unique
+  hp          Int            @default(100)
+  attackPower Int            @default(1)
+  inventory   UserStatsInv[]
+}
+
+type UserStatsInv {
+  item   String @default("")
+  amount Int    @default(0)
 }
 
 type Cooldown {

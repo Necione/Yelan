@@ -1,7 +1,6 @@
 export * from "./access";
 export * from "./achievements";
 export * from "./cards";
-export * from "./color";
 export * from "./hide";
 export * from "./inventory";
 export * from "./invites";
