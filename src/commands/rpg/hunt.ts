@@ -57,6 +57,7 @@ export const hunt = buildCommand<SlashCommand>({
         const monster = monsters[Math.floor(Math.random() * monsters.length)];
         let currentPlayerHp = stats.hp;
         let currentMonsterHp = getRandomValue(monster.minHp, monster.maxHp);
+        const initialMonsterHp = currentMonsterHp;
 
         const createHealthBar = (
             current: number,
@@ -73,7 +74,7 @@ export const hunt = buildCommand<SlashCommand>({
             .setColor("Aqua")
             .setTitle(`You encountered a ${monster.name}!`)
             .setDescription(
-                `**Battle Start!**\nYou encountered a ${monster.name} with ${currentMonsterHp} HP!`,
+                `**Battle Start!**\nYou encountered a ${monster.name} with ${initialMonsterHp} HP!`,
             )
             .setThumbnail(monster.image)
             .addFields(
@@ -84,7 +85,7 @@ export const hunt = buildCommand<SlashCommand>({
                 },
                 {
                     name: "Monster HP",
-                    value: createHealthBar(currentMonsterHp, monster.maxHp),
+                    value: createHealthBar(currentMonsterHp, initialMonsterHp),
                     inline: true,
                 },
             );
@@ -164,7 +165,7 @@ export const hunt = buildCommand<SlashCommand>({
             }
             await thread
                 .send(
-                    `>>> \`⚔️\` You dealt ${stats.attackPower} damage to the ${monster.name}!\n${monster.name}'s HP is now ${currentMonsterHp}/${monster.maxHp}.`,
+                    `>>> \`⚔️\` You dealt ${stats.attackPower} damage to the ${monster.name}!\n${monster.name}'s HP is now ${currentMonsterHp}/${initialMonsterHp}.`,
                 )
                 .catch(() => null);
 
@@ -192,7 +193,7 @@ export const hunt = buildCommand<SlashCommand>({
                 },
                 {
                     name: "Monster HP",
-                    value: createHealthBar(currentMonsterHp, monster.maxHp),
+                    value: createHealthBar(currentMonsterHp, initialMonsterHp),
                     inline: true,
                 },
             );
