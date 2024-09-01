@@ -126,7 +126,7 @@ export async function createProfile(user: CanvasProfile) {
     ctx.fillText(mora, 110, 280);
     ctx.fillText(msgs, 110, 360);
     ctx.fillText(rep, 110, 440);
-    ctx.fillText(lemon, 110, 520);
+    // ctx.fillText(lemon, 110, 520);
 
     // Text for the name of the count
     ctx.fillStyle = "#fefefe";
@@ -134,7 +134,7 @@ export async function createProfile(user: CanvasProfile) {
     ctx.fillText(moratext, getWidth(140, mora), 280);
     ctx.fillText(msgstext, getWidth(140, msgs), 360);
     ctx.fillText(reptext, getWidth(135, rep), 440);
-    ctx.fillText(lemontext, getWidth(130, lemon), 520);
+    // ctx.fillText(lemontext, getWidth(130, lemon), 520);
 
     // Leaderboard
     ctx.fillStyle = "#c0c0c0";
@@ -154,11 +154,11 @@ export async function createProfile(user: CanvasProfile) {
         getWidth(135, `${rep} ${reptext}`),
         440,
     );
-    ctx.fillText(
-        `(#${formatNumber(lb.lemon)})`,
-        getWidth(130, `${lemon} ${lemontext}`),
-        520,
-    );
+    // ctx.fillText(
+    //     `(#${formatNumber(lb.lemon)})`,
+    //     getWidth(130, `${lemon} ${lemontext}`),
+    //     520,
+    // );
 
     // Sub cell background.
     // ctx.globalAlpha = 0.2;
@@ -166,15 +166,67 @@ export async function createProfile(user: CanvasProfile) {
     // ctx.fillStyle = `#000`;
     // curved(ctx, 60, 620, canvas.width - 120, 120, 20, true, false);
 
+
+    // Draw the user badges.
+    ctx.fillStyle = user.icons.messages ? '#fefefe' : '#c0c0c0';
+    ctx.beginPath();
+    ctx.arc(130, 515, 20, 0, Math.PI * 2);
+    ctx.fill();
+    if (user.icons.messages) await rectangle(ctx, 95, 460, 75, 75, 0, './icons/messages.png', false);
+
+    ctx.fillStyle = user.icons.staff ? '#fefefe' : '#c0c0c0';
+    ctx.beginPath();
+    ctx.arc(220, 515, 20, 0, Math.PI * 2);
+    ctx.fill();
+    if (user.icons.staff) await rectangle(ctx, 185, 460, 75, 75, 0, './icons/staff.png', false);
+
+    ctx.fillStyle = user.icons.sage ? '#fefefe' : '#c0c0c0';
+    ctx.beginPath();
+    ctx.arc(310, 515, 20, 0, Math.PI * 2);
+    ctx.fill();
+    if (user.icons.sage) await rectangle(ctx, 275, 460, 75, 75, 0, './icons/sage.png', false);
+
+    ctx.fillStyle = user.icons.winner ? '#fefefe' : '#c0c0c0';
+    ctx.beginPath();
+    ctx.arc(400, 515, 20, 0, Math.PI * 2);
+    ctx.fill();
+    if (user.icons.winner) await rectangle(ctx, 365, 460, 75, 75, 0, './icons/winner.png', false);
+
+    ctx.fillStyle = user.icons.booster ? '#fefefe' : '#c0c0c0';
+    ctx.beginPath();
+    ctx.arc(490, 515, 20, 0, Math.PI * 2);
+    ctx.fill();
+    if (user.icons.booster) await rectangle(ctx, 455, 460, 75, 75, 0, './icons/booster.png', false);
+
+    ctx.fillStyle = user.icons.achievements ? '#fefefe' : '#c0c0c0';
+    ctx.beginPath();
+    ctx.arc(580, 515, 20, 0, Math.PI * 2);
+    ctx.fill();
+    if (user.icons.achievements) await rectangle(ctx, 545, 460, 75, 75, 0, './icons/achievements.png', false);
+
+    ctx.fillStyle = user.icons.cards ? '#fefefe' : '#c0c0c0';
+    ctx.beginPath();
+    ctx.arc(670, 515, 20, 0, Math.PI * 2);
+    ctx.fill();
+    if (user.icons.cards) await rectangle(ctx, 635, 460, 75, 75, 0, './icons/cards.png', false);
+
+    ctx.fillStyle = user.icons.contributor ? '#fefefe' : '#c0c0c0';
+    ctx.beginPath();
+    ctx.arc(760, 515, 20, 0, Math.PI * 2);
+    ctx.fill();
+    if (user.icons.contributor) await rectangle(ctx, 725, 460, 75, 75, 0, './icons/contributor.png', false);
+
+
     // Draw progress bar on the sub cell.
     ctx.fillStyle = "#fefefe";
     await rectangle(ctx, 60, 615, canvas.width - 120, 80, 15, true, false);
     ctx.fillStyle = "#ffd966";
+    let l = (user.progress.current * (canvas.width - 120)) / user.progress.total;
     await rectangle(
         ctx,
         60,
         615,
-        (user.progress.current * (canvas.width - 120)) / user.progress.total,
+        l < 20 ? 20 : l,
         80,
         15,
         true,
