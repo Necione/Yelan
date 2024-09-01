@@ -114,6 +114,47 @@ export const monsters = [
             },
         ],
     },
+    {
+        name: "Electro Hilichurl Shooter",
+        minHp: 20,
+        maxHp: 25,
+        minDamage: 4,
+        maxDamage: 7,
+        minExp: 4,
+        maxExp: 7,
+        minWorldLevel: 2,
+        image: "https://lh.elara.workers.dev/rpg/monsters/electro_hilichurl_shooter.png",
+        drops: [
+            {
+                item: "Firm Arrowhead",
+                minAmount: 1,
+                maxAmount: 2,
+                chance: 100,
+            },
+            {
+                item: "Sharp Arrowhead",
+                minAmount: 1,
+                maxAmount: 2,
+                chance: 50,
+            },
+        ],
+    },
+    {
+        name: "Pyro Hilichurl Berserker",
+        minHp: 20,
+        maxHp: 25,
+        minDamage: 4,
+        maxDamage: 7,
+        minExp: 4,
+        maxExp: 7,
+        minWorldLevel: 2,
+        image: "https://lh.elara.workers.dev/rpg/monsters/pyro_hilichurl_berserker",
+        drops: [
+            { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 100 },
+            { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 75 },
+            { item: "Ominous Mask", minAmount: 1, maxAmount: 2, chance: 25 },
+        ],
+    },
 ];
 
 export function getRandomValue(min: number, max: number): number {
