@@ -41,7 +41,7 @@ export const rpg = buildCommand<SlashCommand>({
         const cc = cooldowns.get(p, "hunt");
 
         const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
-        
+
         const embed = new EmbedBuilder()
             .setColor("Aqua")
             .setTitle(`${i.user.username}'s RPG Stats`)
@@ -50,7 +50,11 @@ export const rpg = buildCommand<SlashCommand>({
             .addFields(
                 {
                     name: "Your Stats",
-                    value: `🌍 World Level: \`${stats.worldLevel}\` ⭐ EXP: \`${stats.exp}/${expRequired.toFixed(0)}\`\n❤️ HP: \`${stats.hp}/100\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)}\``,
+                    value: `🌍 World Level: \`${stats.worldLevel}\` ⭐ EXP: \`${
+                        stats.exp
+                    }/${expRequired.toFixed(0)}\`\n❤️ HP: \`${
+                        stats.hp
+                    }/100\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)}\``,
                     inline: false,
                 },
                 {

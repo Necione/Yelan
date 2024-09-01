@@ -1,4 +1,4 @@
-import { is, log } from "@elara-services/utils";
+import { is } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 
@@ -23,17 +23,12 @@ export const updateUserStats = async (
     userId: string,
     data: Prisma.UserStatsUpdateInput,
 ) => {
-    try {
-        const result = await prisma.userStats.update({
+    return await prisma.userStats
+        .update({
             where: { userId },
             data,
-        });
-        log(`Successfully updated user stats for user ${userId}`, result);
-        return result;
-    } catch (error) {
-        log(`Error updating user stats for user ${userId}: ${error}`);
-        throw error;
-    }
+        })
+        .catch(() => null);
 };
 
 export const addItemToInventory = async (

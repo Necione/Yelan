@@ -2,7 +2,12 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
-import { getProfileByUserId, getUserStats, removeBalance, updateUserStats } from "../../services";
+import {
+    getProfileByUserId,
+    getUserStats,
+    removeBalance,
+    updateUserStats,
+} from "../../services";
 
 export const heal = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -15,12 +20,18 @@ export const heal = buildCommand<SlashCommand>({
         const userProfile = await getProfileByUserId(userId);
 
         if (!userProfile) {
-            return r.edit(embedComment("No profile found for your user. Please set up your profile."));
+            return r.edit(
+                embedComment(
+                    "No profile found for your user. Please set up your profile.",
+                ),
+            );
         }
 
         if (userProfile.balance < 50) {
             return r.edit(
-                embedComment(`You don't have enough ${customEmoji.a.z_coins} coins to heal. You need 50 coins.`),
+                embedComment(
+                    `You don't have enough ${customEmoji.a.z_coins} coins to heal. You need 50 coins.`,
+                ),
             );
         }
 

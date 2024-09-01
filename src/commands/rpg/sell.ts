@@ -50,12 +50,16 @@ export const sell = buildCommand<SlashCommand>({
         const item = stats.inventory.find((c) => c.item === itemName);
         if (!item) {
             return r.edit(
-                embedComment(`You don't have "${itemName}" to sell.\n-# Check your inventory with </rpg:1279824112566665297>`),
+                embedComment(
+                    `You don't have "${itemName}" to sell.\n-# Check your inventory with </rpg:1279824112566665297>`,
+                ),
             );
         }
         if (item.amount < amountToSell) {
             return r.edit(
-                embedComment(`You don't have enough of "${itemName}" to sell.\n-# Check your inventory with </rpg:1279824112566665297>`),
+                embedComment(
+                    `You don't have enough of "${itemName}" to sell.\n-# Check your inventory with </rpg:1279824112566665297>`,
+                ),
             );
         }
         const itemPrice = items[itemName].sellPrice;
