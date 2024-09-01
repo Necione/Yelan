@@ -22,7 +22,9 @@ export const updateUserStats = async (
     data: Prisma.UserStatsUpdateInput,
 ) => {
     if (!is.array(data.inventory)) {
-        throw new Error("Inventory must be an array");
+        data.inventory = {
+            set: [],
+        };
     }
     return await prisma.userStats
         .update({
@@ -39,6 +41,9 @@ export const addItemToInventory = async (
     const stats = await getUserStats(userId);
     if (!stats) {
         return null;
+    }
+    if (!is.array(stats.inventory)) {
+        stats.inventory = [];
     }
 
     if (is.array(items)) {
@@ -67,6 +72,9 @@ export const removeItemFromInventory = async (
     const stats = await getUserStats(userId);
     if (!stats) {
         return null;
+    }
+    if (!is.array(stats.inventory)) {
+        stats.inventory = [];
     }
     const item = stats.inventory.find((c) => c.item === itemName);
     if (!item) {
