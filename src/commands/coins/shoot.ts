@@ -90,11 +90,6 @@ export const shoot = buildCommand<SlashCommand>({
             locked.del(list);
             return r.edit(embedComment(cooldownResult.message));
         }
-        const cd2 = cooldowns.get(p2, "shoot"); // Check for both users.
-        if (!cd2.status) {
-            locked.del(list);
-            return r.edit(embedComment(cd2.message));
-        }
 
         if (!i.member.roles.cache.has(roleId)) {
             const embed = new EmbedBuilder()
