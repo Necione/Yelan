@@ -3,6 +3,7 @@ import {
     getUser,
     type SlashCommand,
 } from "@elara-services/botbuilder";
+import { randomNumber } from "@elara-services/packages";
 import {
     addButtonRow,
     awaitComponent,
@@ -159,10 +160,11 @@ export const shoot = buildCommand<SlashCommand>({
                 ),
             );
         }
-        const minAmount = 50;
-        const maxAmount = 150;
-        const amount =
-            Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
+        const amount = randomNumber({
+            integer: true,
+            min: 50,
+            max: 150,
+        });
         const embed = new EmbedBuilder()
             .setAuthor(author())
             .setColor(Colors.Aqua)
