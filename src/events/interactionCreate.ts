@@ -8,6 +8,7 @@ import type { Interaction, InteractionReplyOptions } from "discord.js";
 import { Events } from "discord.js";
 import * as Commands from "../commands";
 import * as context from "../plugins/context";
+import { handleInviteInteraction, isInviteInt } from "../plugins/other/invites";
 import { handleInteractions } from "../plugins/pets";
 import { onInteraction } from "../plugins/profile";
 import { isInActiveTrade, locked } from "../utils";
@@ -17,6 +18,9 @@ export const interactionCreate = createEvent({
     async execute(i: Interaction) {
         handlePostInteraction(i);
         if ("customId" in i) {
+            if (isInviteInt(i) && i.isButton()) {
+                return handleInviteInteraction(i);
+            }
             i.client.enka.onInteraction(i);
             if (i.customId.startsWith("profile|")) {
                 return onInteraction(i);

@@ -4,6 +4,7 @@ import {
     type SlashCommand,
 } from "@elara-services/botbuilder";
 import {
+    addButtonRow,
     discord,
     embedComment,
     field,
@@ -15,12 +16,14 @@ import {
 } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import {
+    ButtonStyle,
     EmbedBuilder,
     type GuildMember,
     type Role,
     SlashCommandBuilder,
 } from "discord.js";
 import { roles } from "../../config";
+import { getAuthor } from "../../plugins/other/invites";
 import { getProfileByUserId } from "../../services";
 import { cooldowns, logs } from "../../utils";
 
@@ -118,7 +121,7 @@ export const invites = buildCommand<SlashCommand>({
                 );
             }
         }
-        const db = await Invites.formatBy(i.guild, user.id);
+        const db = await Invites.formatBy(i.guild, user.id, 1000, true);
         if (!db.status) {
             if (db.message.includes("No users")) {
                 return r.edit(
@@ -203,18 +206,19 @@ export const invites = buildCommand<SlashCommand>({
                 ),
             )
             .setFooter({ text: `Rewards are given based on unique invites` })
-            .setAuthor({
-                name:
-                    member.displayName === user.displayName
-                        ? user.displayName
-                        : `${member.displayName} (${user.username})`,
-                iconURL: member.displayAvatarURL(),
-            });
+            .setAuthor(getAuthor(member, user));
         if (is.array(rewards)) {
             embed.setDescription(rewards.join("\n\n"));
         }
         return r.edit({
             embeds: [embed],
+            components: [
+                addButtonRow({
+                    id: `ifaq:invites`,
+                    emoji: { name: "❔" },
+                    style: ButtonStyle.Success,
+                }),
+            ],
         });
     },
 });
