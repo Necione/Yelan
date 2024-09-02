@@ -50,6 +50,16 @@ export interface CanvasProfile {
         label: string;
         next: string;
     };
+    icons: {
+        messages: boolean;
+        staff: boolean;
+        sage: boolean;
+        winner: boolean;
+        booster: boolean;
+        achievements: boolean;
+        cards: boolean;
+        contributor: boolean;
+    };
 }
 
 export function rectangle(

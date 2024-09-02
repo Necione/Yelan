@@ -23,6 +23,7 @@ export const hunt = buildCommand<SlashCommand>({
             "[RPG] Go on a hunt to fight monsters and earn rewards.",
         )
         .setDMPermission(false),
+    only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
     async execute(i, r) {
         if (!i.deferred) {
