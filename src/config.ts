@@ -20,6 +20,7 @@ export const economy = {
             "1119423311496097792",
             "1116994375415758868",
             "835328759577313302", // For testing, don't remove.
+            "1279039089974186146" 
         ],
         events: ["1078889213015113788", "1083251462072709150"],
         random: {
@@ -152,6 +153,6 @@ export const roles = {
     graders: "1142915623400243350",
     qotd: "1114590871212523540",
     restrictedColors: ["1089061615133016074"],
-    main: ["1090489182994038864", "835328759128260626"], // Role IDs is for the testing servers, do not remove or replace it.
+    main: ["1090489182994038864", "835328759128260626", "1278979938128756748"], // Role IDs is for the testing servers, do not remove or replace it.
 };
 roles.main.push(roles.admin, roles.devs); // This inserts the 'admin' role ID for the main server.
