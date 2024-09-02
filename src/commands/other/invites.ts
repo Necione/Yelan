@@ -14,7 +14,12 @@ import {
     log,
 } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
-import { EmbedBuilder, type Role, SlashCommandBuilder } from "discord.js";
+import {
+    EmbedBuilder,
+    type GuildMember,
+    type Role,
+    SlashCommandBuilder,
+} from "discord.js";
 import { roles } from "../../config";
 import { getProfileByUserId } from "../../services";
 import { cooldowns, logs } from "../../utils";
@@ -82,7 +87,12 @@ export const invites = buildCommand<SlashCommand>({
                 embedComment(`Unable to find that user or it's a bot account.`),
             );
         }
-        const member = await discord.member(i.guild, user.id, true, true);
+        const member = (await discord.member(
+            i.guild,
+            user.id,
+            true,
+            true,
+        )) as GuildMember;
         if (!member) {
             return r.edit(
                 embedComment(
@@ -135,13 +145,13 @@ export const invites = buildCommand<SlashCommand>({
                 (a, b) => b.invites - a.invites,
             )) {
                 const role = i.guild.roles.resolve(r.role);
-                const bar = `[${"█".repeat(
-                    Math.floor((data.invited / r.invites) * 20),
-                )}${"▒".repeat(
-                    20 - Math.floor((data.invited / r.invites) * 20),
-                )}] ${data.invited}/${r.invites} (${Math.floor(
-                    (data.invited / r.invites) * 100,
-                )}%)`;
+                const completed =
+                    member.roles.cache.has(r.role) || data.invited >= r.invites;
+                const bar = completed
+                    ? `🎉 Completed!`
+                    : `${formatNumber(data.invited)}/${formatNumber(
+                          r.invites,
+                      )}`;
                 if (role) {
                     if (!role.editable) {
                         rewards.push(
@@ -149,7 +159,7 @@ export const invites = buildCommand<SlashCommand>({
                                 r.invites,
                             )} Invites**\n-# Progress: ${bar}\n-# Reward: ${role.toString()} | This role can't be added by me, contact an Admin to fix this!`,
                         );
-                    } else if (data.invited >= r.invites) {
+                    } else if (completed) {
                         const hasRole = member.roles.cache.has(r.role);
                         if (!hasRole) {
                             add.push(role);
