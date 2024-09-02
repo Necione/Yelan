@@ -10,6 +10,7 @@ import {
     embedComment,
     get,
     make,
+    sleep,
 } from "@elara-services/utils";
 import {
     ButtonStyle,
@@ -100,7 +101,8 @@ export const shoot = buildCommand<SlashCommand>({
                 .setDescription(
                     `Only members of the <@&${roleId}> can use this command.\nPress the button below to join. \n\n-# ⚠️**WARNNING** You cannot leave the mafia once you enter.`,
                 )
-                .setColor(Colors.Blue);
+                .setThumbnail(`https://lh.elara.workers.dev/mafia.png`)
+                .setColor(`#4343ff`);
 
             await r.edit({
                 embeds: [embed],
@@ -175,6 +177,8 @@ export const shoot = buildCommand<SlashCommand>({
             .setImage(gifList[Math.floor(Math.random() * gifList.length)]);
 
         await r.edit({ embeds: [embed], components: [] });
+        await cooldowns.set(p1, "shoot", get.hrs(3));
+        await sleep(get.secs(3));
         await Promise.all([
             removeBalance(user.id, amount, false),
             updateUserProfile(i.user.id, { staffCredits: { decrement: 2 } }),
