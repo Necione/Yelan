@@ -1,7 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, get, is, sleep } from "@elara-services/utils";
+import { customEmoji } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
+    addBalance,
     addItemToInventory,
     getProfileByUserId,
     getUserStats,
@@ -70,12 +72,59 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
+        if (Math.random() < 0.20) {
+            const rarities = [
+                { rarity: "Common", multiplier: 1, weight: 50 },
+                { rarity: "Exquisite", multiplier: 2, weight: 25 },
+                { rarity: "Precious", multiplier: 3, weight: 15 },
+                { rarity: "Luxurious", multiplier: 4, weight: 8 },
+                { rarity: "Remarkable", multiplier: 5, weight: 2 },
+            ];
+
+            function selectChestRarity() {
+                const totalWeight = rarities.reduce(
+                    (acc, rarity) => acc + rarity.weight,
+                    0,
+                );
+                let randomWeight = Math.random() * totalWeight;
+
+                for (const rarity of rarities) {
+                    if (randomWeight < rarity.weight) {
+                        return rarity;
+                    }
+                    randomWeight -= rarity.weight;
+                }
+                return rarities[0];
+            }
+
+            const selectedChest = selectChestRarity();
+            const coinsFound =
+                getRandomValue(10, 25) * selectedChest.multiplier;
+
+            await addBalance(
+                i.user.id,
+                coinsFound,
+                false,
+                `Found a ${selectedChest.rarity} Treasure Chest`,
+            );
+            await r.edit(
+                embedComment(
+                    `You stumbled upon a ${selectedChest.rarity} Treasure Chest!\n It gave you ${customEmoji.a.z_coins} \`${coinsFound} Coins\`!`,
+                    "Green",
+                ),
+            );
+            await cooldowns.set(userWallet, "hunt", get.hrs(1));
+
+            locked.del(i.user.id);
+            return;
+        }
+
         const monster = getRandomMonster(stats.worldLevel);
         const selectedDescription = getLiyueEncounterDescription(monster.name);
         let currentPlayerHp = stats.hp;
         let currentMonsterHp = Math.floor(
             getRandomValue(monster.minHp, monster.maxHp) *
-                Math.pow(1.2, stats.worldLevel - 1),
+                Math.pow(1.3, stats.worldLevel - 1),
         );
         const initialMonsterHp = currentMonsterHp;
 

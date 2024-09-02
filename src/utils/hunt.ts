@@ -152,7 +152,22 @@ export const monsters = [
         drops: [
             { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 100 },
             { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 75 },
-            { item: "Ominous Mask", minAmount: 1, maxAmount: 2, chance: 25 },
+            { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 25 },
+        ],
+    },
+    {
+        name: "Mitachurl",
+        minHp: 30,
+        maxHp: 50,
+        minDamage: 6,
+        maxDamage: 10,
+        minExp: 4,
+        maxExp: 7,
+        minWorldLevel: 3,
+        image: "https://lh.elara.workers.dev/rpg/monsters/mitachurl.png",
+        drops: [
+            { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 100 },
+            { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 50 },
         ],
     },
 ];
