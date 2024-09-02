@@ -138,7 +138,6 @@ export const pay: SlashCommand = {
                     name: interaction.user.username,
                     iconURL: interaction.user.displayAvatarURL(),
                 })
-                .setThumbnail("https://file.coffee/u/CWanwcFihzRKWMyxp8g5p.png")
                 .setDescription("You cannot afford this transaction.");
             locked.del([interaction.user.id, user.id]);
             return responder.edit({ embeds: [embed] });
