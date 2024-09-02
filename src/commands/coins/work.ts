@@ -1,5 +1,4 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { getProfileByUserId } from "../../services";
@@ -16,9 +15,7 @@ export const work: SlashCommand = {
     },
     command: new SlashCommandBuilder()
         .setName(`work`)
-        .setDescription(
-            `Receive complimentary ${texts.c.l} hourly with this command.`,
-        )
+        .setDescription(`[Deprecated]`)
         .setDMPermission(false),
     defer: { silent: false },
     async execute(interaction, responder) {
@@ -39,7 +36,7 @@ export const work: SlashCommand = {
                 embeds: [
                     new EmbedBuilder()
                         .setColor("Aqua")
-                        .setTitle("`/work` is being depreciated")
+                        .setTitle("`/work` is being deprecated")
                         .setDescription(
                             "We're working on a new system to replace this command, sorry!",
                         ),

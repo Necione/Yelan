@@ -11,9 +11,9 @@ export * from "./profile";
 export * from "./rakeback";
 export { rps } from "./rps";
 export * from "./rr";
+export * from "./shoot";
 export * from "./slots";
 export * from "./stats";
 export * from "./trade";
 export * from "./vault";
 export * from "./work";
-
