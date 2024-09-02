@@ -168,9 +168,7 @@ export const shoot = buildCommand<SlashCommand>({
             .setColor(Colors.Aqua)
             .setTitle(`💥 BAAAAAAAANG!`)
             .setDescription(
-                `<@${i.user.id}> absolutely obliterated <@${user.id}>.\n-# <@${
-                    i.user.id
-                }> lost 2 Reputation, and <@${user.id}> had to pay ${getAmount(
+                `${i.user.toString()} absolutely obliterated ${user.toString()}.\n-# ${i.user.toString()} lost 2 Reputation, and ${user.toString()} had to pay ${getAmount(
                     amount,
                 )} for medical expenses!`,
             ) // User mentions don't work in the footer.
@@ -178,7 +176,7 @@ export const shoot = buildCommand<SlashCommand>({
 
         await r.edit({ embeds: [embed], components: [] });
         await cooldowns.set(p1, "shoot", get.hrs(3));
-        await sleep(get.secs(3));
+        await sleep(get.secs(2));
         await Promise.all([
             removeBalance(user.id, amount, false),
             updateUserProfile(i.user.id, { staffCredits: { decrement: 2 } }),
