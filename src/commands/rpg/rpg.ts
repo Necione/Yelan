@@ -1,9 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getProfileByUserId, getUserStats } from "../../services";
+import { getProfileByUserId } from "../../services";
+import { syncStats } from "../../services/userStats";
 import { cooldowns } from "../../utils";
-import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 export const rpg = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -30,23 +30,13 @@ export const rpg = buildCommand<SlashCommand>({
                 ),
             );
         }
-        const stats = await getUserStats(i.user.id);
-        if (!stats) {
-            return r.edit(
-                embedComment(
-                    `You don't have any stats yet, try using \`/hunt\` command to get started!`,
-                ),
-            );
-        }
+
+        const stats = await syncStats(i.user.id);
+
         const items = stats.inventory || [];
         const cc = cooldowns.get(p, "hunt");
 
         const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
-        const equippedWeapon = stats.equippedWeapon as WeaponName | null;
-        const additionalAttackPower = equippedWeapon
-            ? weapons[equippedWeapon]?.attackPower || 0
-            : 0;
-        const baseAttackPower = 5;
 
         const embed = new EmbedBuilder()
             .setColor("Aqua")
@@ -56,11 +46,11 @@ export const rpg = buildCommand<SlashCommand>({
             .addFields(
                 {
                     name: "Your Stats",
-                    value: `🌍 World Level: \`${stats.worldLevel}\` ⭐ EXP: \`${
+                    value: `🌍 World Level: \`${stats.worldLevel}\` | ⭐ EXP: \`${
                         stats.exp
                     }/${expRequired.toFixed(0)}\`\n❤️ HP: \`${
                         stats.hp
-                    }/100\`\n⚔️ ATK: \`${baseAttackPower} (+${additionalAttackPower})\``,
+                    }/${stats.maxHP}\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)} (+${(stats.attackPower - stats.baseAttack).toFixed(2)})\``,
                     inline: false,
                 },
                 {
@@ -74,10 +64,10 @@ export const rpg = buildCommand<SlashCommand>({
                 },
             );
 
-        if (equippedWeapon && weapons[equippedWeapon]) {
+        if (stats.equippedWeapon) {
             embed.addFields({
                 name: "Equipped Weapon",
-                value: `${equippedWeapon} (ATK: ${weapons[equippedWeapon].attackPower})`,
+                value: `${stats.equippedWeapon} (ATK: ${(stats.attackPower - stats.baseAttack).toFixed(2)})`,
                 inline: false,
             });
         }

@@ -43,7 +43,8 @@ export const heal = buildCommand<SlashCommand>({
             );
         }
 
-        const newHp = Math.min(stats.hp + 25, 100);
+        const maxHP = stats.maxHP;
+        const newHp = Math.min(stats.hp + 25, maxHP);
 
         await Promise.all([
             updateUserStats(i.user.id, { hp: newHp }),
@@ -52,7 +53,7 @@ export const heal = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You paid ${customEmoji.a.z_coins} \`50 ${texts.c.u}\` and healed \`25 HP\`! Your current HP is \`${newHp}/100\`.`,
+                `You paid ${customEmoji.a.z_coins} \`50 ${texts.c.u}\` and healed \`25 HP\`! Your current HP is \`${newHp}/${maxHP}\`.`,
                 "Green",
             ),
         );

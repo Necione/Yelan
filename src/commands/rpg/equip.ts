@@ -50,11 +50,11 @@ export const equip = buildCommand<SlashCommand>({
         }
 
         const additionalAttackPower = weapons[weaponName].attackPower;
-        const totalAttackPower = 5 + additionalAttackPower;
+        const totalAttackPower = stats.baseAttack + additionalAttackPower;
 
         await updateUserStats(i.user.id, {
-            equippedWeapon: { set: weaponName },
-            attackPower: { set: totalAttackPower },
+            equippedWeapon: weaponName,
+            attackPower: totalAttackPower,
         });
 
         return r.edit(

@@ -39,6 +39,13 @@ const chestLoot: LootItem[] = [
         minWorldLevel: 1,
         dropChance: 30,
     },
+    {
+        name: "Waster Greatsword",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 2,
+        dropChance: 5,
+    },
 ];
 
 function selectChestRarity(): ChestRarity {
