@@ -15,10 +15,8 @@ export const heal = buildCommand<SlashCommand>({
         .setDescription("[RPG] Visit a Statue of the Seven.")
         .setDMPermission(false),
     defer: { silent: false },
-    async execute(interaction, r) {
-        const userId = interaction.user.id;
-        const userProfile = await getProfileByUserId(userId);
-
+    async execute(i, r) {
+        const userProfile = await getProfileByUserId(i.user.id);
         if (!userProfile) {
             return r.edit(
                 embedComment(
@@ -35,7 +33,7 @@ export const heal = buildCommand<SlashCommand>({
             );
         }
 
-        const stats = await getUserStats(userId);
+        const stats = await getUserStats(i.user.id);
 
         if (!stats) {
             return r.edit(
@@ -48,8 +46,8 @@ export const heal = buildCommand<SlashCommand>({
         const newHp = Math.min(stats.hp + 25, 100);
 
         await Promise.all([
-            updateUserStats(userId, { hp: newHp }),
-            removeBalance(userId, 50, true, "Paid 50 coins to heal 25 HP"),
+            updateUserStats(i.user.id, { hp: newHp }),
+            removeBalance(i.user.id, 50, true, "Paid 50 coins to heal 25 HP"),
         ]);
 
         return r.edit(

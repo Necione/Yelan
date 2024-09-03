@@ -10,6 +10,7 @@ import {
     updateUserStats,
 } from "../../services";
 import { cooldowns, locked } from "../../utils";
+import { generateChestLoot } from "../../utils/chest";
 import {
     calculateDrop,
     calculateExp,
@@ -72,53 +73,34 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
-        if (Math.random() < 0.20) {
-            const rarities = [
-                { rarity: "Common", multiplier: 1, weight: 50 },
-                { rarity: "Exquisite", multiplier: 2, weight: 25 },
-                { rarity: "Precious", multiplier: 3, weight: 15 },
-                { rarity: "Luxurious", multiplier: 4, weight: 8 },
-                { rarity: "Remarkable", multiplier: 5, weight: 2 },
-            ];
-
-            function selectChestRarity() {
-                const totalWeight = rarities.reduce(
-                    (acc, rarity) => acc + rarity.weight,
-                    0,
-                );
-                let randomWeight = Math.random() * totalWeight;
-
-                for (const rarity of rarities) {
-                    if (randomWeight < rarity.weight) {
-                        return rarity;
-                    }
-                    randomWeight -= rarity.weight;
-                }
-                return rarities[0];
-            }
-
-            const selectedChest = selectChestRarity();
-            const coinsFound =
-                getRandomValue(10, 25) * selectedChest.multiplier;
+        if (Math.random() < 0.2) {
+            const { rarity, loot, coins } = generateChestLoot(stats.worldLevel);
 
             await addBalance(
                 i.user.id,
-                coinsFound,
+                coins,
                 false,
-                `Found a ${selectedChest.rarity} Treasure Chest`,
+                `Found a ${rarity} Treasure Chest`,
             );
+
+            await addItemToInventory(i.user.id, loot);
+
+            const lootDescription = loot
+                .map((item) => `\`${item.amount}x\` ${item.item}`)
+                .join(", ");
+
             await r.edit(
                 embedComment(
-                    `You stumbled upon a ${selectedChest.rarity} Treasure Chest!\n It gave you ${customEmoji.a.z_coins} \`${coinsFound} Coins\`!`,
+                    `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins} Coins\` and the following items:\n${lootDescription}`,
                     "Green",
                 ),
             );
+
             await cooldowns.set(userWallet, "hunt", get.hrs(1));
 
             locked.del(i.user.id);
             return;
         }
-
         const monster = getRandomMonster(stats.worldLevel);
         const selectedDescription = getLiyueEncounterDescription(monster.name);
         let currentPlayerHp = stats.hp;

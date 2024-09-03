@@ -3,6 +3,7 @@ import { embedComment } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, getUserStats } from "../../services";
 import { cooldowns } from "../../utils";
+import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 export const rpg = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -41,6 +42,11 @@ export const rpg = buildCommand<SlashCommand>({
         const cc = cooldowns.get(p, "hunt");
 
         const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
+        const equippedWeapon = stats.equippedWeapon as WeaponName | null;
+        const additionalAttackPower = equippedWeapon
+            ? weapons[equippedWeapon]?.attackPower || 0
+            : 0;
+        const baseAttackPower = 5;
 
         const embed = new EmbedBuilder()
             .setColor("Aqua")
@@ -54,7 +60,7 @@ export const rpg = buildCommand<SlashCommand>({
                         stats.exp
                     }/${expRequired.toFixed(0)}\`\n❤️ HP: \`${
                         stats.hp
-                    }/100\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)}\``,
+                    }/100\`\n⚔️ ATK: \`${baseAttackPower} (+${additionalAttackPower})\``,
                     inline: false,
                 },
                 {
@@ -67,6 +73,14 @@ export const rpg = buildCommand<SlashCommand>({
                     inline: false,
                 },
             );
+
+        if (equippedWeapon && weapons[equippedWeapon]) {
+            embed.addFields({
+                name: "Equipped Weapon",
+                value: `${equippedWeapon} (ATK: ${weapons[equippedWeapon].attackPower})`,
+                inline: false,
+            });
+        }
 
         await r.edit({ embeds: [embed] });
     },

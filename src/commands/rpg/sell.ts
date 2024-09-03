@@ -3,19 +3,27 @@ import { embedComment, getKeys } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
-import { type ItemName, items } from "../../utils/items";
+import { drops, type DropName } from "../../utils/rpgitems/items";
+import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
+
+type SellableItemName = DropName | WeaponName;
 
 export const sell = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName(`sell`)
-        .setDescription(`[RPG] Sell an item from your inventory.`)
+        .setDescription(`[RPG] Sell an item or weapon from your inventory.`)
+        .setDMPermission(false)
         .addStringOption((option) =>
             option
                 .setName("item")
-                .setDescription("The item to sell")
+                .setDescription("The item or weapon to sell")
                 .setRequired(true)
                 .addChoices(
-                    ...getKeys(items).map((c) => ({
+                    ...getKeys(drops).map((c) => ({
+                        name: c,
+                        value: c,
+                    })),
+                    ...getKeys(weapons).map((c) => ({
                         name: c,
                         value: c,
                     })),
@@ -28,18 +36,20 @@ export const sell = buildCommand<SlashCommand>({
                 .setRequired(true),
         ),
     defer: { silent: false },
-    async execute(interaction, r) {
-        const itemName = interaction.options.getString(
-            "item",
-            true,
-        ) as ItemName;
-        const amountToSell = interaction.options.getInteger("amount", true);
-        if (!items[itemName]) {
+    async execute(i, r) {
+        const itemName = i.options.getString("item", true) as SellableItemName;
+        const amountToSell = i.options.getInteger("amount", true);
+
+        const itemData =
+            drops[itemName as DropName] || weapons[itemName as WeaponName];
+
+        if (!itemData) {
             return r.edit(
                 embedComment(`The item "${itemName}" doesn't exist.`),
             );
         }
-        const stats = await getUserStats(interaction.user.id);
+
+        const stats = await getUserStats(i.user.id);
         if (!stats) {
             return r.edit(
                 embedComment(
@@ -62,8 +72,8 @@ export const sell = buildCommand<SlashCommand>({
                 ),
             );
         }
-        const itemPrice = items[itemName].sellPrice;
-        const totalSellPrice = itemPrice * amountToSell;
+
+        const totalSellPrice = itemData.sellPrice * amountToSell;
 
         item.amount -= amountToSell;
         if (item.amount <= 0) {
@@ -73,13 +83,13 @@ export const sell = buildCommand<SlashCommand>({
         }
 
         await Promise.all([
-            updateUserStats(interaction.user.id, {
+            updateUserStats(i.user.id, {
                 inventory: {
                     set: stats.inventory,
                 },
             }),
             addBalance(
-                interaction.user.id,
+                i.user.id,
                 totalSellPrice,
                 true,
                 `Sold ${amountToSell}x ${itemName}`,
