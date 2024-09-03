@@ -73,31 +73,31 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
-        if (Math.random() < 0.9) {
+        if (Math.random() < 0.2) {
             const { rarity, loot, coins } = generateChestLoot(stats.worldLevel);
-        
+
             await addBalance(
                 i.user.id,
                 coins,
                 false,
                 `Found a ${rarity} Treasure Chest`,
             );
-        
+
             await addItemToInventory(i.user.id, loot);
-        
+
             const lootDescription = loot
                 .map((item) => `\`${item.amount}x\` ${item.item}`)
                 .join(", ");
-        
+
             await r.edit(
                 embedComment(
                     `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins} Coins\` and the following items:\n${lootDescription}`,
                     "Green",
                 ),
             );
-        
+
             await cooldowns.set(userWallet, "hunt", get.hrs(1));
-        
+
             locked.del(i.user.id);
             return;
         }

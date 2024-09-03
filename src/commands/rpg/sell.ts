@@ -12,6 +12,7 @@ export const sell = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName(`sell`)
         .setDescription(`[RPG] Sell an item or weapon from your inventory.`)
+        .setDMPermission(false)
         .addStringOption((option) =>
             option
                 .setName("item")
@@ -35,12 +36,9 @@ export const sell = buildCommand<SlashCommand>({
                 .setRequired(true),
         ),
     defer: { silent: false },
-    async execute(interaction, r) {
-        const itemName = interaction.options.getString(
-            "item",
-            true,
-        ) as SellableItemName;
-        const amountToSell = interaction.options.getInteger("amount", true);
+    async execute(i, r) {
+        const itemName = i.options.getString("item", true) as SellableItemName;
+        const amountToSell = i.options.getInteger("amount", true);
 
         const itemData =
             drops[itemName as DropName] || weapons[itemName as WeaponName];
@@ -51,7 +49,7 @@ export const sell = buildCommand<SlashCommand>({
             );
         }
 
-        const stats = await getUserStats(interaction.user.id);
+        const stats = await getUserStats(i.user.id);
         if (!stats) {
             return r.edit(
                 embedComment(
@@ -85,13 +83,13 @@ export const sell = buildCommand<SlashCommand>({
         }
 
         await Promise.all([
-            updateUserStats(interaction.user.id, {
+            updateUserStats(i.user.id, {
                 inventory: {
                     set: stats.inventory,
                 },
             }),
             addBalance(
-                interaction.user.id,
+                i.user.id,
                 totalSellPrice,
                 true,
                 `Sold ${amountToSell}x ${itemName}`,

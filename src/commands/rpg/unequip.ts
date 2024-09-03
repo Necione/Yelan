@@ -6,10 +6,11 @@ import { getUserStats, updateUserStats } from "../../services";
 export const unequip = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("unequip")
-        .setDescription("[RPG] Unequip your currently equipped weapon."),
+        .setDescription("[RPG] Unequip your currently equipped weapon.")
+        .setDMPermission(false),
     defer: { silent: false },
-    async execute(interaction, r) {
-        const stats = await getUserStats(interaction.user.id);
+    async execute(i, r) {
+        const stats = await getUserStats(i.user.id);
         if (!stats) {
             return r.edit(
                 embedComment(
@@ -24,9 +25,13 @@ export const unequip = buildCommand<SlashCommand>({
 
         const baseAttackPower = 5;
 
-        await updateUserStats(interaction.user.id, {
-            equippedWeapon: null,
-            attackPower: baseAttackPower,
+        await updateUserStats(i.user.id, {
+            equippedWeapon: {
+                set: null,
+            },
+            attackPower: {
+                set: baseAttackPower,
+            },
         });
 
         return r.edit(

@@ -8,6 +8,7 @@ export const equip = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("equip")
         .setDescription("[RPG] Equip a weapon from your inventory.")
+        .setDMPermission(false)
         .addStringOption((option) =>
             option
                 .setName("weapon")
@@ -21,11 +22,8 @@ export const equip = buildCommand<SlashCommand>({
                 ),
         ),
     defer: { silent: false },
-    async execute(interaction, r) {
-        const weaponName = interaction.options.getString(
-            "weapon",
-            true,
-        ) as WeaponName;
+    async execute(i, r) {
+        const weaponName = i.options.getString("weapon", true) as WeaponName;
 
         if (!weapons[weaponName]) {
             return r.edit(
@@ -33,7 +31,7 @@ export const equip = buildCommand<SlashCommand>({
             );
         }
 
-        const stats = await getUserStats(interaction.user.id);
+        const stats = await getUserStats(i.user.id);
         if (!stats) {
             return r.edit(
                 embedComment(
@@ -54,9 +52,9 @@ export const equip = buildCommand<SlashCommand>({
         const additionalAttackPower = weapons[weaponName].attackPower;
         const totalAttackPower = 5 + additionalAttackPower;
 
-        await updateUserStats(interaction.user.id, {
-            equippedWeapon: weaponName,
-            attackPower: totalAttackPower,
+        await updateUserStats(i.user.id, {
+            equippedWeapon: { set: weaponName },
+            attackPower: { set: totalAttackPower },
         });
 
         return r.edit(
