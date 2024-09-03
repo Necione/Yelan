@@ -1,4 +1,4 @@
-export const items = {
+export const drops = {
     "Damaged Mask": { sellPrice: 5 },
     "Stained Mask": { sellPrice: 10 },
     "Ominous Mask": { sellPrice: 20 },
@@ -8,4 +8,4 @@ export const items = {
     "Sharp Arrowhead": { sellPrice: 16 },
 };
 
-export type ItemName = keyof typeof items;
+export type DropName = keyof typeof drops;

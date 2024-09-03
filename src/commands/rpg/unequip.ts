@@ -1,0 +1,39 @@
+import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
+import { embedComment } from "@elara-services/utils";
+import { SlashCommandBuilder } from "discord.js";
+import { getUserStats, updateUserStats } from "../../services";
+
+export const unequip = buildCommand<SlashCommand>({
+    command: new SlashCommandBuilder()
+        .setName("unequip")
+        .setDescription("[RPG] Unequip your currently equipped weapon."),
+    defer: { silent: false },
+    async execute(interaction, r) {
+        const stats = await getUserStats(interaction.user.id);
+        if (!stats) {
+            return r.edit(
+                embedComment(
+                    `No stats found for you, please set up your profile.`,
+                ),
+            );
+        }
+
+        if (!stats.equippedWeapon) {
+            return r.edit(embedComment(`You don't have any weapon equipped.`));
+        }
+
+        const baseAttackPower = 5;
+
+        await updateUserStats(interaction.user.id, {
+            equippedWeapon: null,
+            attackPower: baseAttackPower,
+        });
+
+        return r.edit(
+            embedComment(
+                `You have unequipped your weapon. Your attack power is now back to ${baseAttackPower}.`,
+                "Green",
+            ),
+        );
+    },
+});
