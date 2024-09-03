@@ -236,8 +236,8 @@ export function getRandomMonster(worldLevel: number) {
     );
 
     const weightedMonsters = availableMonsters.flatMap((monster) => {
-        const weight = Math.max(1, worldLevel - monster.minWorldLevel + 1);
-        return Array(weight).fill(monster);
+        const weight = Math.pow(2, worldLevel - monster.minWorldLevel);
+        return Array(Math.max(1, weight)).fill(monster);
     });
 
     return weightedMonsters[

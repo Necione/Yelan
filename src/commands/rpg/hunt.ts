@@ -109,7 +109,7 @@ export const hunt = buildCommand<SlashCommand>({
         let hpMultiplier = 1;
 
         if (levelDifference > 0) {
-            hpMultiplier = Math.pow(1.3, levelDifference);
+            hpMultiplier = Math.pow(1.5, levelDifference);
         }
 
         let currentMonsterHp = Math.floor(
