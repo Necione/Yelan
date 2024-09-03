@@ -174,13 +174,13 @@ type Roles {
 model UserStats {
   id             String         @id @default(auto()) @map("_id") @db.ObjectId
   userId         String         @unique
-  hp             Int            @default(100)
-  maxHP          Int            @default(100)
-  baseAttack     Int            @default(5)
-  attackPower    Int            @default(5)
+  hp             Float          @default(100)
+  maxHP          Float          @default(100)
+  baseAttack     Float          @default(5)
+  attackPower    Float          @default(5)
   inventory      UserStatsInv[]
-  exp            Int            @default(0)
-  worldLevel     Int            @default(1)
+  exp            Float          @default(0)
+  worldLevel     Float          @default(1)
   equippedWeapon String?
 }
 
