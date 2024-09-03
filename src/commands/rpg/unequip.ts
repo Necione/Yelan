@@ -26,8 +26,8 @@ export const unequip = buildCommand<SlashCommand>({
         const baseAttackPower = stats.baseAttack;
 
         await updateUserStats(i.user.id, {
-            equippedWeapon: null,
-            attackPower: baseAttackPower,
+            equippedWeapon: { set: null },
+            attackPower: { set: baseAttackPower },
         });
 
         return r.edit(

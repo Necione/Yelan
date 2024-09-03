@@ -33,6 +33,14 @@ export const rpg = buildCommand<SlashCommand>({
 
         const stats = await syncStats(i.user.id);
 
+        if (!stats) {
+            return r.edit(
+                embedComment(
+                    `No stats found for you :(`,
+                ),
+            );
+        }
+
         const items = stats.inventory || [];
         const cc = cooldowns.get(p, "hunt");
 

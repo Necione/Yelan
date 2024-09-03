@@ -6,7 +6,7 @@ import { weapons, type WeaponName } from "../utils/rpgitems/weapons";
 export async function syncStats(userId: string) {
     const stats = await getUserStats(userId);
     if (!stats) {
-        throw new Error(`No stats found for user ID: ${userId}`);
+        return null;
     }
 
     // Calculate the correct baseAttack and maxHP based on the user's world level
@@ -37,9 +37,9 @@ export async function syncStats(userId: string) {
     // The actual syncing part owo
     if (needsUpdate) {
         await updateUserStats(userId, {
-            baseAttack: calculatedBaseAttack,
-            attackPower: calculatedAttackPower,
-            maxHP: calculatedMaxHP,
+            baseAttack: { set: calculatedBaseAttack },
+            attackPower: { set: calculatedAttackPower },
+            maxHP: { set: calculatedMaxHP },
         });
     }
 
