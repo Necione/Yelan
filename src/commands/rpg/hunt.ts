@@ -104,10 +104,18 @@ export const hunt = buildCommand<SlashCommand>({
         const monster = getRandomMonster(stats.worldLevel);
         const selectedDescription = getLiyueEncounterDescription(monster.name);
         let currentPlayerHp = stats.hp;
+
+        const levelDifference = stats.worldLevel - monster.minWorldLevel;
+        let hpMultiplier = 1;
+
+        if (levelDifference > 0) {
+            hpMultiplier = Math.pow(1.3, levelDifference);
+        }
+
         let currentMonsterHp = Math.floor(
-            getRandomValue(monster.minHp, monster.maxHp) *
-                Math.pow(1.3, stats.worldLevel - 1),
+            getRandomValue(monster.minHp, monster.maxHp) * hpMultiplier,
         );
+
         const initialMonsterHp = currentMonsterHp;
 
         const createHealthBar = (
