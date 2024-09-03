@@ -44,16 +44,17 @@ export const heal = buildCommand<SlashCommand>({
         }
 
         const maxHP = stats.maxHP;
-        const newHp = Math.min(stats.hp + 25, maxHP);
+        const healAmount = Math.floor(Math.random() * (0.75 - 0.25 + 0.01) * maxHP + 0.25 * maxHP);
+        const newHp = Math.min(stats.hp + healAmount, maxHP);
 
         await Promise.all([
             updateUserStats(i.user.id, { hp: newHp }),
-            removeBalance(i.user.id, 50, true, "Paid 50 coins to heal 25 HP"),
+            removeBalance(i.user.id, 50, true, `Paid 50 coins to heal ${healAmount} HP`),
         ]);
 
         return r.edit(
             embedComment(
-                `You paid ${customEmoji.a.z_coins} \`50 ${texts.c.u}\` and healed \`25 HP\`! Your current HP is \`${newHp}/${maxHP}\`.`,
+                `The Statue of The Seven took ${customEmoji.a.z_coins} \`50 ${texts.c.u}\` and healed you for \`${healAmount} HP\`! Your current HP is \`${newHp}/${maxHP}\`.`,
                 "Green",
             ),
         );
