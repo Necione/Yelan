@@ -57,6 +57,18 @@ export const sell = buildCommand<SlashCommand>({
                 ),
             );
         }
+
+        if (
+            weapons[itemName as WeaponName] &&
+            stats.equippedWeapon === itemName
+        ) {
+            return r.edit(
+                embedComment(
+                    `You cannot sell "${itemName}" because it is currently equipped!`,
+                ),
+            );
+        }
+
         const item = stats.inventory.find((c) => c.item === itemName);
         if (!item) {
             return r.edit(

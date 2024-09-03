@@ -6,6 +6,8 @@ export const drops = {
     "Slime Secretions": { sellPrice: 8 },
     "Firm Arrowhead": { sellPrice: 8 },
     "Sharp Arrowhead": { sellPrice: 16 },
+    "Divining Scroll": { sellPrice: 8 },
+    "Sealed Scroll": { sellPrice: 16 },
 };
 
 export type DropName = keyof typeof drops;

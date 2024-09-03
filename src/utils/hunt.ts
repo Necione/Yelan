@@ -170,6 +170,36 @@ export const monsters = [
             { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 50 },
         ],
     },
+    {
+        name: "Anemo Samachurl",
+        minHp: 22,
+        maxHp: 45,
+        minDamage: 7,
+        maxDamage: 11,
+        minExp: 5,
+        maxExp: 8,
+        minWorldLevel: 3,
+        image: "https://lh.elara.workers.dev/rpg/monsters/anemo_samachurl.png",
+        drops: [
+            { item: "Divining Scroll", minAmount: 1, maxAmount: 3, chance: 85 },
+            { item: "Sealed Scroll", minAmount: 1, maxAmount: 2, chance: 35 },
+        ],
+    },
+    {
+        name: "Cryo Samachurl",
+        minHp: 18,
+        maxHp: 38,
+        minDamage: 5,
+        maxDamage: 9,
+        minExp: 3,
+        maxExp: 6,
+        minWorldLevel: 3,
+        image: "https://lh.elara.workers.dev/rpg/monsters/cryo_samachurl.png",
+        drops: [
+            { item: "Divining Scroll", minAmount: 1, maxAmount: 2, chance: 80 },
+            { item: "Sealed Scroll", minAmount: 1, maxAmount: 1, chance: 45 },
+        ],
+    },    
 ];
 
 export function getRandomValue(min: number, max: number): number {
@@ -204,8 +234,14 @@ export function getRandomMonster(worldLevel: number) {
     const availableMonsters = monsters.filter(
         (monster) => worldLevel >= (monster.minWorldLevel || 1),
     );
-    return availableMonsters[
-        Math.floor(Math.random() * availableMonsters.length)
+
+    const weightedMonsters = availableMonsters.flatMap((monster) => {
+        const weight = Math.max(1, worldLevel - monster.minWorldLevel + 1);
+        return Array(weight).fill(monster);
+    });
+
+    return weightedMonsters[
+        Math.floor(Math.random() * weightedMonsters.length)
     ];
 }
 
