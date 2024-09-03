@@ -34,11 +34,7 @@ export const rpg = buildCommand<SlashCommand>({
         const stats = await syncStats(i.user.id);
 
         if (!stats) {
-            return r.edit(
-                embedComment(
-                    `No stats found for you :(`,
-                ),
-            );
+            return r.edit(embedComment(`No stats found for you :(`));
         }
 
         const items = stats.inventory || [];
@@ -54,11 +50,15 @@ export const rpg = buildCommand<SlashCommand>({
             .addFields(
                 {
                     name: "Your Stats",
-                    value: `🌍 World Level: \`${stats.worldLevel}\` | ⭐ EXP: \`${
-                        stats.exp
-                    }/${expRequired.toFixed(0)}\`\n❤️ HP: \`${
-                        stats.hp
-                    }/${stats.maxHP}\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)} (+${(stats.attackPower - stats.baseAttack).toFixed(2)})\``,
+                    value: `🌍 World Level: \`${
+                        stats.worldLevel
+                    }\` | ⭐ EXP: \`${stats.exp}/${expRequired.toFixed(
+                        0,
+                    )}\`\n❤️ HP: \`${stats.hp}/${
+                        stats.maxHP
+                    }\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)} (+${(
+                        stats.attackPower - stats.baseAttack
+                    ).toFixed(2)})\``,
                     inline: false,
                 },
                 {
@@ -75,7 +75,9 @@ export const rpg = buildCommand<SlashCommand>({
         if (stats.equippedWeapon) {
             embed.addFields({
                 name: "Equipped Weapon",
-                value: `${stats.equippedWeapon} (ATK: ${(stats.attackPower - stats.baseAttack).toFixed(2)})`,
+                value: `${stats.equippedWeapon} (ATK: ${(
+                    stats.attackPower - stats.baseAttack
+                ).toFixed(2)})`,
                 inline: false,
             });
         }
