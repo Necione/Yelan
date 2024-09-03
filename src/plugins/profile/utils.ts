@@ -108,7 +108,7 @@ export async function createCanvasProfile(
             elo: elo || 0,
         },
         icons: {
-            messages: bypass || (messages || 0) >= cpro.messages,
+            messages: bypass || (p.messagesSent || 0) >= cpro.messages,
             achievements: bypass || p.achievements.length >= cpro.achievements,
             booster: bypass || hasRole([g?.roles.premiumSubscriberRole?.id]),
             cards: bypass || p.collectables.length >= cpro.cards,
