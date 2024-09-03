@@ -199,7 +199,7 @@ export const monsters = [
             { item: "Divining Scroll", minAmount: 1, maxAmount: 2, chance: 80 },
             { item: "Sealed Scroll", minAmount: 1, maxAmount: 1, chance: 45 },
         ],
-    },    
+    },
 ];
 
 export function getRandomValue(min: number, max: number): number {
