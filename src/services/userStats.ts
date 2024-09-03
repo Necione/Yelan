@@ -36,7 +36,7 @@ export async function syncStats(userId: string) {
 
     // The actual syncing part owo
     if (needsUpdate) {
-        return await updateUserStats(userId, {
+        await updateUserStats(userId, {
             baseAttack: { set: calculatedBaseAttack },
             attackPower: { set: calculatedAttackPower },
             maxHP: { set: calculatedMaxHP },
