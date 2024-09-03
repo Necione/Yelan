@@ -187,8 +187,8 @@ export const monsters = [
     },
     {
         name: "Cryo Samachurl",
-        minHp: 18,
-        maxHp: 38,
+        minHp: 28,
+        maxHp: 48,
         minDamage: 5,
         maxDamage: 9,
         minExp: 3,

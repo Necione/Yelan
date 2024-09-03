@@ -179,8 +179,8 @@ model UserStats {
   baseAttack     Float          @default(5)
   attackPower    Float          @default(5)
   inventory      UserStatsInv[]
-  exp            Float          @default(0)
-  worldLevel     Float          @default(1)
+  exp            Int            @default(0)
+  worldLevel     Int            @default(1)
   equippedWeapon String?
 }
 
