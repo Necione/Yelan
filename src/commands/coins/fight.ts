@@ -41,7 +41,7 @@ function getRandomAccident(
 
     const accidents = [
         {
-            msg: "You guys was not watching where you are fighting. A car went by and hit both of you.",
+            msg: "You guys were not watching where you are fighting. A car went by and hit both of you.",
             loss: 15,
         },
         {
