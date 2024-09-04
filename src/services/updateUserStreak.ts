@@ -1,20 +1,11 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { addBalance } from "./userProfile";
 
 export async function updateUserStreak(userId: string) {
     const dailyCommand = await getDailyCommandByUserId(userId);
     if (!dailyCommand) {
-        // If the user doesn't have a daily command record, create a new one
-        await prisma.dailyCommand.create({
-            data: {
-                userId,
-                dailyStreak: 0, // Initialize dailyStreak to 0
-                dailyTotal: 50, // Initialize dailyTotal to 50
-                lastDateClaim: new Date(),
-            },
-        });
-        await addBalance(userId, 50, true, `Daily check-in reward`);
-        return { dailyStreak: 0, dailyTotal: 50 };
+        return null;
     }
 
     const now = new Date();
@@ -25,17 +16,14 @@ export async function updateUserStreak(userId: string) {
 
     if (lastDateClaim && isSameDay(lastDateClaim, now)) {
         // If the user has already claimed their daily reward for the current day, don't increment the streak and total
-        return { dailyStreak: newStreak, dailyTotal: newTotal };
+        return dailyCommand;
+    }
+    newStreak =
+        lastDateClaim && isYesterday(lastDateClaim, now) ? newStreak + 1 : 1;
+    if (newStreak === 1) {
+        newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
     } else {
-        newStreak =
-            lastDateClaim && isYesterday(lastDateClaim, now)
-                ? newStreak + 1
-                : 1;
-        if (newStreak === 1) {
-            newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
-        } else {
-            newTotal = newTotal + 50 + (newStreak - 1);
-        }
+        newTotal = newTotal + 50 + (newStreak - 1);
     }
 
     await addBalance(
@@ -45,13 +33,11 @@ export async function updateUserStreak(userId: string) {
         `Daily check-in reward`,
     );
 
-    await updateDailyCommand(userId, {
-        dailyStreak: newStreak,
-        dailyTotal: newTotal,
-        lastDateClaim: now,
+    return await updateDailyCommand(userId, {
+        dailyStreak: { set: newStreak },
+        dailyTotal: { set: newTotal },
+        lastDateClaim: { set: now },
     });
-
-    return { dailyStreak: newStreak, dailyTotal: newTotal };
 }
 
 function isSameDay(date1: Date, date2: Date) {
@@ -69,25 +55,30 @@ function isYesterday(date1: Date, date2: Date) {
 }
 
 async function getDailyCommandByUserId(userId: string) {
-    return await prisma.dailyCommand.findUnique({
-        where: {
-            userId,
-        },
-    });
+    return await prisma.dailyCommand
+        .upsert({
+            where: { userId },
+            create: {
+                userId,
+                dailyStreak: 0,
+                dailyTotal: 50,
+                lastDateClaim: new Date(),
+            },
+            update: {},
+        })
+        .catch(() => null);
 }
 
 async function updateDailyCommand(
     userId: string,
-    data: {
-        dailyStreak: number;
-        dailyTotal: number;
-        lastDateClaim: Date;
-    },
+    data: Prisma.DailyCommandUpdateInput,
 ) {
-    return await prisma.dailyCommand.update({
-        where: {
-            userId,
-        },
-        data,
-    });
+    return await prisma.dailyCommand
+        .update({
+            where: {
+                userId,
+            },
+            data,
+        })
+        .catch(() => null);
 }

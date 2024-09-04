@@ -1,9 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { embedComment, get } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, updateUserStreak } from "../../services";
-import { cooldowns } from "../../utils";
+import { cooldowns, getAmount } from "../../utils";
 
 export const daily = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -11,65 +10,47 @@ export const daily = buildCommand<SlashCommand>({
         .setDescription("Claim your daily check-in reward.")
         .setDMPermission(false),
     defer: { silent: false },
-    execute: async (interaction, responder) => {
-        const userProfile = await getProfileByUserId(interaction.user.id);
-
-        const hasCooldown = cooldowns.get(
-            userProfile,
+    execute: async (i, r) => {
+        const p = await getProfileByUserId(i.user.id);
+        const cc = cooldowns.get(
+            p,
             "daily",
             `⌚ You've already claimed your daily reward, try again %DURATION%`,
         );
-        if (!hasCooldown.status) {
-            return responder.edit(embedComment(hasCooldown.message, "Red"));
+        if (!cc.status) {
+            return r.edit(embedComment(cc.message));
         }
-
-        let reward: number;
-        try {
-            const updatedUser = await updateUserStreak(interaction.user.id);
-            if (!updatedUser) {
-                return responder.edit(
-                    embedComment(
-                        "An error occurred while updating your streak.",
-                        "Red",
-                    ),
-                );
-            }
-
-            reward = updatedUser.dailyTotal; // Use the updated dailyTotal value
-
-            await cooldowns.set(userProfile, "daily", 86400000); // 1 day in milliseconds
-            return responder.edit({
-                embeds: [
-                    {
-                        title: `🗓️ ${interaction.user.username}'s Daily Check-in`,
-                        description: `You just claimed ${customEmoji.a.z_coins} \`${reward} ${texts.c.u}\`!`,
-                        color: 0x5865F2,
-                        fields: [
-                            {
-                                name: "❤️ Current Streak:",
-                                value: `${updatedUser.dailyStreak ?? 0} Day(s)`,
-                                inline: true,
-                            },
-                            {
-                                name: "💫 Next Check-in reward:",
-                                value: `${customEmoji.a.z_coins} \`${updatedUser.dailyTotal + 1} ${texts.c.u}\``, // Calculate the next reward
-                                inline: false,
-                            },
-                        ],
-                        footer: {
-                            text: "Come back tomorrow to continue your streak!",
-                        },
-                    },
-                ],
-            });
-        } catch (error) {
-            console.error(error);
-            return responder.edit(
-                embedComment(
-                    "An error occurred while claiming your daily reward.",
-                    "Red",
-                ),
+        const updatedUser = await updateUserStreak(i.user.id);
+        if (!updatedUser) {
+            return r.edit(
+                embedComment("An error occurred while updating your streak."),
             );
         }
+
+        await cooldowns.set(p, "daily", get.days(1)); // 1 day in milliseconds
+        return r.edit({
+            embeds: [
+                {
+                    title: `🗓️ ${i.user.username}'s Daily Check-in`,
+                    description: `You just claimed ${getAmount(
+                        updatedUser.dailyTotal,
+                    )}!`,
+                    color: 0x5865f2,
+                    fields: [
+                        {
+                            name: "❤️ Current Streak:",
+                            value: `${updatedUser.dailyStreak ?? 0} Day(s)`,
+                        },
+                        {
+                            name: "💫 Next Check-in reward:",
+                            value: getAmount(updatedUser.dailyTotal + 1),
+                        },
+                    ],
+                    footer: {
+                        text: "Come back tomorrow to continue your streak!",
+                    },
+                },
+            ],
+        });
     },
 });
