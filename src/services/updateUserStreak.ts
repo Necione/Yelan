@@ -37,7 +37,7 @@ export async function updateUserStreak(userId: string) {
 
     await addBalance(userId, 50 + (newStreak - 1), true, `Daily check-in reward`);
 
-    const updatedUser = await updateDailyCommand(userId, {
+    await updateDailyCommand(userId, {
         dailyStreak: newStreak,
         dailyTotal: newTotal,
         lastDateClaim: now,

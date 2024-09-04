@@ -13,7 +13,6 @@ export const daily = buildCommand<SlashCommand>({
     defer: { silent: false },
     execute: async (interaction, responder) => {
         const userProfile = await getProfileByUserId(interaction.user.id);
-        if (!userProfile) return;
 
         const hasCooldown = cooldowns.get(
             userProfile,
