@@ -14,7 +14,7 @@ export const fonts = {
     typeRacer: "Nunito",
 };
 
-export function width(ctx: CanvasRenderingContext2D, ...params: any[]) {
+export function width(ctx: CanvasRenderingContext2D, ...params: string[]) {
     let width = 0;
     for (const param of params) {
         width +=
@@ -68,8 +68,8 @@ export function rectangle(
     y: number,
     width: number,
     height: number,
-    radius: any,
-    background: any,
+    radius: { tl: number; tr: number; br: number; bl: number },
+    background: string,
     stroke: boolean,
 ) {
     return new Promise(async (resolve) => {
@@ -80,13 +80,16 @@ export function rectangle(
         if (typeof stroke === "undefined") {
             stroke = false;
         }
-        if (typeof radius === "undefined") {
-            radius = 5;
-        }
-        radius =
-            typeof radius === "number"
-                ? { tl: radius, tr: radius, br: radius, bl: radius }
-                : { tl: 0, tr: 0, br: 0, bl: 0 };
+        radius = is.undefined(radius)
+            ? {
+                  tl: 5,
+                  tr: 5,
+                  br: 5,
+                  bl: 5,
+              }
+            : is.number(radius)
+              ? { tl: radius, tr: radius, br: radius, bl: radius }
+              : { tl: 0, tr: 0, br: 0, bl: 0 };
 
         // Draw the rectangle.
         if (img) {
