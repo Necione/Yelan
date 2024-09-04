@@ -27,7 +27,10 @@ export async function updateUserStreak(userId: string) {
         // If the user has already claimed their daily reward for the current day, don't increment the streak and total
         return { dailyStreak: newStreak, dailyTotal: newTotal };
     } else {
-        newStreak = lastDateClaim && isYesterday(lastDateClaim, now) ? newStreak + 1 : 1;
+        newStreak =
+            lastDateClaim && isYesterday(lastDateClaim, now)
+                ? newStreak + 1
+                : 1;
         if (newStreak === 1) {
             newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
         } else {
@@ -35,7 +38,12 @@ export async function updateUserStreak(userId: string) {
         }
     }
 
-    await addBalance(userId, 50 + (newStreak - 1), true, `Daily check-in reward`);
+    await addBalance(
+        userId,
+        50 + (newStreak - 1),
+        true,
+        `Daily check-in reward`,
+    );
 
     await updateDailyCommand(userId, {
         dailyStreak: newStreak,
@@ -47,9 +55,11 @@ export async function updateUserStreak(userId: string) {
 }
 
 function isSameDay(date1: Date, date2: Date) {
-    return date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate();
+    return (
+        date1.getFullYear() === date2.getFullYear() &&
+        date1.getMonth() === date2.getMonth() &&
+        date1.getDate() === date2.getDate()
+    );
 }
 
 function isYesterday(date1: Date, date2: Date) {
@@ -60,17 +70,20 @@ function isYesterday(date1: Date, date2: Date) {
 
 async function getDailyCommandByUserId(userId: string) {
     return await prisma.dailyCommand.findUnique({
-      where: {
-        userId,
-      },
+        where: {
+            userId,
+        },
     });
 }
 
-async function updateDailyCommand(userId: string, data: {
-    dailyStreak: number;
-    dailyTotal: number;
-    lastDateClaim: Date;
-}) {
+async function updateDailyCommand(
+    userId: string,
+    data: {
+        dailyStreak: number;
+        dailyTotal: number;
+        lastDateClaim: Date;
+    },
+) {
     return await prisma.dailyCommand.update({
         where: {
             userId,
