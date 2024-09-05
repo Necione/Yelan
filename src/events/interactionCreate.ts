@@ -42,7 +42,6 @@ export const interactionCreate = createEvent({
 });
 
 function handleCommands(i: Interaction, commands: object) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return handleInteractionCommand(i, getFilesList<any>(commands), (ii) => {
         if (!ii.isCommand()) {
             return false;

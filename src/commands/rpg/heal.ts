@@ -44,19 +44,12 @@ export const heal = buildCommand<SlashCommand>({
         }
 
         const maxHP = stats.maxHP;
-        const healAmount = Math.floor(
-            Math.random() * (0.75 - 0.25 + 0.01) * maxHP + 0.25 * maxHP,
-        );
+        const healAmount = Math.floor(Math.random() * (0.75 - 0.25 + 0.01) * maxHP + 0.25 * maxHP);
         const newHp = Math.min(stats.hp + healAmount, maxHP);
 
         await Promise.all([
             updateUserStats(i.user.id, { hp: newHp }),
-            removeBalance(
-                i.user.id,
-                50,
-                true,
-                `Paid 50 coins to heal ${healAmount} HP`,
-            ),
+            removeBalance(i.user.id, 50, true, `Paid 50 coins to heal ${healAmount} HP`),
         ]);
 
         return r.edit(

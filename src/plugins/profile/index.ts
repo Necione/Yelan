@@ -92,11 +92,12 @@ export async function onInteraction(interaction: RepliableInteraction) {
                 );
             }
             const url =
-                interaction.message.components[0].components.find(
-                    (c) =>
-                        c.data.type === ComponentType.Button &&
-                        c.data.label === "Image",
-                    // @ts-ignore
+                (
+                    interaction.message.components[0].components.find(
+                        (c) =>
+                            c.data.type === ComponentType.Button &&
+                            c.data.label === "Image",
+                    ) as any
                 )?.data.url || "";
             if (!url) {
                 return responder.edit(

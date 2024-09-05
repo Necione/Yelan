@@ -166,14 +166,6 @@ model UserWallet {
   roles            Roles[]
 }
 
-model DailyCommand {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String   @unique
-  dailyStreak   Int      @default(0)
-  dailyTotal    Int      @default(50)
-  lastDateClaim DateTime @default(now())
-}
-
 type Roles {
   type String
   role String

@@ -31,7 +31,6 @@ export function sortLB(
     return (
         unsorted
             .slice()
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .sort((a: any, b: any) => (b[name] || 0) - (a[name] || 0))
             .map((c) => c.userId)
             .indexOf(id) + 1

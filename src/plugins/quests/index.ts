@@ -158,7 +158,7 @@ export function getCurrentDailys(p: UserWallet) {
     const tier = (num: keyof typeof amounts = 100) => ({
         user: c?.messages || 0,
         date: c?.date || def.toDate(),
-        tier: parseInt(`${num}`),
+        tier: parseInt(num as any),
         got: (c?.messages || 0) >= num,
         amount: amounts[num],
         achieved: (c?.achieved || []).includes(`${num}`) ? true : false,
