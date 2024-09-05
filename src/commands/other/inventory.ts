@@ -260,6 +260,7 @@ export const inventory = buildCommand<SlashCommand>({
         }
 
         async function handleSellItem(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             c: any,
             name: string,
             total: number,

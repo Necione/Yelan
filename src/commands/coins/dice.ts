@@ -160,7 +160,7 @@ export const dice: SlashCommand = {
         await responder.edit({ embeds: [e] });
         await sleep(get.secs(1));
 
-        const promises: any[] = [
+        const promises: unknown[] = [
             addRakeback(interaction.user.id, Math.floor(betAmount)),
         ];
         if (isWin) {
