@@ -8,6 +8,7 @@ import {
 import type { Prisma } from "@prisma/client";
 import { roles } from "../../../../config";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
+import { cooldowns } from "../../../../utils";
 
 const choices = [
     "elo",
@@ -101,6 +102,10 @@ export const reset = buildCommand({
             data = { rakeback: { amount: 0, claimed: 0 } };
             str = "rakeback amount and claim timer is now 0";
         }
+        if (type === "daily") {
+            await cooldowns.set(p, "daily", 0);
+            str = "daily cooldown";
+        } //for testing the daily check-in
         const col = await getConfirmPrompt(
             i,
             i.user,
