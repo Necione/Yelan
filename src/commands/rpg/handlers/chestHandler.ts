@@ -1,13 +1,15 @@
 import { embedComment, get } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
+import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
 import { addBalance, addItemToInventory } from "../../../services";
 import { cooldowns } from "../../../utils";
 import { generateChestLoot } from "../../../utils/chest";
+
 export async function handleChest(
     i: ChatInputCommandInteraction,
-    stats: any,
-    userWallet: any,
+    stats: UserStats,
+    userWallet: UserWallet,
 ) {
     const { rarity, loot, coins } = generateChestLoot(stats.worldLevel);
 

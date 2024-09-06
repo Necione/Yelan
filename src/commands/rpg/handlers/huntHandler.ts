@@ -1,4 +1,5 @@
 import { embedComment, get, sleep } from "@elara-services/utils";
+import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction, Message } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { addItemToInventory, updateUserStats } from "../../../services";
@@ -14,8 +15,8 @@ import {
 export async function handleHunt(
     i: ChatInputCommandInteraction,
     r: Message,
-    stats: any,
-    userWallet: any,
+    stats: UserStats,
+    userWallet: UserWallet,
 ) {
     const monster = getRandomMonster(stats.worldLevel, stats.location);
 
