@@ -1,5 +1,6 @@
 import { embedComment, get, sleep } from "@elara-services/utils";
-import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
+import type { ChatInputCommandInteraction, Message } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { addItemToInventory, updateUserStats } from "../../../services";
 import { cooldowns } from "../../../utils";
 import {

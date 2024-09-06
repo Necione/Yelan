@@ -1,6 +1,6 @@
 import { embedComment, get } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
-import { ChatInputCommandInteraction } from "discord.js";
+import type { ChatInputCommandInteraction } from "discord.js";
 import { addBalance, addItemToInventory } from "../../../services";
 import { cooldowns } from "../../../utils";
 import { generateChestLoot } from "../../../utils/chest";
