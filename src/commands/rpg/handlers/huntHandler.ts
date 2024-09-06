@@ -21,9 +21,13 @@ export async function handleHunt(
     const monster = getRandomMonster(stats.worldLevel, stats.location);
 
     if (!monster) {
-        await i.editReply({
-            content: `This area (${stats.location}) has no monsters to encounter.`,
-        });
+        await i
+            .editReply(
+                embedComment(
+                    `This area (${stats.location}) has no monsters to encounter.`,
+                ),
+            )
+            .catch(() => null);
         return;
     }
 
@@ -75,9 +79,11 @@ export async function handleHunt(
             },
         );
 
-    await i.editReply({
-        embeds: [battleEmbed],
-    });
+    await i
+        .editReply({
+            embeds: [battleEmbed],
+        })
+        .catch(() => null);
 
     const thread = await r
         .startThread({
@@ -86,7 +92,9 @@ export async function handleHunt(
         })
         .catch(() => null);
     if (!thread) {
-        return i.editReply(embedComment(`Unable to create the thread.`));
+        return i
+            .editReply(embedComment(`Unable to create the thread.`))
+            .catch(() => null);
     }
 
     const battleInterval = setInterval(async () => {
@@ -144,7 +152,7 @@ export async function handleHunt(
                 }
             }
 
-            await i.editReply({ embeds: [finalEmbed] });
+            await i.editReply({ embeds: [finalEmbed] }).catch(() => null);
             sleep(get.secs(30)).then(
                 () => void thread.delete().catch(() => null),
             );

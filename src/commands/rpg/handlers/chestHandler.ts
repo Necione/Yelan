@@ -26,12 +26,14 @@ export async function handleChest(
         .map((item) => `\`${item.amount}x\` ${item.item}`)
         .join(", ");
 
-    await i.editReply(
-        embedComment(
-            `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins} Coins\` and the following items:\n${lootDescription}`,
-            "Green",
-        ),
-    );
+    await i
+        .editReply(
+            embedComment(
+                `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins} Coins\` and the following items:\n${lootDescription}`,
+                "Green",
+            ),
+        )
+        .catch(() => null);
 
     await cooldowns.set(userWallet, "hunt", get.hrs(1));
 }

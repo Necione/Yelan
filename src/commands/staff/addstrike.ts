@@ -42,9 +42,9 @@ export const addStrike = buildCommand<SlashCommand>({
 
         const profile = await getProfileByUserId(user.id);
         if (!profile) {
-            return i.editReply(
-                embedComment("Unable to find/create user profile."),
-            );
+            return i
+                .editReply(embedComment("Unable to find/create user profile."))
+                .catch(() => null);
         }
 
         const updatedStrikes = (profile.strikes || 0) + 1;
@@ -96,12 +96,14 @@ export const addStrike = buildCommand<SlashCommand>({
             ],
         });
 
-        return i.editReply(
-            embedComment(
-                `${user.toString()} has been given a strike and fined ${
-                    customEmoji.a.z_coins
-                } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
-            ),
-        );
+        return i
+            .editReply(
+                embedComment(
+                    `${user.toString()} has been given a strike and fined ${
+                        customEmoji.a.z_coins
+                    } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
+                ),
+            )
+            .catch(() => null);
     },
 });
