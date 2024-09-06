@@ -1,8 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, sleep } from "@elara-services/utils";
+import { embedComment, getKeys, sleep } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
-import { locked } from "../../utils";
 
 type LocationName =
     | "Liyue Harbor"
@@ -16,7 +15,12 @@ type LocationName =
     | "Guili Plains"
     | "Jueyun Karst";
 
-const locations: Record<LocationName, { x: number; y: number }> = {
+type LocationXY = {
+    x: number;
+    y: number;
+};
+
+const locations: Record<LocationName, LocationXY> = {
     "Liyue Harbor": { x: 15, y: 4 },
     "Qingxu Pool": { x: 7, y: 2 },
     "Lingju Pass": { x: 8, y: 4 },
@@ -29,10 +33,7 @@ const locations: Record<LocationName, { x: number; y: number }> = {
     "Jueyun Karst": { x: 7, y: 13 },
 };
 
-function calculateDistance(
-    start: { x: number; y: number },
-    end: { x: number; y: number },
-) {
+function calculateDistance(start: LocationXY, end: LocationXY) {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     return Math.sqrt(dx * dx + dy * dy);
@@ -49,25 +50,18 @@ export const travel = buildCommand<SlashCommand>({
                 .setDescription("Select the location to travel to")
                 .setRequired(true)
                 .addChoices(
-                    { name: "Liyue Harbor", value: "Liyue Harbor" },
-                    { name: "Qingxu Pool", value: "Qingxu Pool" },
-                    { name: "Lingju Pass", value: "Lingju Pass" },
-                    { name: "Lumberpick Valley", value: "Lumberpick Valley" },
-                    { name: "Dunyu Ruins", value: "Dunyu Ruins" },
-                    { name: "Nantianmen", value: "Nantianmen" },
-                    { name: "Tianqiu Valley", value: "Tianqiu Valley" },
-                    { name: "Luhua Pool", value: "Luhua Pool" },
-                    { name: "Guili Plains", value: "Guili Plains" },
-                    { name: "Jueyun Karst", value: "Jueyun Karst" },
+                    ...getKeys(locations).map((c) => ({
+                        name: c,
+                        value: c,
+                    })),
                 ),
         ),
     defer: { silent: false },
-    async execute(i) {
+    async execute(i, r) {
         const stats = await getUserStats(i.user.id);
 
         if (!stats) {
-            locked.del(i.user.id);
-            return i.editReply(
+            return r.edit(
                 embedComment(
                     "No stats found for you, please set up your profile.",
                 ),
@@ -75,7 +69,7 @@ export const travel = buildCommand<SlashCommand>({
         }
 
         if (stats.isTravelling) {
-            return i.editReply(
+            return r.edit(
                 embedComment(
                     "You are already travelling! Please wait until you arrive at your destination.",
                 ),
@@ -88,7 +82,7 @@ export const travel = buildCommand<SlashCommand>({
         ) as LocationName;
 
         if (!locations[selectedLocation]) {
-            return i.editReply(embedComment("Invalid location selected."));
+            return r.edit(embedComment("Invalid location selected."));
         }
 
         const startCoords = locations[stats.location as LocationName];
@@ -99,7 +93,7 @@ export const travel = buildCommand<SlashCommand>({
 
         await updateUserStats(i.user.id, { isTravelling: true });
 
-        await i.editReply(
+        await r.edit(
             embedComment(
                 `You are travelling to ${selectedLocation}, which will take approximately ${Math.round(
                     travelTime,
@@ -114,7 +108,7 @@ export const travel = buildCommand<SlashCommand>({
             isTravelling: false,
         });
 
-        return i.editReply(
+        return r.edit(
             embedComment(
                 `You have arrived at ${selectedLocation}. Welcome and enjoy your stay!`,
             ),
