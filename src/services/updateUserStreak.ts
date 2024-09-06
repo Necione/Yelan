@@ -24,7 +24,7 @@ export async function updateUserStreak(userId: string) {
     if (newStreak === 1) {
         newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
     } else {
-        newTotal = newTotal + (newStreak - 1);
+        newTotal = 50 + (newStreak - 1);
     }
 
     const db = await updateDailyCommand(userId, {
