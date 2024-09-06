@@ -4,4 +4,6 @@ export * from "./heal";
 export * from "./hunt";
 export * from "./rpg";
 export * from "./sell";
+export * from "./travel";
 export * from "./unequip";
+

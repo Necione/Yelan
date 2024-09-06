@@ -13,6 +13,7 @@ export const monsters = [
             { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 100 },
             { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 50 },
         ],
+        locations: ["Qingxu Pool", "Lingju Pass", "Tianqiu Valley"],
     },
     {
         name: "Anemo Slime",
@@ -37,6 +38,17 @@ export const monsters = [
                 maxAmount: 2,
                 chance: 50,
             },
+        ],
+        locations: [
+            "Qingxu Pool",
+            "Lingju Pass",
+            "Lumberpick Valley",
+            "Dunyu Ruins",
+            "Nantianmen",
+            "Tianqiu Valley",
+            "Luhua Pool",
+            "Guili Plains",
+            "Jueyun Karst",
         ],
     },
     {
@@ -63,6 +75,17 @@ export const monsters = [
                 chance: 50,
             },
         ],
+        locations: [
+            "Qingxu Pool",
+            "Lingju Pass",
+            "Lumberpick Valley",
+            "Dunyu Ruins",
+            "Nantianmen",
+            "Tianqiu Valley",
+            "Luhua Pool",
+            "Guili Plains",
+            "Jueyun Karst",
+        ],
     },
     {
         name: "Pyro Slime",
@@ -87,6 +110,17 @@ export const monsters = [
                 maxAmount: 2,
                 chance: 50,
             },
+        ],
+        locations: [
+            "Qingxu Pool",
+            "Lingju Pass",
+            "Lumberpick Valley",
+            "Dunyu Ruins",
+            "Nantianmen",
+            "Tianqiu Valley",
+            "Luhua Pool",
+            "Guili Plains",
+            "Jueyun Karst",
         ],
     },
     {
@@ -113,6 +147,17 @@ export const monsters = [
                 chance: 50,
             },
         ],
+        locations: [
+            "Qingxu Pool",
+            "Lingju Pass",
+            "Lumberpick Valley",
+            "Dunyu Ruins",
+            "Nantianmen",
+            "Tianqiu Valley",
+            "Luhua Pool",
+            "Guili Plains",
+            "Jueyun Karst",
+        ],
     },
     {
         name: "Electro Hilichurl Shooter",
@@ -138,6 +183,7 @@ export const monsters = [
                 chance: 50,
             },
         ],
+        locations: ["Tianqiu Valley", "Lumberpick Valley", "Dunyu Ruins"],
     },
     {
         name: "Pyro Hilichurl Berserker",
@@ -154,6 +200,7 @@ export const monsters = [
             { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 75 },
             { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 25 },
         ],
+        locations: ["Lingju Pass", "Jueyun Karst", "Luhua Pool"],
     },
     {
         name: "Mitachurl",
@@ -169,6 +216,7 @@ export const monsters = [
             { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 100 },
             { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 50 },
         ],
+        locations: ["Dunyu Ruins", "Luhua Pool", "Guili Plains"],
     },
     {
         name: "Anemo Samachurl",
@@ -184,6 +232,7 @@ export const monsters = [
             { item: "Divining Scroll", minAmount: 1, maxAmount: 3, chance: 85 },
             { item: "Sealed Scroll", minAmount: 1, maxAmount: 2, chance: 35 },
         ],
+        locations: ["Lumberpick Valley", "Nantianmen", "Jueyun Karst"],
     },
     {
         name: "Cryo Samachurl",
@@ -198,6 +247,79 @@ export const monsters = [
         drops: [
             { item: "Divining Scroll", minAmount: 1, maxAmount: 2, chance: 80 },
             { item: "Sealed Scroll", minAmount: 1, maxAmount: 1, chance: 45 },
+        ],
+        locations: ["Tianqiu Valley", "Jueyun Karst", "Guili Plains"],
+    },
+    {
+        name: "Dendro Slime",
+        minHp: 45,
+        maxHp: 60,
+        minDamage: 8,
+        maxDamage: 12,
+        minExp: 7,
+        maxExp: 10,
+        minWorldLevel: 4,
+        image: "https://lh.elara.workers.dev/rpg/monsters/dendro_slime.png",
+        drops: [
+            {
+                item: "Slime Secretions",
+                minAmount: 1,
+                maxAmount: 3,
+                chance: 100,
+            },
+            {
+                item: "Slime Concentrate",
+                minAmount: 1,
+                maxAmount: 2,
+                chance: 75,
+            },
+        ],
+        locations: [
+            "Qingxu Pool",
+            "Lingju Pass",
+            "Lumberpick Valley",
+            "Dunyu Ruins",
+            "Nantianmen",
+            "Tianqiu Valley",
+            "Luhua Pool",
+            "Guili Plains",
+            "Jueyun Karst",
+        ],
+    },
+    {
+        name: "Large Cryo Slime",
+        minHp: 50,
+        maxHp: 65,
+        minDamage: 9,
+        maxDamage: 13,
+        minExp: 8,
+        maxExp: 12,
+        minWorldLevel: 4,
+        image: "https://lh.elara.workers.dev/rpg/monsters/large_cryo_slime.png",
+        drops: [
+            {
+                item: "Slime Secretions",
+                minAmount: 2,
+                maxAmount: 4,
+                chance: 100,
+            },
+            {
+                item: "Slime Concentrate",
+                minAmount: 1,
+                maxAmount: 1,
+                chance: 50,
+            },
+        ],
+        locations: [
+            "Qingxu Pool",
+            "Lingju Pass",
+            "Lumberpick Valley",
+            "Dunyu Ruins",
+            "Nantianmen",
+            "Tianqiu Valley",
+            "Luhua Pool",
+            "Guili Plains",
+            "Jueyun Karst",
         ],
     },
 ];
@@ -230,10 +352,16 @@ export function calculateExp(minExp: number, maxExp: number): number {
     return getRandomValue(minExp, maxExp);
 }
 
-export function getRandomMonster(worldLevel: number) {
+export function getRandomMonster(worldLevel: number, location: string) {
     const availableMonsters = monsters.filter(
-        (monster) => worldLevel >= (monster.minWorldLevel || 1),
+        (monster) =>
+            worldLevel >= (monster.minWorldLevel || 1) &&
+            monster.locations.includes(location),
     );
+
+    if (availableMonsters.length === 0) {
+        return null;
+    }
 
     const weightedMonsters = availableMonsters.flatMap((monster) => {
         const weight = Math.pow(2, monster.minWorldLevel - worldLevel);
@@ -245,27 +373,15 @@ export function getRandomMonster(worldLevel: number) {
     ];
 }
 
-export function getLiyueEncounterDescription(monsterName: string) {
-    const locations = [
-        "Cuijue Slope",
-        "Qingce Village",
-        "Wuwang Hill",
-        "Jueyun Karst",
-        "Mt. Aozang",
-        "Liyue Harbor",
-        "Dihua Marsh",
-    ];
-
-    const randomLocation =
-        locations[Math.floor(Math.random() * locations.length)];
+export function getEncounterDescription(monsterName: string, location: string) {
     const encounterDescriptions = [
-        `You were travelling around ${randomLocation} when a ${monsterName} attacked you!`,
-        `As you explored the ancient ruins near ${randomLocation}, a ${monsterName} suddenly appeared!`,
-        `While gathering herbs in ${randomLocation}, a ${monsterName} jumped out from the bushes!`,
-        `You were admiring the scenery at ${randomLocation} when a ${monsterName} confronted you!`,
-        `As you crossed the bridges of ${randomLocation}, a ${monsterName} blocked your path!`,
-        `Wandering through the mist at ${randomLocation}, you were ambushed by a ${monsterName}!`,
-        `In the depths of ${randomLocation}, a ${monsterName} loomed in the shadows and charged at you!`,
+        `You were travelling around ${location} when a ${monsterName} attacked you!`,
+        `As you explored the ancient ruins near ${location}, a ${monsterName} suddenly appeared!`,
+        `While gathering herbs in ${location}, a ${monsterName} jumped out from the bushes!`,
+        `You were admiring the scenery at ${location} when a ${monsterName} confronted you!`,
+        `As you crossed the bridges of ${location}, a ${monsterName} blocked your path!`,
+        `Wandering through the mist at ${location}, you were ambushed by a ${monsterName}!`,
+        `In the depths of ${location}, a ${monsterName} loomed in the shadows and charged at you!`,
     ];
 
     return encounterDescriptions[

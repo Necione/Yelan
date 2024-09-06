@@ -190,6 +190,8 @@ model UserStats {
   exp            Int            @default(0)
   worldLevel     Int            @default(1)
   equippedWeapon String?
+  location       String         @default("Liyue")
+  isTravelling   Boolean        @default(false)
 }
 
 type UserStatsInv {

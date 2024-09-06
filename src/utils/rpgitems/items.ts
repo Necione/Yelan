@@ -4,6 +4,7 @@ export const drops = {
     "Ominous Mask": { sellPrice: 20 },
     "Slime Condensate": { sellPrice: 3 },
     "Slime Secretions": { sellPrice: 8 },
+    "Slime Concentrate": { sellPrice: 15 },
     "Firm Arrowhead": { sellPrice: 8 },
     "Sharp Arrowhead": { sellPrice: 16 },
     "Divining Scroll": { sellPrice: 8 },
