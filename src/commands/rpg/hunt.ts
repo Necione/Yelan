@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import type { ChatInputCommandInteraction } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, getUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { handleChest } from "./handlers/chestHandler";
