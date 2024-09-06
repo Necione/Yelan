@@ -134,7 +134,6 @@ export const rps: SlashCommand = {
             ),
         );
         if (!message) {
-            console.log(`Unable to edit the main message`);
             removeTimeout();
             return;
         }

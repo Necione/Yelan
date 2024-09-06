@@ -447,7 +447,7 @@ export async function displayData(
         });
     }
 
-    return pager.run(interaction, interaction.user).catch(console.log);
+    return pager.run(interaction, interaction.user).catch(() => null);
 }
 
 export async function handleInteractions(interaction: Interaction) {
@@ -475,7 +475,7 @@ export async function handleInteractions(interaction: Interaction) {
     };
     if (action === "rename_modal" && interaction.isModalSubmit()) {
         const name = interaction.fields.getTextInputValue("name");
-        await interaction.deferUpdate().catch(console.log);
+        await interaction.deferUpdate().catch(() => null);
         if (!checkName(name)) {
             return await send(
                 embedComment(
@@ -650,7 +650,7 @@ export async function handleInteractions(interaction: Interaction) {
                     },
                 ],
             })
-            .catch(console.log);
+            .catch(() => null);
     }
 
     if (action === "disown") {

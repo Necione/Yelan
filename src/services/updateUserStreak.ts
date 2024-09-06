@@ -1,3 +1,4 @@
+import { status } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { addBalance } from "./userProfile";
@@ -5,7 +6,7 @@ import { addBalance } from "./userProfile";
 export async function updateUserStreak(userId: string) {
     const dailyCommand = await getDailyCommandByUserId(userId);
     if (!dailyCommand) {
-        return null;
+        return status.error(`Unable to find/create your daily info.`);
     }
 
     const now = new Date();
@@ -16,14 +17,25 @@ export async function updateUserStreak(userId: string) {
 
     if (lastDateClaim && isSameDay(lastDateClaim, now)) {
         // If the user has already claimed their daily reward for the current day, don't increment the streak and total
-        return dailyCommand;
+        return status.error(`Come back tomorrow to claim your daily.`);
     }
     newStreak =
         lastDateClaim && isYesterday(lastDateClaim, now) ? newStreak + 1 : 1;
     if (newStreak === 1) {
         newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
     } else {
-        newTotal = newTotal + 50 + (newStreak - 1);
+        newTotal = newTotal + (newStreak - 1);
+    }
+
+    const db = await updateDailyCommand(userId, {
+        dailyStreak: { set: newStreak },
+        dailyTotal: { set: newTotal },
+        lastDateClaim: { set: now },
+    });
+    if (!db) {
+        return status.error(
+            `Unknown error while trying to save your daily info.`,
+        );
     }
 
     await addBalance(
@@ -33,11 +45,7 @@ export async function updateUserStreak(userId: string) {
         `Daily check-in reward`,
     );
 
-    return await updateDailyCommand(userId, {
-        dailyStreak: { set: newStreak },
-        dailyTotal: { set: newTotal },
-        lastDateClaim: { set: now },
-    });
+    return status.data(db);
 }
 
 function isSameDay(date1: Date, date2: Date) {
@@ -62,7 +70,7 @@ async function getDailyCommandByUserId(userId: string) {
                 userId,
                 dailyStreak: 0,
                 dailyTotal: 50,
-                lastDateClaim: new Date(),
+                lastDateClaim: null,
             },
             update: {},
         })

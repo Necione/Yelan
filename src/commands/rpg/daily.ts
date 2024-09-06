@@ -21,10 +21,8 @@ export const daily = buildCommand<SlashCommand>({
             return r.edit(embedComment(cc.message));
         }
         const updatedUser = await updateUserStreak(i.user.id);
-        if (!updatedUser) {
-            return r.edit(
-                embedComment("An error occurred while updating your streak."),
-            );
+        if (!updatedUser.status) {
+            return r.edit(embedComment(updatedUser.message));
         }
 
         await cooldowns.set(p, "daily", get.days(1)); // 1 day in milliseconds
@@ -33,17 +31,19 @@ export const daily = buildCommand<SlashCommand>({
                 {
                     title: `🗓️ ${i.user.username}'s Daily Check-in`,
                     description: `You just claimed ${getAmount(
-                        updatedUser.dailyTotal,
+                        updatedUser.data.dailyTotal,
                     )}!`,
                     color: 0x5865f2,
                     fields: [
                         {
                             name: "❤️ Current Streak:",
-                            value: `${updatedUser.dailyStreak ?? 0} Day(s)`,
+                            value: `${
+                                updatedUser.data.dailyStreak ?? 0
+                            } Day(s)`,
                         },
                         {
                             name: "💫 Next Check-in reward:",
-                            value: getAmount(updatedUser.dailyTotal + 1),
+                            value: getAmount(updatedUser.data.dailyTotal + 1),
                         },
                     ],
                     footer: {
