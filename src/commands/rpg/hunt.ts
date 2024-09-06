@@ -15,8 +15,11 @@ export const hunt = buildCommand<SlashCommand>({
     only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
     async execute(i: ChatInputCommandInteraction) {
-        if (!i.deferred) return;
         locked.set(i.user);
+
+        if (!i.deferred) {
+            return;
+        }
 
         const r = await i.fetchReply().catch(() => null);
         if (!r) {

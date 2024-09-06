@@ -62,7 +62,7 @@ export const travel = buildCommand<SlashCommand>({
                 ),
         ),
     defer: { silent: false },
-    async execute(i, r) {
+    async execute(i) {
         const stats = await getUserStats(i.user.id);
 
         if (!stats) {
