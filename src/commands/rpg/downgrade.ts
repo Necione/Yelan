@@ -1,4 +1,4 @@
-import { buildCommand, SlashCommand } from "@elara-services/botbuilder";
+import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import {
     ActionRowBuilder,
