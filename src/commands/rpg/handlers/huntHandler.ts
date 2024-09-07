@@ -164,7 +164,7 @@ export async function handleHunt(
                 () => void thread.delete().catch(() => null),
             );
 
-            await cooldowns.set(userWallet, "hunt", get.hrs(1));
+            await cooldowns.set(userWallet, "hunt", get.mins(30));
 
             return;
         }
