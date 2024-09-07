@@ -193,6 +193,7 @@ model UserStats {
   inventory      UserStatsInv[]
   exp            Int            @default(0)
   worldLevel     Int            @default(1)
+  highestWL      Int            @default(1)
   equippedWeapon String?
   equippedFlower String?
   equippedPlume  String?

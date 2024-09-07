@@ -1,4 +1,5 @@
 export * from "./daily";
+export * from "./downgrade";
 export * from "./equip";
 export * from "./heal";
 export * from "./hunt";

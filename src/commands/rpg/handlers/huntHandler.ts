@@ -44,7 +44,7 @@ export async function handleHunt(
     let hpMultiplier = 1;
 
     if (levelDifference > 0) {
-        hpMultiplier = Math.pow(1.5, levelDifference);
+        hpMultiplier = Math.pow(1.2, levelDifference);
     }
 
     let currentMonsterHp = Math.floor(

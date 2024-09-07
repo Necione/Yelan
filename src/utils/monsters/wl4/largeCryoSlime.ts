@@ -3,7 +3,7 @@ const largeCryoSlime = {
     minHp: 50,
     maxHp: 65,
     minDamage: 9,
-    maxDamage: 13,
+    maxDamage: 11,
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 4,

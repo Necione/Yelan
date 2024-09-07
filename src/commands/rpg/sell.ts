@@ -17,7 +17,7 @@ export const sell = buildCommand<SlashCommand>({
         .addStringOption((option) =>
             option
                 .setName("item")
-                .setDescription("The item or weapon to sell")
+                .setDescription("The item that you want to sell")
                 .setRequired(true)
                 .addChoices(
                     ...getKeys(drops).map((c) => ({
@@ -25,6 +25,10 @@ export const sell = buildCommand<SlashCommand>({
                         value: c,
                     })),
                     ...getKeys(weapons).map((c) => ({
+                        name: c,
+                        value: c,
+                    })),
+                    ...getKeys(artifacts).map((c) => ({
                         name: c,
                         value: c,
                     })),

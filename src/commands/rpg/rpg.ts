@@ -41,6 +41,16 @@ export const rpg = buildCommand<SlashCommand>({
         const items = stats.inventory || [];
         const cc = cooldowns.get(p, "hunt");
 
+        const filteredInventory = items.filter(
+            (item) =>
+                item.item !== stats.equippedWeapon &&
+                item.item !== stats.equippedFlower &&
+                item.item !== stats.equippedPlume &&
+                item.item !== stats.equippedSands &&
+                item.item !== stats.equippedGoblet &&
+                item.item !== stats.equippedCirclet,
+        );
+
         const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
 
         const embed = new EmbedBuilder()
@@ -82,8 +92,8 @@ export const rpg = buildCommand<SlashCommand>({
                 },
                 {
                     name: "Inventory",
-                    value: items.length
-                        ? items
+                    value: filteredInventory.length
+                        ? filteredInventory
                               .map((i) => `\`${i.amount}x\` ${i.item}`)
                               .join("\n")
                         : "Your inventory is empty.",

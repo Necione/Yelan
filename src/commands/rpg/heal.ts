@@ -25,10 +25,12 @@ export const heal = buildCommand<SlashCommand>({
             );
         }
 
+        const healCost = Math.floor(Math.random() * (50 - 40 + 1)) + 40;
+
         if (userProfile.balance < 50) {
             return r.edit(
                 embedComment(
-                    `You don't have enough ${customEmoji.a.z_coins} coins to heal. You need 50 coins.`,
+                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal. You need at least 50 coins.`,
                 ),
             );
         }
@@ -53,15 +55,15 @@ export const heal = buildCommand<SlashCommand>({
             updateUserStats(i.user.id, { hp: newHp }),
             removeBalance(
                 i.user.id,
-                50,
+                healCost,
                 true,
-                `Paid 50 coins to heal ${healAmount} HP`,
+                `Paid ${healCost} coins to heal ${healAmount} HP`,
             ),
         ]);
 
         return r.edit(
             embedComment(
-                `The Statue of The Seven took ${customEmoji.a.z_coins} \`50 ${texts.c.u}\` and healed you for \`${healAmount} HP\`! Your current HP is \`${newHp}/${maxHP}\`.`,
+                `The Statue of The Seven took ${customEmoji.a.z_coins} \`${healCost} ${texts.c.u}\` and healed you for \`${healAmount} HP\`! Your current HP is \`${newHp}/${maxHP}\`.`,
                 "Green",
             ),
         );
