@@ -59,7 +59,7 @@ export async function handleHunt(
         const filledLength = Math.round((current / max) * length);
         const emptyLength = length - filledLength;
         const bar = "█".repeat(filledLength) + "░".repeat(emptyLength);
-        return `\`${bar}\` ${current}/${max} HP`;
+        return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
     };
 
     const battleEmbed = new EmbedBuilder()

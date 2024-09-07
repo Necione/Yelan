@@ -72,8 +72,10 @@ export function generateChestLoot(worldLevel: number) {
         amount: number;
     }[] = [];
 
+    let totalItems = 0;
+
     chestLoot.forEach((lootItem) => {
-        if (loot.length >= 3) {
+        if (totalItems >= 5) {
             return;
         }
 
@@ -84,10 +86,16 @@ export function generateChestLoot(worldLevel: number) {
                     lootItem.minAmount,
                     lootItem.maxAmount,
                 );
+
+                const remainingItems = 4 - totalItems;
+                const finalAmount = Math.min(amount, remainingItems);
+
                 loot.push({
                     item: lootItem.name,
-                    amount: Math.floor(amount),
+                    amount: finalAmount,
                 });
+
+                totalItems += finalAmount;
             }
         }
     });
