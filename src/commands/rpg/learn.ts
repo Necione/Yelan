@@ -86,7 +86,7 @@ export const learn = buildCommand<SlashCommand>({
             );
         }
 
-        let missingRequirements = [];
+        const missingRequirements = [];
 
         if (stats.worldLevel < skillData.worldLevel) {
             missingRequirements.push(
