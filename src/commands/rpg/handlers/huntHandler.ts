@@ -287,7 +287,7 @@ export async function handleHunt(
             )
             .catch(noop);
 
-        battleEmbed.setFields(
+        battleEmbed.setFields([
             {
                 name: "Your HP",
                 value: createHealthBar(currentPlayerHp, stats.hp),
@@ -298,7 +298,7 @@ export async function handleHunt(
                 value: createHealthBar(currentMonsterHp, initialMonsterHp),
                 inline: true,
             },
-        );
+        ]);
 
         await i.editReply({ embeds: [battleEmbed] }).catch(noop);
     }, get.secs(4));
