@@ -33,10 +33,7 @@ export const unequip = buildCommand<SlashCommand>({
         });
 
         return r.edit(
-            embedComment(
-                `You have unequipped your weapon.`,
-                "Green",
-            ),
+            embedComment(`You have unequipped your weapon.`, "Green"),
         );
     },
 });
