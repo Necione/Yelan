@@ -33,6 +33,19 @@ const locations: Record<LocationName, LocationXY> = {
     "Jueyun Karst": { x: 7, y: 13 },
 };
 
+const locationEmojis: Record<LocationName, string> = {
+    "Liyue Harbor": "🏮",
+    "Qingxu Pool": "🌊",
+    "Lingju Pass": "🌉",
+    "Lumberpick Valley": "🌲",
+    "Dunyu Ruins": "🏛️",
+    Nantianmen: "⛩️",
+    "Tianqiu Valley": "⛰️",
+    "Luhua Pool": "🌊",
+    "Guili Plains": "🏞️",
+    "Jueyun Karst": "🗻",
+};
+
 function calculateDistance(start: LocationXY, end: LocationXY) {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
@@ -93,9 +106,11 @@ export const travel = buildCommand<SlashCommand>({
 
         await updateUserStats(i.user.id, { isTravelling: true });
 
+        const emoji = locationEmojis[selectedLocation];
+
         await r.edit(
             embedComment(
-                `You are travelling to ${selectedLocation}, which will take approximately ${Math.round(
+                `You are travelling to ${emoji} **${selectedLocation}**, which will take approximately ${Math.round(
                     travelTime,
                 )} seconds.`,
             ),
@@ -110,7 +125,7 @@ export const travel = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You have arrived at ${selectedLocation}. Welcome and enjoy your stay!`,
+                `You have arrived at ${emoji} **${selectedLocation}**. Welcome and enjoy your stay!`,
             ),
         );
     },
