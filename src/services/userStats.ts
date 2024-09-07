@@ -67,7 +67,6 @@ export const getUserStats = async (userId: string) => {
         .catch(() => null);
 };
 
-
 export const updateUserStats = async (
     userId: string,
     data: Prisma.UserStatsUpdateInput,
