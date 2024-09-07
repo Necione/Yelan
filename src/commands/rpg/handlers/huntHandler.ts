@@ -44,7 +44,7 @@ export async function handleHunt(
     let hpMultiplier = 1;
 
     if (levelDifference > 0) {
-        hpMultiplier = Math.pow(1.2, levelDifference);
+        hpMultiplier = Math.pow(1.5, levelDifference);
     }
 
     let currentMonsterHp = Math.floor(
@@ -99,6 +99,12 @@ export async function handleHunt(
             .editReply(embedComment(`Unable to create the thread.`))
             .catch(() => null);
     }
+
+    const hasVigilance = stats.skills.some(
+        (skill) => skill.name === "Vigilance",
+    );
+    const hasLeech = stats.skills.some((skill) => skill.name === "Leech");
+    let vigilanceUsed = false;
 
     const battleInterval = setInterval(async () => {
         if (currentPlayerHp <= 0 || currentMonsterHp <= 0) {
@@ -174,16 +180,47 @@ export async function handleHunt(
             attackPower *= critValue;
         }
 
-        currentMonsterHp -= attackPower;
+        if (hasVigilance && !vigilanceUsed) {
+            currentMonsterHp -= attackPower;
+            await thread.send(
+                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name}.`,
+            );
+
+            const vigilanceAttackPower = attackPower / 2;
+            currentMonsterHp -= vigilanceAttackPower;
+            vigilanceUsed = true;
+            await thread.send(
+                `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name} ✨ (Vigilance Skill).`,
+            );
+        } else {
+            currentMonsterHp -= attackPower;
+            await thread.send(
+                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name}${
+                    isCrit ? " 💢 (Critical Hit!)" : ""
+                }.`,
+            );
+        }
+
+        if (hasLeech && Math.random() < 0.5) {
+            const leechHeal = Math.ceil(initialMonsterHp * 0.01);
+            currentPlayerHp = Math.min(
+                currentPlayerHp + leechHeal,
+                stats.maxHP,
+            );
+            await thread.send(
+                `>>> \`💖\` You healed \`${leechHeal}\` HP due to the Leech skill.`,
+            );
+        }
+
         if (currentMonsterHp < 0) {
             currentMonsterHp = 0;
         }
-
-        await thread.send(
-            `>>> \`⚔️\` You dealt \`${attackPower.toFixed(2)}\` damage to the ${
-                monster.name
-            }${isCrit ? " 💢 (Critical Hit!)" : ""}.`,
-        );
 
         let monsterDamage = getRandomValue(
             monster.minDamage,

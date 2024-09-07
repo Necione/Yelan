@@ -191,6 +191,7 @@ model UserStats {
   defChance      Float          @default(0)
   defValue       Float          @default(0)
   inventory      UserStatsInv[]
+  skills         UserSkill[]
   exp            Int            @default(0)
   worldLevel     Int            @default(1)
   highestWL      Int            @default(1)
@@ -207,6 +208,11 @@ model UserStats {
 type UserStatsInv {
   item   String @default("")
   amount Int    @default(0)
+}
+
+type UserSkill {
+  name  String @default("")
+  level Int    @default(1)
 }
 
 type Cooldown {
