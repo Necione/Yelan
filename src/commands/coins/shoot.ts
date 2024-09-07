@@ -11,6 +11,7 @@ import {
     embedComment,
     get,
     make,
+    noop,
     sleep,
 } from "@elara-services/utils";
 import {
@@ -53,7 +54,7 @@ export const shoot = buildCommand<SlashCommand>({
         if (!i.inCachedGuild() || !i.member || !i.channel) {
             return;
         }
-        const message = await i.fetchReply().catch(() => null); // For components, do this so it only attaches to the message the bot created.
+        const message = await i.fetchReply().catch(noop); // For components, do this so it only attaches to the message the bot created.
         if (!message) {
             return;
         }
@@ -133,9 +134,7 @@ export const shoot = buildCommand<SlashCommand>({
                     ),
                 );
             }
-            await i.member.roles
-                .add(roleId, `Joined Le Milieu`)
-                .catch(() => null);
+            await i.member.roles.add(roleId, `Joined Le Milieu`).catch(noop);
             await r.edit(embedComment(`Loading... one moment..`));
         }
         const tm = await discord.member(i.guild, user.id, true, true);

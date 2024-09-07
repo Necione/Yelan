@@ -1,5 +1,11 @@
 import { getData } from "@elara-services/leveling";
-import { addButton, discord, embedComment, is } from "@elara-services/utils";
+import {
+    addButton,
+    discord,
+    embedComment,
+    is,
+    noop,
+} from "@elara-services/utils";
 import type { UserWallet } from "@prisma/client";
 import {
     ActionRowBuilder,
@@ -189,7 +195,7 @@ export async function fetchData(
                         content: "> This is your profile:",
                         files: [{ name: "profile.png", attachment: data }],
                     })
-                    .catch(() => null);
+                    .catch(noop);
 
                 if (!sent) {
                     return embedComment(

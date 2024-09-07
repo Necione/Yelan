@@ -1,5 +1,11 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { chunk, embedComment, formatNumber, is } from "@elara-services/utils";
+import {
+    chunk,
+    embedComment,
+    formatNumber,
+    is,
+    noop,
+} from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserWallet } from "@prisma/client";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
@@ -135,7 +141,7 @@ export const cards = buildCommand<SlashCommand>({
                 em.setDescription(page.join("\n"));
                 pager.addPageEmbed(em);
             }
-            return pager.run(i, i.user).catch(() => null);
+            return pager.run(i, i.user).catch(noop);
         }
     },
 });

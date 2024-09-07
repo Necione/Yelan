@@ -1,4 +1,4 @@
-import { embedComment, get, sleep, time } from "@elara-services/utils";
+import { embedComment, get, noop, sleep, time } from "@elara-services/utils";
 import { type Message } from "discord.js";
 import { channels } from "../../config";
 import { getProfileByUserId } from "../../services";
@@ -23,7 +23,7 @@ export async function onAchievemntSubmit(message: Message<true>) {
 
     if (!db.rankedUID) {
         announced.add(message.author.id);
-        await message.react("1110060610164621392").catch(() => null);
+        await message.react("1110060610164621392").catch(noop);
         return message
             .reply(
                 embedComment(
@@ -32,9 +32,7 @@ export async function onAchievemntSubmit(message: Message<true>) {
                     )}`,
                 ),
             )
-            .then((m) =>
-                sleep(get.secs(20)).then(() => m.delete().catch(() => null)),
-            )
-            .catch(() => null);
+            .then((m) => sleep(get.secs(20)).then(() => m.delete().catch(noop)))
+            .catch(noop);
     }
 }

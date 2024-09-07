@@ -1,5 +1,5 @@
 /* eslint-disable no-async-promise-executor */
-import { formatNumber } from "@elara-services/utils";
+import { formatNumber, noop } from "@elara-services/utils";
 import { texts } from "@liyueharbor/econ";
 import { Canvas, loadImage, type CanvasRenderingContext2D } from "skia-canvas";
 import { images } from "../../utils/images";
@@ -40,7 +40,7 @@ const draw = (
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
         ctx.clip();
-        const img = await loadImage(image).catch(() => null);
+        const img = await loadImage(image).catch(noop);
         if (img) {
             ctx.drawImage(img, x, y, width, height);
         }

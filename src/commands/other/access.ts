@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, noop } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
@@ -33,7 +33,7 @@ export const access = buildCommand<SlashCommand>({
             ),
         );
         await member.roles[type ? "remove" : "add"](roles.flashRole).catch(
-            () => null,
+            noop,
         );
         return r.edit(
             embedComment(

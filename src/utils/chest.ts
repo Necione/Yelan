@@ -1,14 +1,14 @@
 import { getRandomValue } from "./hunt";
-import { type ArtifactName } from "./rpgitems/artifacts";
-import { type DropName } from "./rpgitems/items";
-import { type WeaponName } from "./rpgitems/weapons";
+import { type ArtifactName, artifacts } from "./rpgitems/artifacts";
+import { type DropName, drops } from "./rpgitems/items";
+import { type WeaponName, weapons } from "./rpgitems/weapons";
 
 type LootItem = {
     name: DropName | WeaponName | ArtifactName;
     minAmount: number;
     maxAmount: number;
     minWorldLevel: number;
-    dropChance: number;
+    chestChance: number;
 };
 
 type ChestRarity = {
@@ -26,118 +26,27 @@ const rarities: ChestRarity[] = [
 ];
 
 const chestLoot: LootItem[] = [
-    {
-        name: "Damaged Mask",
-        minAmount: 1,
-        maxAmount: 2,
-        minWorldLevel: 1,
-        dropChance: 70,
-    },
-    {
-        name: "Dull Blade",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 1,
-        dropChance: 30,
-    },
-    {
-        name: "Waster Greatsword",
+    ...Object.keys(drops).map((drop) => ({
+        name: drop as DropName,
+        minAmount: drops[drop as DropName].minAmount || 1,
+        maxAmount: drops[drop as DropName].maxAmount || 1,
+        minWorldLevel: drops[drop as DropName].minWorldLevel,
+        chestChance: drops[drop as DropName].chestChance,
+    })),
+    ...Object.keys(weapons).map((weapon) => ({
+        name: weapon as WeaponName,
         minAmount: 1,
         maxAmount: 1,
-        minWorldLevel: 2,
-        dropChance: 20,
-    },
-    {
-        name: "Iron Point",
+        minWorldLevel: weapons[weapon as WeaponName].minWorldLevel,
+        chestChance: weapons[weapon as WeaponName].chestChance,
+    })),
+    ...Object.keys(artifacts).map((artifact) => ({
+        name: artifact as ArtifactName,
         minAmount: 1,
         maxAmount: 1,
-        minWorldLevel: 3,
-        dropChance: 10,
-    },
-    {
-        name: "Silver Sword",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 3,
-        dropChance: 5,
-    },
-    {
-        name: "Cool Steel",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 4,
-        dropChance: 10,
-    },
-    {
-        name: "Adventurer's Flower",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 2,
-        dropChance: 15,
-    },
-    {
-        name: "Adventurer's Tail Feather",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 2,
-        dropChance: 15,
-    },
-    {
-        name: "Adventurer's Pocket Watch",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 2,
-        dropChance: 15,
-    },
-    {
-        name: "Adventurer's Golden Goblet",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 2,
-        dropChance: 10,
-    },
-    {
-        name: "Adventurer's Bandana",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 2,
-        dropChance: 10,
-    },
-    {
-        name: "Travelling Doctor's Silver Lotus",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 3,
-        dropChance: 10,
-    },
-    {
-        name: "Travelling Doctor's Owl Feather",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 3,
-        dropChance: 10,
-    },
-    {
-        name: "Travelling Doctor's Pocket Watch",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 3,
-        dropChance: 10,
-    },
-    {
-        name: "Travelling Doctor's Medicine Pot",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 3,
-        dropChance: 10,
-    },
-    {
-        name: "Travelling Doctor's Handkerchief",
-        minAmount: 1,
-        maxAmount: 1,
-        minWorldLevel: 3,
-        dropChance: 10,
-    },
+        minWorldLevel: artifacts[artifact as ArtifactName].minWorldLevel,
+        chestChance: artifacts[artifact as ArtifactName].chestChance,
+    })),
 ];
 
 function selectChestRarity(): ChestRarity {
@@ -164,9 +73,13 @@ export function generateChestLoot(worldLevel: number) {
     }[] = [];
 
     chestLoot.forEach((lootItem) => {
+        if (loot.length >= 3) {
+            return;
+        }
+
         if (worldLevel >= lootItem.minWorldLevel) {
             const chance = Math.random() * 100;
-            if (chance <= lootItem.dropChance) {
+            if (chance <= lootItem.chestChance) {
                 const amount = getRandomValue(
                     lootItem.minAmount,
                     lootItem.maxAmount,

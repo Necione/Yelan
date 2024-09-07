@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
@@ -9,6 +9,7 @@ import {
 import { cooldowns, locked } from "../../utils";
 import { handleChest } from "./handlers/chestHandler";
 import { handleHunt } from "./handlers/huntHandler";
+import { handleTrade } from "./handlers/tradeHandler";
 
 export const hunt = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -26,7 +27,7 @@ export const hunt = buildCommand<SlashCommand>({
             return;
         }
 
-        const message = await i.fetchReply().catch(() => null);
+        const message = await i.fetchReply().catch(noop);
         if (!message) {
             locked.del(i.user.id);
             return r.edit(
@@ -80,7 +81,9 @@ export const hunt = buildCommand<SlashCommand>({
         }
 
         const randomChance = Math.random();
-        if (randomChance < 0.2) {
+        if (randomChance < 0.1) {
+            await handleTrade(i, stats);
+        } else if (randomChance < 0.3) {
             await handleChest(i, stats, userWallet);
         } else {
             await updateUserStats(i.user.id, { isHunting: true });

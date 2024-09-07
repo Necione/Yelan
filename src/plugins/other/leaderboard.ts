@@ -1,4 +1,10 @@
-import { chunk, embedComment, formatNumber, is } from "@elara-services/utils";
+import {
+    chunk,
+    embedComment,
+    formatNumber,
+    is,
+    noop,
+} from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserWallet } from "@prisma/client";
 import { EmbedBuilder, type RepliableInteraction, type User } from "discord.js";
@@ -78,7 +84,7 @@ export async function handleLeaderboard(
                         `Unable to find (${searchUser.toString()}) in the (${displayText}) leaderboard!`,
                     ),
                 )
-                .catch(() => null);
+                .catch(noop);
         }
         return interaction
             .editReply(
@@ -91,14 +97,14 @@ export async function handleLeaderboard(
                     "Aqua",
                 ),
             )
-            .catch(() => null);
+            .catch(noop);
     }
     // Split the leaderboard into pages
     const pages = getLeaderboardPages(leaderboard, displayText);
     if (!pages.length) {
         return interaction
             .editReply(embedComment(`I found no one on the leaderboard!`))
-            .catch(() => null);
+            .catch(noop);
     }
 
     const pager = getPaginatedMessage();
@@ -125,7 +131,7 @@ export async function handleLeaderboard(
         pager.pages.push({ embeds: [embed] });
     }
 
-    return pager.run(interaction, interaction.user).catch(() => null); // Ignore these, they only error out if the message/interaction got deleted
+    return pager.run(interaction, interaction.user).catch(noop); // Ignore these, they only error out if the message/interaction got deleted
 }
 
 export function getLeaderboardPages<T>(

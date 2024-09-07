@@ -1,4 +1,4 @@
-import { is, log } from "@elara-services/utils";
+import { is, log, noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { artifacts, type ArtifactName } from "../utils/rpgitems/artifacts";
@@ -159,7 +159,7 @@ export const getUserStats = async (userId: string) => {
             },
             update: {},
         })
-        .catch(() => null);
+        .catch(noop);
 };
 
 export const updateUserStats = async (

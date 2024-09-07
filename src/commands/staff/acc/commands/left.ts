@@ -29,7 +29,7 @@ export const left = buildCommand({
                 ),
             );
         }
-        const members = await guild.members.fetch().catch(() => null);
+        const members = await guild.members.fetch().catch(noop);
         if (!members || !members.size) {
             return r.edit(
                 embedComment(
@@ -58,7 +58,7 @@ export const left = buildCommand({
         if (!co) {
             return;
         }
-        await co.deferUpdate().catch(() => null);
+        await co.deferUpdate().catch(noop);
         await r.edit(
             embedComment(
                 `Purging the left users profiles, one moment...`,

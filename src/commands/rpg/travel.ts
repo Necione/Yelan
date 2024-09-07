@@ -130,9 +130,9 @@ export const travel = buildCommand<SlashCommand>({
 
         await r.edit(
             embedComment(
-                `You are travelling to ${emoji} **${selectedLocation}**, which will take approximately ${Math.round(
+                `You are travelling to ${emoji} **${selectedLocation}**.\n-# This will take approximately ${Math.round(
                     travelTime,
-                )} seconds.`,
+                )} seconds!`,
             ),
         );
 

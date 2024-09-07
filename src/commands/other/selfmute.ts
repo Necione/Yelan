@@ -1,6 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { Duration } from "@elara-services/packages";
-import { embedComment, error, is, ms } from "@elara-services/utils";
+import { embedComment, error, is, ms, noop } from "@elara-services/utils";
 import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 export const selfmute = buildCommand<SlashCommand>({
@@ -60,7 +60,7 @@ export const selfmute = buildCommand<SlashCommand>({
                             "Aqua",
                         ),
                     )
-                    .catch(() => null);
+                    .catch(noop);
                 return r.edit(
                     embedComment(
                         `You've been selfmuted for ${format}`,

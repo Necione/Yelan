@@ -1,4 +1,4 @@
-import { is } from "@elara-services/utils";
+import { is, noop } from "@elara-services/utils";
 import {
     FontLibrary,
     loadImage,
@@ -118,7 +118,7 @@ export function rectangle(
         // Draw the background.
         if (img) {
             ctx.clip();
-            const image = await loadImage(background).catch(() => null);
+            const image = await loadImage(background).catch(noop);
             if (image) {
                 ctx.drawImage(image, x, y, width, height);
                 ctx.restore();

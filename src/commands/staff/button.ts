@@ -5,6 +5,7 @@ import {
     displayButtonRandomly,
     embedComment,
     get,
+    noop,
 } from "@elara-services/utils";
 import { ButtonStyle, SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
@@ -17,7 +18,7 @@ export const button = buildCommand<SlashCommand>({
     defer: { silent: false },
     locked: { roles: roles.main },
     async execute(interaction, responder) {
-        const msg = await interaction.fetchReply().catch(() => null);
+        const msg = await interaction.fetchReply().catch(noop);
         if (!msg) {
             return;
         }
@@ -57,6 +58,6 @@ export const button = buildCommand<SlashCommand>({
                     ]),
                 ],
             })
-            .catch(() => null);
+            .catch(noop);
     },
 });

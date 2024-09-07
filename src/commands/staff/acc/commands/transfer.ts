@@ -4,6 +4,7 @@ import {
     get,
     getConfirmPrompt,
     log,
+    noop,
 } from "@elara-services/utils";
 import { mainServerId, roles } from "../../../../config";
 import { prisma } from "../../../../prisma";
@@ -111,14 +112,14 @@ export const transfer = buildCommand({
                     create: op,
                     update: op,
                 })
-                .catch(() => null),
+                .catch(noop),
             prisma.userWallet
                 .delete({
                     where: {
                         userId: oldUser.id,
                     },
                 })
-                .catch(() => null),
+                .catch(noop),
             levels.api.users.delete.guild(user.id, i.guildId),
         ]);
 

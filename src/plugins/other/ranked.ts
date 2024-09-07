@@ -3,6 +3,7 @@ import {
     embedComment,
     formatNumber,
     is,
+    noop,
     time,
 } from "@elara-services/utils";
 import type { RankedGame } from "@prisma/client";
@@ -166,7 +167,7 @@ export async function fetchRankedData(userId: string) {
             create: { userId },
             update: {},
         })
-        .catch(() => null);
+        .catch(noop);
 }
 
 export function getRankedRoles(

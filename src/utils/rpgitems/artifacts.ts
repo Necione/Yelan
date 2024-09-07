@@ -8,6 +8,8 @@ export const artifacts = {
         maxHP: 10,
         defChance: 0,
         defValue: 0,
+        minWorldLevel: 2,
+        chestChance: 15,
     },
     "Adventurer's Tail Feather": {
         type: "Plume",
@@ -18,6 +20,8 @@ export const artifacts = {
         maxHP: 0,
         defChance: 0,
         defValue: 0,
+        minWorldLevel: 2,
+        chestChance: 15,
     },
     "Adventurer's Pocket Watch": {
         type: "Sands",
@@ -28,6 +32,8 @@ export const artifacts = {
         maxHP: 5,
         defChance: 0,
         defValue: 0,
+        minWorldLevel: 2,
+        chestChance: 15,
     },
     "Adventurer's Golden Goblet": {
         type: "Goblet",
@@ -38,6 +44,8 @@ export const artifacts = {
         maxHP: 0,
         defChance: 10,
         defValue: 1.5,
+        minWorldLevel: 2,
+        chestChance: 15,
     },
     "Adventurer's Bandana": {
         type: "Circlet",
@@ -48,6 +56,8 @@ export const artifacts = {
         maxHP: 0,
         defChance: 0,
         defValue: 0,
+        minWorldLevel: 2,
+        chestChance: 15,
     },
     "Travelling Doctor's Silver Lotus": {
         type: "Flower",
@@ -58,6 +68,8 @@ export const artifacts = {
         maxHP: 15,
         defChance: 5,
         defValue: 8,
+        minWorldLevel: 3,
+        chestChance: 15,
     },
     "Travelling Doctor's Owl Feather": {
         type: "Plume",
@@ -68,6 +80,8 @@ export const artifacts = {
         maxHP: 0,
         defChance: 5,
         defValue: 4,
+        minWorldLevel: 3,
+        chestChance: 15,
     },
     "Travelling Doctor's Pocket Watch": {
         type: "Sands",
@@ -78,6 +92,8 @@ export const artifacts = {
         maxHP: 10,
         defChance: 5,
         defValue: 3,
+        minWorldLevel: 3,
+        chestChance: 15,
     },
     "Travelling Doctor's Medicine Pot": {
         type: "Goblet",
@@ -88,6 +104,8 @@ export const artifacts = {
         maxHP: 0,
         defChance: 15,
         defValue: 2,
+        minWorldLevel: 3,
+        chestChance: 15,
     },
     "Travelling Doctor's Handkerchief": {
         type: "Circlet",
@@ -98,6 +116,8 @@ export const artifacts = {
         maxHP: 0,
         defChance: 30,
         defValue: 1,
+        minWorldLevel: 3,
+        chestChance: 15,
     },
 };
 

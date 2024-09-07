@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, is } from "@elara-services/utils";
+import { embedComment, formatNumber, is, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
@@ -74,7 +74,7 @@ export const payment = buildCommand<SlashCommand>({
                     "Green",
                 ),
             )
-            .catch(() => null);
+            .catch(noop);
         return r.edit(
             embedComment(
                 `${customEmoji.a.z_coins} Paid (${formatNumber(amount)}) ${

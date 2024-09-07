@@ -5,6 +5,7 @@ import {
     get,
     getInteractionResponder,
     is,
+    noop,
     proper,
     status,
     time,
@@ -347,7 +348,7 @@ export async function send(
             false,
             false,
         )
-        .catch(() => null)) as APIMessage | null;
+        .catch(noop)) as APIMessage | null;
 }
 
 export function getRandomImage() {

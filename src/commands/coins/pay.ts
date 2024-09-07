@@ -1,5 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { discord, embedComment, field } from "@elara-services/utils";
+import { discord, embedComment, field, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
@@ -199,7 +199,7 @@ export const pay: SlashCommand = {
 
         locked.del([interaction.user.id, user.id]);
         await Promise.all([
-            user.send({ embeds: [dmEmbed] }).catch(() => null),
+            user.send({ embeds: [dmEmbed] }).catch(noop),
             responder.edit({
                 embeds: [
                     new EmbedBuilder()

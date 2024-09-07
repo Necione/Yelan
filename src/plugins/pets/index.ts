@@ -9,6 +9,7 @@ import {
     getConfirmPrompt,
     getInteractionResponder,
     is,
+    noop,
     proper,
     time,
     type XOR,
@@ -447,7 +448,7 @@ export async function displayData(
         });
     }
 
-    return pager.run(interaction, interaction.user).catch(() => null);
+    return pager.run(interaction, interaction.user).catch(noop);
 }
 
 export async function handleInteractions(interaction: Interaction) {
@@ -475,7 +476,7 @@ export async function handleInteractions(interaction: Interaction) {
     };
     if (action === "rename_modal" && interaction.isModalSubmit()) {
         const name = interaction.fields.getTextInputValue("name");
-        await interaction.deferUpdate().catch(() => null);
+        await interaction.deferUpdate().catch(noop);
         if (!checkName(name)) {
             return await send(
                 embedComment(
@@ -650,7 +651,7 @@ export async function handleInteractions(interaction: Interaction) {
                     },
                 ],
             })
-            .catch(() => null);
+            .catch(noop);
     }
 
     if (action === "disown") {

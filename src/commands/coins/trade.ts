@@ -9,6 +9,7 @@ import {
     get,
     getInteractionResponder,
     is,
+    noop,
 } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserWallet } from "@prisma/client";
@@ -371,7 +372,7 @@ export const trade: SlashCommand = {
                                 filter: (ii) => ii.user.id === i.user.id,
                                 time: get.secs(50),
                             })
-                            .catch(() => null);
+                            .catch(noop);
                         if (!c) {
                             return void r.edit(
                                 embedComment(
@@ -379,7 +380,7 @@ export const trade: SlashCommand = {
                                 ),
                             );
                         }
-                        await c.deferUpdate().catch(() => null);
+                        await c.deferUpdate().catch(noop);
                         // @ts-ignore
                         const rr = getInteractionResponder(c);
                         const amount = parseInt(

@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, log } from "@elara-services/utils";
+import { embedComment, is, log, noop } from "@elara-services/utils";
 import { SlashCommandBuilder, type Message } from "discord.js";
 import { channels, roles } from "../../config";
 import { images } from "../../utils/images";
@@ -68,13 +68,13 @@ export const qotd = buildCommand<SlashCommand>({
                 .editReply(embedComment(message.message))
                 .catch((e) => log(`[${this.command.name}]: ERROR`, e));
         }
-        await message.crosspost().catch(() => null);
+        await message.crosspost().catch(noop);
         await message
             .startThread({
                 name: `Daily Question #${num}`,
                 reason: `Created for QOTD`,
             })
-            .catch(() => null);
+            .catch(noop);
         return i
             .editReply(
                 embedComment(

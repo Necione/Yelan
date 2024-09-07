@@ -1,3 +1,4 @@
+import { noop } from "@elara-services/utils";
 import type { Prisma, UserWallet } from "@prisma/client";
 import { prisma } from "../prisma";
 
@@ -8,7 +9,7 @@ export async function getBotFromId(clientId: string) {
             create: { clientId },
             update: {},
         })
-        .catch(() => null);
+        .catch(noop);
 }
 
 export async function updateBotData(
@@ -20,7 +21,7 @@ export async function updateBotData(
             where: { clientId },
             data,
         })
-        .catch(() => null);
+        .catch(noop);
 }
 
 export function sortLB(
@@ -56,7 +57,7 @@ export async function getStore(guildId: string) {
             create: { guildId },
             update: {},
         })
-        .catch(() => null);
+        .catch(noop);
 }
 
 export async function getCollectables(guildId: string) {
@@ -66,5 +67,5 @@ export async function getCollectables(guildId: string) {
             create: { guildId },
             update: {},
         })
-        .catch(() => null);
+        .catch(noop);
 }

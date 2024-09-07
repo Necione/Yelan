@@ -1,5 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { addButtonRow, awaitComponent, get } from "@elara-services/utils";
+import { addButtonRow, awaitComponent, get, noop } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import {
     ButtonStyle,
@@ -114,7 +114,7 @@ export const blackjack: SlashCommand = {
             embed.setDescription(desc);
             await insuranceInteraction
                 .update({ embeds: [embed], components: [] })
-                .catch(() => null);
+                .catch(noop);
             if (insuranceInteraction.customId === "blackjack|insurance") {
                 tookInsurance = true;
             }

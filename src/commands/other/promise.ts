@@ -5,6 +5,7 @@ import {
     discord,
     embedComment,
     get,
+    noop,
 } from "@elara-services/utils";
 import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
@@ -31,7 +32,7 @@ export const promise = buildCommand<SlashCommand>({
         if (!i.channel) {
             return;
         }
-        const message = await i.fetchReply().catch(() => null);
+        const message = await i.fetchReply().catch(noop);
         if (!message) {
             return;
         }
@@ -90,11 +91,9 @@ export const promise = buildCommand<SlashCommand>({
             return r.edit(embedComment(`Promise Cancelled.`));
         }
         if (co.customId !== "confirm-yes") {
-            return co
-                .update(embedComment(`Promise Cancelled.`))
-                .catch(() => null);
+            return co.update(embedComment(`Promise Cancelled.`)).catch(noop);
         }
-        await co.update({ components: [] }).catch(() => null);
+        await co.update({ components: [] }).catch(noop);
         const promiseEmbed = new EmbedBuilder()
             .setColor(0xc0f6fb)
             .setTitle("New Promise Made")
@@ -128,7 +127,7 @@ export const promise = buildCommand<SlashCommand>({
                         "Yellow",
                     ),
                 )
-                .catch(() => null),
+                .catch(noop),
             user
                 .send(
                     embedComment(
@@ -138,7 +137,7 @@ export const promise = buildCommand<SlashCommand>({
                         "Yellow",
                     ),
                 )
-                .catch(() => null),
+                .catch(noop),
         ]);
         return r.edit(embedComment(`Your promise has been sent!`, "Green"));
     },

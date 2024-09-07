@@ -6,6 +6,7 @@ import {
     get,
     getInteractionResponder,
     is,
+    noop,
     time,
 } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
@@ -45,7 +46,7 @@ export const inventory = buildCommand<SlashCommand>({
             return;
         }
         // Defer
-        const originalMessage = await i.fetchReply().catch(() => null);
+        const originalMessage = await i.fetchReply().catch(noop);
         if (!originalMessage) {
             return;
         }
@@ -144,10 +145,10 @@ export const inventory = buildCommand<SlashCommand>({
                                             },
                                         ],
                                     })
-                                    .catch(() => null);
+                                    .catch(noop);
                                 const collect = await context.interaction
                                     .awaitModalSubmit({ time: 35000 })
-                                    .catch(() => null);
+                                    .catch(noop);
                                 if (!collect) {
                                     return;
                                 }
@@ -181,7 +182,7 @@ export const inventory = buildCommand<SlashCommand>({
                                 );
                                 await originalMessage
                                     .edit({ components: [] })
-                                    .catch(() => null);
+                                    .catch(noop);
                                 await rr.edit({
                                     embeds: embedComment(
                                         `Are you sure you want to sell (${amount}) ${
@@ -199,7 +200,7 @@ export const inventory = buildCommand<SlashCommand>({
                                     .awaitMessageComponent({
                                         time: get.secs(10),
                                     })
-                                    .catch(() => null);
+                                    .catch(noop);
                                 if (collected?.customId !== "confirm") {
                                     return rr.edit(
                                         embedComment(`Command Cancelled.`),
@@ -222,7 +223,7 @@ export const inventory = buildCommand<SlashCommand>({
                                 const priceTotal = Math.floor(find.price * 1);
                                 await originalMessage
                                     .edit({ components: [] })
-                                    .catch(() => null);
+                                    .catch(noop);
                                 await r.edit({
                                     embeds: embedComment(
                                         `Are you sure you want to sell (1) ${
@@ -240,7 +241,7 @@ export const inventory = buildCommand<SlashCommand>({
                                     .awaitMessageComponent({
                                         time: get.secs(10),
                                     })
-                                    .catch(() => null);
+                                    .catch(noop);
                                 if (co?.customId !== "confirm") {
                                     return r.edit(
                                         embedComment(`Command Cancelled.`),
@@ -266,7 +267,7 @@ export const inventory = buildCommand<SlashCommand>({
             total: number,
             amount: number,
         ) {
-            await c.deferUpdate().catch(() => null);
+            await c.deferUpdate().catch(noop);
             c.deferred = true;
             const profile = await getProfileByUserId(i.user.id);
             if (!profile) {
@@ -278,7 +279,7 @@ export const inventory = buildCommand<SlashCommand>({
             }
             const r = checkBalanceForLimit(profile, total);
             if (!r.status) {
-                return c.editReply(embedComment(r.message)).catch(() => null);
+                return c.editReply(embedComment(r.message)).catch(noop);
             }
             find.count = Math.floor(find.count - amount);
             if (find.count <= 0) {
@@ -330,7 +331,7 @@ export const inventory = buildCommand<SlashCommand>({
                         "Green",
                     ),
                 )
-                .catch(() => null);
+                .catch(noop);
         }
         const dupes = p.collectables
             .filter((c) => c.count > 1)
@@ -371,6 +372,6 @@ export const inventory = buildCommand<SlashCommand>({
             ...pages,
         );
 
-        return pager.run(i, i.user).catch(() => null);
+        return pager.run(i, i.user).catch(noop);
     },
 });

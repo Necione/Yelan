@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { is } from "@elara-services/utils";
+import { is, noop } from "@elara-services/utils";
 import {
     Colors,
     EmbedBuilder,
@@ -119,7 +119,7 @@ export const color = buildCommand<SlashCommand>({
                 roles,
                 reason: `Updated color roles.`,
             })
-            .catch(() => null);
+            .catch(noop);
 
         await r.edit({
             embeds: [roleUpdatedEmbed(removedRoles, [role])],

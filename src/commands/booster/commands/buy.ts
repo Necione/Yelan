@@ -6,6 +6,7 @@ import {
     get,
     getInteractionResponder,
     is,
+    noop,
 } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import {
@@ -161,13 +162,13 @@ export const buy = buildCommand<SubCommand>({
                     location: `Bought by: @${i.user.tag}`,
                 },
             })
-            .catch(() => null);
+            .catch(noop);
         const start = Date.now() - startTime;
         if (event) {
             if (!start.toString().startsWith("-")) {
                 await event
                     .edit({ status: GuildScheduledEventStatus.Active })
-                    .catch(() => null);
+                    .catch(noop);
             }
         }
         const collector = message.createMessageComponentCollector({
@@ -200,7 +201,7 @@ export const buy = buildCommand<SubCommand>({
                             ),
                         ],
                     })
-                    .catch(() => null);
+                    .catch(noop);
                 const col = await m
                     .awaitModalSubmit({
                         filter: (ii) =>
@@ -208,11 +209,11 @@ export const buy = buildCommand<SubCommand>({
                             ii.customId.startsWith("custom_tip"),
                         time: get.secs(30),
                     })
-                    .catch(() => null);
+                    .catch(noop);
                 if (!col) {
                     return;
                 }
-                await col.deferReply({ ephemeral: true }).catch(() => null);
+                await col.deferReply({ ephemeral: true }).catch(noop);
                 amount = parseInt(col.fields.getTextInputValue("amount"));
                 removeFrom = Math.floor(
                     amount + (await getTax(amount, m.member)),
@@ -272,7 +273,7 @@ export const buy = buildCommand<SubCommand>({
 
         collector.on("end", async () => {
             if (event) {
-                await event.edit({ description: `` }).catch(() => null);
+                await event.edit({ description: `` }).catch(noop);
             }
             await message.edit({
                 ...buyBoosterEmbed(

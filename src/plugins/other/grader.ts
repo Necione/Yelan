@@ -1,4 +1,4 @@
-import { discord, is } from "@elara-services/utils";
+import { discord, is, noop } from "@elara-services/utils";
 import { Colors, EmbedBuilder, type Message, type User } from "discord.js";
 import { getAllUserProfiles } from "../../services";
 
@@ -28,7 +28,7 @@ export async function handleUserToUID(message: Message) {
         }
     }
     if (!is.array(users)) {
-        return message.react(`❌`).catch(() => null);
+        return message.react(`❌`).catch(noop);
     }
     const dbs = await getAllUserProfiles({
         where: {
@@ -38,7 +38,7 @@ export async function handleUserToUID(message: Message) {
         },
     });
     if (!is.array(dbs)) {
-        return message.react(`❌`).catch(() => null);
+        return message.react(`❌`).catch(noop);
     }
     const embed = new EmbedBuilder()
         .setTitle(`Genshin UID`)
@@ -53,8 +53,8 @@ export async function handleUserToUID(message: Message) {
         }
     }
     if (!is.array(desc)) {
-        return message.react(`❌`).catch(() => null);
+        return message.react(`❌`).catch(noop);
     }
     embed.setDescription(desc.map((c) => `- ${c}`).join("\n"));
-    return message.reply({ embeds: [embed] }).catch(() => null);
+    return message.reply({ embeds: [embed] }).catch(noop);
 }

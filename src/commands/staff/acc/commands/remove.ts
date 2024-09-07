@@ -1,5 +1,10 @@
 import { buildCommand, getUser } from "@elara-services/botbuilder";
-import { embedComment, get, getConfirmPrompt } from "@elara-services/utils";
+import {
+    embedComment,
+    get,
+    getConfirmPrompt,
+    noop,
+} from "@elara-services/utils";
 import { prisma } from "../../../../prisma";
 import { getProfileByUserId } from "../../../../services";
 import { logs } from "../../../../utils";
@@ -58,7 +63,7 @@ export const remove = buildCommand({
 
         await prisma.userWallet
             .delete({ where: { userId: user.id } })
-            .catch(() => null);
+            .catch(noop);
         return r.edit(
             embedComment(
                 `I've completely removed ${user.toString()}'s profile from the database.`,

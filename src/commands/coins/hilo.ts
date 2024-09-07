@@ -4,6 +4,7 @@ import {
     awaitComponent,
     embedComment,
     get,
+    noop,
 } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
@@ -33,7 +34,7 @@ export const hilo: SlashCommand = {
     },
     async execute(interaction, responder) {
         locked.set(interaction);
-        const message = await interaction.fetchReply().catch(() => null);
+        const message = await interaction.fetchReply().catch(noop);
         if (!message) {
             locked.del(interaction.user.id);
             return;
@@ -109,7 +110,7 @@ export const hilo: SlashCommand = {
                 components: [],
             });
         }
-        await i.update({ components: [] }).catch(() => null);
+        await i.update({ components: [] }).catch(noop);
 
         const userChoice = i.customId.split("|")[1];
         const nextCard = getRandomCard();
@@ -161,7 +162,7 @@ export const hilo: SlashCommand = {
                 embeds: [resultEmbed],
                 components: [],
             })
-            .catch(() => null);
+            .catch(noop);
     },
 };
 

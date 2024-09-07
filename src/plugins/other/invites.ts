@@ -1,4 +1,4 @@
-import { colors } from "@elara-services/utils";
+import { colors, noop } from "@elara-services/utils";
 import {
     EmbedBuilder,
     type ButtonInteraction,
@@ -32,7 +32,7 @@ export async function handleInviteInteraction(i: ButtonInteraction) {
                     ),
             ],
         })
-        .catch(() => null);
+        .catch(noop);
 }
 
 export function isInviteInt(i: Interaction) {

@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, is } from "@elara-services/utils";
+import { embedComment, formatNumber, is, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
@@ -75,7 +75,7 @@ export const fine = buildCommand<SlashCommand>({
                         Colors.Red,
                     ),
                 )
-                .catch(() => null);
+                .catch(noop);
         }
 
         await logs.fines({

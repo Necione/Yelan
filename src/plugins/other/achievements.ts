@@ -1,3 +1,4 @@
+import { noop } from "@elara-services/utils";
 import type { SlashCommandIntegerOption } from "discord.js";
 import { prisma } from "../../prisma";
 
@@ -60,7 +61,7 @@ export async function getAchievements(client: string) {
             create: { client },
             update: {},
         })
-        .catch(() => null);
+        .catch(noop);
 }
 
 export type Achievement = {

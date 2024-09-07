@@ -1,28 +1,43 @@
 export const weapons = {
-    "Dull Blade": { sellPrice: 5, attackPower: 2, critChance: 0, critValue: 0 },
+    "Dull Blade": {
+        sellPrice: 5,
+        attackPower: 2,
+        critChance: 0,
+        critValue: 0,
+        minWorldLevel: 1,
+        chestChance: 30,
+    },
     "Waster Greatsword": {
         sellPrice: 5,
         attackPower: 3.5,
         critChance: 10,
         critValue: 1.5,
+        minWorldLevel: 2,
+        chestChance: 20,
     },
     "Iron Point": {
         sellPrice: 8,
         attackPower: 4,
         critChance: 15,
         critValue: 1.75,
+        minWorldLevel: 3,
+        chestChance: 10,
     },
     "Silver Sword": {
         sellPrice: 8,
         attackPower: 4.5,
         critChance: 15,
         critValue: 2,
+        minWorldLevel: 3,
+        chestChance: 5,
     },
     "Cool Steel": {
         sellPrice: 10,
         attackPower: 5,
         critChance: 15,
         critValue: 2.5,
+        minWorldLevel: 4,
+        chestChance: 5,
     },
 };
 

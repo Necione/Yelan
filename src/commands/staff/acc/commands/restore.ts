@@ -6,6 +6,7 @@ import {
     getConfirmPrompt,
     is,
     log,
+    noop,
     time,
 } from "@elara-services/utils";
 import type { UserWallet } from "@prisma/client";
@@ -123,7 +124,7 @@ export const restore = buildCommand({
                 create: obj,
                 update: obj,
             })
-            .catch(() => null);
+            .catch(noop);
         await message
             .reply(
                 embedComment(

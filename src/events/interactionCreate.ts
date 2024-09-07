@@ -3,7 +3,7 @@ import {
     handleInteractionCommand,
     handlePostInteraction,
 } from "@elara-services/botbuilder";
-import { embedComment, getFilesList } from "@elara-services/utils";
+import { embedComment, getFilesList, noop } from "@elara-services/utils";
 import type { Interaction, InteractionReplyOptions } from "discord.js";
 import { Events } from "discord.js";
 import * as Commands from "../commands";
@@ -49,14 +49,14 @@ function handleCommands(i: Interaction, commands: object) {
         }
         const send = async (options: InteractionReplyOptions) => {
             if (ii.deferred) {
-                return ii.editReply(options).catch(() => null);
+                return ii.editReply(options).catch(noop);
             } else {
                 return ii
                     .reply({
                         ...options,
                         ephemeral: true,
                     })
-                    .catch(() => null);
+                    .catch(noop);
             }
         };
         // @ts-ignore

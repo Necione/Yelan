@@ -1,4 +1,4 @@
-import { embedComment, get } from "@elara-services/utils";
+import { embedComment, get, noop } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
@@ -33,7 +33,7 @@ export async function handleChest(
         ? `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins} Coins\` and the following items:\n${lootDescription}`
         : `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins} Coins\`.`;
 
-    await i.editReply(embedComment(message, "Green")).catch(() => null);
+    await i.editReply(embedComment(message, "Green")).catch(noop);
 
-    await cooldowns.set(userWallet, "hunt", get.hrs(1));
+    await cooldowns.set(userWallet, "hunt", get.mins(1));
 }

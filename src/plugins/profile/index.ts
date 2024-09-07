@@ -2,6 +2,7 @@ import {
     addButtonRow,
     embedComment,
     getInteractionResponder,
+    noop,
 } from "@elara-services/utils";
 import {
     ActionRowBuilder,
@@ -172,7 +173,7 @@ export async function onInteraction(interaction: RepliableInteraction) {
                     ),
                 );
             }
-            const imageData = await loadImage(url).catch(() => null);
+            const imageData = await loadImage(url).catch(noop);
             if (!imageData) {
                 return responder.edit(
                     embedComment(

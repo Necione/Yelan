@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, log } from "@elara-services/utils";
+import { embedComment, formatNumber, log, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
@@ -44,7 +44,7 @@ export const addStrike = buildCommand<SlashCommand>({
         if (!profile) {
             return i
                 .editReply(embedComment("Unable to find/create user profile."))
-                .catch(() => null);
+                .catch(noop);
         }
 
         const updatedStrikes = (profile.strikes || 0) + 1;
@@ -104,6 +104,6 @@ export const addStrike = buildCommand<SlashCommand>({
                     } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
                 ),
             )
-            .catch(() => null);
+            .catch(noop);
     },
 });

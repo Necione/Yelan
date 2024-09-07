@@ -1,4 +1,4 @@
-import { status } from "@elara-services/utils";
+import { noop, status } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { addBalance } from "./userProfile";
@@ -74,7 +74,7 @@ async function getDailyCommandByUserId(userId: string) {
             },
             update: {},
         })
-        .catch(() => null);
+        .catch(noop);
 }
 
 async function updateDailyCommand(
@@ -88,5 +88,5 @@ async function updateDailyCommand(
             },
             data,
         })
-        .catch(() => null);
+        .catch(noop);
 }

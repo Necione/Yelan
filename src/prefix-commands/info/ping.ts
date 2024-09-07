@@ -1,5 +1,5 @@
 import { type PrefixCommand } from "@elara-services/botbuilder";
-import { comment } from "@elara-services/utils";
+import { comment, noop } from "@elara-services/utils";
 import { Colors } from "discord.js";
 
 export const ping: PrefixCommand = {
@@ -14,6 +14,6 @@ export const ping: PrefixCommand = {
                     comment(`🏓 Pong! \`${Date.now() - d}ms\``, Colors.Aqua),
                 ],
             })
-            .catch(() => null);
+            .catch(noop);
     },
 };
