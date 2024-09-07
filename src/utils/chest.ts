@@ -73,6 +73,7 @@ export function generateChestLoot(worldLevel: number) {
     }[] = [];
 
     let totalItems = 0;
+    let hasLoot = false;
 
     chestLoot.forEach((lootItem) => {
         if (totalItems >= 5) {
@@ -87,18 +88,32 @@ export function generateChestLoot(worldLevel: number) {
                     lootItem.maxAmount,
                 );
 
-                const remainingItems = 4 - totalItems;
-                const finalAmount = Math.min(amount, remainingItems);
+                if (amount > 0) {
+                    const remainingItems = 5 - totalItems;
+                    const finalAmount = Math.min(amount, remainingItems);
 
-                loot.push({
-                    item: lootItem.name,
-                    amount: finalAmount,
-                });
+                    loot.push({
+                        item: lootItem.name,
+                        amount: finalAmount,
+                    });
 
-                totalItems += finalAmount;
+                    totalItems += 1;
+                    hasLoot = true;
+                }
             }
         }
     });
+
+    if (!hasLoot && chestLoot.length > 0) {
+        const fallbackLoot = chestLoot[0];
+        loot.push({
+            item: fallbackLoot.name,
+            amount: getRandomValue(
+                fallbackLoot.minAmount,
+                fallbackLoot.maxAmount,
+            ),
+        });
+    }
 
     const coins = getRandomValue(4, 8) * selectedRarity.multiplier;
 
