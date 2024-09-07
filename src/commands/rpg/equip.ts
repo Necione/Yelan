@@ -60,6 +60,14 @@ export const equip = buildCommand<SlashCommand>({
                 );
             }
 
+            if (stats.equippedWeapon) {
+                return r.edit(
+                    embedComment(
+                        `You already have a weapon equipped (**${stats.equippedWeapon}**). Please </unequip:1280334713193496577> it first.`,
+                    ),
+                );
+            }
+
             const additionalAttackPower = weapons[weaponName].attackPower;
             const additionalCritChance = weapons[weaponName].critChance || 0;
             const additionalCritValue = weapons[weaponName].critValue || 0;
@@ -124,7 +132,16 @@ export const equip = buildCommand<SlashCommand>({
             }
 
             const artifactType = getArtifactType(artifactName);
-            const equippedField = `equipped${artifactType}`;
+            const equippedField =
+                `equipped${artifactType}` as keyof typeof stats;
+
+            if (stats[equippedField]) {
+                return r.edit(
+                    embedComment(
+                        `You already have an artifact of type **${artifactType}** equipped (**${stats[equippedField]}**). Please </unequip:1280334713193496577> it first.`,
+                    ),
+                );
+            }
 
             const additionalAttackPower =
                 artifacts[artifactName].attackPower || 0;
@@ -182,9 +199,9 @@ export const equip = buildCommand<SlashCommand>({
                 updatedStats.push(
                     `🛡️ Def Value: ${formatChange(
                         additionalDefValue,
-                    )}x (Total: ${formatChange(
+                    )} (Total: ${formatChange(
                         stats.defValue + additionalDefValue,
-                    )}x)`,
+                    )})`,
                 );
             }
 
