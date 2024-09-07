@@ -5,7 +5,7 @@ import {
     get,
     getConfirmPrompt,
     is,
-    log,
+    noop,
 } from "@elara-services/utils";
 import { Colors } from "discord.js";
 import { mainServerId, roles } from "../../../../config";
@@ -17,29 +17,25 @@ export const left = buildCommand({
     subCommand: (b) =>
         b.setName(`left`).setDescription(`Resets the left users profiles`),
     locked: { roles: roles.main },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
         }
         const guild = i.client.guilds.resolve(mainServerId); // This is the main server ID, DO NOT CHANGE IT, ANY USERS NOT FOUND IN THIS SERVER WILL REMOVE THEIR PROFILES.
         if (!guild || !guild.available) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to find the main server or it's not available.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `Unable to find the main server or it's not available.`,
+                ),
+            );
         }
         const members = await guild.members.fetch().catch(() => null);
         if (!members || !members.size) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to fetch the members list for: ${guild.name} (${guild.id}) so I can't check the user profiles list.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `Unable to fetch the members list for: ${guild.name} (${guild.id}) so I can't check the user profiles list.`,
+                ),
+            );
         }
         const profiles = await getAllUserProfiles({
             where: {
@@ -49,9 +45,7 @@ export const left = buildCommand({
             },
         });
         if (!is.array(profiles)) {
-            return i
-                .editReply(embedComment(`No one needed to be removed.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`No one needed to be removed.`));
         }
         const co = await getConfirmPrompt(
             i,
@@ -65,14 +59,12 @@ export const left = buildCommand({
             return;
         }
         await co.deferUpdate().catch(() => null);
-        await co
-            .editReply(
-                embedComment(
-                    `Purging the left users profiles, one moment...`,
-                    "Orange",
-                ),
-            )
-            .catch(() => null);
+        await r.edit(
+            embedComment(
+                `Purging the left users profiles, one moment...`,
+                "Orange",
+            ),
+        );
         const list = profiles
             .map(
                 (c) =>
@@ -118,11 +110,9 @@ export const left = buildCommand({
             ],
         });
         if (!backup) {
-            return co
-                .editReply(
-                    embedComment(`Unable to purge the left users profiles`),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`Unable to purge the left users profiles`),
+            );
         }
         await prisma.userWallet
             .deleteMany({
@@ -132,17 +122,15 @@ export const left = buildCommand({
                     },
                 },
             })
-            .catch(() => null);
+            .catch(noop);
 
-        return co
-            .editReply(
-                embedComment(
-                    `✅ Purged (${formatNumber(
-                        profiles.length,
-                    )}) user profiles.\n> Backed up to the \`#Backups\` thread.`,
-                    "Green",
-                ),
-            )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        return r.edit(
+            embedComment(
+                `✅ Purged (${formatNumber(
+                    profiles.length,
+                )}) user profiles.\n> Backed up to the \`#Backups\` thread.`,
+                "Green",
+            ),
+        );
     },
 });

@@ -36,7 +36,11 @@ export const vault = buildCommand<UserContextMenuCommand>({
                         iconURL: i.targetUser.displayAvatarURL(),
                     })
                     .setFooter({ text: `ID: ${i.targetId}` })
-                    .setColor(i.targetMember.displayColor || Colors.Aqua)
+                    .setColor(
+                        i.targetMember
+                            ? i.targetMember.displayColor || Colors.Aqua
+                            : Colors.Aqua,
+                    )
                     .addFields(
                         {
                             name: `Balance`,

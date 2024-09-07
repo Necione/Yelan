@@ -16,6 +16,9 @@ export const downgrade = buildCommand<SlashCommand>({
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
+        if (!i.inCachedGuild() || !i.channel) {
+            return;
+        }
         const stats = await getUserStats(i.user.id);
 
         if (!stats) {
@@ -83,7 +86,7 @@ export const downgrade = buildCommand<SlashCommand>({
             components: [actionRow],
         });
 
-        const confirmation = await i.channel?.awaitMessageComponent({
+        const confirmation = await i.channel.awaitMessageComponent({
             time: 15000,
             componentType: ComponentType.Button,
             filter: (interaction) => interaction.user.id === i.user.id,

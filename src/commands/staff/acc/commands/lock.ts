@@ -24,7 +24,7 @@ export const lock = buildCommand({
                 }),
             ),
     locked: { roles: roles.main },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
         }
@@ -36,15 +36,11 @@ export const lock = buildCommand({
             shouldDM = true;
         }
         if (user.bot) {
-            return i
-                .editReply(embedComment(`Bots don't have a profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Bots don't have a profile.`));
         }
         const p = await getProfileByUserId(user.id);
         if (!p) {
-            return i
-                .editReply(embedComment(`Unable to find their user profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Unable to find their user profile.`));
         }
         const type = p.locked ? false : true;
         if (shouldDM) {
@@ -80,15 +76,13 @@ export const lock = buildCommand({
             }),
             updateUserProfile(user.id, { locked: type }),
         ]);
-        return i
-            .editReply(
-                embedComment(
-                    type
-                        ? `${user.toString()}'s account is now locked.`
-                        : `${user.toString()}'s account is now unlocked.`,
-                    type ? "Red" : "Green",
-                ),
-            )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        return r.edit(
+            embedComment(
+                type
+                    ? `${user.toString()}'s account is now locked.`
+                    : `${user.toString()}'s account is now unlocked.`,
+                type ? "Red" : "Green",
+            ),
+        );
     },
 });

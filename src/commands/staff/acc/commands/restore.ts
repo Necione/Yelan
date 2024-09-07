@@ -28,104 +28,82 @@ export const restore = buildCommand({
                 }),
             ),
     locked: { roles: roles.main },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
         }
         const user = i.options.getUser("user", true);
         const messageURL = i.options.getString("message_url", true);
         if (user.bot) {
-            return i
-                .editReply(embedComment(`Bots don't have a profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Bots don't have a profile.`));
         }
         if (!messageURL.match(/\/channels\//gi)) {
-            return i
-                .editReply(
-                    embedComment(`You didn't provide a valid message link`),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`You didn't provide a valid message link`),
+            );
         }
         const s = messageURL.split(/\/channels\//gi)[1];
         if (!is.string(s)) {
-            return i
-                .editReply(embedComment(`Unable to parse the link`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Unable to parse the link`));
         }
         const [guildId, channelId, messageId] = s.split("/");
         const guild = i.client.guilds.resolve(guildId);
         if (!guild || !guild.available) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to find the server that message belongs to.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `Unable to find the server that message belongs to.`,
+                ),
+            );
         }
         const channel = guild.channels.resolve(channelId);
         if (!channel || !("messages" in channel)) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to find the channel that message belongs to.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `Unable to find the channel that message belongs to.`,
+                ),
+            );
         }
         const message = await channel.messages.fetch(messageId).catch((e) => e);
         if (!(message instanceof Message)) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to fetch the message info: ${message}`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`Unable to fetch the message info: ${message}`),
+            );
         }
         const attachment = message.attachments.find((c) =>
             c.name.endsWith(".json"),
         );
         if (!attachment) {
-            return i
-                .editReply(
-                    embedComment(`Unable to find the file in the channel.`),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`Unable to find the file in the channel.`),
+            );
         }
         const data = await fetch<
             object,
             UserWallet | { users: string[]; profiles: UserWallet[] } | null
         >(attachment.url);
         if (!data) {
-            return i
-                .editReply(embedComment(`Unable to fetch the file's data.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Unable to fetch the file's data.`));
         }
         let obj: Response; // don't judge this, TS is just stupid.
         if ("profiles" in data) {
             const find = data.profiles.find((c) => c.userId === user.id);
             if (!find) {
-                return i
-                    .editReply(
-                        embedComment(
-                            `Unable to find ${user.toString()} user in the 'profiles' array.`,
-                        ),
-                    )
-                    .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+                return r.edit(
+                    embedComment(
+                        `Unable to find ${user.toString()} user in the 'profiles' array.`,
+                    ),
+                );
             }
             obj = find;
         } else {
             obj = new Object(data) as Response;
         }
         if (!obj) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to find any data to restore for that user.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `Unable to find any data to restore for that user.`,
+                ),
+            );
         }
         const col = await getConfirmPrompt(
             i,
@@ -158,13 +136,11 @@ export const restore = buildCommand({
                 ),
             )
             .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
-        return i
-            .editReply(
-                embedComment(
-                    `Restored <@${obj.userId}>'s profile to the file data you provided.`,
-                    "Green",
-                ),
-            )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        return r.edit(
+            embedComment(
+                `Restored <@${obj.userId}>'s profile to the file data you provided.`,
+                "Green",
+            ),
+        );
     },
 });

@@ -32,7 +32,7 @@ export const transfer = buildCommand({
                 }),
             ),
     locked: { roles: roles.main },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
         }
@@ -40,21 +40,15 @@ export const transfer = buildCommand({
         const oldUser = i.options.getUser("old_user", true);
         const user = i.options.getUser("user", true);
         if (oldUser.bot || user.bot) {
-            return i
-                .editReply(
-                    embedComment(
-                        `One of the users you provided is a bot account.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`One of the users you provided is a bot account.`),
+            );
         }
         const op = (await getProfileByUserId(oldUser.id)) as Response;
         if (!op) {
-            return i
-                .editReply(
-                    embedComment(`Unable to find their old account data`),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`Unable to find their old account data`),
+            );
         }
         const leveling = await levels.api.users.get(user.id, mainServerId);
         const col = await getConfirmPrompt(
@@ -100,13 +94,11 @@ export const transfer = buildCommand({
             ],
         });
         if (!msg) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to transfer the user's profile data, notify the developer(s) about this issue.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `Unable to transfer the user's profile data, notify the developer(s) about this issue.`,
+                ),
+            );
         }
         delete op.id;
         op.userId = user.id;
@@ -130,17 +122,15 @@ export const transfer = buildCommand({
             levels.api.users.delete.guild(user.id, i.guildId),
         ]);
 
-        return i
-            .editReply(
-                embedComment(
-                    `I've transferred all data from ${oldUser.toString()} (${
-                        oldUser.id
-                    }) to ${user.toString()} (${
-                        user.id
-                    })\n> Note: The old account profile data is now deleted.`,
-                    "Green",
-                ),
-            )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        return r.edit(
+            embedComment(
+                `I've transferred all data from ${oldUser.toString()} (${
+                    oldUser.id
+                }) to ${user.toString()} (${
+                    user.id
+                })\n> Note: The old account profile data is now deleted.`,
+                "Green",
+            ),
+        );
     },
 });

@@ -95,7 +95,8 @@ export async function onInteraction(interaction: RepliableInteraction) {
                 interaction.message.components[0].components.find(
                     (c) =>
                         c.data.type === ComponentType.Button &&
-                        c.data.label === "Image",
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        (c.data as any).label === "Image",
                     // @ts-ignore
                 )?.data.url || "";
             if (!url) {

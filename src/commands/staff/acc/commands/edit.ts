@@ -9,7 +9,6 @@ import {
     formatNumber,
     get,
     getConfirmPrompt,
-    log,
 } from "@elara-services/utils";
 import type { UserWallet } from "@prisma/client";
 import { Colors, EmbedBuilder } from "discord.js";
@@ -57,7 +56,7 @@ export const edit = buildCommand({
                 }),
             ),
     locked: { roles: roles.main },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
         }
@@ -65,39 +64,27 @@ export const edit = buildCommand({
         const type = i.options.getString("type", true) as ValidTypes;
         const amount = i.options.getInteger("amount", true);
         if (!valid.includes(type)) {
-            return i
-                .editReply(embedComment(`You provided an invalid type.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`You provided an invalid type.`));
         }
         if (user.bot) {
-            return i
-                .editReply(embedComment(`Bots don't have a user profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Bots don't have a user profile.`));
         }
         const p = await getProfileByUserId(user.id);
         if (!p) {
-            return i
-                .editReply(embedComment(`Unable to find the user's profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Unable to find the user's profile.`));
         }
         const data = await getProfileByUserId(user.id);
         if (!data) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to find ${user.toString()}'s profile.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`Unable to find ${user.toString()}'s profile.`),
+            );
         }
         if (data[type] === amount) {
-            return i
-                .editReply(
-                    embedComment(
-                        `${user.toString()}'s (\`${type}\`) is already set to that!`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `${user.toString()}'s (\`${type}\`) is already set to that!`,
+                ),
+            );
         }
 
         const prompt = await getConfirmPrompt(
@@ -135,15 +122,13 @@ export const edit = buildCommand({
             ],
         });
 
-        return prompt
-            .editReply(
-                embedComment(
-                    `✅ I've updated ${user.toString()} (${
-                        user.id
-                    })'s (\`${type}\`) to ${formatNumber(amount)}!`,
-                    "Green",
-                ),
-            )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        return r.edit(
+            embedComment(
+                `✅ I've updated ${user.toString()} (${
+                    user.id
+                })'s (\`${type}\`) to ${formatNumber(amount)}!`,
+                "Green",
+            ),
+        );
     },
 });

@@ -1,10 +1,5 @@
 import { buildCommand, getStr, getUser } from "@elara-services/botbuilder";
-import {
-    embedComment,
-    get,
-    getConfirmPrompt,
-    log,
-} from "@elara-services/utils";
+import { embedComment, get, getConfirmPrompt } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { roles } from "../../../../config";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
@@ -59,27 +54,21 @@ export const reset = buildCommand({
                 }),
             ),
     locked: { roles: roles.main },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
         }
         const user = i.options.getUser("user", true);
         const type = i.options.getString("type", true);
         if (!choices.includes(type)) {
-            return i
-                .editReply(embedComment(`You provided an invalid type.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`You provided an invalid type.`));
         }
         if (user.bot) {
-            return i
-                .editReply(embedComment(`Bots don't have a user profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Bots don't have a user profile.`));
         }
         const p = await getProfileByUserId(user.id);
         if (!p) {
-            return i
-                .editReply(embedComment(`Unable to find the user's profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Unable to find the user's profile.`));
         }
         let str = "";
         let data: Prisma.UserWalletUpdateInput = {};
@@ -116,13 +105,11 @@ export const reset = buildCommand({
             return;
         }
         await updateUserProfile(user.id, data);
-        return i
-            .editReply(
-                embedComment(
-                    `I've reset ${user.toString()}'s (${type}) ${str}`,
-                    "Green",
-                ),
-            )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        return r.edit(
+            embedComment(
+                `I've reset ${user.toString()}'s (${type}) ${str}`,
+                "Green",
+            ),
+        );
     },
 });

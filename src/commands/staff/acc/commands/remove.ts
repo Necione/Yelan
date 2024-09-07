@@ -1,10 +1,5 @@
 import { buildCommand, getUser } from "@elara-services/botbuilder";
-import {
-    embedComment,
-    get,
-    getConfirmPrompt,
-    log,
-} from "@elara-services/utils";
+import { embedComment, get, getConfirmPrompt } from "@elara-services/utils";
 import { prisma } from "../../../../prisma";
 import { getProfileByUserId } from "../../../../services";
 import { logs } from "../../../../utils";
@@ -23,22 +18,18 @@ export const remove = buildCommand({
             "1113509442223345734", // Aqua
         ],
     },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
         }
         const user = i.options.getUser("user", true);
 
         if (user.bot) {
-            return i
-                .editReply(embedComment(`Bots don't have a profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Bots don't have a profile.`));
         }
         const p = await getProfileByUserId(user.id);
         if (!p) {
-            return i
-                .editReply(embedComment(`Unable to find their user profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Unable to find their user profile.`));
         }
         const col = await getConfirmPrompt(
             i,
@@ -60,25 +51,19 @@ export const remove = buildCommand({
             ],
         });
         if (!msg) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to delete ${user.toString()}'s profile.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`Unable to delete ${user.toString()}'s profile.`),
+            );
         }
 
         await prisma.userWallet
             .delete({ where: { userId: user.id } })
             .catch(() => null);
-        return i
-            .editReply(
-                embedComment(
-                    `I've completely removed ${user.toString()}'s profile from the database.`,
-                    `Green`,
-                ),
-            )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        return r.edit(
+            embedComment(
+                `I've completely removed ${user.toString()}'s profile from the database.`,
+                `Green`,
+            ),
+        );
     },
 });

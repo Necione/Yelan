@@ -1,5 +1,5 @@
 import { buildCommand, getInt, getUser } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, is, log } from "@elara-services/utils";
+import { embedComment, formatNumber, is } from "@elara-services/utils";
 import { roles } from "../../../../config";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
 
@@ -17,38 +17,30 @@ export const limit = buildCommand({
                 }),
             ),
     locked: { roles: roles.main },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
         }
         const user = i.options.getUser("user", true);
         const amount = i.options.getInteger("amount", true);
         if (!is.number(amount)) {
-            return i
-                .editReply(embedComment(`You provided an invalid amount.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`You provided an invalid amount.`));
         }
         if (user.bot) {
-            return i
-                .editReply(embedComment(`Bots don't have a profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Bots don't have a profile.`));
         }
         const p = await getProfileByUserId(user.id);
         if (!p) {
-            return i
-                .editReply(embedComment(`Unable to find their user profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Unable to find their user profile.`));
         }
         await updateUserProfile(user.id, { dailyLimit: { set: amount } });
-        return i
-            .editReply(
-                embedComment(
-                    `I've set ${user.toString()}'s daily limit to: ${formatNumber(
-                        amount,
-                    )}`,
-                    "Green",
-                ),
-            )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        return r.edit(
+            embedComment(
+                `I've set ${user.toString()}'s daily limit to: ${formatNumber(
+                    amount,
+                )}`,
+                "Green",
+            ),
+        );
     },
 });

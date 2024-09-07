@@ -3,7 +3,7 @@ import {
     getUser,
     type SubCommand,
 } from "@elara-services/botbuilder";
-import { awaitComponent, embedComment, log } from "@elara-services/utils";
+import { awaitComponent, embedComment, noop } from "@elara-services/utils";
 import {
     ActionRowBuilder,
     StringSelectMenuBuilder,
@@ -20,22 +20,18 @@ export const badges = buildCommand<SubCommand>({
             .setDescription(`Manage the badges for a user`)
             .addUserOption((o) => getUser(o, { required: true })),
     locked: { roles: roles.main },
-    async execute(i) {
+    async execute(i, r) {
         const user = i.options.getUser("user", true);
         if (user.bot) {
-            return i
-                .editReply(embedComment(`Bots don't have a profile.`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`Bots don't have a profile.`));
         }
         const profile = await getProfileByUserId(user.id);
         if (!profile) {
-            return i
-                .editReply(
-                    embedComment(
-                        `I was unable to find their profile, try again later?`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `I was unable to find their profile, try again later?`,
+                ),
+            );
         }
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>();
@@ -55,26 +51,22 @@ export const badges = buildCommand<SubCommand>({
             }
         }
         if (!select.options.length) {
-            return i
-                .editReply(
-                    embedComment(
-                        `There is no more available badges for this user to get.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `There is no more available badges for this user to get.`,
+                ),
+            );
         }
         select.setMaxValues(select.options.length);
         row.addComponents(select);
 
-        const sentMessage = await i
-            .editReply({
-                embeds: embedComment(
-                    `Select the badges you want to assign to the user.`,
-                    "Orange",
-                ).embeds,
-                components: [row],
-            })
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        const sentMessage = await r.edit({
+            embeds: embedComment(
+                `Select the badges you want to assign to the user.`,
+                "Orange",
+            ).embeds,
+            components: [row],
+        });
         if (!sentMessage) {
             return;
         }
@@ -87,9 +79,7 @@ export const badges = buildCommand<SubCommand>({
             },
         );
         if (!int) {
-            return i
-                .editReply(embedComment(`You didn't make a selection in time!`))
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(embedComment(`You didn't make a selection in time!`));
         }
         await int
             .update(
@@ -97,7 +87,7 @@ export const badges = buildCommand<SubCommand>({
                     `One moment, getting the badges and adding them to the user.`,
                 ),
             )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            .catch(noop);
         const results = [];
         for (const value of int.values) {
             const [badgeId, tierId] = value.split("|");
@@ -130,17 +120,11 @@ export const badges = buildCommand<SubCommand>({
             }
         }
         if (!results.length) {
-            return i
-                .editReply(
-                    embedComment(
-                        `The user's badges didn't need to be updated.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`The user's badges didn't need to be updated.`),
+            );
         }
         await updateUserProfile(user.id, { badges: profile.badges });
-        return i
-            .editReply(embedComment(results.join("\n"), "Green"))
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+        return r.edit(embedComment(results.join("\n"), "Green"));
     },
 });
