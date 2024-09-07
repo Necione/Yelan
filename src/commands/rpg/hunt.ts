@@ -58,7 +58,7 @@ export const hunt = buildCommand<SlashCommand>({
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
-                    "You cannot go on a hunt while you are travelling. Please wait until you arrive at your destination.",
+                    "You cannot go on a hunt while you are travelling!",
                 ),
             );
         }
@@ -66,7 +66,7 @@ export const hunt = buildCommand<SlashCommand>({
         if (stats.hp <= 0) {
             locked.del(i.user.id);
             return r.edit(
-                embedComment("You don't have enough HP to go on a hunt."),
+                embedComment("You don't have enough HP to go on a hunt :("),
             );
         }
 

@@ -2,6 +2,7 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, getKeys } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
+import { formatChange } from "../../utils/hunt";
 import {
     artifacts,
     getArtifactType,
@@ -45,6 +46,8 @@ export const equip = buildCommand<SlashCommand>({
             );
         }
 
+        const updatedStats: string[] = [];
+
         if (weapons[itemName as WeaponName]) {
             const weaponName = itemName as WeaponName;
             const weapon = stats.inventory.find((c) => c.item === weaponName);
@@ -60,34 +63,38 @@ export const equip = buildCommand<SlashCommand>({
             const additionalAttackPower = weapons[weaponName].attackPower;
             const additionalCritChance = weapons[weaponName].critChance || 0;
             const additionalCritValue = weapons[weaponName].critValue || 0;
-            const updatedStats: string[] = [];
 
-            const totalAttackPower = stats.baseAttack + additionalAttackPower;
-            if (additionalAttackPower > 0) {
+            if (additionalAttackPower !== 0) {
                 updatedStats.push(
-                    `⚔️ Attack Power: +${additionalAttackPower} (Total: ${totalAttackPower})`,
+                    `⚔️ Attack Power: ${formatChange(
+                        additionalAttackPower,
+                    )} (Total: ${formatChange(
+                        stats.attackPower + additionalAttackPower,
+                    )})`,
                 );
             }
-            if (additionalCritChance > 0) {
+            if (additionalCritChance !== 0) {
                 updatedStats.push(
-                    `🎯 Crit Chance: +${additionalCritChance}% (Total: ${
-                        stats.critChance + additionalCritChance
-                    }%)`,
+                    `🎯 Crit Chance: ${formatChange(
+                        additionalCritChance,
+                    )}% (Total: ${formatChange(
+                        stats.critChance + additionalCritChance,
+                    )}%)`,
                 );
             }
-            if (additionalCritValue > 0) {
+            if (additionalCritValue !== 0) {
                 updatedStats.push(
-                    `💥 Crit Value: +${additionalCritValue.toFixed(
-                        2,
-                    )}x (Total: ${(
-                        stats.critValue + additionalCritValue
-                    ).toFixed(2)}x)`,
+                    `💥 Crit Value: ${formatChange(
+                        additionalCritValue,
+                    )}x (Total: ${formatChange(
+                        stats.critValue + additionalCritValue,
+                    )}x)`,
                 );
             }
 
             await updateUserStats(i.user.id, {
                 equippedWeapon: weaponName,
-                attackPower: totalAttackPower,
+                attackPower: stats.attackPower + additionalAttackPower,
                 critChance: stats.critChance + additionalCritChance,
                 critValue: stats.critValue + additionalCritValue,
             });
@@ -125,36 +132,59 @@ export const equip = buildCommand<SlashCommand>({
                 artifacts[artifactName].critChance || 0;
             const additionalCritValue = artifacts[artifactName].critValue || 0;
             const additionalMaxHP = artifacts[artifactName].maxHP || 0;
-            const updatedStats: string[] = [];
+            const additionalDefChance = artifacts[artifactName].defChance || 0;
+            const additionalDefValue = artifacts[artifactName].defValue || 0;
 
-            if (additionalAttackPower > 0) {
+            if (additionalAttackPower !== 0) {
                 updatedStats.push(
-                    `⚔️ Attack Power: +${additionalAttackPower} (Total: ${
-                        stats.attackPower + additionalAttackPower
-                    })`,
+                    `⚔️ Attack Power: ${formatChange(
+                        additionalAttackPower,
+                    )} (Total: ${formatChange(
+                        stats.attackPower + additionalAttackPower,
+                    )})`,
                 );
             }
-            if (additionalCritChance > 0) {
+            if (additionalCritChance !== 0) {
                 updatedStats.push(
-                    `🎯 Crit Chance: +${additionalCritChance}% (Total: ${
-                        stats.critChance + additionalCritChance
-                    }%)`,
+                    `🎯 Crit Chance: ${formatChange(
+                        additionalCritChance,
+                    )}% (Total: ${formatChange(
+                        stats.critChance + additionalCritChance,
+                    )}%)`,
                 );
             }
-            if (additionalCritValue > 0) {
+            if (additionalCritValue !== 0) {
                 updatedStats.push(
-                    `💥 Crit Value: +${additionalCritValue.toFixed(
-                        2,
-                    )}x (Total: ${(
-                        stats.critValue + additionalCritValue
-                    ).toFixed(2)}x)`,
+                    `💥 Crit Value: ${formatChange(
+                        additionalCritValue,
+                    )}x (Total: ${formatChange(
+                        stats.critValue + additionalCritValue,
+                    )}x)`,
                 );
             }
-            if (additionalMaxHP > 0) {
+            if (additionalMaxHP !== 0) {
                 updatedStats.push(
-                    `❤️ Max HP: +${additionalMaxHP} (Total: ${
-                        stats.maxHP + additionalMaxHP
-                    })`,
+                    `❤️ Max HP: ${formatChange(
+                        additionalMaxHP,
+                    )} (Total: ${formatChange(stats.maxHP + additionalMaxHP)})`,
+                );
+            }
+            if (additionalDefChance !== 0) {
+                updatedStats.push(
+                    `🛡️ Def Chance: ${formatChange(
+                        additionalDefChance,
+                    )}% (Total: ${formatChange(
+                        stats.defChance + additionalDefChance,
+                    )}%)`,
+                );
+            }
+            if (additionalDefValue !== 0) {
+                updatedStats.push(
+                    `🛡️ Def Value: ${formatChange(
+                        additionalDefValue,
+                    )}x (Total: ${formatChange(
+                        stats.defValue + additionalDefValue,
+                    )}x)`,
                 );
             }
 
@@ -164,6 +194,8 @@ export const equip = buildCommand<SlashCommand>({
                 critChance: stats.critChance + additionalCritChance,
                 critValue: stats.critValue + additionalCritValue,
                 maxHP: stats.maxHP + additionalMaxHP,
+                defChance: stats.defChance + additionalDefChance,
+                defValue: stats.defValue + additionalDefValue,
             });
 
             return r.edit(

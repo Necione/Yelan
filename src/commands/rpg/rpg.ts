@@ -4,6 +4,7 @@ import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
 import { cooldowns } from "../../utils";
+import { formatChange } from "../../utils/hunt";
 
 export const rpg = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -56,15 +57,25 @@ export const rpg = buildCommand<SlashCommand>({
                         0,
                     )}\`\n❤️ HP: \`${stats.hp}/${
                         stats.maxHP
-                    }\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)} (+${(
-                        stats.attackPower - stats.baseAttack
-                    ).toFixed(2)})\`${
+                    }\`\n⚔️ ATK: \`${stats.attackPower.toFixed(
+                        2,
+                    )} (${formatChange(
+                        stats.attackPower - stats.baseAttack,
+                    )})\`${
                         stats.critChance > 0 || stats.critValue > 0
                             ? `\n🎯 Crit Chance: \`${
                                   stats.critChance
                               }%\` | 💥 Crit Value: \`${stats.critValue.toFixed(
                                   2,
                               )}x\``
+                            : ""
+                    }${
+                        stats.defChance > 0 || stats.defValue > 0
+                            ? `\n🛡️ DEF Chance: \`${
+                                  stats.defChance
+                              }%\` | 🛡️ DEF Value: \`${stats.defValue.toFixed(
+                                  2,
+                              )}\``
                             : ""
                     }`,
                     inline: false,
@@ -83,9 +94,9 @@ export const rpg = buildCommand<SlashCommand>({
         if (stats.equippedWeapon) {
             embed.addFields({
                 name: "Equipped Weapon",
-                value: `${stats.equippedWeapon} (ATK: ${(
-                    stats.attackPower - stats.baseAttack
-                ).toFixed(2)})`,
+                value: `${stats.equippedWeapon} (ATK: ${formatChange(
+                    stats.attackPower - stats.baseAttack,
+                )})`,
                 inline: false,
             });
         }

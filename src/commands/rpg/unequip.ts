@@ -83,6 +83,8 @@ export const unequip = buildCommand<SlashCommand>({
                         stats.critChance - (artifactStats.critChance || 0),
                     critValue: stats.critValue - (artifactStats.critValue || 0),
                     maxHP: stats.maxHP - (artifactStats.maxHP || 0),
+                    defChance: stats.defChance - (artifactStats.defChance || 0),
+                    defValue: stats.defValue - (artifactStats.defValue || 0),
                 });
 
                 return r.edit(

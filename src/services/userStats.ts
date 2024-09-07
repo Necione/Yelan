@@ -27,6 +27,8 @@ export async function syncStats(userId: string) {
         attackPower: 0,
         critChance: 0,
         critValue: 0,
+        defChance: 0,
+        defValue: 0,
         maxHP: 0,
     };
 
@@ -35,6 +37,8 @@ export async function syncStats(userId: string) {
         additionalArtifactStats.attackPower += flower.attackPower;
         additionalArtifactStats.critChance += flower.critChance;
         additionalArtifactStats.critValue += flower.critValue;
+        additionalArtifactStats.defChance += flower.defChance;
+        additionalArtifactStats.defValue += flower.defValue;
         additionalArtifactStats.maxHP += flower.maxHP;
     }
     if (stats.equippedPlume) {
@@ -42,6 +46,8 @@ export async function syncStats(userId: string) {
         additionalArtifactStats.attackPower += plume.attackPower;
         additionalArtifactStats.critChance += plume.critChance;
         additionalArtifactStats.critValue += plume.critValue;
+        additionalArtifactStats.defChance += plume.defChance;
+        additionalArtifactStats.defValue += plume.defValue;
         additionalArtifactStats.maxHP += plume.maxHP;
     }
     if (stats.equippedSands) {
@@ -49,6 +55,8 @@ export async function syncStats(userId: string) {
         additionalArtifactStats.attackPower += sands.attackPower;
         additionalArtifactStats.critChance += sands.critChance;
         additionalArtifactStats.critValue += sands.critValue;
+        additionalArtifactStats.defChance += sands.defChance;
+        additionalArtifactStats.defValue += sands.defValue;
         additionalArtifactStats.maxHP += sands.maxHP;
     }
     if (stats.equippedGoblet) {
@@ -56,6 +64,8 @@ export async function syncStats(userId: string) {
         additionalArtifactStats.attackPower += goblet.attackPower;
         additionalArtifactStats.critChance += goblet.critChance;
         additionalArtifactStats.critValue += goblet.critValue;
+        additionalArtifactStats.defChance += goblet.defChance;
+        additionalArtifactStats.defValue += goblet.defValue;
         additionalArtifactStats.maxHP += goblet.maxHP;
     }
     if (stats.equippedCirclet) {
@@ -63,6 +73,8 @@ export async function syncStats(userId: string) {
         additionalArtifactStats.attackPower += circlet.attackPower;
         additionalArtifactStats.critChance += circlet.critChance;
         additionalArtifactStats.critValue += circlet.critValue;
+        additionalArtifactStats.defChance += circlet.defChance;
+        additionalArtifactStats.defValue += circlet.defValue;
         additionalArtifactStats.maxHP += circlet.maxHP;
     }
 
@@ -78,6 +90,9 @@ export async function syncStats(userId: string) {
     if (calculatedCritValue < 1) {
         calculatedCritValue = 1 + (calculatedCritValue % 1);
     }
+
+    const calculatedDefChance = additionalArtifactStats.defChance;
+    const calculatedDefValue = additionalArtifactStats.defValue;
 
     const finalMaxHP = calculatedMaxHP + additionalArtifactStats.maxHP;
 
@@ -102,6 +117,14 @@ export async function syncStats(userId: string) {
         stats.critValue = calculatedCritValue;
         needsUpdate = true;
     }
+    if (stats.defChance !== calculatedDefChance) {
+        stats.defChance = calculatedDefChance;
+        needsUpdate = true;
+    }
+    if (stats.defValue !== calculatedDefValue) {
+        stats.defValue = calculatedDefValue;
+        needsUpdate = true;
+    }
 
     if (needsUpdate) {
         return await updateUserStats(userId, {
@@ -110,6 +133,8 @@ export async function syncStats(userId: string) {
             maxHP: { set: finalMaxHP },
             critChance: { set: calculatedCritChance },
             critValue: { set: calculatedCritValue },
+            defChance: { set: calculatedDefChance },
+            defValue: { set: calculatedDefValue },
         });
     }
 

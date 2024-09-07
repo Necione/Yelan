@@ -125,3 +125,10 @@ export function getEncounterDescription(monsterName: string, location: string) {
         Math.floor(Math.random() * encounterDescriptions.length)
     ];
 }
+
+export function formatChange(value: number): string {
+    if (value < 0) {
+        return `-${Math.abs(value).toFixed(2)}`;
+    }
+    return `+${value.toFixed(2)}`;
+}

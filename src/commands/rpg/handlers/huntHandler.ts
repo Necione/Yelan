@@ -27,7 +27,7 @@ export async function handleHunt(
         await i
             .editReply(
                 embedComment(
-                    `This area (${stats.location}) has no monsters to encounter.\nTry to \`/travel\` to another location!`,
+                    `This area (${stats.location}) has no monsters to encounter.\nTry to </travel:1281778318160691301> to another location!`,
                 ),
             )
             .catch(() => null);
@@ -182,20 +182,33 @@ export async function handleHunt(
         await thread.send(
             `>>> \`⚔️\` You dealt \`${attackPower.toFixed(2)}\` damage to the ${
                 monster.name
-            }${isCrit ? " (Critical Hit!)" : ""}.`,
+            }${isCrit ? " 💢 (Critical Hit!)" : ""}.`,
         );
 
-        const monsterDamage = getRandomValue(
+        let monsterDamage = getRandomValue(
             monster.minDamage,
             monster.maxDamage,
         );
+
+        const defChance = stats.defChance || 0;
+        const defValue = stats.defValue || 0;
+
+        const defended = Math.random() * 100 < defChance;
+        if (defended) {
+            monsterDamage = Math.max(monsterDamage - defValue, 0);
+        }
+
         currentPlayerHp -= monsterDamage;
         if (currentPlayerHp < 0) {
             currentPlayerHp = 0;
         }
 
         await thread.send(
-            `>>> \`⚔️\` The ${monster.name} dealt \`${monsterDamage}\` damage to you.`,
+            `>>> \`⚔️\` The ${
+                monster.name
+            } dealt \`${monsterDamage}\` damage to you${
+                defended ? ` 🛡️ (Defended: -${defValue})` : ""
+            }.`,
         );
 
         battleEmbed.setFields(

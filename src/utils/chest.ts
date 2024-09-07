@@ -103,6 +103,41 @@ const chestLoot: LootItem[] = [
         minWorldLevel: 2,
         dropChance: 10,
     },
+    {
+        name: "Travelling Doctor's Silver Lotus",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 3,
+        dropChance: 10,
+    },
+    {
+        name: "Travelling Doctor's Owl Feather",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 3,
+        dropChance: 10,
+    },
+    {
+        name: "Travelling Doctor's Pocket Watch",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 3,
+        dropChance: 10,
+    },
+    {
+        name: "Travelling Doctor's Medicine Pot",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 3,
+        dropChance: 10,
+    },
+    {
+        name: "Travelling Doctor's Handkerchief",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 3,
+        dropChance: 10,
+    },
 ];
 
 function selectChestRarity(): ChestRarity {

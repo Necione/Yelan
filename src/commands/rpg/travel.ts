@@ -137,7 +137,7 @@ export const travel = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You have arrived at ${emoji} **${selectedLocation}**. Welcome and enjoy your stay!`,
+                `You have arrived at ${emoji} **${selectedLocation}**!\n-# Maybe try using </hunt:1279824112566665296> now?`,
             ),
         );
     },
