@@ -3,7 +3,7 @@ import { embedComment, getKeys } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
-import { ArtifactName, artifacts } from "../../utils/rpgitems/artifacts";
+import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/items";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
