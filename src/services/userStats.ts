@@ -1,6 +1,7 @@
 import { is, log } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
+import { artifacts, type ArtifactName } from "../utils/rpgitems/artifacts";
 import { weapons, type WeaponName } from "../utils/rpgitems/weapons";
 
 export async function syncStats(userId: string) {
@@ -9,17 +10,77 @@ export async function syncStats(userId: string) {
         return null;
     }
 
-    // Calculate the correct baseAttack and maxHP based on the user's world level
     const calculatedBaseAttack = 5 + (stats.worldLevel - 1) * 0.5;
     const calculatedMaxHP = 100 + (stats.worldLevel - 1) * 5;
 
-    // Calculate the correct attackPower based on baseAttack and equipped weapon
-    const additionalAttackPower = stats.equippedWeapon
+    const additionalWeaponAttackPower = stats.equippedWeapon
         ? weapons[stats.equippedWeapon as WeaponName]?.attackPower || 0
         : 0;
-    const calculatedAttackPower = calculatedBaseAttack + additionalAttackPower;
+    const additionalWeaponCritChance = stats.equippedWeapon
+        ? weapons[stats.equippedWeapon as WeaponName]?.critChance || 0
+        : 0;
+    const additionalWeaponCritValue = stats.equippedWeapon
+        ? weapons[stats.equippedWeapon as WeaponName]?.critValue || 0
+        : 0;
 
-    // Check if baseAttack, attackPower, or maxHP need updating
+    const additionalArtifactStats = {
+        attackPower: 0,
+        critChance: 0,
+        critValue: 0,
+        maxHP: 0,
+    };
+
+    if (stats.equippedFlower) {
+        const flower = artifacts[stats.equippedFlower as ArtifactName];
+        additionalArtifactStats.attackPower += flower.attackPower;
+        additionalArtifactStats.critChance += flower.critChance;
+        additionalArtifactStats.critValue += flower.critValue;
+        additionalArtifactStats.maxHP += flower.maxHP;
+    }
+    if (stats.equippedPlume) {
+        const plume = artifacts[stats.equippedPlume as ArtifactName];
+        additionalArtifactStats.attackPower += plume.attackPower;
+        additionalArtifactStats.critChance += plume.critChance;
+        additionalArtifactStats.critValue += plume.critValue;
+        additionalArtifactStats.maxHP += plume.maxHP;
+    }
+    if (stats.equippedSands) {
+        const sands = artifacts[stats.equippedSands as ArtifactName];
+        additionalArtifactStats.attackPower += sands.attackPower;
+        additionalArtifactStats.critChance += sands.critChance;
+        additionalArtifactStats.critValue += sands.critValue;
+        additionalArtifactStats.maxHP += sands.maxHP;
+    }
+    if (stats.equippedGoblet) {
+        const goblet = artifacts[stats.equippedGoblet as ArtifactName];
+        additionalArtifactStats.attackPower += goblet.attackPower;
+        additionalArtifactStats.critChance += goblet.critChance;
+        additionalArtifactStats.critValue += goblet.critValue;
+        additionalArtifactStats.maxHP += goblet.maxHP;
+    }
+    if (stats.equippedCirclet) {
+        const circlet = artifacts[stats.equippedCirclet as ArtifactName];
+        additionalArtifactStats.attackPower += circlet.attackPower;
+        additionalArtifactStats.critChance += circlet.critChance;
+        additionalArtifactStats.critValue += circlet.critValue;
+        additionalArtifactStats.maxHP += circlet.maxHP;
+    }
+
+    const calculatedAttackPower =
+        calculatedBaseAttack +
+        additionalWeaponAttackPower +
+        additionalArtifactStats.attackPower;
+    const calculatedCritChance =
+        additionalWeaponCritChance + additionalArtifactStats.critChance;
+
+    let calculatedCritValue =
+        additionalWeaponCritValue + additionalArtifactStats.critValue;
+    if (calculatedCritValue < 1) {
+        calculatedCritValue = 1 + (calculatedCritValue % 1);
+    }
+
+    const finalMaxHP = calculatedMaxHP + additionalArtifactStats.maxHP;
+
     let needsUpdate = false;
     if (stats.baseAttack !== calculatedBaseAttack) {
         stats.baseAttack = calculatedBaseAttack;
@@ -29,17 +90,26 @@ export async function syncStats(userId: string) {
         stats.attackPower = calculatedAttackPower;
         needsUpdate = true;
     }
-    if (stats.maxHP !== calculatedMaxHP) {
-        stats.maxHP = calculatedMaxHP;
+    if (stats.maxHP !== finalMaxHP) {
+        stats.maxHP = finalMaxHP;
+        needsUpdate = true;
+    }
+    if (stats.critChance !== calculatedCritChance) {
+        stats.critChance = calculatedCritChance;
+        needsUpdate = true;
+    }
+    if (stats.critValue !== calculatedCritValue) {
+        stats.critValue = calculatedCritValue;
         needsUpdate = true;
     }
 
-    // The actual syncing part owo
     if (needsUpdate) {
         return await updateUserStats(userId, {
             baseAttack: { set: calculatedBaseAttack },
             attackPower: { set: calculatedAttackPower },
-            maxHP: { set: calculatedMaxHP },
+            maxHP: { set: finalMaxHP },
+            critChance: { set: calculatedCritChance },
+            critValue: { set: calculatedCritValue },
         });
     }
 

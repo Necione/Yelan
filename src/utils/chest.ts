@@ -1,9 +1,10 @@
 import { getRandomValue } from "./hunt";
+import { type ArtifactName } from "./rpgitems/artifacts";
 import { type DropName } from "./rpgitems/items";
 import { type WeaponName } from "./rpgitems/weapons";
 
 type LootItem = {
-    name: DropName | WeaponName;
+    name: DropName | WeaponName | ArtifactName;
     minAmount: number;
     maxAmount: number;
     minWorldLevel: number;
@@ -67,6 +68,41 @@ const chestLoot: LootItem[] = [
         minWorldLevel: 4,
         dropChance: 10,
     },
+    {
+        name: "Adventurer's Flower",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 2,
+        dropChance: 15,
+    },
+    {
+        name: "Adventurer's Tail Feather",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 2,
+        dropChance: 15,
+    },
+    {
+        name: "Adventurer's Pocket Watch",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 2,
+        dropChance: 15,
+    },
+    {
+        name: "Adventurer's Golden Goblet",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 2,
+        dropChance: 10,
+    },
+    {
+        name: "Adventurer's Bandana",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 2,
+        dropChance: 10,
+    },
 ];
 
 function selectChestRarity(): ChestRarity {
@@ -87,7 +123,10 @@ function selectChestRarity(): ChestRarity {
 
 export function generateChestLoot(worldLevel: number) {
     const selectedRarity = selectChestRarity();
-    const loot: { item: DropName | WeaponName; amount: number }[] = [];
+    const loot: {
+        item: DropName | WeaponName | ArtifactName;
+        amount: number;
+    }[] = [];
 
     chestLoot.forEach((lootItem) => {
         if (worldLevel >= lootItem.minWorldLevel) {

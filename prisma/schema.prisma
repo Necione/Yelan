@@ -192,7 +192,12 @@ model UserStats {
   exp            Int            @default(0)
   worldLevel     Int            @default(1)
   equippedWeapon String?
-  location       String         @default("Liyue")
+  equippedFlower String?
+  equippedPlume  String?
+  equippedSands  String?
+  equippedGoblet String?
+  equippedCirclet String?
+  location       String         @default("Liyue Harbor")
   isTravelling   Boolean        @default(false)
 }
 

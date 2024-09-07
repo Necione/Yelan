@@ -90,6 +90,32 @@ export const rpg = buildCommand<SlashCommand>({
             });
         }
 
+        const equippedArtifacts: string[] = [];
+
+        if (stats.equippedFlower) {
+            equippedArtifacts.push(`🌸 Flower: **${stats.equippedFlower}**`);
+        }
+        if (stats.equippedPlume) {
+            equippedArtifacts.push(`🪶 Plume: **${stats.equippedPlume}**`);
+        }
+        if (stats.equippedSands) {
+            equippedArtifacts.push(`⏳ Sands: **${stats.equippedSands}**`);
+        }
+        if (stats.equippedGoblet) {
+            equippedArtifacts.push(`🍷 Goblet: **${stats.equippedGoblet}**`);
+        }
+        if (stats.equippedCirclet) {
+            equippedArtifacts.push(`👑 Circlet: **${stats.equippedCirclet}**`);
+        }
+
+        if (equippedArtifacts.length > 0) {
+            embed.addFields({
+                name: "Equipped Artifacts",
+                value: equippedArtifacts.join("\n"),
+                inline: false,
+            });
+        }
+
         await r.edit({ embeds: [embed] });
     },
 });

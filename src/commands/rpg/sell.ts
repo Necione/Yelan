@@ -3,10 +3,11 @@ import { embedComment, getKeys } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
+import { ArtifactName, artifacts } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/items";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
-type SellableItemName = DropName | WeaponName;
+type SellableItemName = DropName | WeaponName | ArtifactName;
 
 export const sell = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -41,7 +42,9 @@ export const sell = buildCommand<SlashCommand>({
         const amountToSell = i.options.getInteger("amount", true);
 
         const itemData =
-            drops[itemName as DropName] || weapons[itemName as WeaponName];
+            drops[itemName as DropName] ||
+            weapons[itemName as WeaponName] ||
+            artifacts[itemName as ArtifactName];
 
         if (!itemData) {
             return r.edit(
@@ -61,6 +64,21 @@ export const sell = buildCommand<SlashCommand>({
         if (
             weapons[itemName as WeaponName] &&
             stats.equippedWeapon === itemName
+        ) {
+            return r.edit(
+                embedComment(
+                    `You cannot sell "${itemName}" because it is currently equipped!`,
+                ),
+            );
+        }
+
+        if (
+            artifacts[itemName as ArtifactName] &&
+            (stats.equippedFlower === itemName ||
+                stats.equippedPlume === itemName ||
+                stats.equippedSands === itemName ||
+                stats.equippedGoblet === itemName ||
+                stats.equippedCirclet === itemName)
         ) {
             return r.edit(
                 embedComment(

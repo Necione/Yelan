@@ -1,16 +1,42 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, getKeys } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
+import {
+    artifacts,
+    getArtifactType,
+    type ArtifactName,
+} from "../../utils/rpgitems/artifacts";
+import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 export const unequip = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("unequip")
-        .setDescription("[RPG] Unequip your currently equipped weapon.")
-        .setDMPermission(false),
+        .setDescription(
+            "[RPG] Unequip your currently equipped weapon or artifact.",
+        )
+        .setDMPermission(false)
+        .addStringOption((option) =>
+            option
+                .setName("item")
+                .setDescription("The weapon or artifact to unequip")
+                .setRequired(true)
+                .addChoices(
+                    ...getKeys(weapons).map((c) => ({
+                        name: c,
+                        value: c,
+                    })),
+                    ...getKeys(artifacts).map((c) => ({
+                        name: c,
+                        value: c,
+                    })),
+                ),
+        ),
     defer: { silent: false },
     async execute(i, r) {
+        const itemName = i.options.getString("item", true);
         const stats = await getUserStats(i.user.id);
+
         if (!stats) {
             return r.edit(
                 embedComment(
@@ -19,21 +45,63 @@ export const unequip = buildCommand<SlashCommand>({
             );
         }
 
-        if (!stats.equippedWeapon) {
-            return r.edit(embedComment(`You don't have any weapon equipped.`));
+        if (itemName === stats.equippedWeapon) {
+            const unequippedWeaponStats =
+                weapons[stats.equippedWeapon as WeaponName];
+
+            await updateUserStats(i.user.id, {
+                equippedWeapon: { set: null },
+                attackPower:
+                    stats.attackPower - unequippedWeaponStats.attackPower,
+                critChance:
+                    stats.critChance - (unequippedWeaponStats.critChance || 0),
+                critValue:
+                    stats.critValue - (unequippedWeaponStats.critValue || 0),
+            });
+
+            return r.edit(
+                embedComment(
+                    `You have unequipped your weapon: **${stats.equippedWeapon}**.`,
+                    "Green",
+                ),
+            );
         }
 
-        const baseAttackPower = stats.baseAttack;
+        const artifactType = getArtifactType(itemName as ArtifactName);
 
-        await updateUserStats(i.user.id, {
-            equippedWeapon: { set: null },
-            attackPower: { set: baseAttackPower },
-            critChance: { set: 0 },
-            critValue: { set: 0 },
-        });
+        if (artifactType) {
+            const equippedField =
+                `equipped${artifactType}` as keyof typeof stats;
+
+            if (stats[equippedField]) {
+                const artifactStats = artifacts[itemName as ArtifactName];
+
+                await updateUserStats(i.user.id, {
+                    [equippedField]: { set: null },
+                    attackPower: stats.attackPower - artifactStats.attackPower,
+                    critChance:
+                        stats.critChance - (artifactStats.critChance || 0),
+                    critValue: stats.critValue - (artifactStats.critValue || 0),
+                    maxHP: stats.maxHP - (artifactStats.maxHP || 0),
+                });
+
+                return r.edit(
+                    embedComment(
+                        `You have unequipped your artifact: **${itemName}**.`,
+                        "Green",
+                    ),
+                );
+            } else {
+                return r.edit(
+                    embedComment(
+                        `You don't have the artifact "${itemName}" equipped.`,
+                    ),
+                );
+            }
+        }
 
         return r.edit(
-            embedComment(`You have unequipped your weapon.`, "Green"),
+            embedComment(`The item "${itemName}" is not currently equipped.`),
         );
     },
 });

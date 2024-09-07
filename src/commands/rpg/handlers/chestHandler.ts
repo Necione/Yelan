@@ -20,20 +20,20 @@ export async function handleChest(
         `Found a ${rarity} Treasure Chest`,
     );
 
-    await addItemToInventory(i.user.id, loot);
+    if (loot.length > 0) {
+        await addItemToInventory(i.user.id, loot);
+    }
 
-    const lootDescription = loot
-        .map((item) => `\`${item.amount}x\` ${item.item}`)
-        .join(", ");
+    const lootDescription =
+        loot.length > 0
+            ? loot.map((item) => `\`${item.amount}x\` ${item.item}`).join(", ")
+            : "";
 
-    await i
-        .editReply(
-            embedComment(
-                `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins} Coins\` and the following items:\n${lootDescription}`,
-                "Green",
-            ),
-        )
-        .catch(() => null);
+    const message = lootDescription
+        ? `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins} Coins\` and the following items:\n${lootDescription}`
+        : `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins} Coins\`.`;
+
+    await i.editReply(embedComment(message, "Green")).catch(() => null);
 
     await cooldowns.set(userWallet, "hunt", get.hrs(1));
 }
