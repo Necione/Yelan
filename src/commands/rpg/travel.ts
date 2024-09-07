@@ -33,7 +33,26 @@ const locations: Record<LocationName, LocationXY> = {
     "Jueyun Karst": { x: 7, y: 13 },
 };
 
-function calculateDistance(start: LocationXY, end: LocationXY) {
+const locationEmojis: Record<LocationName, string> = {
+    "Liyue Harbor": "⛵",
+    "Qingxu Pool": "🏞️",
+    "Lingju Pass": "🌉",
+    "Lumberpick Valley": "🌲",
+    "Dunyu Ruins": "🏛️",
+    Nantianmen: "⛩️",
+    "Tianqiu Valley": "⛰️",
+    "Luhua Pool": "🏖️",
+    "Guili Plains": "🏞️",
+    "Jueyun Karst": "🗻",
+};
+
+function calculateDistance(
+    start: LocationXY | undefined,
+    end: LocationXY | undefined,
+) {
+    if (!start || !end) {
+        throw new Error("Invalid locations provided for distance calculation.");
+    }
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     return Math.sqrt(dx * dx + dy * dy);
@@ -76,6 +95,12 @@ export const travel = buildCommand<SlashCommand>({
             );
         }
 
+        let currentLocation = stats.location as LocationName;
+        if (!locations[currentLocation]) {
+            currentLocation = "Liyue Harbor";
+            await updateUserStats(i.user.id, { location: currentLocation });
+        }
+
         const selectedLocation = i.options.getString(
             "location",
             true,
@@ -85,7 +110,7 @@ export const travel = buildCommand<SlashCommand>({
             return r.edit(embedComment("Invalid location selected."));
         }
 
-        const startCoords = locations[stats.location as LocationName];
+        const startCoords = locations[currentLocation];
         const endCoords = locations[selectedLocation];
 
         const distance = calculateDistance(startCoords, endCoords);
@@ -93,9 +118,11 @@ export const travel = buildCommand<SlashCommand>({
 
         await updateUserStats(i.user.id, { isTravelling: true });
 
+        const emoji = locationEmojis[selectedLocation];
+
         await r.edit(
             embedComment(
-                `You are travelling to ${selectedLocation}, which will take approximately ${Math.round(
+                `You are travelling to ${emoji} **${selectedLocation}**, which will take approximately ${Math.round(
                     travelTime,
                 )} seconds.`,
             ),
@@ -110,7 +137,7 @@ export const travel = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You have arrived at ${selectedLocation}. Welcome and enjoy your stay!`,
+                `You have arrived at ${emoji} **${selectedLocation}**. Welcome and enjoy your stay!`,
             ),
         );
     },
