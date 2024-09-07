@@ -31,6 +31,11 @@ export async function handleHunt(
                 ),
             )
             .catch(noop);
+
+        await updateUserStats(i.user.id, {
+            isHunting: false,
+        });
+
         return;
     }
 
