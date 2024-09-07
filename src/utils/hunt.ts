@@ -20,7 +20,7 @@ interface Monster {
     locations: string[];
 }
 
-let monsters: Monster[] = [];
+const monsters: Monster[] = [];
 let monstersLoaded = false;
 
 async function loadMonsters(dir: string): Promise<void> {
@@ -105,10 +105,9 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         return Array(weight).fill(monster);
     });
 
-    const selectedMonster =
-        weightedMonsters[Math.floor(Math.random() * weightedMonsters.length)];
-
-    return selectedMonster;
+    return weightedMonsters[
+        Math.floor(Math.random() * weightedMonsters.length)
+    ];
 }
 
 export function getEncounterDescription(monsterName: string, location: string) {
