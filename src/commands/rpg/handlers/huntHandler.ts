@@ -252,6 +252,24 @@ export async function handleHunt(
                     `>>> \`🔥\` The Large Pyro Slime inflicted \`${burnDamage}\` burn damage to you, bypassing defense!`,
                 )
                 .catch(noop);
+        } else if (monster.name === "Pyro Slime") {
+            const burnDamage = 2;
+            currentPlayerHp -= burnDamage;
+            await thread
+                .send(
+                    `>>> \`🔥\` The Pyro Slime inflicted \`${burnDamage}\` burn damage to you, bypassing defense!`,
+                )
+                .catch(noop);
+        }
+
+        if (monster.name.includes("Cryo") && Math.random() < 0.25) {
+            const crippleDamage = 3;
+            currentPlayerHp -= crippleDamage;
+            await thread
+                .send(
+                    `>>> \`❄️\` The ${monster.name} inflicted \`${crippleDamage}\` Cripple damage to you, bypassing defense!`,
+                )
+                .catch(noop);
         }
 
         currentPlayerHp -= monsterDamage;
