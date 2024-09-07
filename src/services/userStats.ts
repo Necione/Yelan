@@ -56,6 +56,8 @@ export const getUserStats = async (userId: string) => {
                 maxHP: 100,
                 attackPower: 5,
                 baseAttack: 5,
+                critChance: 0,
+                critValue: 0,
                 inventory: [],
                 exp: 0,
                 worldLevel: 1,

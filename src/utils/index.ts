@@ -49,6 +49,7 @@ export function displayTradeInAction(user: User) {
         ephemeral: true,
     };
 }
+
 export function isInActiveTrade(interaction: ChatInputCommandInteraction) {
     const r = getInteractionResponder(interaction);
     if (!interaction.user) {
@@ -354,6 +355,7 @@ export function getRandomImage() {
         Math.random() * 6,
     )}.png`;
 }
+
 export function percentage(num: number, total: number) {
     return (100 * num) / total;
 }

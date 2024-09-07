@@ -28,13 +28,12 @@ export const unequip = buildCommand<SlashCommand>({
         await updateUserStats(i.user.id, {
             equippedWeapon: { set: null },
             attackPower: { set: baseAttackPower },
+            critChance: { set: 0 },
+            critValue: { set: 0 },
         });
 
         return r.edit(
-            embedComment(
-                `You have unequipped your weapon. Your attack power is now back to ${baseAttackPower}.`,
-                "Green",
-            ),
+            embedComment(`You have unequipped your weapon.`, "Green"),
         );
     },
 });
