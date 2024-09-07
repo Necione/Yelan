@@ -1,328 +1,61 @@
-export const monsters = [
-    {
-        name: "Hilichurl",
-        minHp: 20,
-        maxHp: 25,
-        minDamage: 2,
-        maxDamage: 3,
-        minExp: 5,
-        maxExp: 10,
-        minWorldLevel: 1,
-        image: "https://lh.elara.workers.dev/rpg/monsters/hilichurl.png",
-        drops: [
-            { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 100 },
-            { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 50 },
-        ],
-        locations: ["Qingxu Pool", "Lingju Pass", "Tianqiu Valley"],
-    },
-    {
-        name: "Anemo Slime",
-        minHp: 10,
-        maxHp: 15,
-        minDamage: 2,
-        maxDamage: 3,
-        minExp: 3,
-        maxExp: 6,
-        minWorldLevel: 1,
-        image: "https://lh.elara.workers.dev/rpg/monsters/anemo_slime.png",
-        drops: [
-            {
-                item: "Slime Condensate",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 100,
-            },
-            {
-                item: "Slime Secretions",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 50,
-            },
-        ],
-        locations: [
-            "Qingxu Pool",
-            "Lingju Pass",
-            "Lumberpick Valley",
-            "Dunyu Ruins",
-            "Nantianmen",
-            "Tianqiu Valley",
-            "Luhua Pool",
-            "Guili Plains",
-            "Jueyun Karst",
-        ],
-    },
-    {
-        name: "Cryo Slime",
-        minHp: 12,
-        maxHp: 18,
-        minDamage: 2,
-        maxDamage: 4,
-        minExp: 3,
-        maxExp: 6,
-        minWorldLevel: 1,
-        image: "https://lh.elara.workers.dev/rpg/monsters/cryo_slime.png",
-        drops: [
-            {
-                item: "Slime Condensate",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 100,
-            },
-            {
-                item: "Slime Secretions",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 50,
-            },
-        ],
-        locations: [
-            "Qingxu Pool",
-            "Lingju Pass",
-            "Lumberpick Valley",
-            "Dunyu Ruins",
-            "Nantianmen",
-            "Tianqiu Valley",
-            "Luhua Pool",
-            "Guili Plains",
-            "Jueyun Karst",
-        ],
-    },
-    {
-        name: "Pyro Slime",
-        minHp: 14,
-        maxHp: 20,
-        minDamage: 3,
-        maxDamage: 5,
-        minExp: 3,
-        maxExp: 6,
-        minWorldLevel: 1,
-        image: "https://lh.elara.workers.dev/rpg/monsters/pyro_slime.png",
-        drops: [
-            {
-                item: "Slime Condensate",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 100,
-            },
-            {
-                item: "Slime Secretions",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 50,
-            },
-        ],
-        locations: [
-            "Qingxu Pool",
-            "Lingju Pass",
-            "Lumberpick Valley",
-            "Dunyu Ruins",
-            "Nantianmen",
-            "Tianqiu Valley",
-            "Luhua Pool",
-            "Guili Plains",
-            "Jueyun Karst",
-        ],
-    },
-    {
-        name: "Electro Slime",
-        minHp: 15,
-        maxHp: 22,
-        minDamage: 3,
-        maxDamage: 4,
-        minExp: 3,
-        maxExp: 6,
-        minWorldLevel: 1,
-        image: "https://lh.elara.workers.dev/rpg/monsters/electro_slime.png",
-        drops: [
-            {
-                item: "Slime Condensate",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 100,
-            },
-            {
-                item: "Slime Secretions",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 50,
-            },
-        ],
-        locations: [
-            "Qingxu Pool",
-            "Lingju Pass",
-            "Lumberpick Valley",
-            "Dunyu Ruins",
-            "Nantianmen",
-            "Tianqiu Valley",
-            "Luhua Pool",
-            "Guili Plains",
-            "Jueyun Karst",
-        ],
-    },
-    {
-        name: "Electro Hilichurl Shooter",
-        minHp: 20,
-        maxHp: 25,
-        minDamage: 4,
-        maxDamage: 7,
-        minExp: 4,
-        maxExp: 7,
-        minWorldLevel: 2,
-        image: "https://lh.elara.workers.dev/rpg/monsters/electro_hilichurl_shooter.png",
-        drops: [
-            {
-                item: "Firm Arrowhead",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 100,
-            },
-            {
-                item: "Sharp Arrowhead",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 50,
-            },
-        ],
-        locations: ["Tianqiu Valley", "Lumberpick Valley", "Dunyu Ruins"],
-    },
-    {
-        name: "Pyro Hilichurl Berserker",
-        minHp: 20,
-        maxHp: 25,
-        minDamage: 4,
-        maxDamage: 7,
-        minExp: 4,
-        maxExp: 7,
-        minWorldLevel: 2,
-        image: "https://lh.elara.workers.dev/rpg/monsters/pyro_hilichurl_berserker.png",
-        drops: [
-            { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 100 },
-            { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 75 },
-            { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 25 },
-        ],
-        locations: ["Lingju Pass", "Jueyun Karst", "Luhua Pool"],
-    },
-    {
-        name: "Mitachurl",
-        minHp: 30,
-        maxHp: 50,
-        minDamage: 6,
-        maxDamage: 10,
-        minExp: 4,
-        maxExp: 7,
-        minWorldLevel: 3,
-        image: "https://lh.elara.workers.dev/rpg/monsters/mitachurl.png",
-        drops: [
-            { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 100 },
-            { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 50 },
-        ],
-        locations: ["Dunyu Ruins", "Luhua Pool", "Guili Plains"],
-    },
-    {
-        name: "Anemo Samachurl",
-        minHp: 22,
-        maxHp: 45,
-        minDamage: 7,
-        maxDamage: 11,
-        minExp: 5,
-        maxExp: 8,
-        minWorldLevel: 3,
-        image: "https://lh.elara.workers.dev/rpg/monsters/anemo_samachurl.png",
-        drops: [
-            { item: "Divining Scroll", minAmount: 1, maxAmount: 3, chance: 85 },
-            { item: "Sealed Scroll", minAmount: 1, maxAmount: 2, chance: 35 },
-        ],
-        locations: ["Lumberpick Valley", "Nantianmen", "Jueyun Karst"],
-    },
-    {
-        name: "Cryo Samachurl",
-        minHp: 28,
-        maxHp: 48,
-        minDamage: 5,
-        maxDamage: 9,
-        minExp: 3,
-        maxExp: 6,
-        minWorldLevel: 3,
-        image: "https://lh.elara.workers.dev/rpg/monsters/cryo_samachurl.png",
-        drops: [
-            { item: "Divining Scroll", minAmount: 1, maxAmount: 2, chance: 80 },
-            { item: "Sealed Scroll", minAmount: 1, maxAmount: 1, chance: 45 },
-        ],
-        locations: ["Tianqiu Valley", "Jueyun Karst", "Guili Plains"],
-    },
-    {
-        name: "Dendro Slime",
-        minHp: 45,
-        maxHp: 60,
-        minDamage: 8,
-        maxDamage: 12,
-        minExp: 7,
-        maxExp: 10,
-        minWorldLevel: 4,
-        image: "https://lh.elara.workers.dev/rpg/monsters/dendro_slime.png",
-        drops: [
-            {
-                item: "Slime Secretions",
-                minAmount: 1,
-                maxAmount: 3,
-                chance: 100,
-            },
-            {
-                item: "Slime Concentrate",
-                minAmount: 1,
-                maxAmount: 2,
-                chance: 75,
-            },
-        ],
-        locations: [
-            "Qingxu Pool",
-            "Lingju Pass",
-            "Lumberpick Valley",
-            "Dunyu Ruins",
-            "Nantianmen",
-            "Tianqiu Valley",
-            "Luhua Pool",
-            "Guili Plains",
-            "Jueyun Karst",
-        ],
-    },
-    {
-        name: "Large Cryo Slime",
-        minHp: 50,
-        maxHp: 65,
-        minDamage: 9,
-        maxDamage: 13,
-        minExp: 8,
-        maxExp: 12,
-        minWorldLevel: 4,
-        image: "https://lh.elara.workers.dev/rpg/monsters/large_cryo_slime.png",
-        drops: [
-            {
-                item: "Slime Secretions",
-                minAmount: 2,
-                maxAmount: 4,
-                chance: 100,
-            },
-            {
-                item: "Slime Concentrate",
-                minAmount: 1,
-                maxAmount: 1,
-                chance: 50,
-            },
-        ],
-        locations: [
-            "Qingxu Pool",
-            "Lingju Pass",
-            "Lumberpick Valley",
-            "Dunyu Ruins",
-            "Nantianmen",
-            "Tianqiu Valley",
-            "Luhua Pool",
-            "Guili Plains",
-            "Jueyun Karst",
-        ],
-    },
-];
+import * as fs from "fs";
+import * as path from "path";
+
+interface Monster {
+    name: string;
+    minHp: number;
+    maxHp: number;
+    minDamage: number;
+    maxDamage: number;
+    minExp: number;
+    maxExp: number;
+    minWorldLevel: number;
+    image: string;
+    drops: {
+        item: string;
+        minAmount: number;
+        maxAmount: number;
+        chance: number;
+    }[];
+    locations: string[];
+}
+
+let monsters: Monster[] = [];
+let monstersLoaded = false;
+
+async function loadMonsters(dir: string): Promise<void> {
+    const files = fs.readdirSync(dir);
+
+    for (const file of files) {
+        const fullPath = path.join(dir, file);
+
+        if (fs.statSync(fullPath).isDirectory()) {
+            await loadMonsters(fullPath);
+        } else if (file.endsWith(".ts") || file.endsWith(".js")) {
+            try {
+                const monsterModule = await import(fullPath);
+                const monster = monsterModule.default as Monster;
+                if (monster) {
+                    monsters.push(monster);
+                }
+            } catch (error) {
+                console.error(
+                    `Error loading monster from file: ${fullPath}`,
+                    error,
+                );
+            }
+        }
+    }
+}
+
+const monstersDir = path.resolve(__dirname, "./monsters");
+
+export async function initializeMonsters(): Promise<void> {
+    await loadMonsters(monstersDir);
+    monstersLoaded = true;
+}
+
+export { monsters, monstersLoaded };
 
 export function getRandomValue(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -352,10 +85,14 @@ export function calculateExp(minExp: number, maxExp: number): number {
     return getRandomValue(minExp, maxExp);
 }
 
-export function getRandomMonster(worldLevel: number, location: string) {
+export async function getRandomMonster(worldLevel: number, location: string) {
+    if (!monstersLoaded) {
+        return null;
+    }
+
     const availableMonsters = monsters.filter(
         (monster) =>
-            worldLevel >= (monster.minWorldLevel || 1) &&
+            worldLevel >= monster.minWorldLevel &&
             monster.locations.includes(location),
     );
 
@@ -363,14 +100,15 @@ export function getRandomMonster(worldLevel: number, location: string) {
         return null;
     }
 
-    const weightedMonsters = availableMonsters.flatMap((monster) => {
-        const weight = Math.pow(2, monster.minWorldLevel - worldLevel);
-        return Array(Math.max(1, weight)).fill(monster);
+    const weightedMonsters: Monster[] = availableMonsters.flatMap((monster) => {
+        const weight = monster.minWorldLevel;
+        return Array(weight).fill(monster);
     });
 
-    return weightedMonsters[
-        Math.floor(Math.random() * weightedMonsters.length)
-    ];
+    const selectedMonster =
+        weightedMonsters[Math.floor(Math.random() * weightedMonsters.length)];
+
+    return selectedMonster;
 }
 
 export function getEncounterDescription(monsterName: string, location: string) {

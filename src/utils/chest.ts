@@ -44,7 +44,28 @@ const chestLoot: LootItem[] = [
         minAmount: 1,
         maxAmount: 1,
         minWorldLevel: 2,
+        dropChance: 20,
+    },
+    {
+        name: "Iron Point",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 3,
+        dropChance: 10,
+    },
+    {
+        name: "Silver Sword",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 3,
         dropChance: 5,
+    },
+    {
+        name: "Cool Steel",
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 4,
+        dropChance: 10,
     },
 ];
 

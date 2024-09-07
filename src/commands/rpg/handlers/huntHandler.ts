@@ -10,6 +10,7 @@ import {
     getEncounterDescription,
     getRandomMonster,
     getRandomValue,
+    initializeMonsters,
 } from "../../../utils/hunt";
 
 export async function handleHunt(
@@ -18,13 +19,15 @@ export async function handleHunt(
     stats: UserStats,
     userWallet: UserWallet,
 ) {
-    const monster = getRandomMonster(stats.worldLevel, stats.location);
+    await initializeMonsters();
+
+    const monster = await getRandomMonster(stats.worldLevel, stats.location);
 
     if (!monster) {
         await i
             .editReply(
                 embedComment(
-                    `This area (${stats.location}) has no monsters to encounter.`,
+                    `This area (${stats.location}) has no monsters to encounter.\nTry to \`/travel\` to another location!`,
                 ),
             )
             .catch(() => null);
@@ -162,10 +165,25 @@ export async function handleHunt(
             return;
         }
 
-        currentMonsterHp -= stats.attackPower;
+        let attackPower = stats.attackPower;
+        const critChance = stats.critChance || 0;
+        const critValue = stats.critValue || 1;
+
+        const isCrit = Math.random() * 100 < critChance;
+        if (isCrit) {
+            attackPower *= critValue;
+        }
+
+        currentMonsterHp -= attackPower;
         if (currentMonsterHp < 0) {
             currentMonsterHp = 0;
         }
+
+        await thread.send(
+            `>>> \`⚔️\` You dealt \`${attackPower.toFixed(2)}\` damage to the ${
+                monster.name
+            }${isCrit ? " (Critical Hit!)" : ""}.`,
+        );
 
         const monsterDamage = getRandomValue(
             monster.minDamage,
@@ -175,6 +193,10 @@ export async function handleHunt(
         if (currentPlayerHp < 0) {
             currentPlayerHp = 0;
         }
+
+        await thread.send(
+            `>>> \`⚔️\` The ${monster.name} dealt \`${monsterDamage}\` damage to you.`,
+        );
 
         battleEmbed.setFields(
             {

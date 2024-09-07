@@ -186,6 +186,8 @@ model UserStats {
   maxHP          Float          @default(100)
   baseAttack     Float          @default(5)
   attackPower    Float          @default(5)
+  critChance     Float          @default(0)
+  critValue      Float          @default(0)
   inventory      UserStatsInv[]
   exp            Int            @default(0)
   worldLevel     Int            @default(1)

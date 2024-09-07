@@ -73,8 +73,10 @@ export const hunt = buildCommand<SlashCommand>({
         const randomChance = Math.random();
         if (randomChance < 0.2) {
             await handleChest(i, stats, userWallet);
+            locked.del(i.user.id);
         } else {
             await handleHunt(i, message, stats, userWallet);
+            locked.del(i.user.id);
         }
 
         locked.del(i.user.id);

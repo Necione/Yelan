@@ -50,16 +50,22 @@ export const equip = buildCommand<SlashCommand>({
         }
 
         const additionalAttackPower = weapons[weaponName].attackPower;
+        const additionalCritChance = weapons[weaponName].critChance || 0;
+        const additionalCritValue = weapons[weaponName].critValue || 0;
         const totalAttackPower = stats.baseAttack + additionalAttackPower;
 
         await updateUserStats(i.user.id, {
             equippedWeapon: weaponName,
             attackPower: totalAttackPower,
+            critChance: additionalCritChance,
+            critValue: additionalCritValue,
         });
 
         return r.edit(
             embedComment(
-                `You have equipped **${weaponName}**! Your attack power is now ${totalAttackPower} (+${additionalAttackPower} from ${weaponName}).`,
+                `You have equipped **${weaponName}**! Your attack power is now ${totalAttackPower} (+${additionalAttackPower} from ${weaponName}).\n🎯 Crit Chance: ${additionalCritChance}%\n💥 Crit Value: ${additionalCritValue.toFixed(
+                    2,
+                )}x`,
                 "Green",
             ),
         );

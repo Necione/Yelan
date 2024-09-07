@@ -58,7 +58,15 @@ export const rpg = buildCommand<SlashCommand>({
                         stats.maxHP
                     }\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)} (+${(
                         stats.attackPower - stats.baseAttack
-                    ).toFixed(2)})\``,
+                    ).toFixed(2)})\`${
+                        stats.critChance > 0 || stats.critValue > 0
+                            ? `\n🎯 Crit Chance: \`${
+                                  stats.critChance
+                              }%\` | 💥 Crit Value: \`${stats.critValue.toFixed(
+                                  2,
+                              )}x\``
+                            : ""
+                    }`,
                     inline: false,
                 },
                 {
