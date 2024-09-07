@@ -203,6 +203,7 @@ model UserStats {
   equippedCirclet String?
   location       String         @default("Liyue Harbor")
   isTravelling   Boolean        @default(false)
+  isHunting      Boolean        @default(false)
 }
 
 type UserStatsInv {

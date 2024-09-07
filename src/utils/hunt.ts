@@ -105,9 +105,30 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         return Array(weight).fill(monster);
     });
 
-    return weightedMonsters[
-        Math.floor(Math.random() * weightedMonsters.length)
-    ];
+    const selectedMonster =
+        weightedMonsters[Math.floor(Math.random() * weightedMonsters.length)];
+
+    const levelDifference = worldLevel - selectedMonster.minWorldLevel;
+
+    if (levelDifference > 0) {
+        const attackScaleFactor = 1 + levelDifference * 0.3;
+        selectedMonster.minDamage = Math.floor(
+            selectedMonster.minDamage * attackScaleFactor,
+        );
+        selectedMonster.maxDamage = Math.floor(
+            selectedMonster.maxDamage * attackScaleFactor,
+        );
+
+        const hpScaleFactor = 1 + levelDifference * 0.3;
+        selectedMonster.minHp = Math.floor(
+            selectedMonster.minHp * hpScaleFactor,
+        );
+        selectedMonster.maxHp = Math.floor(
+            selectedMonster.maxHp * hpScaleFactor,
+        );
+    }
+
+    return selectedMonster;
 }
 
 export function getEncounterDescription(monsterName: string, location: string) {

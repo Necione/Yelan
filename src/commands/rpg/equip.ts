@@ -46,6 +46,10 @@ export const equip = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.isHunting) {
+            return r.edit(embedComment("You cannot equip while hunting!"));
+        }
+
         const updatedStats: string[] = [];
 
         if (weapons[itemName as WeaponName]) {

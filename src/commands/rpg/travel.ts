@@ -87,6 +87,14 @@ export const travel = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.isHunting) {
+            return r.edit(
+                embedComment(
+                    "You cannot travel while you are hunting! Please finish your hunt first.",
+                ),
+            );
+        }
+
         if (stats.isTravelling) {
             return r.edit(
                 embedComment(

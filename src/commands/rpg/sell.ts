@@ -65,6 +65,10 @@ export const sell = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.isHunting) {
+            return r.edit(embedComment("You cannot sell while hunting!"));
+        }
+
         if (
             weapons[itemName as WeaponName] &&
             stats.equippedWeapon === itemName
