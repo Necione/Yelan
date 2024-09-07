@@ -69,6 +69,10 @@ export const learn = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.isHunting) {
+            return r.edit(embedComment("You cannot learn while hunting!"));
+        }
+
         const skillData = skillRequirements[skillName];
 
         if (!skillData) {

@@ -45,6 +45,10 @@ export const unequip = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.isHunting) {
+            return r.edit(embedComment("You cannot unequip while hunting!"));
+        }
+
         if (itemName === stats.equippedWeapon) {
             const unequippedWeaponStats =
                 weapons[stats.equippedWeapon as WeaponName];

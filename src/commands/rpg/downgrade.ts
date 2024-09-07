@@ -30,7 +30,7 @@ export const downgrade = buildCommand<SlashCommand>({
 
         if (stats.worldLevel <= 1) {
             const embed = embedComment(
-                `You are already at the lowest world level (1). You cannot downgrade further.`,
+                `You are already at the lowest world level (1)! You cannot downgrade further.`,
             );
             return r.edit({
                 embeds: embed.embeds,
@@ -46,7 +46,7 @@ export const downgrade = buildCommand<SlashCommand>({
 
         if (stats.worldLevel - 1 < stats.highestWL) {
             const embed = embedComment(
-                `You cannot downgrade below your highest world level (${stats.highestWL}).`,
+                `You cannot downgrade 2 below your highest world level (${stats.highestWL}).`,
             );
             return r.edit({
                 embeds: embed.embeds,

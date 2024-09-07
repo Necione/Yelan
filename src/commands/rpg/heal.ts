@@ -45,6 +45,10 @@ export const heal = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.isHunting) {
+            return r.edit(embedComment("You cannot heal while hunting!"));
+        }
+
         const maxHP = stats.maxHP;
         const healAmount = Math.floor(
             Math.random() * (0.75 - 0.25 + 0.01) * maxHP + 0.25 * maxHP,

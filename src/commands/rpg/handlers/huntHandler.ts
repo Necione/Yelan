@@ -40,15 +40,8 @@ export async function handleHunt(
     );
     let currentPlayerHp = stats.hp;
 
-    const levelDifference = stats.worldLevel - monster.minWorldLevel;
-    let hpMultiplier = 1;
-
-    if (levelDifference > 0) {
-        hpMultiplier = Math.pow(1.5, levelDifference);
-    }
-
     let currentMonsterHp = Math.floor(
-        getRandomValue(monster.minHp, monster.maxHp) * hpMultiplier,
+        getRandomValue(monster.minHp, monster.maxHp),
     );
 
     const initialMonsterHp = currentMonsterHp;
@@ -86,18 +79,18 @@ export async function handleHunt(
         .editReply({
             embeds: [battleEmbed],
         })
-        .catch(() => null);
+        .catch(noop);
 
     const thread = await r
         .startThread({
             name: `Battle with ${monster.name}`,
             autoArchiveDuration: 60,
         })
-        .catch(() => null);
+        .catch(noop);
     if (!thread) {
         return i
             .editReply(embedComment(`Unable to create the thread.`))
-            .catch(() => null);
+            .catch(noop);
     }
 
     const hasVigilance = stats.skills.some(
@@ -138,7 +131,7 @@ export async function handleHunt(
                     .setColor("Red")
                     .setTitle(`Defeat...`)
                     .setDescription(
-                        `You were defeated by the ${monster.name}...`,
+                        `Oh no :( You were defeated by the ${monster.name}...\n-# Use </downgrade:1282035993242767450> if this WL is too hard`,
                     );
             }
 
@@ -162,9 +155,14 @@ export async function handleHunt(
             }
 
             await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+
+            await updateUserStats(i.user.id, {
+                isHunting: false,
+            });
+
             sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
 
-            await cooldowns.set(userWallet, "hunt", get.hrs(1));
+            await cooldowns.set(userWallet, "hunt", get.mins(30));
 
             return;
         }

@@ -1,7 +1,11 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { getProfileByUserId, getUserStats } from "../../services";
+import {
+    getProfileByUserId,
+    getUserStats,
+    updateUserStats,
+} from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { handleChest } from "./handlers/chestHandler";
 import { handleHunt } from "./handlers/huntHandler";
@@ -63,6 +67,11 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.isHunting) {
+            locked.del(i.user.id);
+            return r.edit(embedComment("You are already hunting!"));
+        }
+
         if (stats.hp <= 0) {
             locked.del(i.user.id);
             return r.edit(
@@ -73,10 +82,9 @@ export const hunt = buildCommand<SlashCommand>({
         const randomChance = Math.random();
         if (randomChance < 0.2) {
             await handleChest(i, stats, userWallet);
-            locked.del(i.user.id);
         } else {
+            await updateUserStats(i.user.id, { isHunting: true });
             await handleHunt(i, message, stats, userWallet);
-            locked.del(i.user.id);
         }
 
         locked.del(i.user.id);
