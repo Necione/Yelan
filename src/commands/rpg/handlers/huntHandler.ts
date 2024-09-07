@@ -1,4 +1,4 @@
-import { embedComment, get, sleep } from "@elara-services/utils";
+import { embedComment, get, noop, sleep } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction, Message } from "discord.js";
 import { EmbedBuilder } from "discord.js";
@@ -30,7 +30,7 @@ export async function handleHunt(
                     `This area (${stats.location}) has no monsters to encounter.\nTry to </travel:1281778318160691301> to another location!`,
                 ),
             )
-            .catch(() => null);
+            .catch(noop);
         return;
     }
 
@@ -161,10 +161,8 @@ export async function handleHunt(
                 }
             }
 
-            await i.editReply({ embeds: [finalEmbed] }).catch(() => null);
-            sleep(get.secs(30)).then(
-                () => void thread.delete().catch(() => null),
-            );
+            await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+            sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
 
             await cooldowns.set(userWallet, "hunt", get.hrs(1));
 
@@ -182,29 +180,35 @@ export async function handleHunt(
 
         if (hasVigilance && !vigilanceUsed) {
             currentMonsterHp -= attackPower;
-            await thread.send(
-                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                    2,
-                )}\` damage to the ${monster.name}.`,
-            );
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name}.`,
+                )
+                .catch(noop);
 
             const vigilanceAttackPower = attackPower / 2;
             currentMonsterHp -= vigilanceAttackPower;
             vigilanceUsed = true;
-            await thread.send(
-                `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                    2,
-                )}\` damage to the ${monster.name} ✨ (Vigilance Skill).`,
-            );
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name} ✨ (Vigilance Skill).`,
+                )
+                .catch(noop);
         } else {
             currentMonsterHp -= attackPower;
-            await thread.send(
-                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                    2,
-                )}\` damage to the ${monster.name}${
-                    isCrit ? " 💢 (Critical Hit!)" : ""
-                }.`,
-            );
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name}${
+                        isCrit ? " 💢 (Critical Hit!)" : ""
+                    }.`,
+                )
+                .catch(noop);
         }
 
         if (hasLeech && Math.random() < 0.5) {
@@ -213,9 +217,11 @@ export async function handleHunt(
                 currentPlayerHp + leechHeal,
                 stats.maxHP,
             );
-            await thread.send(
-                `>>> \`💖\` You healed \`${leechHeal}\` HP due to the Leech skill.`,
-            );
+            await thread
+                .send(
+                    `>>> \`💖\` You healed \`${leechHeal}\` HP due to the Leech skill.`,
+                )
+                .catch(noop);
         }
 
         if (currentMonsterHp < 0) {
@@ -240,13 +246,15 @@ export async function handleHunt(
             currentPlayerHp = 0;
         }
 
-        await thread.send(
-            `>>> \`⚔️\` The ${
-                monster.name
-            } dealt \`${monsterDamage}\` damage to you${
-                defended ? ` 🛡️ (Defended: -${defValue})` : ""
-            }.`,
-        );
+        await thread
+            .send(
+                `>>> \`⚔️\` The ${
+                    monster.name
+                } dealt \`${monsterDamage}\` damage to you${
+                    defended ? ` 🛡️ (Defended: -${defValue})` : ""
+                }.`,
+            )
+            .catch(noop);
 
         battleEmbed.setFields(
             {
@@ -261,6 +269,6 @@ export async function handleHunt(
             },
         );
 
-        await i.editReply({ embeds: [battleEmbed] }).catch(() => null);
+        await i.editReply({ embeds: [battleEmbed] }).catch(noop);
     }, get.secs(4));
 }
