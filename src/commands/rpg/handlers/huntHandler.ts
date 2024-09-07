@@ -244,6 +244,16 @@ export async function handleHunt(
             monsterDamage = Math.max(monsterDamage - defValue, 0);
         }
 
+        if (monster.name === "Large Pyro Slime") {
+            const burnDamage = 5;
+            currentPlayerHp -= burnDamage;
+            await thread
+                .send(
+                    `>>> \`🔥\` The Large Pyro Slime inflicted \`${burnDamage}\` burn damage to you, bypassing defense!`,
+                )
+                .catch(noop);
+        }
+
         currentPlayerHp -= monsterDamage;
         if (currentPlayerHp < 0) {
             currentPlayerHp = 0;
