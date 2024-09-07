@@ -11,7 +11,8 @@
     "deploy": "ts-node ./src/scripts/deploy.ts",
     "lint": "eslint .",
     "pf": "prettier --write src/**/*.ts",
-    "pc": "prettier --check src/**/*.ts"
+    "pc": "prettier --check src/**/*.ts",
+    "fix": "eslint . --fix && npm run pf"
   },
   "keywords": [
     "typescript",
@@ -41,7 +42,7 @@
     "@elara-services/fetch": "^2.0.2",
     "@elara-services/leveling": "^1.2.1",
     "@elara-services/packages": "^6.0.8",
-    "@elara-services/utils": "^1.6.24",
+    "@elara-services/utils": "^1.7.0",
     "@elara-services/webhooks": "^2.1.18",
     "@liyueharbor/econ": "^1.0.5",
     "@prisma/client": "5.7.1",
