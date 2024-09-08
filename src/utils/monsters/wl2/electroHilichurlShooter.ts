@@ -1,4 +1,4 @@
-const electorHilichurlShooter = {
+const electroHilichurlShooter = {
     name: "Electro Hilichurl Shooter",
     minHp: 20,
     maxHp: 25,
@@ -23,6 +23,11 @@ const electorHilichurlShooter = {
         },
     ],
     locations: ["Tianqiu Valley", "Lumberpick Valley", "Dunyu Ruins"],
+
+    critChance: 10,
+    critValue: 1.5,
+    defChance: 20,
+    defValue: 2,
 };
 
-export default electorHilichurlShooter;
+export default electroHilichurlShooter;

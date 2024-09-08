@@ -14,6 +14,11 @@ const pyroHilichurlBerserker = {
         { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 25 },
     ],
     locations: ["Lingju Pass", "Jueyun Karst", "Luhua Pool"],
+
+    critChance: 10,
+    critValue: 1.5,
+    defChance: 20,
+    defValue: 2,
 };
 
 export default pyroHilichurlBerserker;

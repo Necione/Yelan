@@ -13,6 +13,11 @@ const anemoSamachurl = {
         { item: "Sealed Scroll", minAmount: 1, maxAmount: 2, chance: 35 },
     ],
     locations: ["Lumberpick Valley", "Nantianmen", "Jueyun Karst"],
+
+    critChance: 10,
+    critValue: 1.5,
+    defChance: 20,
+    defValue: 4,
 };
 
 export default anemoSamachurl;

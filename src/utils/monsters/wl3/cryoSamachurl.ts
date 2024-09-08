@@ -13,6 +13,11 @@ const cryoSamachurl = {
         { item: "Sealed Scroll", minAmount: 1, maxAmount: 1, chance: 45 },
     ],
     locations: ["Tianqiu Valley", "Jueyun Karst", "Guili Plains"],
+
+    critChance: 10,
+    critValue: 1.5,
+    defChance: 20,
+    defValue: 4,
 };
 
 export default cryoSamachurl;

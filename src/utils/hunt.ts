@@ -9,6 +9,10 @@ export interface Monster {
     maxDamage: number;
     minExp: number;
     maxExp: number;
+    critChance: number;
+    critValue: number;
+    defChance: number;
+    defValue: number;
     minWorldLevel: number;
     image: string;
     drops: {
@@ -107,6 +111,7 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     const groups: { [groupName: string]: Monster[] } = {
         Slime: [],
         HilichurlGroup: [],
+        Treasure: [],
         Others: [],
     };
 
@@ -119,6 +124,8 @@ export async function getRandomMonster(worldLevel: number, location: string) {
             monster.name.includes("Lawachurl")
         ) {
             groups.HilichurlGroup.push(monster);
+        } else if (monster.name.includes("Treasure")) {
+            groups.Treasure.push(monster);
         } else {
             groups.Others.push(monster);
         }
@@ -127,7 +134,6 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     const activeGroups = Object.keys(groups).filter(
         (groupName) => groups[groupName].length > 0,
     );
-
     const randomGroupName =
         activeGroups[Math.floor(Math.random() * activeGroups.length)];
     const selectedGroup = groups[randomGroupName];
@@ -140,32 +146,23 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     const randomMonster =
         weightedMonsters[Math.floor(Math.random() * weightedMonsters.length)];
 
+    const hpScalingConstant = 0.5;
+    const damageScalingConstant = 0.22;
+
     const levelDifference = worldLevel - randomMonster.minWorldLevel;
 
     if (levelDifference > 0) {
-        let attackIncreaseFactor = 1;
-        let hpIncreaseFactor = 1;
+        const hpScalingFactor = 1 + hpScalingConstant * levelDifference;
+        const damageScalingFactor = 1 + damageScalingConstant * levelDifference;
 
-        if (levelDifference > 2) {
-            attackIncreaseFactor += 0.15 * levelDifference;
-            hpIncreaseFactor += 0.15 * levelDifference;
-        } else {
-            attackIncreaseFactor += 0.25 * levelDifference;
-            hpIncreaseFactor += 0.25 * levelDifference;
-        }
+        randomMonster.minHp = Math.floor(randomMonster.minHp * hpScalingFactor);
+        randomMonster.maxHp = Math.floor(randomMonster.maxHp * hpScalingFactor);
 
         randomMonster.minDamage = Math.floor(
-            randomMonster.minDamage * attackIncreaseFactor,
+            randomMonster.minDamage * damageScalingFactor,
         );
         randomMonster.maxDamage = Math.floor(
-            randomMonster.maxDamage * attackIncreaseFactor,
-        );
-
-        randomMonster.minHp = Math.floor(
-            randomMonster.minHp * hpIncreaseFactor,
-        );
-        randomMonster.maxHp = Math.floor(
-            randomMonster.maxHp * hpIncreaseFactor,
+            randomMonster.maxDamage * damageScalingFactor,
         );
     }
 

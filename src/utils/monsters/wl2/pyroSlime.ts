@@ -33,6 +33,11 @@ const pyroSlime = {
         "Guili Plains",
         "Jueyun Karst",
     ],
+
+    critChance: 10,
+    critValue: 1.5,
+    defChance: 20,
+    defValue: 2,
 };
 
 export default pyroSlime;

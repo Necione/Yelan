@@ -35,5 +35,5 @@ export async function handleChest(
 
     await i.editReply(embedComment(message, "Green")).catch(noop);
 
-    await cooldowns.set(userWallet, "hunt", get.mins(1));
+    await cooldowns.set(userWallet, "explore", get.mins(30));
 }

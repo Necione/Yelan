@@ -1,18 +1,17 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import {
-    getProfileByUserId,
-    getUserStats,
-    updateUserStats,
-} from "../../services";
+import { getProfileByUserId, getUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
+import { handleChest } from "./handlers/chestHandler";
 import { handleHunt } from "./handlers/huntHandler";
 
-export const hunt = buildCommand<SlashCommand>({
+export const explore = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
-        .setName("hunt")
-        .setDescription("[RPG] Go on a hunt to fight monsters.")
+        .setName("explore")
+        .setDescription(
+            "[RPG] Go on an exploration to find traders or treasure.",
+        )
         .setDMPermission(false),
     only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
@@ -39,7 +38,7 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
-        const cc = cooldowns.get(userWallet, "hunt");
+        const cc = cooldowns.get(userWallet, "explore");
         if (!cc.status) {
             locked.del(i.user.id);
             return r.edit(embedComment(cc.message));
@@ -59,25 +58,29 @@ export const hunt = buildCommand<SlashCommand>({
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
-                    "You cannot go on a hunt while you are travelling!",
+                    "You cannot go on an exploration while you are travelling!",
                 ),
             );
         }
 
         if (stats.isHunting) {
             locked.del(i.user.id);
-            return r.edit(embedComment("You are already hunting!"));
+            return r.edit(embedComment("You cannot explore while hunting!"));
         }
 
         if (stats.hp <= 0) {
             locked.del(i.user.id);
             return r.edit(
-                embedComment("You don't have enough HP to go on a hunt :("),
+                embedComment("You don't have enough HP to explore :("),
             );
         }
 
-        await updateUserStats(i.user.id, { isHunting: true });
-        await handleHunt(i, message, stats, userWallet);
+        const randomChance = Math.random();
+        if (randomChance < 0.8) {
+            await handleHunt(i, message, stats, userWallet);
+        } else {
+            await handleChest(i, stats, userWallet);
+        }
 
         locked.del(i.user.id);
     },

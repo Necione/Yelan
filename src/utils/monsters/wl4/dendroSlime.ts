@@ -33,6 +33,11 @@ const dendroSlime = {
         "Guili Plains",
         "Jueyun Karst",
     ],
+
+    critChance: 10,
+    critValue: 1.5,
+    defChance: 20,
+    defValue: 6,
 };
 
 export default dendroSlime;

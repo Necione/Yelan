@@ -13,6 +13,11 @@ const mitachurl = {
         { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 50 },
     ],
     locations: ["Dunyu Ruins", "Luhua Pool", "Guili Plains"],
+
+    critChance: 15,
+    critValue: 2,
+    defChance: 15,
+    defValue: 10,
 };
 
 export default mitachurl;

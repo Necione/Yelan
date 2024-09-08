@@ -2,7 +2,7 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
-import { type DropName } from "../../utils/rpgitems/items";
+import { type DropName } from "../../utils/rpgitems/drops";
 
 export const craft = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -15,6 +15,33 @@ export const craft = buildCommand<SlashCommand>({
                 .setDescription("The item you want to craft")
                 .setRequired(true)
                 .addChoices(
+                    {
+                        name: "Firm Arrowhead -> Sharp Arrowhead",
+                        value: "FirmArrowhead",
+                    },
+                    {
+                        name: "Sharp Arrowhead -> Weathered Arrowhead",
+                        value: "SharpArrowhead",
+                    },
+
+                    {
+                        name: "Heavy Horn -> Black Bronze Horn",
+                        value: "HeavyHorn",
+                    },
+                    {
+                        name: "Black Bronze Horn -> Black Crystal Horn",
+                        value: "BlackBronzeHorn",
+                    },
+
+                    {
+                        name: "Divining Scroll -> Sealed Scroll",
+                        value: "DiviningScroll",
+                    },
+                    {
+                        name: "Sealed Scroll -> Forbidden Curse Scroll",
+                        value: "SealedScroll",
+                    },
+
                     {
                         name: "Slime Condensate -> Slime Secretions",
                         value: "SlimeCondensate",
@@ -48,6 +75,33 @@ export const craft = buildCommand<SlashCommand>({
             string,
             { source: DropName; target: DropName }
         > = {
+            FirmArrowhead: {
+                source: "Firm Arrowhead",
+                target: "Sharp Arrowhead",
+            },
+            SharpArrowhead: {
+                source: "Sharp Arrowhead",
+                target: "Weathered Arrowhead",
+            },
+
+            HeavyHorn: {
+                source: "Heavy Horn",
+                target: "Black Bronze Horn",
+            },
+            BlackBronzeHorn: {
+                source: "Black Bronze Horn",
+                target: "Black Crystal Horn",
+            },
+
+            DiviningScroll: {
+                source: "Divining Scroll",
+                target: "Sealed Scroll",
+            },
+            SealedScroll: {
+                source: "Sealed Scroll",
+                target: "Forbidden Curse Scroll",
+            },
+
             SlimeCondensate: {
                 source: "Slime Condensate",
                 target: "Slime Secretions",
@@ -56,8 +110,14 @@ export const craft = buildCommand<SlashCommand>({
                 source: "Slime Secretions",
                 target: "Slime Concentrate",
             },
-            DamagedMask: { source: "Damaged Mask", target: "Stained Mask" },
-            StainedMask: { source: "Stained Mask", target: "Ominous Mask" },
+            DamagedMask: {
+                source: "Damaged Mask",
+                target: "Stained Mask",
+            },
+            StainedMask: {
+                source: "Stained Mask",
+                target: "Ominous Mask",
+            },
         };
 
         const craftingRecipe = craftingMap[craftOption];

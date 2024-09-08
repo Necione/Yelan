@@ -13,6 +13,11 @@ const electroSamachurl = {
         { item: "Sealed Scroll", minAmount: 1, maxAmount: 2, chance: 35 },
     ],
     locations: ["Luhua Pool", "Jueyun Karst", "Lumberpick Valley"],
+
+    critChance: 10,
+    critValue: 1.5,
+    defChance: 20,
+    defValue: 6,
 };
 
 export default electroSamachurl;

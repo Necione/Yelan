@@ -1,6 +1,10 @@
 import { embedComment, get, is, noop, sleep } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
-import type { ChatInputCommandInteraction, Message } from "discord.js";
+import type {
+    ChatInputCommandInteraction,
+    Message,
+    ThreadChannel,
+} from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { addItemToInventory, updateUserStats } from "../../../services";
 import { cooldowns } from "../../../utils";
@@ -11,7 +15,231 @@ import {
     getRandomMonster,
     getRandomValue,
     initializeMonsters,
+    type Monster,
 } from "../../../utils/hunt";
+
+async function handleVictory(
+    i: ChatInputCommandInteraction,
+    thread: ThreadChannel,
+    stats: UserStats,
+    monster: Monster,
+    currentPlayerHp: number,
+    userWallet: UserWallet,
+) {
+    const finalEmbed = new EmbedBuilder();
+    const expGained = calculateExp(monster.minExp, monster.maxExp);
+    let newExp = stats.exp + expGained;
+    let expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
+
+    while (newExp >= expRequired) {
+        newExp -= expRequired;
+        stats.worldLevel += 1;
+        expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
+    }
+
+    await updateUserStats(i.user.id, {
+        exp: newExp,
+        worldLevel: stats.worldLevel,
+    });
+
+    finalEmbed
+        .setColor("Green")
+        .setTitle(`Victory in ${stats.location}!`)
+        .setDescription(
+            `You defeated the ${monster.name}!\n-# \`⭐\` \`+${expGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
+        )
+        .setThumbnail(monster.image);
+
+    const hasTotemSkill = stats.skills.some((skill) => skill.name === "Totem");
+    if (hasTotemSkill) {
+        const healAmount = Math.ceil(stats.maxHP * 0.05);
+        currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
+
+        finalEmbed.addFields({
+            name: "Totem Skill",
+            value: `\`💖\` You healed \`${healAmount}\` HP due to the Totem skill.`,
+        });
+
+        await updateUserStats(i.user.id, {
+            hp: currentPlayerHp,
+        });
+    }
+
+    const drops = calculateDrop(monster.drops);
+    if (is.array(drops)) {
+        await addItemToInventory(i.user.id, drops);
+
+        const dropsDescription = drops
+            .map((drop) => `\`${drop.amount}x\` ${drop.item}`)
+            .join(", ");
+        finalEmbed.addFields({
+            name: "Drops",
+            value: dropsDescription,
+        });
+    }
+
+    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+    await updateUserStats(i.user.id, { isHunting: false });
+    sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
+
+    const hasInsomniaSkill = stats.skills.some(
+        (skill) => skill.name === "Insomnia",
+    );
+    const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
+    await cooldowns.set(userWallet, "hunt", huntCooldown);
+}
+
+async function handleDefeat(
+    i: ChatInputCommandInteraction,
+    thread: ThreadChannel,
+    stats: UserStats,
+    monster: Monster,
+    currentPlayerHp: number,
+    userWallet: UserWallet,
+) {
+    const finalEmbed = new EmbedBuilder()
+        .setColor("Red")
+        .setTitle(`Defeat...`)
+        .setDescription(
+            `Oh no :( You were defeated by the ${monster.name}...\n-# Use </downgrade:1282035993242767450> if this WL is too hard`,
+        );
+
+    await updateUserStats(i.user.id, {
+        hp: Math.max(currentPlayerHp, 0),
+        isHunting: false,
+    });
+
+    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+    await cooldowns.set(userWallet, "hunt", get.mins(30));
+    sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
+}
+
+async function playerAttack(
+    thread: ThreadChannel,
+    stats: UserStats,
+    monster: Monster,
+    currentMonsterHp: number,
+    initialMonsterHp: number,
+    hasVigilance: boolean,
+    vigilanceUsed: boolean,
+): Promise<{ currentMonsterHp: number; vigilanceUsed: boolean }> {
+    let attackPower = stats.attackPower;
+    const critChance = stats.critChance || 0;
+    const critValue = stats.critValue || 1;
+
+    console.log(`[DEBUG] Player attack power: ${attackPower}`);
+
+    const isCrit = Math.random() * 100 < critChance;
+    if (isCrit) {
+        attackPower *= critValue;
+    }
+
+    console.log(
+        `[DEBUG] Is crit: ${isCrit}, Attack power after crit: ${attackPower}`,
+    );
+
+    const isAnemo = monster.name.includes("Anemo");
+    const dodgeChance = Math.random() < 0.25;
+
+    if (isAnemo && dodgeChance) {
+        await thread
+            .send(
+                `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
+            )
+            .catch(noop);
+        console.log(`[DEBUG] The monster dodged the player's attack.`);
+    } else {
+        currentMonsterHp -= attackPower;
+        await thread
+            .send(
+                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name}${
+                    isCrit ? " 💢 (Critical Hit!)" : ""
+                }.`,
+            )
+            .catch(noop);
+
+        console.log(
+            `[DEBUG] Player dealt ${attackPower} damage to the monster.`,
+        );
+
+        if (hasVigilance && !vigilanceUsed) {
+            const vigilanceAttackPower = attackPower / 2;
+            currentMonsterHp -= vigilanceAttackPower;
+            vigilanceUsed = true;
+
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name} ✨ (Vigilance Skill).`,
+                )
+                .catch(noop);
+
+            console.log(
+                `[DEBUG] Vigilance attack triggered. Dealt ${vigilanceAttackPower} damage (half of attackPower).`,
+            );
+        }
+    }
+
+    return { currentMonsterHp, vigilanceUsed };
+}
+
+async function monsterAttack(
+    thread: ThreadChannel,
+    stats: UserStats,
+    monster: Monster,
+    currentPlayerHp: number,
+): Promise<number> {
+    let monsterDamage = getRandomValue(monster.minDamage, monster.maxDamage);
+    const critChance = monster.critChance || 0;
+    const critValue = monster.critValue || 1;
+    const isCrit = Math.random() * 100 < critChance;
+
+    if (isCrit) {
+        monsterDamage *= critValue;
+    }
+
+    const defChance = stats.defChance || 0;
+    const defValue = stats.defValue || 0;
+    const defended = Math.random() * 100 < defChance;
+
+    if (defended) {
+        monsterDamage = Math.max(monsterDamage - defValue, 0);
+    }
+
+    currentPlayerHp -= monsterDamage;
+    if (currentPlayerHp < 0) {
+        currentPlayerHp = 0;
+    }
+
+    const hasLeechSkill = stats.skills.some((skill) => skill.name === "Leech");
+    const leechTriggered = Math.random() < 0.5;
+    if (hasLeechSkill && leechTriggered) {
+        const healAmount = Math.ceil(monster.maxHp * 0.05);
+        currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
+        await thread
+            .send(
+                `>>> \`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}.`,
+            )
+            .catch(noop);
+    }
+
+    await updateUserStats(stats.userId, { hp: currentPlayerHp });
+
+    await thread
+        .send(
+            `>>> \`⚔️\` The ${
+                monster.name
+            } dealt \`${monsterDamage}\` damage to you${
+                defended ? ` 🛡️ (Defended: -${defValue})` : ""
+            }${isCrit ? " 💢 (Critical Hit!)" : ""}.`,
+        )
+        .catch(noop);
+
+    return currentPlayerHp;
+}
 
 export async function handleHunt(
     i: ChatInputCommandInteraction,
@@ -44,11 +272,9 @@ export async function handleHunt(
         stats.location,
     );
     let currentPlayerHp = stats.hp;
-
     let currentMonsterHp = Math.floor(
         getRandomValue(monster.minHp, monster.maxHp),
     );
-
     const initialMonsterHp = currentMonsterHp;
 
     const createHealthBar = (
@@ -56,8 +282,10 @@ export async function handleHunt(
         max: number,
         length: number = 20,
     ): string => {
+        current = Math.max(0, Math.min(current, max));
         const filledLength = Math.round((current / max) * length);
-        const emptyLength = length - filledLength;
+        const emptyLength = Math.max(length - filledLength, 0);
+
         const bar = "█".repeat(filledLength) + "░".repeat(emptyLength);
         return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
     };
@@ -92,6 +320,7 @@ export async function handleHunt(
             autoArchiveDuration: 60,
         })
         .catch(noop);
+
     if (!thread) {
         return i
             .editReply(embedComment(`Unable to create the thread.`))
@@ -101,274 +330,81 @@ export async function handleHunt(
     const hasVigilance = stats.skills.some(
         (skill) => skill.name === "Vigilance",
     );
-    const hasLeech = stats.skills.some((skill) => skill.name === "Leech");
     let vigilanceUsed = false;
 
     const battleInterval = setInterval(async () => {
         if (currentPlayerHp <= 0 || currentMonsterHp <= 0) {
             clearInterval(battleInterval);
 
-            const finalEmbed = new EmbedBuilder();
             if (currentPlayerHp > 0) {
-                const expGained = calculateExp(monster.minExp, monster.maxExp);
-                let newExp = stats.exp + expGained;
-                let expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
-
-                while (newExp >= expRequired) {
-                    newExp -= expRequired;
-                    stats.worldLevel += 1;
-                    expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
-                }
-
-                await updateUserStats(i.user.id, {
-                    exp: newExp,
-                    worldLevel: stats.worldLevel,
-                });
-
-                finalEmbed
-                    .setColor("Green")
-                    .setTitle(`Victory!`)
-                    .setDescription(
-                        `You defeated the ${monster.name}!\n-# \`⭐\` \`+${expGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
-                    );
-
-                const hasTotemSkill = stats.skills.some(
-                    (skill) => skill.name === "Totem",
+                await handleVictory(
+                    i,
+                    thread,
+                    stats,
+                    monster,
+                    currentPlayerHp,
+                    userWallet,
                 );
-                if (hasTotemSkill) {
-                    const healAmount = Math.ceil(stats.maxHP * 0.05);
-                    currentPlayerHp = Math.min(
-                        currentPlayerHp + healAmount,
-                        stats.maxHP,
-                    );
-
-                    finalEmbed.addFields({
-                        name: "Totem Skill",
-                        value: `\`💖\` You healed \`${healAmount}\` HP due to the Totem skill.`,
-                    });
-
-                    await updateUserStats(i.user.id, {
-                        hp: currentPlayerHp,
-                    });
-                }
             } else {
-                finalEmbed
-                    .setColor("Red")
-                    .setTitle(`Defeat...`)
-                    .setDescription(
-                        `Oh no :( You were defeated by the ${monster.name}...\n-# Use </downgrade:1282035993242767450> if this WL is too hard`,
-                    );
+                await handleDefeat(
+                    i,
+                    thread,
+                    stats,
+                    monster,
+                    currentPlayerHp,
+                    userWallet,
+                );
             }
 
-            await updateUserStats(i.user.id, {
-                hp: Math.max(currentPlayerHp, 0),
-            });
-
-            if (currentPlayerHp > 0 && currentMonsterHp <= 0) {
-                const drops = calculateDrop(monster.drops);
-                if (is.array(drops)) {
-                    await addItemToInventory(i.user.id, drops);
-
-                    const dropsDescription = drops
-                        .map((drop) => `\`${drop.amount}x\` ${drop.item}`)
-                        .join(", ");
-                    finalEmbed.addFields({
-                        name: "Drops",
-                        value: dropsDescription,
-                    });
-                }
-            }
-
-            await i.editReply({ embeds: [finalEmbed] }).catch(noop);
-
-            await updateUserStats(i.user.id, {
-                isHunting: false,
-            });
-
-            sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
-
-            const hasInsomniaSkill = stats.skills.some(
-                (skill) => skill.name === "Insomnia",
-            );
-
-            const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
-
-            await cooldowns.set(userWallet, "hunt", huntCooldown);
             return;
         }
 
-        const isStunned =
-            monster.name.includes("Lawachurl") && Math.random() < 0.2;
+        const result = await playerAttack(
+            thread,
+            stats,
+            monster,
+            currentMonsterHp,
+            initialMonsterHp,
+            hasVigilance,
+            vigilanceUsed,
+        );
 
-        if (isStunned) {
-            await thread
-                .send(
-                    `>>> \`💫\` The ${monster.name} used its Stun ability and skipped your turn!`,
-                )
-                .catch(noop);
-        } else {
-            let attackPower = stats.attackPower;
-            const critChance = stats.critChance || 0;
-            const critValue = stats.critValue || 1;
-
-            const isCrit = Math.random() * 100 < critChance;
-            if (isCrit) {
-                attackPower *= critValue;
-            }
-
-            const isAnemo = monster.name.includes("Anemo");
-            const dodgeChance = Math.random() < 0.25;
-
-            if (isAnemo && dodgeChance) {
-                await thread
-                    .send(
-                        `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
-                    )
-                    .catch(noop);
-            } else {
-                if (hasVigilance && !vigilanceUsed) {
-                    currentMonsterHp -= attackPower;
-                    await thread
-                        .send(
-                            `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                                2,
-                            )}\` damage to the ${monster.name}.`,
-                        )
-                        .catch(noop);
-
-                    const vigilanceAttackPower = attackPower / 2;
-                    currentMonsterHp -= vigilanceAttackPower;
-                    vigilanceUsed = true;
-                    await thread
-                        .send(
-                            `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                                2,
-                            )}\` damage to the ${
-                                monster.name
-                            } ✨ (Vigilance Skill).`,
-                        )
-                        .catch(noop);
-                } else {
-                    currentMonsterHp -= attackPower;
-                    await thread
-                        .send(
-                            `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                                2,
-                            )}\` damage to the ${monster.name}${
-                                isCrit ? " 💢 (Critical Hit!)" : ""
-                            }.`,
-                        )
-                        .catch(noop);
-                }
-            }
-
-            if (hasLeech && Math.random() < 0.5) {
-                const leechHeal = Math.ceil(initialMonsterHp * 0.01);
-                currentPlayerHp = Math.min(
-                    currentPlayerHp + leechHeal,
-                    stats.maxHP,
-                );
-                await thread
-                    .send(
-                        `>>> \`💖\` You healed \`${leechHeal}\` HP due to the Leech skill.`,
-                    )
-                    .catch(noop);
-            }
-        }
+        currentMonsterHp = result.currentMonsterHp;
+        vigilanceUsed = result.vigilanceUsed;
 
         if (currentMonsterHp > 0) {
-            let monsterDamage = getRandomValue(
-                monster.minDamage,
-                monster.maxDamage,
+            currentPlayerHp = await monsterAttack(
+                thread,
+                stats,
+                monster,
+                currentPlayerHp,
             );
-
-            const defChance = stats.defChance || 0;
-            const defValue = stats.defValue || 0;
-
-            const defended = Math.random() * 100 < defChance;
-            if (defended) {
-                monsterDamage = Math.max(monsterDamage - defValue, 0);
-            }
-
-            if (
-                monster.name.includes("Pyro Slime") ||
-                monster.name.includes("Cryo") ||
-                monster.name.includes("Frost")
-            ) {
-                let damageType = "";
-                let damageAmount = 0;
-
-                if (monster.name.includes("Pyro Slime")) {
-                    damageType = "🔥 Burn";
-                    damageAmount = monster.name === "Large Pyro Slime" ? 5 : 2;
-                } else if (
-                    (monster.name.includes("Cryo") ||
-                        monster.name.includes("Frost")) &&
-                    Math.random() < 0.25
-                ) {
-                    damageType = "❄️ Cripple";
-                    damageAmount = monster.maxDamage * 0.5;
-                }
-
-                if (damageAmount > 0) {
-                    currentPlayerHp -= damageAmount;
-                    await thread
-                        .send(
-                            `>>> \`${damageType}\` The ${
-                                monster.name
-                            } inflicted \`${damageAmount.toFixed(
-                                2,
-                            )}\` damage to you, bypassing defense!`,
-                        )
-                        .catch(noop);
-                }
-            }
-
-            currentPlayerHp -= monsterDamage;
-            if (currentPlayerHp < 0) {
-                currentPlayerHp = 0;
-            }
-
-            await thread
-                .send(
-                    `>>> \`⚔️\` The ${
-                        monster.name
-                    } dealt \`${monsterDamage}\` damage to you${
-                        defended ? ` 🛡️ (Defended: -${defValue})` : ""
-                    }.`,
-                )
-                .catch(noop);
-
-            const playerHpBar = createHealthBar(currentPlayerHp, stats.hp);
-            const monsterHpBar = createHealthBar(
-                currentMonsterHp,
-                initialMonsterHp,
-            );
-
-            if (
-                typeof playerHpBar === "string" &&
-                typeof monsterHpBar === "string"
-            ) {
-                battleEmbed.setFields([
-                    {
-                        name: "Your HP",
-                        value: playerHpBar,
-                        inline: true,
-                    },
-                    {
-                        name: "Monster HP",
-                        value: monsterHpBar,
-                        inline: true,
-                    },
-                ]);
-            } else {
-                console.error("Invalid health bar values:", {
-                    playerHpBar,
-                    monsterHpBar,
-                });
-            }
-
-            await i.editReply({ embeds: [battleEmbed] }).catch(noop);
         }
+
+        const playerHpBar = createHealthBar(currentPlayerHp, stats.hp);
+        const monsterHpBar = createHealthBar(
+            currentMonsterHp,
+            initialMonsterHp,
+        );
+
+        if (
+            typeof playerHpBar === "string" &&
+            typeof monsterHpBar === "string"
+        ) {
+            battleEmbed.setFields([
+                {
+                    name: "Your HP",
+                    value: playerHpBar,
+                    inline: true,
+                },
+                {
+                    name: "Monster HP",
+                    value: monsterHpBar,
+                    inline: true,
+                },
+            ]);
+        }
+
+        await i.editReply({ embeds: [battleEmbed] }).catch(noop);
     }, get.secs(4));
 }

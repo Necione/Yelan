@@ -1,10 +1,12 @@
-import type { UserStats } from "@prisma/client";
+import { get } from "@elara-services/utils";
+import { customEmoji } from "@liyueharbor/econ";
+import type { UserStats, UserWallet } from "@prisma/client";
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    type ChatInputCommandInteraction,
     EmbedBuilder,
+    type ChatInputCommandInteraction,
     type MessageComponentInteraction,
 } from "discord.js";
 import {
@@ -13,10 +15,9 @@ import {
     removeBalance,
     removeItemFromInventory,
 } from "../../../services";
+import { cooldowns } from "../../../utils";
 import { artifacts } from "../../../utils/rpgitems/artifacts";
-import { drops } from "../../../utils/rpgitems/items";
-
-import { customEmoji } from "@liyueharbor/econ";
+import { drops } from "../../../utils/rpgitems/drops";
 import { weapons } from "../../../utils/rpgitems/weapons";
 
 function randBetween(min: number, max: number) {
@@ -26,6 +27,7 @@ function randBetween(min: number, max: number) {
 export async function handleTrade(
     i: ChatInputCommandInteraction,
     stats: UserStats,
+    userWallet: UserWallet,
 ) {
     const tradeDeals = generateRandomTradeDeals();
 
@@ -228,6 +230,8 @@ export async function handleTrade(
                 components: [],
             });
         }
+
+        await cooldowns.set(userWallet, "explore", get.mins(30));
     });
 }
 

@@ -1,6 +1,6 @@
 import { getRandomValue } from "./hunt";
 import { type ArtifactName, artifacts } from "./rpgitems/artifacts";
-import { type DropName, drops } from "./rpgitems/items";
+import { type DropName, drops } from "./rpgitems/drops";
 import { type WeaponName, weapons } from "./rpgitems/weapons";
 
 type LootItem = {

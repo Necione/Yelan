@@ -22,6 +22,9 @@ export async function syncStats(userId: string) {
     const additionalWeaponCritValue = stats.equippedWeapon
         ? weapons[stats.equippedWeapon as WeaponName]?.critValue || 0
         : 0;
+    const additionalWeaponHP = stats.equippedWeapon
+        ? weapons[stats.equippedWeapon as WeaponName]?.additionalHP || 0
+        : 0;
 
     const additionalArtifactStats = {
         attackPower: 0,
@@ -82,6 +85,7 @@ export async function syncStats(userId: string) {
         calculatedBaseAttack +
         additionalWeaponAttackPower +
         additionalArtifactStats.attackPower;
+
     const calculatedCritChance =
         additionalWeaponCritChance + additionalArtifactStats.critChance;
 
@@ -94,7 +98,8 @@ export async function syncStats(userId: string) {
     const calculatedDefChance = additionalArtifactStats.defChance;
     const calculatedDefValue = additionalArtifactStats.defValue;
 
-    const finalMaxHP = calculatedMaxHP + additionalArtifactStats.maxHP;
+    const finalMaxHP =
+        calculatedMaxHP + additionalArtifactStats.maxHP + additionalWeaponHP;
 
     let needsUpdate = false;
     if (stats.baseAttack !== calculatedBaseAttack) {

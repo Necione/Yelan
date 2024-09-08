@@ -55,6 +55,13 @@ export const drops = {
         minWorldLevel: 2,
         chestChance: 15,
     },
+    "Weathered Arrowhead": {
+        sellPrice: 16,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 2,
+        chestChance: 15,
+    },
     "Divining Scroll": {
         sellPrice: 8,
         minAmount: 1,
@@ -69,6 +76,13 @@ export const drops = {
         minWorldLevel: 3,
         chestChance: 25,
     },
+    "Forbidden Curse Scroll": {
+        sellPrice: 16,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 3,
+        chestChance: 25,
+    },
     "Heavy Horn": {
         sellPrice: 18,
         minAmount: 1,
@@ -77,6 +91,13 @@ export const drops = {
         chestChance: 10,
     },
     "Black Bronze Horn": {
+        sellPrice: 25,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 6,
+        chestChance: 5,
+    },
+    "Black Crystal Horn": {
         sellPrice: 25,
         minAmount: 1,
         maxAmount: 2,

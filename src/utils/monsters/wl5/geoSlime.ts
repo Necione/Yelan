@@ -39,6 +39,11 @@ const geoSlime = {
         "Guili Plains",
         "Jueyun Karst",
     ],
+
+    critChance: 10,
+    critValue: 1.5,
+    defChance: 20,
+    defValue: 8,
 };
 
 export default geoSlime;

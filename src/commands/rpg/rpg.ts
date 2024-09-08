@@ -39,18 +39,8 @@ export const rpg = buildCommand<SlashCommand>({
             return r.edit(embedComment(`No stats found for you :(`));
         }
 
-        const items = stats.inventory || [];
-        const cc = cooldowns.get(p, "hunt");
-
-        const filteredInventory = items.filter(
-            (item) =>
-                item.item !== stats.equippedWeapon &&
-                item.item !== stats.equippedFlower &&
-                item.item !== stats.equippedPlume &&
-                item.item !== stats.equippedSands &&
-                item.item !== stats.equippedGoblet &&
-                item.item !== stats.equippedCirclet,
-        );
+        const huntCooldown = cooldowns.get(p, "hunt");
+        const exploreCooldown = cooldowns.get(p, "explore");
 
         const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
 
@@ -58,49 +48,31 @@ export const rpg = buildCommand<SlashCommand>({
             .setColor("Aqua")
             .setTitle(`${i.user.username}'s RPG Stats`)
             .setThumbnail(i.user.displayAvatarURL())
-            .setDescription(cc.status ? "Ready to hunt!" : cc.message)
-            .addFields(
-                {
-                    name: "Your Stats",
-                    value: `🌍 World Level: \`${
-                        stats.worldLevel
-                    }\` | ⭐ EXP: \`${stats.exp}/${expRequired.toFixed(
-                        0,
-                    )}\`\n❤️ HP: \`${stats.hp}/${
-                        stats.maxHP
-                    }\`\n⚔️ ATK: \`${stats.attackPower.toFixed(
-                        2,
-                    )} (${formatChange(
-                        stats.attackPower - stats.baseAttack,
-                    )})\`${
-                        stats.critChance > 0 || stats.critValue > 0
-                            ? `\n🎯 Crit Chance: \`${
-                                  stats.critChance
-                              }%\` | 💥 Crit Value: \`${stats.critValue.toFixed(
-                                  2,
-                              )}x\``
-                            : ""
-                    }${
-                        stats.defChance > 0 || stats.defValue > 0
-                            ? `\n🛡️ DEF Chance: \`${
-                                  stats.defChance
-                              }%\` | 🛡️ DEF Value: \`${stats.defValue.toFixed(
-                                  2,
-                              )}\``
-                            : ""
-                    }`,
-                    inline: false,
-                },
-                {
-                    name: "Inventory",
-                    value: filteredInventory.length
-                        ? filteredInventory
-                              .map((i) => `\`${i.amount}x\` ${i.item}`)
-                              .join("\n")
-                        : "Your inventory is empty.",
-                    inline: false,
-                },
-            );
+            .addFields({
+                name: "Your Stats",
+                value: `🌍 World Level: \`${stats.worldLevel}\` | ⭐ EXP: \`${
+                    stats.exp
+                }/${expRequired.toFixed(0)}\`\n❤️ HP: \`${stats.hp}/${
+                    stats.maxHP
+                }\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)} (${formatChange(
+                    stats.attackPower - stats.baseAttack,
+                )})\`${
+                    stats.critChance > 0 || stats.critValue > 0
+                        ? `\n🎯 Crit Chance: \`${
+                              stats.critChance
+                          }%\` | 💥 Crit Value: \`${stats.critValue.toFixed(
+                              2,
+                          )}x\``
+                        : ""
+                }${
+                    stats.defChance > 0 || stats.defValue > 0
+                        ? `\n🛡️ DEF Chance: \`${
+                              stats.defChance
+                          }%\` | 🛡️ DEF Value: \`${stats.defValue.toFixed(2)}\``
+                        : ""
+                }`,
+                inline: false,
+            });
 
         if (stats.equippedWeapon) {
             const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
@@ -108,9 +80,9 @@ export const rpg = buildCommand<SlashCommand>({
 
             embed.addFields({
                 name: "Equipped Weapon",
-                value: `${stats.equippedWeapon} (ATK Bonus: ${formatChange(
-                    weaponBonusAttack,
-                )})`,
+                value: `${equippedWeapon.emoji} ${
+                    stats.equippedWeapon
+                } (ATK Bonus: ${formatChange(weaponBonusAttack)})`,
                 inline: false,
             });
         }
@@ -140,6 +112,16 @@ export const rpg = buildCommand<SlashCommand>({
                 inline: false,
             });
         }
+
+        embed.addFields({
+            name: "Cooldowns",
+            value: `Hunt: ${
+                huntCooldown.status ? "Ready" : huntCooldown.message
+            }\nExplore: ${
+                exploreCooldown.status ? "Ready" : exploreCooldown.message
+            }`,
+            inline: false,
+        });
 
         await r.edit({ embeds: [embed] });
     },
