@@ -48,7 +48,7 @@ const skillRequirements: Record<
         worldLevel: 4,
         coins: 250,
         items: [
-            { item: "Elemental Core", amount: 3 },
+            { item: "Firm Arrowhead", amount: 3 },
             { item: "Sealed Scroll", amount: 5 },
         ],
     },
