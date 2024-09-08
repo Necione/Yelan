@@ -181,37 +181,50 @@ export async function handleHunt(
             attackPower *= critValue;
         }
 
-        if (hasVigilance && !vigilanceUsed) {
-            currentMonsterHp -= attackPower;
-            await thread
-                .send(
-                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name}.`,
-                )
-                .catch(noop);
+        const isAnemo = monster.name.includes("Anemo");
+        const dodgeChance = Math.random() < 0.1;
 
-            const vigilanceAttackPower = attackPower / 2;
-            currentMonsterHp -= vigilanceAttackPower;
-            vigilanceUsed = true;
+        if (isAnemo && dodgeChance) {
             await thread
                 .send(
-                    `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name} ✨ (Vigilance Skill).`,
+                    `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
                 )
                 .catch(noop);
         } else {
-            currentMonsterHp -= attackPower;
-            await thread
-                .send(
-                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name}${
-                        isCrit ? " 💢 (Critical Hit!)" : ""
-                    }.`,
-                )
-                .catch(noop);
+            if (hasVigilance && !vigilanceUsed) {
+                currentMonsterHp -= attackPower;
+                await thread
+                    .send(
+                        `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                            2,
+                        )}\` damage to the ${monster.name}.`,
+                    )
+                    .catch(noop);
+
+                const vigilanceAttackPower = attackPower / 2;
+                currentMonsterHp -= vigilanceAttackPower;
+                vigilanceUsed = true;
+                await thread
+                    .send(
+                        `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                            2,
+                        )}\` damage to the ${
+                            monster.name
+                        } ✨ (Vigilance Skill).`,
+                    )
+                    .catch(noop);
+            } else {
+                currentMonsterHp -= attackPower;
+                await thread
+                    .send(
+                        `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                            2,
+                        )}\` damage to the ${monster.name}${
+                            isCrit ? " 💢 (Critical Hit!)" : ""
+                        }.`,
+                    )
+                    .catch(noop);
+            }
         }
 
         if (hasLeech && Math.random() < 0.5) {
@@ -263,11 +276,15 @@ export async function handleHunt(
         }
 
         if (monster.name.includes("Cryo") && Math.random() < 0.25) {
-            const crippleDamage = 3;
+            const crippleDamage = monster.maxDamage * 0.5;
             currentPlayerHp -= crippleDamage;
             await thread
                 .send(
-                    `>>> \`❄️\` The ${monster.name} inflicted \`${crippleDamage}\` Cripple damage to you, bypassing defense!`,
+                    `>>> \`❄️\` The ${
+                        monster.name
+                    } inflicted \`${crippleDamage.toFixed(
+                        2,
+                    )}\` Cripple damage to you, bypassing defense!`,
                 )
                 .catch(noop);
         }
@@ -287,18 +304,34 @@ export async function handleHunt(
             )
             .catch(noop);
 
-        battleEmbed.setFields([
-            {
-                name: "Your HP",
-                value: createHealthBar(currentPlayerHp, stats.hp),
-                inline: true,
-            },
-            {
-                name: "Monster HP",
-                value: createHealthBar(currentMonsterHp, initialMonsterHp),
-                inline: true,
-            },
-        ]);
+        const playerHpBar = createHealthBar(currentPlayerHp, stats.hp);
+        const monsterHpBar = createHealthBar(
+            currentMonsterHp,
+            initialMonsterHp,
+        );
+
+        if (
+            typeof playerHpBar === "string" &&
+            typeof monsterHpBar === "string"
+        ) {
+            battleEmbed.setFields([
+                {
+                    name: "Your HP",
+                    value: playerHpBar,
+                    inline: true,
+                },
+                {
+                    name: "Monster HP",
+                    value: monsterHpBar,
+                    inline: true,
+                },
+            ]);
+        } else {
+            console.error("Invalid health bar values:", {
+                playerHpBar,
+                monsterHpBar,
+            });
+        }
 
         await i.editReply({ embeds: [battleEmbed] }).catch(noop);
     }, get.secs(4));
