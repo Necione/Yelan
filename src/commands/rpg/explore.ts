@@ -4,7 +4,6 @@ import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, getUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { handleChest } from "./handlers/chestHandler";
-import { handleHunt } from "./handlers/huntHandler";
 
 export const explore = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -75,12 +74,7 @@ export const explore = buildCommand<SlashCommand>({
             );
         }
 
-        const randomChance = Math.random();
-        if (randomChance < 0.8) {
-            await handleHunt(i, message, stats, userWallet);
-        } else {
-            await handleChest(i, stats, userWallet);
-        }
+        await handleChest(i, stats, userWallet);
 
         locked.del(i.user.id);
     },
