@@ -50,6 +50,10 @@ export const sell = buildCommand<SlashCommand>({
         const itemName = i.options.getString("item", true);
         const amountToSell = i.options.getInteger("amount", true);
 
+        if (itemName === "n/a") {
+            return r.edit(embedComment(`You didn't select a valid item.`));
+        }
+
         const itemData =
             drops[itemName as DropName] ||
             weapons[itemName as WeaponName] ||
