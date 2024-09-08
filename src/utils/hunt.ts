@@ -33,6 +33,10 @@ async function loadMonsters(dir: string): Promise<void> {
     for (const file of files) {
         const fullPath = path.join(dir, file);
 
+        if (file === "bosses" && fs.statSync(fullPath).isDirectory()) {
+            continue;
+        }
+
         if (fs.statSync(fullPath).isDirectory()) {
             await loadMonsters(fullPath);
         } else if (file.endsWith(".ts") || file.endsWith(".js")) {

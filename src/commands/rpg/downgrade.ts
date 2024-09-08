@@ -12,7 +12,7 @@ import { getUserStats, updateUserStats } from "../../services";
 export const downgrade = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("downgrade")
-        .setDescription("[RPG] Downgrade your world level by 1.")
+        .setDescription("[RPG] Downgrade your world level by up to 3 levels.")
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
@@ -41,15 +41,22 @@ export const downgrade = buildCommand<SlashCommand>({
             });
         }
 
-        if (stats.highestWL < stats.worldLevel) {
+        if (stats.worldLevel > stats.highestWL) {
             await updateUserStats(i.user.id, {
                 highestWL: stats.worldLevel,
             });
         }
 
-        if (stats.worldLevel - 1 < stats.highestWL) {
+        const highestAllowedDowngrade = Math.max(stats.highestWL - 3, 1);
+        const minDowngradeLevel = Math.max(1, stats.worldLevel - 3);
+        const allowedDowngradeLevels = Math.max(
+            minDowngradeLevel,
+            highestAllowedDowngrade,
+        );
+
+        if (allowedDowngradeLevels >= stats.worldLevel) {
             const embed = embedComment(
-                `You cannot downgrade 2 below your highest world level (${stats.highestWL}).`,
+                `You cannot downgrade lower than the limit of 3 levels below your highest world level (${stats.highestWL}).`,
             );
             return r.edit({
                 embeds: embed.embeds,
@@ -57,27 +64,28 @@ export const downgrade = buildCommand<SlashCommand>({
             });
         }
 
-        const confirmButton = new ButtonBuilder()
-            .setCustomId("confirm")
-            .setLabel("Confirm")
-            .setStyle(ButtonStyle.Success);
+        const downgradeLevels = [];
+        for (
+            let level = stats.worldLevel - 1;
+            level >= allowedDowngradeLevels;
+            level--
+        ) {
+            downgradeLevels.push(level);
+        }
 
-        const cancelButton = new ButtonBuilder()
-            .setCustomId("cancel")
-            .setLabel("Cancel")
-            .setStyle(ButtonStyle.Danger);
+        const buttons = downgradeLevels.map((level) =>
+            new ButtonBuilder()
+                .setCustomId(`downgrade_${level}`)
+                .setLabel(`Downgrade to WL${level}`)
+                .setStyle(ButtonStyle.Primary),
+        );
 
         const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            confirmButton,
-            cancelButton,
+            ...buttons,
         );
 
         const confirmationEmbed = embedComment(
-            `Are you sure you want to downgrade your world level from ${
-                stats.worldLevel
-            } to ${
-                stats.worldLevel - 1
-            }?\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
+            `Select the world level you want to downgrade to.\nYour current world level is ${stats.worldLevel}.\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
             "Yellow",
         );
 
@@ -86,11 +94,13 @@ export const downgrade = buildCommand<SlashCommand>({
             components: [actionRow],
         });
 
-        const confirmation = await i.channel.awaitMessageComponent({
-            time: 15000,
-            componentType: ComponentType.Button,
-            filter: (interaction) => interaction.user.id === i.user.id,
-        });
+        const confirmation = await i.channel
+            .awaitMessageComponent({
+                time: 30000,
+                componentType: ComponentType.Button,
+                filter: (interaction) => interaction.user.id === i.user.id,
+            })
+            .catch(() => null);
 
         if (!confirmation) {
             const timeoutEmbed = embedComment(
@@ -103,31 +113,20 @@ export const downgrade = buildCommand<SlashCommand>({
             });
         }
 
-        if (confirmation.customId === "confirm") {
-            await updateUserStats(i.user.id, {
-                worldLevel: stats.worldLevel - 1,
-                exp: 0,
-            });
+        const selectedLevel = parseInt(confirmation.customId.split("_")[1], 10);
 
-            const successEmbed = embedComment(
-                `Your world level has been downgraded to ${
-                    stats.worldLevel - 1
-                } and your EXP has been reset to 0.`,
-                "Green",
-            );
-            return r.edit({
-                embeds: successEmbed.embeds,
-                components: [],
-            });
-        } else if (confirmation.customId === "cancel") {
-            const cancelEmbed = embedComment(
-                `Downgrade cancelled. Your world level remains at ${stats.worldLevel}.`,
-                "Red",
-            );
-            return r.edit({
-                embeds: cancelEmbed.embeds,
-                components: [],
-            });
-        }
+        await updateUserStats(i.user.id, {
+            worldLevel: selectedLevel,
+            exp: 0,
+        });
+
+        const successEmbed = embedComment(
+            `Your world level has been downgraded to ${selectedLevel} and your EXP has been reset to 0.`,
+            "Green",
+        );
+        return r.edit({
+            embeds: successEmbed.embeds,
+            components: [],
+        });
     },
 });
