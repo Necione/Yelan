@@ -17,13 +17,12 @@ export const equip = buildCommand<SlashCommand>({
             "[RPG] Equip a weapon or an artifact from your inventory.",
         )
         .setDMPermission(false)
-        .addStringOption(
-            (option) =>
-                option
-                    .setName("item")
-                    .setDescription("The weapon or artifact to equip")
-                    .setRequired(true)
-                    .setAutocomplete(true),
+        .addStringOption((option) =>
+            option
+                .setName("item")
+                .setDescription("The weapon or artifact to equip")
+                .setRequired(true)
+                .setAutocomplete(true),
         ),
     defer: { silent: false },
     async autocomplete(i) {
@@ -147,6 +146,13 @@ export const equip = buildCommand<SlashCommand>({
             }
 
             const artifactType = getArtifactType(artifactName);
+            if (!artifactType) {
+                return r.edit(
+                    embedComment(
+                        `Unable to find the artifact type for "${artifactName}"`,
+                    ),
+                );
+            }
             const equippedField =
                 `equipped${artifactType}` as keyof typeof stats;
 

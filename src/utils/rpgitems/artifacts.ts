@@ -184,6 +184,9 @@ export const artifacts = {
 export type ArtifactName = keyof typeof artifacts;
 export type ArtifactType = "Flower" | "Plume" | "Sands" | "Goblet" | "Circlet";
 
-export function getArtifactType(artifact: ArtifactName): ArtifactType {
+export function getArtifactType(artifact: ArtifactName): ArtifactType | null {
+    if (!artifacts[artifact]) {
+        return null;
+    }
     return artifacts[artifact].type as ArtifactType;
 }

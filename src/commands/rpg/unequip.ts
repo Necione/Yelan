@@ -83,6 +83,14 @@ export const unequip = buildCommand<SlashCommand>({
 
         const artifactType = getArtifactType(itemName as ArtifactName);
 
+        if (!artifactType) {
+            return r.edit(
+                embedComment(
+                    `Unable to find the artifact type for "${itemName}"`,
+                ),
+            );
+        }
+
         if (artifactType) {
             const equippedField =
                 `equipped${artifactType}` as keyof typeof stats;
