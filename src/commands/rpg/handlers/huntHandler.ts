@@ -187,8 +187,13 @@ export async function handleHunt(
 
             sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
 
-            await cooldowns.set(userWallet, "hunt", get.mins(30));
+            const hasInsomniaSkill = stats.skills.some(
+                (skill) => skill.name === "Insomnia",
+            );
 
+            const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
+
+            await cooldowns.set(userWallet, "hunt", huntCooldown);
             return;
         }
 

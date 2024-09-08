@@ -26,6 +26,11 @@ const availableSkills = [
         description: "Heal 5% of your Max HP after every battle",
         emoji: "⭐",
     },
+    {
+        name: "Insomnia",
+        description: "Reduce your hunt cooldown from 30 minutes to 20 minutes",
+        emoji: "🌙",
+    },
 ];
 
 export const skills = buildCommand<SlashCommand>({
