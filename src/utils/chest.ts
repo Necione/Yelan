@@ -80,29 +80,42 @@ export function generateChestLoot(worldLevel: number) {
 
     let totalUniqueItems = 0;
 
-    chestLoot.forEach((lootItem) => {
-        if (totalUniqueItems >= maxUniqueItems) {
-            return;
-        }
+    const eligibleLoot = chestLoot.filter(
+        (lootItem) => worldLevel >= lootItem.minWorldLevel,
+    );
 
-        if (worldLevel >= lootItem.minWorldLevel) {
-            const chance = Math.random() * 100;
-            if (chance <= lootItem.chestChance) {
-                const amount = getRandomValue(
-                    lootItem.minAmount,
-                    lootItem.maxAmount,
-                );
+    const totalWeight = eligibleLoot.reduce(
+        (acc, lootItem) => acc + lootItem.minWorldLevel,
+        0,
+    );
 
-                if (amount > 0) {
-                    loot.push({
-                        item: lootItem.name,
-                        amount: Math.floor(amount),
-                    });
-                    totalUniqueItems++;
+    while (totalUniqueItems < maxUniqueItems && eligibleLoot.length > 0) {
+        let randomWeight = Math.random() * totalWeight;
+
+        for (const lootItem of eligibleLoot) {
+            if (randomWeight < lootItem.minWorldLevel) {
+                const chance = Math.random() * 100;
+                if (chance <= lootItem.chestChance) {
+                    const amount = getRandomValue(
+                        lootItem.minAmount,
+                        lootItem.maxAmount,
+                    );
+
+                    if (amount > 0) {
+                        loot.push({
+                            item: lootItem.name,
+                            amount: Math.floor(amount),
+                        });
+                        totalUniqueItems++;
+
+                        eligibleLoot.splice(eligibleLoot.indexOf(lootItem), 1);
+                    }
                 }
+                break;
             }
+            randomWeight -= lootItem.minWorldLevel;
         }
-    });
+    }
 
     const coins = getRandomValue(4, 8) * selectedRarity.multiplier;
 
