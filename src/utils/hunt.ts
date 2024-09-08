@@ -29,7 +29,6 @@ async function loadMonsters(dir: string): Promise<void> {
     for (const file of files) {
         const fullPath = path.join(dir, file);
 
-        // Skip the bosses directory
         if (fs.statSync(fullPath).isDirectory() && file === "bosses") {
             continue;
         }
@@ -105,15 +104,43 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         return null;
     }
 
-    const weightedMonsters: Monster[] = availableMonsters.flatMap((monster) => {
+    const groups: { [groupName: string]: Monster[] } = {
+        Slime: [],
+        HilichurlGroup: [],
+        Others: [],
+    };
+
+    availableMonsters.forEach((monster) => {
+        if (monster.name.includes("Slime")) {
+            groups.Slime.push(monster);
+        } else if (
+            monster.name.includes("Samachurl") ||
+            monster.name.includes("Hilichurl") ||
+            monster.name.includes("Lawachurl")
+        ) {
+            groups.HilichurlGroup.push(monster);
+        } else {
+            groups.Others.push(monster);
+        }
+    });
+
+    const activeGroups = Object.keys(groups).filter(
+        (groupName) => groups[groupName].length > 0,
+    );
+
+    const randomGroupName =
+        activeGroups[Math.floor(Math.random() * activeGroups.length)];
+    const selectedGroup = groups[randomGroupName];
+
+    const weightedMonsters: Monster[] = selectedGroup.flatMap((monster) => {
         const weight = monster.minWorldLevel;
         return Array(weight).fill(monster);
     });
 
-    const selectedMonster =
+    const randomMonster =
         weightedMonsters[Math.floor(Math.random() * weightedMonsters.length)];
 
-    const levelDifference = worldLevel - selectedMonster.minWorldLevel;
+    const levelDifference = worldLevel - randomMonster.minWorldLevel;
 
     if (levelDifference > 0) {
         let attackIncreaseFactor = 1;
@@ -127,22 +154,22 @@ export async function getRandomMonster(worldLevel: number, location: string) {
             hpIncreaseFactor += 0.25 * levelDifference;
         }
 
-        selectedMonster.minDamage = Math.floor(
-            selectedMonster.minDamage * attackIncreaseFactor,
+        randomMonster.minDamage = Math.floor(
+            randomMonster.minDamage * attackIncreaseFactor,
         );
-        selectedMonster.maxDamage = Math.floor(
-            selectedMonster.maxDamage * attackIncreaseFactor,
+        randomMonster.maxDamage = Math.floor(
+            randomMonster.maxDamage * attackIncreaseFactor,
         );
 
-        selectedMonster.minHp = Math.floor(
-            selectedMonster.minHp * hpIncreaseFactor,
+        randomMonster.minHp = Math.floor(
+            randomMonster.minHp * hpIncreaseFactor,
         );
-        selectedMonster.maxHp = Math.floor(
-            selectedMonster.maxHp * hpIncreaseFactor,
+        randomMonster.maxHp = Math.floor(
+            randomMonster.maxHp * hpIncreaseFactor,
         );
     }
 
-    return selectedMonster;
+    return randomMonster;
 }
 
 export async function getRandomBoss(
