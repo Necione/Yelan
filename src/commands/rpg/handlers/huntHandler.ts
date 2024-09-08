@@ -132,6 +132,14 @@ async function playerAttack(
         attackPower *= critValue;
     }
 
+    const monsterDefChance = monster.defChance || 0;
+    const monsterDefValue = monster.defValue || 0;
+    const monsterDefended = Math.random() * 100 < monsterDefChance;
+
+    if (monsterDefended) {
+        attackPower = Math.max(attackPower - monsterDefValue, 0);
+    }
+
     const isAnemo = monster.name.includes("Anemo");
     const dodgeChance = Math.random() < 0.25;
 
@@ -149,6 +157,8 @@ async function playerAttack(
                     2,
                 )}\` damage to the ${monster.name}${
                     isCrit ? " 💢 (Critical Hit!)" : ""
+                }${
+                    monsterDefended ? ` 🛡️ (Defended: -${monsterDefValue})` : ""
                 }.`,
             )
             .catch(noop);
@@ -178,10 +188,10 @@ async function monsterAttack(
     currentPlayerHp: number,
 ): Promise<number> {
     let monsterDamage = getRandomValue(monster.minDamage, monster.maxDamage);
+
     const critChance = monster.critChance || 0;
     const critValue = monster.critValue || 1;
     const isCrit = Math.random() * 100 < critChance;
-
     if (isCrit) {
         monsterDamage *= critValue;
     }
@@ -189,7 +199,6 @@ async function monsterAttack(
     const defChance = stats.defChance || 0;
     const defValue = stats.defValue || 0;
     const defended = Math.random() * 100 < defChance;
-
     if (defended) {
         monsterDamage = Math.max(monsterDamage - defValue, 0);
     }
