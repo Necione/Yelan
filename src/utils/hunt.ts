@@ -28,18 +28,10 @@ const monsters: Monster[] = [];
 let monstersLoaded = false;
 
 async function loadMonsters(dir: string): Promise<void> {
-    if (monstersLoaded) {
-        return;
-    }
-
     const files = fs.readdirSync(dir);
 
     for (const file of files) {
         const fullPath = path.join(dir, file);
-
-        if (fs.statSync(fullPath).isDirectory() && file === "bosses") {
-            continue;
-        }
 
         if (fs.statSync(fullPath).isDirectory()) {
             await loadMonsters(fullPath);
@@ -59,8 +51,6 @@ async function loadMonsters(dir: string): Promise<void> {
             }
         }
     }
-
-    monstersLoaded = true;
 }
 
 const monstersDir = path.resolve(__dirname, "./monsters");
@@ -68,6 +58,8 @@ const monstersDir = path.resolve(__dirname, "./monsters");
 export async function initializeMonsters(): Promise<void> {
     if (!monstersLoaded) {
         await loadMonsters(monstersDir);
+        monstersLoaded = true;
+        console.log(`Total monsters loaded: ${monsters.length}`);
     }
 }
 
