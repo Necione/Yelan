@@ -104,6 +104,27 @@ export const drops = {
         minWorldLevel: 6,
         chestChance: 5,
     },
+    "Treasure Hoarder Insignia": {
+        sellPrice: 20,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 7,
+        chestChance: 5,
+    },
+    "Silver Raven Insignia": {
+        sellPrice: 30,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 7,
+        chestChance: 4,
+    },
+    "Golden Raven Insignia": {
+        sellPrice: 40,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 7,
+        chestChance: 3,
+    },
     "Elemental Core": {
         sellPrice: 20,
         minAmount: 0,
