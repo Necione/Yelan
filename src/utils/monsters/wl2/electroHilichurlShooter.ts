@@ -4,8 +4,8 @@ const electorHilichurlShooter = {
     maxHp: 25,
     minDamage: 4,
     maxDamage: 7,
-    minExp: 5,
-    maxExp: 10,
+    minExp: 4,
+    maxExp: 8,
     minWorldLevel: 2,
     image: "https://lh.elara.workers.dev/rpg/monsters/electro_hilichurl_shooter.png",
     drops: [

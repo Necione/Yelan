@@ -4,8 +4,8 @@ const stonehideLawachurl = {
     maxHp: 200,
     minDamage: 10,
     maxDamage: 15,
-    minExp: 7,
-    maxExp: 12,
+    minExp: 5,
+    maxExp: 10,
     minWorldLevel: 6,
     image: "https://lh.elara.workers.dev/rpg/monsters/stonehide_lawachurl.png",
     drops: [

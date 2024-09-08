@@ -116,21 +116,13 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     const levelDifference = worldLevel - selectedMonster.minWorldLevel;
 
     if (levelDifference > 0) {
-        const attackScaleFactor = 1 + levelDifference * 0.25;
-        selectedMonster.minDamage = Math.floor(
-            selectedMonster.minDamage * attackScaleFactor,
-        );
-        selectedMonster.maxDamage = Math.floor(
-            selectedMonster.maxDamage * attackScaleFactor,
-        );
+        const attackIncrease = getRandomValue(5, 10) * levelDifference;
+        selectedMonster.minDamage += attackIncrease;
+        selectedMonster.maxDamage += attackIncrease;
 
-        const hpScaleFactor = 1 + levelDifference * 0.25;
-        selectedMonster.minHp = Math.floor(
-            selectedMonster.minHp * hpScaleFactor,
-        );
-        selectedMonster.maxHp = Math.floor(
-            selectedMonster.maxHp * hpScaleFactor,
-        );
+        const hpIncrease = getRandomValue(10, 15) * levelDifference;
+        selectedMonster.minHp += hpIncrease;
+        selectedMonster.maxHp += hpIncrease;
     }
 
     return selectedMonster;

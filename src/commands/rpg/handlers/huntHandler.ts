@@ -197,170 +197,178 @@ export async function handleHunt(
             return;
         }
 
-        let attackPower = stats.attackPower;
-        const critChance = stats.critChance || 0;
-        const critValue = stats.critValue || 1;
+        const isStunned =
+            monster.name.includes("Lawachurl") && Math.random() < 0.2;
 
-        const isCrit = Math.random() * 100 < critChance;
-        if (isCrit) {
-            attackPower *= critValue;
-        }
-
-        const isAnemo = monster.name.includes("Anemo");
-        const dodgeChance = Math.random() < 0.1;
-
-        if (isAnemo && dodgeChance) {
+        if (isStunned) {
             await thread
                 .send(
-                    `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
+                    `>>> \`💫\` The ${monster.name} used its Stun ability and skipped your turn!`,
                 )
                 .catch(noop);
         } else {
-            if (hasVigilance && !vigilanceUsed) {
-                currentMonsterHp -= attackPower;
-                await thread
-                    .send(
-                        `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                            2,
-                        )}\` damage to the ${monster.name}.`,
-                    )
-                    .catch(noop);
+            let attackPower = stats.attackPower;
+            const critChance = stats.critChance || 0;
+            const critValue = stats.critValue || 1;
 
-                const vigilanceAttackPower = attackPower / 2;
-                currentMonsterHp -= vigilanceAttackPower;
-                vigilanceUsed = true;
+            const isCrit = Math.random() * 100 < critChance;
+            if (isCrit) {
+                attackPower *= critValue;
+            }
+
+            const isAnemo = monster.name.includes("Anemo");
+            const dodgeChance = Math.random() < 0.25;
+
+            if (isAnemo && dodgeChance) {
                 await thread
                     .send(
-                        `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                            2,
-                        )}\` damage to the ${
-                            monster.name
-                        } ✨ (Vigilance Skill).`,
+                        `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
                     )
                     .catch(noop);
             } else {
-                currentMonsterHp -= attackPower;
+                if (hasVigilance && !vigilanceUsed) {
+                    currentMonsterHp -= attackPower;
+                    await thread
+                        .send(
+                            `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                                2,
+                            )}\` damage to the ${monster.name}.`,
+                        )
+                        .catch(noop);
+
+                    const vigilanceAttackPower = attackPower / 2;
+                    currentMonsterHp -= vigilanceAttackPower;
+                    vigilanceUsed = true;
+                    await thread
+                        .send(
+                            `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                                2,
+                            )}\` damage to the ${
+                                monster.name
+                            } ✨ (Vigilance Skill).`,
+                        )
+                        .catch(noop);
+                } else {
+                    currentMonsterHp -= attackPower;
+                    await thread
+                        .send(
+                            `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                                2,
+                            )}\` damage to the ${monster.name}${
+                                isCrit ? " 💢 (Critical Hit!)" : ""
+                            }.`,
+                        )
+                        .catch(noop);
+                }
+            }
+
+            if (hasLeech && Math.random() < 0.5) {
+                const leechHeal = Math.ceil(initialMonsterHp * 0.01);
+                currentPlayerHp = Math.min(
+                    currentPlayerHp + leechHeal,
+                    stats.maxHP,
+                );
                 await thread
                     .send(
-                        `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                            2,
-                        )}\` damage to the ${monster.name}${
-                            isCrit ? " 💢 (Critical Hit!)" : ""
-                        }.`,
+                        `>>> \`💖\` You healed \`${leechHeal}\` HP due to the Leech skill.`,
                     )
                     .catch(noop);
             }
         }
 
-        if (hasLeech && Math.random() < 0.5) {
-            const leechHeal = Math.ceil(initialMonsterHp * 0.01);
-            currentPlayerHp = Math.min(
-                currentPlayerHp + leechHeal,
-                stats.maxHP,
+        if (currentMonsterHp > 0) {
+            let monsterDamage = getRandomValue(
+                monster.minDamage,
+                monster.maxDamage,
             );
+
+            const defChance = stats.defChance || 0;
+            const defValue = stats.defValue || 0;
+
+            const defended = Math.random() * 100 < defChance;
+            if (defended) {
+                monsterDamage = Math.max(monsterDamage - defValue, 0);
+            }
+
+            if (
+                monster.name.includes("Pyro Slime") ||
+                monster.name.includes("Cryo") ||
+                monster.name.includes("Frost")
+            ) {
+                let damageType = "";
+                let damageAmount = 0;
+
+                if (monster.name.includes("Pyro Slime")) {
+                    damageType = "🔥 Burn";
+                    damageAmount = monster.name === "Large Pyro Slime" ? 5 : 2;
+                } else if (
+                    (monster.name.includes("Cryo") ||
+                        monster.name.includes("Frost")) &&
+                    Math.random() < 0.25
+                ) {
+                    damageType = "❄️ Cripple";
+                    damageAmount = monster.maxDamage * 0.5;
+                }
+
+                if (damageAmount > 0) {
+                    currentPlayerHp -= damageAmount;
+                    await thread
+                        .send(
+                            `>>> \`${damageType}\` The ${
+                                monster.name
+                            } inflicted \`${damageAmount.toFixed(
+                                2,
+                            )}\` damage to you, bypassing defense!`,
+                        )
+                        .catch(noop);
+                }
+            }
+
+            currentPlayerHp -= monsterDamage;
+            if (currentPlayerHp < 0) {
+                currentPlayerHp = 0;
+            }
+
             await thread
                 .send(
-                    `>>> \`💖\` You healed \`${leechHeal}\` HP due to the Leech skill.`,
-                )
-                .catch(noop);
-        }
-
-        if (currentMonsterHp < 0) {
-            currentMonsterHp = 0;
-        }
-
-        let monsterDamage = getRandomValue(
-            monster.minDamage,
-            monster.maxDamage,
-        );
-
-        const defChance = stats.defChance || 0;
-        const defValue = stats.defValue || 0;
-
-        const defended = Math.random() * 100 < defChance;
-        if (defended) {
-            monsterDamage = Math.max(monsterDamage - defValue, 0);
-        }
-
-        if (monster.name === "Large Pyro Slime") {
-            const burnDamage = 5;
-            currentPlayerHp -= burnDamage;
-            await thread
-                .send(
-                    `>>> \`🔥\` The Large Pyro Slime inflicted \`${burnDamage}\` burn damage to you, bypassing defense!`,
-                )
-                .catch(noop);
-        } else if (monster.name === "Pyro Slime") {
-            const burnDamage = 2;
-            currentPlayerHp -= burnDamage;
-            await thread
-                .send(
-                    `>>> \`🔥\` The Pyro Slime inflicted \`${burnDamage}\` burn damage to you, bypassing defense!`,
-                )
-                .catch(noop);
-        }
-
-        if (
-            (monster.name.includes("Cryo") || monster.name.includes("Frost")) &&
-            Math.random() < 0.25
-        ) {
-            const crippleDamage = monster.maxDamage * 0.5;
-            currentPlayerHp -= crippleDamage;
-            await thread
-                .send(
-                    `>>> \`❄️\` The ${
+                    `>>> \`⚔️\` The ${
                         monster.name
-                    } inflicted \`${crippleDamage.toFixed(
-                        2,
-                    )}\` Cripple damage to you, bypassing defense!`,
+                    } dealt \`${monsterDamage}\` damage to you${
+                        defended ? ` 🛡️ (Defended: -${defValue})` : ""
+                    }.`,
                 )
                 .catch(noop);
+
+            const playerHpBar = createHealthBar(currentPlayerHp, stats.hp);
+            const monsterHpBar = createHealthBar(
+                currentMonsterHp,
+                initialMonsterHp,
+            );
+
+            if (
+                typeof playerHpBar === "string" &&
+                typeof monsterHpBar === "string"
+            ) {
+                battleEmbed.setFields([
+                    {
+                        name: "Your HP",
+                        value: playerHpBar,
+                        inline: true,
+                    },
+                    {
+                        name: "Monster HP",
+                        value: monsterHpBar,
+                        inline: true,
+                    },
+                ]);
+            } else {
+                console.error("Invalid health bar values:", {
+                    playerHpBar,
+                    monsterHpBar,
+                });
+            }
+
+            await i.editReply({ embeds: [battleEmbed] }).catch(noop);
         }
-
-        currentPlayerHp -= monsterDamage;
-        if (currentPlayerHp < 0) {
-            currentPlayerHp = 0;
-        }
-
-        await thread
-            .send(
-                `>>> \`⚔️\` The ${
-                    monster.name
-                } dealt \`${monsterDamage}\` damage to you${
-                    defended ? ` 🛡️ (Defended: -${defValue})` : ""
-                }.`,
-            )
-            .catch(noop);
-
-        const playerHpBar = createHealthBar(currentPlayerHp, stats.hp);
-        const monsterHpBar = createHealthBar(
-            currentMonsterHp,
-            initialMonsterHp,
-        );
-
-        if (
-            typeof playerHpBar === "string" &&
-            typeof monsterHpBar === "string"
-        ) {
-            battleEmbed.setFields([
-                {
-                    name: "Your HP",
-                    value: playerHpBar,
-                    inline: true,
-                },
-                {
-                    name: "Monster HP",
-                    value: monsterHpBar,
-                    inline: true,
-                },
-            ]);
-        } else {
-            console.error("Invalid health bar values:", {
-                playerHpBar,
-                monsterHpBar,
-            });
-        }
-
-        await i.editReply({ embeds: [battleEmbed] }).catch(noop);
     }, get.secs(4));
 }
