@@ -5,6 +5,7 @@ import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
 import { cooldowns } from "../../utils";
 import { formatChange } from "../../utils/hunt";
+import { WeaponName, weapons } from "../../utils/rpgitems/weapons";
 
 export const rpg = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -102,10 +103,13 @@ export const rpg = buildCommand<SlashCommand>({
             );
 
         if (stats.equippedWeapon) {
+            const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
+            const weaponBonusAttack = equippedWeapon.attackPower;
+
             embed.addFields({
                 name: "Equipped Weapon",
-                value: `${stats.equippedWeapon} (ATK: ${formatChange(
-                    stats.attackPower - stats.baseAttack,
+                value: `${stats.equippedWeapon} (ATK Bonus: ${formatChange(
+                    weaponBonusAttack,
                 )})`,
                 inline: false,
             });
