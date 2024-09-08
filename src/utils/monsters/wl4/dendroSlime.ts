@@ -5,7 +5,7 @@ const dendroSlime = {
     minDamage: 8,
     maxDamage: 12,
     minExp: 5,
-    maxExp: 8,
+    maxExp: 10,
     minWorldLevel: 4,
     image: "https://lh.elara.workers.dev/rpg/monsters/dendro_slime.png",
     drops: [

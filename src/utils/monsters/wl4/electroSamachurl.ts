@@ -4,8 +4,8 @@ const electroSamachurl = {
     maxHp: 55,
     minDamage: 8,
     maxDamage: 13,
-    minExp: 4,
-    maxExp: 8,
+    minExp: 5,
+    maxExp: 10,
     minWorldLevel: 4,
     image: "https://lh.elara.workers.dev/rpg/monsters/electro_samachurl.png",
     drops: [

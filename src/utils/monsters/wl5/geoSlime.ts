@@ -4,8 +4,8 @@ const geoSlime = {
     maxHp: 100,
     minDamage: 1,
     maxDamage: 15,
-    minExp: 3,
-    maxExp: 8,
+    minExp: 5,
+    maxExp: 10,
     minWorldLevel: 5,
     image: "https://lh.elara.workers.dev/rpg/monsters/geo_slime.png",
     drops: [

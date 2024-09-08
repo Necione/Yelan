@@ -295,7 +295,10 @@ export async function handleHunt(
                 .catch(noop);
         }
 
-        if (monster.name.includes("Cryo") && Math.random() < 0.25) {
+        if (
+            (monster.name.includes("Cryo") || monster.name.includes("Frost")) &&
+            Math.random() < 0.25
+        ) {
             const crippleDamage = monster.maxDamage * 0.5;
             currentPlayerHp -= crippleDamage;
             await thread

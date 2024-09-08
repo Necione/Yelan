@@ -5,7 +5,7 @@ import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
 import { cooldowns } from "../../utils";
 import { formatChange } from "../../utils/hunt";
-import { WeaponName, weapons } from "../../utils/rpgitems/weapons";
+import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
 
 export const rpg = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

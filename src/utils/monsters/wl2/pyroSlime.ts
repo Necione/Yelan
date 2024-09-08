@@ -4,8 +4,8 @@ const pyroSlime = {
     maxHp: 20,
     minDamage: 3,
     maxDamage: 5,
-    minExp: 3,
-    maxExp: 6,
+    minExp: 5,
+    maxExp: 10,
     minWorldLevel: 2,
     image: "https://lh.elara.workers.dev/rpg/monsters/pyro_slime.png",
     drops: [

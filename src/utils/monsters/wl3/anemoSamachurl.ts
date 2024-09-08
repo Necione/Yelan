@@ -4,8 +4,8 @@ const anemoSamachurl = {
     maxHp: 45,
     minDamage: 5,
     maxDamage: 9,
-    minExp: 4,
-    maxExp: 8,
+    minExp: 7,
+    maxExp: 12,
     minWorldLevel: 3,
     image: "https://lh.elara.workers.dev/rpg/monsters/anemo_samachurl.png",
     drops: [
