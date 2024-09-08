@@ -4,8 +4,8 @@ const cryoSamachurl = {
     maxHp: 48,
     minDamage: 5,
     maxDamage: 9,
-    minExp: 7,
-    maxExp: 12,
+    minExp: 5,
+    maxExp: 7,
     minWorldLevel: 3,
     image: "https://lh.elara.workers.dev/rpg/monsters/cryo_samachurl.png",
     drops: [
