@@ -4,8 +4,8 @@ const frostarmLawachurl = {
     maxHp: 125,
     minDamage: 10,
     maxDamage: 25,
-    minExp: 7,
-    maxExp: 12,
+    minExp: 5,
+    maxExp: 10,
     minWorldLevel: 6,
     image: "https://lh.elara.workers.dev/rpg/monsters/frostarm_lawachurl.png",
     drops: [

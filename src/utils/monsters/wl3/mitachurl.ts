@@ -4,8 +4,8 @@ const mitachurl = {
     maxHp: 50,
     minDamage: 6,
     maxDamage: 10,
-    minExp: 7,
-    maxExp: 12,
+    minExp: 5,
+    maxExp: 7,
     minWorldLevel: 3,
     image: "https://lh.elara.workers.dev/rpg/monsters/mitachurl.png",
     drops: [

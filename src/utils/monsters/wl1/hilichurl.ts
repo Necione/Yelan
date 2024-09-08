@@ -4,8 +4,8 @@ const hilichurl = {
     maxHp: 25,
     minDamage: 2,
     maxDamage: 3,
-    minExp: 4,
-    maxExp: 8,
+    minExp: 3,
+    maxExp: 6,
     minWorldLevel: 1,
     image: "https://lh.elara.workers.dev/rpg/monsters/hilichurl.png",
     drops: [
