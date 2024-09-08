@@ -1,9 +1,9 @@
 const eyeOfTheStorm = {
     name: "Eye of the Storm",
-    minHp: 200,
-    maxHp: 400,
+    minHp: 500,
+    maxHp: 800,
     minDamage: 10,
-    maxDamage: 25,
+    maxDamage: 35,
     minExp: 10,
     maxExp: 20,
     minWorldLevel: 1,

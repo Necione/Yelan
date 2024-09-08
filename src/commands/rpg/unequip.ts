@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, getKeys } from "@elara-services/utils";
+import { embedComment, getKeys, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import {
@@ -21,18 +21,28 @@ export const unequip = buildCommand<SlashCommand>({
                 .setName("item")
                 .setDescription("The weapon or artifact to unequip")
                 .setRequired(true)
-                .addChoices(
-                    ...getKeys(weapons).map((c) => ({
-                        name: c,
-                        value: c,
-                    })),
-                    ...getKeys(artifacts).map((c) => ({
-                        name: c,
-                        value: c,
-                    })),
-                ),
+                .setAutocomplete(true),
         ),
     defer: { silent: false },
+    async autocomplete(i) {
+        const list = [...getKeys(weapons), ...getKeys(artifacts)].map((c) => ({
+            name: c,
+            value: c,
+        }));
+        const item = i.options.getString("item", false) ?? "";
+        if (!item) {
+            return i.respond(list.slice(0, 25)).catch(noop);
+        }
+        const items = list.filter((c) =>
+            c.name.toLowerCase().includes(item.toLowerCase()),
+        );
+        if (!is.array(items)) {
+            return i
+                .respond([{ name: "No match found for that.", value: "n/a" }])
+                .catch(noop);
+        }
+        return i.respond(items.slice(0, 25)).catch(noop);
+    },
     async execute(i, r) {
         const itemName = i.options.getString("item", true);
         const stats = await getUserStats(i.user.id);

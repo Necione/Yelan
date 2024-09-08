@@ -39,6 +39,30 @@ export const weapons = {
         minWorldLevel: 4,
         chestChance: 5,
     },
+    "White Tassel": {
+        sellPrice: 10,
+        attackPower: 0,
+        critChance: 50,
+        critValue: 1.5,
+        minWorldLevel: 4,
+        chestChance: 5,
+    },
+    "Skyrider Sword": {
+        sellPrice: 15,
+        attackPower: 6,
+        critChance: 20,
+        critValue: 1.5,
+        minWorldLevel: 5,
+        chestChance: 5,
+    },
+    "Twin Nephrite": {
+        sellPrice: 15,
+        attackPower: 2,
+        critChance: 5,
+        critValue: 5,
+        minWorldLevel: 5,
+        chestChance: 5,
+    },
 };
 
 export type WeaponName = keyof typeof weapons;
