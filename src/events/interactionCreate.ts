@@ -1,5 +1,6 @@
 import {
     createEvent,
+    handleAutocompleteCommand,
     handleInteractionCommand,
     handlePostInteraction,
 } from "@elara-services/botbuilder";
@@ -16,6 +17,9 @@ import { isInActiveTrade, locked } from "../utils";
 export const interactionCreate = createEvent({
     name: Events.InteractionCreate,
     async execute(i: Interaction) {
+        if (i.isAutocomplete()) {
+            return handleAutocompleteCommand(i, getFilesList(Commands));
+        }
         handlePostInteraction(i);
         if ("customId" in i) {
             if (isInviteInt(i) && i.isButton()) {
