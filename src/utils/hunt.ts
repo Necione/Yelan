@@ -28,6 +28,10 @@ const monsters: Monster[] = [];
 let monstersLoaded = false;
 
 async function loadMonsters(dir: string): Promise<void> {
+    if (monstersLoaded) {
+        return;
+    }
+
     const files = fs.readdirSync(dir);
 
     for (const file of files) {
@@ -43,7 +47,8 @@ async function loadMonsters(dir: string): Promise<void> {
             try {
                 const monsterModule = await import(fullPath);
                 const monster = monsterModule.default as Monster;
-                if (monster) {
+
+                if (monster && !monsters.some((m) => m.name === monster.name)) {
                     monsters.push(monster);
                 }
             } catch (error) {
@@ -54,13 +59,16 @@ async function loadMonsters(dir: string): Promise<void> {
             }
         }
     }
+
+    monstersLoaded = true;
 }
 
 const monstersDir = path.resolve(__dirname, "./monsters");
 
 export async function initializeMonsters(): Promise<void> {
-    await loadMonsters(monstersDir);
-    monstersLoaded = true;
+    if (!monstersLoaded) {
+        await loadMonsters(monstersDir);
+    }
 }
 
 export { monsters, monstersLoaded };
