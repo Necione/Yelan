@@ -59,6 +59,7 @@ export const learn = buildCommand<SlashCommand>({
                     { name: "Vigilance", value: "Vigilance" },
                     { name: "Leech", value: "Leech" },
                     { name: "Appraise", value: "Appraise" },
+                    { name: "Totem", value: "Totem" },
                 ),
         ),
     defer: { silent: false },
