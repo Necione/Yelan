@@ -127,16 +127,10 @@ async function playerAttack(
     const critChance = stats.critChance || 0;
     const critValue = stats.critValue || 1;
 
-    console.log(`[DEBUG] Player attack power: ${attackPower}`);
-
     const isCrit = Math.random() * 100 < critChance;
     if (isCrit) {
         attackPower *= critValue;
     }
-
-    console.log(
-        `[DEBUG] Is crit: ${isCrit}, Attack power after crit: ${attackPower}`,
-    );
 
     const isAnemo = monster.name.includes("Anemo");
     const dodgeChance = Math.random() < 0.25;
@@ -147,7 +141,6 @@ async function playerAttack(
                 `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
             )
             .catch(noop);
-        console.log(`[DEBUG] The monster dodged the player's attack.`);
     } else {
         currentMonsterHp -= attackPower;
         await thread
@@ -159,10 +152,6 @@ async function playerAttack(
                 }.`,
             )
             .catch(noop);
-
-        console.log(
-            `[DEBUG] Player dealt ${attackPower} damage to the monster.`,
-        );
 
         if (hasVigilance && !vigilanceUsed) {
             const vigilanceAttackPower = attackPower / 2;
@@ -176,10 +165,6 @@ async function playerAttack(
                     )}\` damage to the ${monster.name} ✨ (Vigilance Skill).`,
                 )
                 .catch(noop);
-
-            console.log(
-                `[DEBUG] Vigilance attack triggered. Dealt ${vigilanceAttackPower} damage (half of attackPower).`,
-            );
         }
     }
 
@@ -207,6 +192,26 @@ async function monsterAttack(
 
     if (defended) {
         monsterDamage = Math.max(monsterDamage - defValue, 0);
+    }
+
+    if (monster.name.includes("Pyro")) {
+        const burnDamage = Math.ceil(stats.maxHP * 0.03);
+        currentPlayerHp -= burnDamage;
+        await thread
+            .send(
+                `>>> \`🔥\` The ${monster.name} inflicted Burn! You took \`${burnDamage}\` Burn damage.`,
+            )
+            .catch(noop);
+    }
+
+    if (monster.name.includes("Cryo") && Math.random() < 0.5) {
+        const crippleDamage = Math.ceil(stats.maxHP * 0.05);
+        currentPlayerHp -= crippleDamage;
+        await thread
+            .send(
+                `>>> \`❄️\` The ${monster.name} inflicted Cripple! You took \`${crippleDamage}\` Cripple damage.`,
+            )
+            .catch(noop);
     }
 
     currentPlayerHp -= monsterDamage;
