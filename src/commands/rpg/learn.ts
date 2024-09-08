@@ -8,7 +8,7 @@ import {
     updateUserStats,
 } from "../../services";
 
-type SkillName = "Vigilance" | "Leech";
+type SkillName = "Vigilance" | "Leech" | "Appraise" | "Totem";
 
 const skillRequirements: Record<
     SkillName,
@@ -31,6 +31,19 @@ const skillRequirements: Record<
         coins: 150,
         items: [{ item: "Slime Concentrate", amount: 2 }],
     },
+    Appraise: {
+        worldLevel: 1,
+        coins: 50,
+        items: [
+            { item: "Slime Condensate", amount: 2 },
+            { item: "Sharp Arrowhead", amount: 2 },
+        ],
+    },
+    Totem: {
+        worldLevel: 1,
+        coins: 100,
+        items: [{ item: "Stained Mask", amount: 5 }],
+    },
 };
 
 export const learn = buildCommand<SlashCommand>({
@@ -45,6 +58,7 @@ export const learn = buildCommand<SlashCommand>({
                 .addChoices(
                     { name: "Vigilance", value: "Vigilance" },
                     { name: "Leech", value: "Leech" },
+                    { name: "Appraise", value: "Appraise" },
                 ),
         ),
     defer: { silent: false },

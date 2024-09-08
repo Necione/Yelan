@@ -131,6 +131,26 @@ export async function handleHunt(
                     .setDescription(
                         `You defeated the ${monster.name}!\n-# \`⭐\` \`+${expGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
                     );
+
+                const hasTotemSkill = stats.skills.some(
+                    (skill) => skill.name === "Totem",
+                );
+                if (hasTotemSkill) {
+                    const healAmount = Math.ceil(stats.maxHP * 0.05);
+                    currentPlayerHp = Math.min(
+                        currentPlayerHp + healAmount,
+                        stats.maxHP,
+                    );
+
+                    finalEmbed.addFields({
+                        name: "Totem Skill",
+                        value: `\`💖\` You healed \`${healAmount}\` HP due to the Totem skill.`,
+                    });
+
+                    await updateUserStats(i.user.id, {
+                        hp: currentPlayerHp,
+                    });
+                }
             } else {
                 finalEmbed
                     .setColor("Red")
@@ -144,7 +164,7 @@ export async function handleHunt(
                 hp: Math.max(currentPlayerHp, 0),
             });
 
-            if (currentMonsterHp <= 0) {
+            if (currentPlayerHp > 0 && currentMonsterHp <= 0) {
                 const drops = calculateDrop(monster.drops);
                 if (Array.isArray(drops)) {
                     await addItemToInventory(i.user.id, drops);

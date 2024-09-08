@@ -16,6 +16,16 @@ const availableSkills = [
             "Gain 2% lifesteal from the enemy's Max HP 50% of the time",
         emoji: "💖",
     },
+    {
+        name: "Appraise",
+        description: "Sell things for a little bit more than they're worth",
+        emoji: "🔍",
+    },
+    {
+        name: "Totem",
+        description: "Heal 5% of your Max HP after every battle",
+        emoji: "⭐",
+    },
 ];
 
 export const skills = buildCommand<SlashCommand>({

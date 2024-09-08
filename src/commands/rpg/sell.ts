@@ -111,7 +111,21 @@ export const sell = buildCommand<SlashCommand>({
             );
         }
 
-        const totalSellPrice = itemData.sellPrice * amountToSell;
+        let totalSellPrice = itemData.sellPrice * amountToSell;
+        let appraiseBonusMessage = "";
+        let appraiseBonus = 0;
+
+        const hasAppraiseSkill = stats.skills.some(
+            (skill) => skill.name === "Appraise",
+        );
+
+        if (hasAppraiseSkill) {
+            appraiseBonus = Math.round(totalSellPrice * 0.05);
+            totalSellPrice = Math.round(totalSellPrice + appraiseBonus);
+            appraiseBonusMessage = `\n-# 🔍 (Appraisal Skill Bonus: +${appraiseBonus} ${texts.c.u})`;
+        } else {
+            totalSellPrice = Math.round(totalSellPrice);
+        }
 
         item.amount -= amountToSell;
         if (item.amount <= 0) {
@@ -136,7 +150,7 @@ export const sell = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You sold \`${amountToSell}x\` **${itemName}** for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\`!`,
+                `You sold \`${amountToSell}x\` **${itemName}** for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\`${appraiseBonusMessage}!`,
                 "Green",
             ),
         );
