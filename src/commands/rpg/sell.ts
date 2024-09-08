@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, getKeys } from "@elara-services/utils";
+import { embedComment } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
@@ -7,32 +7,16 @@ import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/items";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
-type SellableItemName = DropName | WeaponName | ArtifactName;
-
 export const sell = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
-        .setName(`sell`)
-        .setDescription(`[RPG] Sell an item or weapon from your inventory.`)
+        .setName("sell")
+        .setDescription("[RPG] Sell an item or weapon from your inventory.")
         .setDMPermission(false)
         .addStringOption((option) =>
             option
                 .setName("item")
                 .setDescription("The item that you want to sell")
-                .setRequired(true)
-                .addChoices(
-                    ...getKeys(drops).map((c) => ({
-                        name: c,
-                        value: c,
-                    })),
-                    ...getKeys(weapons).map((c) => ({
-                        name: c,
-                        value: c,
-                    })),
-                    ...getKeys(artifacts).map((c) => ({
-                        name: c,
-                        value: c,
-                    })),
-                ),
+                .setRequired(true),
         )
         .addIntegerOption((option) =>
             option
@@ -42,7 +26,7 @@ export const sell = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
     async execute(i, r) {
-        const itemName = i.options.getString("item", true) as SellableItemName;
+        const itemName = i.options.getString("item", true);
         const amountToSell = i.options.getInteger("amount", true);
 
         const itemData =
@@ -52,7 +36,9 @@ export const sell = buildCommand<SlashCommand>({
 
         if (!itemData) {
             return r.edit(
-                embedComment(`The item "${itemName}" doesn't exist.`),
+                embedComment(
+                    `The item "${itemName}" doesn't exist. Make sure you typed it correctly.`,
+                ),
             );
         }
 
@@ -60,7 +46,7 @@ export const sell = buildCommand<SlashCommand>({
         if (!stats) {
             return r.edit(
                 embedComment(
-                    `No stats found for you, please setup your profile.`,
+                    `No stats found for you, please set up your profile.`,
                 ),
             );
         }

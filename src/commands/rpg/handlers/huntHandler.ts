@@ -228,7 +228,8 @@ export async function handleHunt(
                     .send(
                         `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
                             2,
-                        )}\` damage to the ${monster.name
+                        )}\` damage to the ${
+                            monster.name
                         } ✨ (Vigilance Skill).`,
                     )
                     .catch(noop);
@@ -238,7 +239,8 @@ export async function handleHunt(
                     .send(
                         `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
                             2,
-                        )}\` damage to the ${monster.name}${isCrit ? " 💢 (Critical Hit!)" : ""
+                        )}\` damage to the ${monster.name}${
+                            isCrit ? " 💢 (Critical Hit!)" : ""
                         }.`,
                     )
                     .catch(noop);
@@ -298,7 +300,8 @@ export async function handleHunt(
             currentPlayerHp -= crippleDamage;
             await thread
                 .send(
-                    `>>> \`❄️\` The ${monster.name
+                    `>>> \`❄️\` The ${
+                        monster.name
                     } inflicted \`${crippleDamage.toFixed(
                         2,
                     )}\` Cripple damage to you, bypassing defense!`,
@@ -313,8 +316,10 @@ export async function handleHunt(
 
         await thread
             .send(
-                `>>> \`⚔️\` The ${monster.name
-                } dealt \`${monsterDamage}\` damage to you${defended ? ` 🛡️ (Defended: -${defValue})` : ""
+                `>>> \`⚔️\` The ${
+                    monster.name
+                } dealt \`${monsterDamage}\` damage to you${
+                    defended ? ` 🛡️ (Defended: -${defValue})` : ""
                 }.`,
             )
             .catch(noop);

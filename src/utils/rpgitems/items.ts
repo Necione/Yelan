@@ -69,6 +69,13 @@ export const drops = {
         minWorldLevel: 3,
         chestChance: 25,
     },
+    "Elemental Core": {
+        sellPrice: 20,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 1,
+        chestChance: 0,
+    },
 };
 
 export type DropName = keyof typeof drops;

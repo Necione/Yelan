@@ -7,6 +7,7 @@ import {
     updateUserStats,
 } from "../../services";
 import { cooldowns, locked } from "../../utils";
+import { handleBossFight } from "./handlers/bossHandler";
 import { handleChest } from "./handlers/chestHandler";
 import { handleHunt } from "./handlers/huntHandler";
 import { handleTrade } from "./handlers/tradeHandler";
@@ -81,7 +82,9 @@ export const hunt = buildCommand<SlashCommand>({
         }
 
         const randomChance = Math.random();
-        if (randomChance < 0.1) {
+        if (randomChance < 0.05 && stats.worldLevel >= 5) {
+            await handleBossFight(i, message, stats);
+        } else if (randomChance < 0.1) {
             await handleTrade(i, stats);
         } else if (randomChance < 0.3) {
             await handleChest(i, stats, userWallet);

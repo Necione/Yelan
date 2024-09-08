@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 
-interface Monster {
+export interface Monster {
     name: string;
     minHp: number;
     maxHp: number;
@@ -28,6 +28,11 @@ async function loadMonsters(dir: string): Promise<void> {
 
     for (const file of files) {
         const fullPath = path.join(dir, file);
+
+        // Skip the bosses directory
+        if (fs.statSync(fullPath).isDirectory() && file === "bosses") {
+            continue;
+        }
 
         if (fs.statSync(fullPath).isDirectory()) {
             await loadMonsters(fullPath);
@@ -129,6 +134,41 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     }
 
     return selectedMonster;
+}
+
+export async function getRandomBoss(
+    worldLevel: number,
+): Promise<Monster | null> {
+    const bossDir = path.resolve(__dirname, "./monsters/bosses");
+    const bossFiles = fs.readdirSync(bossDir);
+
+    const bosses: Monster[] = [];
+    for (const file of bossFiles) {
+        const fullPath = path.join(bossDir, file);
+        if (
+            fs.statSync(fullPath).isFile() &&
+            (file.endsWith(".ts") || file.endsWith(".js"))
+        ) {
+            try {
+                const bossModule = await import(fullPath);
+                const boss = bossModule.default as Monster;
+                if (boss && worldLevel >= boss.minWorldLevel) {
+                    bosses.push(boss);
+                }
+            } catch (error) {
+                console.error(
+                    `Error loading boss from file: ${fullPath}`,
+                    error,
+                );
+            }
+        }
+    }
+
+    if (bosses.length === 0) {
+        return null;
+    }
+
+    return bosses[Math.floor(Math.random() * bosses.length)];
 }
 
 export function getEncounterDescription(monsterName: string, location: string) {
