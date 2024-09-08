@@ -44,6 +44,11 @@ export const rpg = buildCommand<SlashCommand>({
 
         const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
 
+        const hpDisplay =
+            stats.hp > stats.maxHP
+                ? `💜 \`${stats.hp}/${stats.maxHP}\` **OVERHEALED**`
+                : `❤️ \`${stats.hp}/${stats.maxHP}\``;
+
         const embed = new EmbedBuilder()
             .setColor("Aqua")
             .setTitle(`${i.user.username}'s RPG Stats`)
@@ -52,11 +57,11 @@ export const rpg = buildCommand<SlashCommand>({
                 name: "Your Stats",
                 value: `🌍 World Level: \`${stats.worldLevel}\` | ⭐ EXP: \`${
                     stats.exp
-                }/${expRequired.toFixed(0)}\`\n❤️ HP: \`${stats.hp}/${
-                    stats.maxHP
-                }\`\n⚔️ ATK: \`${stats.attackPower.toFixed(2)} (${formatChange(
-                    stats.attackPower - stats.baseAttack,
-                )})\`${
+                }/${expRequired.toFixed(
+                    0,
+                )}\`\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
+                    2,
+                )} (${formatChange(stats.attackPower - stats.baseAttack)})\`${
                     stats.critChance > 0 || stats.critValue > 0
                         ? `\n🎯 Crit Chance: \`${
                               stats.critChance
