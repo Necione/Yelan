@@ -58,6 +58,22 @@ export const craft = buildCommand<SlashCommand>({
                         name: "Stained Mask -> Ominous Mask",
                         value: "StainedMask",
                     },
+                    {
+                        name: "Treasure Hoarder Insignia -> Silver Raven Insignia",
+                        value: "TreasureHoarderInsignia",
+                    },
+                    {
+                        name: "Silver Raven Insignia -> Golden Raven Insignia",
+                        value: "SilverRavenInsignia",
+                    },
+                    {
+                        name: "Dead Ley Line Branch -> Dead Ley Line Leaves",
+                        value: "DeadLeyLineBranch",
+                    },
+                    {
+                        name: "Dead Ley Line Leaves -> Ley Line Sprout",
+                        value: "DeadLeyLineLeaves",
+                    },
                 ),
         )
         .addIntegerOption((option) =>
@@ -117,6 +133,22 @@ export const craft = buildCommand<SlashCommand>({
             StainedMask: {
                 source: "Stained Mask",
                 target: "Ominous Mask",
+            },
+            TreasureHoarderInsignia: {
+                source: "Treasure Hoarder Insignia",
+                target: "Silver Raven Insignia",
+            },
+            SilverRavenInsignia: {
+                source: "Silver Raven Insignia",
+                target: "Golden Raven Insignia",
+            },
+            DeadLeyLineBranch: {
+                source: "Dead Ley Line Branch",
+                target: "Dead Ley Line Leaves",
+            },
+            DeadLeyLineLeaves: {
+                source: "Dead Ley Line Leaves",
+                target: "Ley Line Sprout",
             },
         };
 
