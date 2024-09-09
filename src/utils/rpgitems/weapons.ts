@@ -156,7 +156,7 @@ export const weapons = {
         critValue: 1.5,
         additionalHP: 50,
         minWorldLevel: 8,
-        chestChance: 3,
+        chestChance: 5,
         emoji: "<:Weapon_Ferrous_Shadow:1282456147210535013>",
     },
     "Fillet Blade": {
@@ -166,8 +166,28 @@ export const weapons = {
         critValue: 2,
         additionalHP: -25,
         minWorldLevel: 8,
-        chestChance: 3,
+        chestChance: 5,
         emoji: "<:Weapon_Fillet_Blade:1282456217150558258>",
+    },
+    "Sacrificial Sword": {
+        sellPrice: 45,
+        attackPower: -5,
+        critChance: 0,
+        critValue: 0.5,
+        additionalHP: 50,
+        minWorldLevel: 8,
+        chestChance: 5,
+        emoji: "<:Weapon_Sacrificial_Sword:1282504118518284338>",
+    },
+    "The Flute": {
+        sellPrice: 45,
+        attackPower: 5,
+        critChance: 50,
+        critValue: 0.5,
+        additionalHP: 10,
+        minWorldLevel: 8,
+        chestChance: 5,
+        emoji: "<:Weapon_The_Flute:1282504448538837013>",
     },
 };
 
