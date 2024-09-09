@@ -1,8 +1,70 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, getKeys, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { type DropName } from "../../utils/rpgitems/drops";
+
+const craftingMap: Record<string, { source: DropName; target: DropName }> = {
+    FirmArrowhead: {
+        source: "Firm Arrowhead",
+        target: "Sharp Arrowhead",
+    },
+    SharpArrowhead: {
+        source: "Sharp Arrowhead",
+        target: "Weathered Arrowhead",
+    },
+
+    HeavyHorn: {
+        source: "Heavy Horn",
+        target: "Black Bronze Horn",
+    },
+    BlackBronzeHorn: {
+        source: "Black Bronze Horn",
+        target: "Black Crystal Horn",
+    },
+
+    DiviningScroll: {
+        source: "Divining Scroll",
+        target: "Sealed Scroll",
+    },
+    SealedScroll: {
+        source: "Sealed Scroll",
+        target: "Forbidden Curse Scroll",
+    },
+
+    SlimeCondensate: {
+        source: "Slime Condensate",
+        target: "Slime Secretions",
+    },
+    SlimeSecretions: {
+        source: "Slime Secretions",
+        target: "Slime Concentrate",
+    },
+    DamagedMask: {
+        source: "Damaged Mask",
+        target: "Stained Mask",
+    },
+    StainedMask: {
+        source: "Stained Mask",
+        target: "Ominous Mask",
+    },
+    TreasureHoarderInsignia: {
+        source: "Treasure Hoarder Insignia",
+        target: "Silver Raven Insignia",
+    },
+    SilverRavenInsignia: {
+        source: "Silver Raven Insignia",
+        target: "Golden Raven Insignia",
+    },
+    DeadLeyLineBranch: {
+        source: "Dead Ley Line Branch",
+        target: "Dead Ley Line Leaves",
+    },
+    DeadLeyLineLeaves: {
+        source: "Dead Ley Line Leaves",
+        target: "Ley Line Sprout",
+    },
+};
 
 export const craft = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -14,67 +76,7 @@ export const craft = buildCommand<SlashCommand>({
                 .setName("item")
                 .setDescription("The item you want to craft")
                 .setRequired(true)
-                .addChoices(
-                    {
-                        name: "Firm Arrowhead -> Sharp Arrowhead",
-                        value: "FirmArrowhead",
-                    },
-                    {
-                        name: "Sharp Arrowhead -> Weathered Arrowhead",
-                        value: "SharpArrowhead",
-                    },
-
-                    {
-                        name: "Heavy Horn -> Black Bronze Horn",
-                        value: "HeavyHorn",
-                    },
-                    {
-                        name: "Black Bronze Horn -> Black Crystal Horn",
-                        value: "BlackBronzeHorn",
-                    },
-
-                    {
-                        name: "Divining Scroll -> Sealed Scroll",
-                        value: "DiviningScroll",
-                    },
-                    {
-                        name: "Sealed Scroll -> Forbidden Curse Scroll",
-                        value: "SealedScroll",
-                    },
-
-                    {
-                        name: "Slime Condensate -> Slime Secretions",
-                        value: "SlimeCondensate",
-                    },
-                    {
-                        name: "Slime Secretions -> Slime Concentrate",
-                        value: "SlimeSecretions",
-                    },
-                    {
-                        name: "Damaged Mask -> Stained Mask",
-                        value: "DamagedMask",
-                    },
-                    {
-                        name: "Stained Mask -> Ominous Mask",
-                        value: "StainedMask",
-                    },
-                    {
-                        name: "Treasure Hoarder Insignia -> Silver Raven Insignia",
-                        value: "TreasureHoarderInsignia",
-                    },
-                    {
-                        name: "Silver Raven Insignia -> Golden Raven Insignia",
-                        value: "SilverRavenInsignia",
-                    },
-                    {
-                        name: "Dead Ley Line Branch -> Dead Ley Line Leaves",
-                        value: "DeadLeyLineBranch",
-                    },
-                    {
-                        name: "Dead Ley Line Leaves -> Ley Line Sprout",
-                        value: "DeadLeyLineLeaves",
-                    },
-                ),
+                .setAutocomplete(true),
         )
         .addIntegerOption((option) =>
             option
@@ -82,75 +84,35 @@ export const craft = buildCommand<SlashCommand>({
                 .setDescription("The number of items to craft")
                 .setRequired(true),
         ),
+    async autocomplete(i) {
+        let choices = getKeys(craftingMap).map((c) => ({
+            name: `${craftingMap[c]?.source || "???"} -> ${
+                craftingMap[c]?.target || "????"
+            }`,
+            value: c,
+        }));
+        const item = i.options.getString("item", false) ?? "";
+        if (!item) {
+            return i.respond(choices).catch(noop);
+        }
+        choices = choices.filter((c) =>
+            c.value.toLowerCase().includes(item.toLowerCase()),
+        );
+        if (!is.array(choices)) {
+            return i
+                .respond([{ name: "No matches for that", value: "n/a" }])
+                .catch(noop);
+        }
+        return i.respond(choices).catch(noop);
+    },
     defer: { silent: false },
     async execute(i, r) {
         const craftOption = i.options.getString("item", true);
         const amountToCraft = i.options.getInteger("amount", true);
 
-        const craftingMap: Record<
-            string,
-            { source: DropName; target: DropName }
-        > = {
-            FirmArrowhead: {
-                source: "Firm Arrowhead",
-                target: "Sharp Arrowhead",
-            },
-            SharpArrowhead: {
-                source: "Sharp Arrowhead",
-                target: "Weathered Arrowhead",
-            },
-
-            HeavyHorn: {
-                source: "Heavy Horn",
-                target: "Black Bronze Horn",
-            },
-            BlackBronzeHorn: {
-                source: "Black Bronze Horn",
-                target: "Black Crystal Horn",
-            },
-
-            DiviningScroll: {
-                source: "Divining Scroll",
-                target: "Sealed Scroll",
-            },
-            SealedScroll: {
-                source: "Sealed Scroll",
-                target: "Forbidden Curse Scroll",
-            },
-
-            SlimeCondensate: {
-                source: "Slime Condensate",
-                target: "Slime Secretions",
-            },
-            SlimeSecretions: {
-                source: "Slime Secretions",
-                target: "Slime Concentrate",
-            },
-            DamagedMask: {
-                source: "Damaged Mask",
-                target: "Stained Mask",
-            },
-            StainedMask: {
-                source: "Stained Mask",
-                target: "Ominous Mask",
-            },
-            TreasureHoarderInsignia: {
-                source: "Treasure Hoarder Insignia",
-                target: "Silver Raven Insignia",
-            },
-            SilverRavenInsignia: {
-                source: "Silver Raven Insignia",
-                target: "Golden Raven Insignia",
-            },
-            DeadLeyLineBranch: {
-                source: "Dead Ley Line Branch",
-                target: "Dead Ley Line Leaves",
-            },
-            DeadLeyLineLeaves: {
-                source: "Dead Ley Line Leaves",
-                target: "Ley Line Sprout",
-            },
-        };
+        if (craftOption === "n/a") {
+            return r.edit(embedComment(`You didn't select a valid option.`));
+        }
 
         const craftingRecipe = craftingMap[craftOption];
         const stats = await getUserStats(i.user.id);
