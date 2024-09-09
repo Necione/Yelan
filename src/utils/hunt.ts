@@ -1,6 +1,6 @@
 import { log } from "@elara-services/utils";
-import * as fs from "fs";
-import * as path from "path";
+import { readdirSync, statSync } from "fs";
+import { join, resolve } from "path";
 
 export interface Monster {
     name: string;
@@ -29,22 +29,20 @@ const monsters: Monster[] = [];
 let monstersLoaded = false;
 
 async function loadMonsters(dir: string): Promise<void> {
-    const files = fs.readdirSync(dir);
+    const files = readdirSync(dir);
 
     for (const file of files) {
-        const fullPath = path.join(dir, file);
+        const fullPath = join(dir, file);
 
-        if (file === "bosses" && fs.statSync(fullPath).isDirectory()) {
+        if (file === "bosses" && statSync(fullPath).isDirectory()) {
             continue;
         }
 
-        if (fs.statSync(fullPath).isDirectory()) {
+        if (statSync(fullPath).isDirectory()) {
             await loadMonsters(fullPath);
-        } else if (file.endsWith(".ts") || file.endsWith(".js")) {
+        } else if ([".ts", ".js"].some((c) => file.endsWith(c))) {
             try {
-                const monsterModule = await import(fullPath);
-                const monster = monsterModule.default as Monster;
-
+                const monster = (await import(fullPath)).default as Monster;
                 if (monster && !monsters.some((m) => m.name === monster.name)) {
                     monsters.push(monster);
                 }
@@ -55,7 +53,7 @@ async function loadMonsters(dir: string): Promise<void> {
     }
 }
 
-const monstersDir = path.resolve(__dirname, "./monsters");
+const monstersDir = resolve(__dirname, "./monsters");
 
 export async function initializeMonsters(): Promise<void> {
     if (!monstersLoaded) {
@@ -222,19 +220,18 @@ export async function getRandomMonster(worldLevel: number, location: string) {
 export async function getRandomBoss(
     worldLevel: number,
 ): Promise<Monster | null> {
-    const bossDir = path.resolve(__dirname, "./monsters/bosses");
-    const bossFiles = fs.readdirSync(bossDir);
+    const bossDir = resolve(__dirname, "./monsters/bosses");
+    const bossFiles = readdirSync(bossDir);
 
     const bosses: Monster[] = [];
     for (const file of bossFiles) {
-        const fullPath = path.join(bossDir, file);
+        const fullPath = join(bossDir, file);
         if (
-            fs.statSync(fullPath).isFile() &&
+            statSync(fullPath).isFile() &&
             (file.endsWith(".ts") || file.endsWith(".js"))
         ) {
             try {
-                const bossModule = await import(fullPath);
-                const boss = bossModule.default as Monster;
+                const boss = (await import(fullPath)).default as Monster;
                 if (boss && worldLevel >= boss.minWorldLevel) {
                     bosses.push(boss);
                 }
