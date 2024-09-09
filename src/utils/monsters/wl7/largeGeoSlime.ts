@@ -1,5 +1,6 @@
 const largeGeoSlime = {
     name: "Large Geo Slime",
+    group: "Slime",
     minHp: 150,
     maxHp: 250,
     minDamage: 10,

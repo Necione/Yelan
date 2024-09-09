@@ -1,5 +1,6 @@
 const cryoSamachurl = {
     name: "Cryo Samachurl",
+    group: "Hilichurl",
     minHp: 28,
     maxHp: 48,
     minDamage: 5,

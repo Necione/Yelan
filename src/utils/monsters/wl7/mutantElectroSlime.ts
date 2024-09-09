@@ -1,5 +1,6 @@
 const mutantElectroSlime = {
     name: "Mutant Electro Slime",
+    group: "Slime",
     minHp: 150,
     maxHp: 200,
     minDamage: 10,

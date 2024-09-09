@@ -1,5 +1,6 @@
 const treasureHoarderCrusher = {
     name: "Treasure Hoarder Crusher",
+    group: "Human",
     minHp: 100,
     maxHp: 150,
     minDamage: 18,

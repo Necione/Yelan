@@ -4,6 +4,7 @@ import { join, resolve } from "path";
 
 export interface Monster {
     name: string;
+    group: string;
     minHp: number;
     maxHp: number;
     minDamage: number;
@@ -109,6 +110,10 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         return null;
     }
 
+    const uniqueGroups = [
+        ...new Set(availableMonsters.map((monster) => monster.group)),
+    ];
+
     let monstersAtCurrentLevel = monsters.filter(
         (monster) => monster.minWorldLevel === worldLevel,
     );
@@ -143,39 +148,58 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         }
     }
 
-    const randomCurrentLevelMonster =
-        monstersAtCurrentLevel[
-            Math.floor(Math.random() * monstersAtCurrentLevel.length)
-        ];
+    const randomGroup =
+        uniqueGroups[Math.floor(Math.random() * uniqueGroups.length)];
 
-    log(
-        `Random monster chosen from world level (${randomCurrentLevelMonster.minWorldLevel}):`,
-        randomCurrentLevelMonster,
+    const monstersInGroup = availableMonsters.filter(
+        (monster) => monster.group === randomGroup,
     );
 
-    const randomMonster =
-        availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
+    if (monstersInGroup.length === 0) {
+        log(`No monsters found for group ${randomGroup} at this world level.`);
+        return null;
+    }
 
-    log(`Randomly encountered monster:`, randomMonster);
+    const totalWeight = monstersInGroup.reduce(
+        (acc, monster) => acc + monster.minWorldLevel,
+        0,
+    );
+    let randomWeight = Math.random() * totalWeight;
+    let selectedMonster: Monster | null = null;
 
-    if (worldLevel > randomMonster.minWorldLevel) {
-        const levelDifference = worldLevel - randomMonster.minWorldLevel;
+    for (const monster of monstersInGroup) {
+        randomWeight -= monster.minWorldLevel;
+        if (randomWeight <= 0) {
+            selectedMonster = monster;
+            break;
+        }
+    }
+
+    if (!selectedMonster) {
+        log("No monster selected after applying weights.");
+        return null;
+    }
+
+    log(`Random monster chosen from group ${randomGroup}:`, selectedMonster);
+
+    if (worldLevel > selectedMonster.minWorldLevel) {
+        const levelDifference = worldLevel - selectedMonster.minWorldLevel;
         const reductionFactor = Math.max(0.85, 1 - 0.05 * levelDifference);
         log(
             `Level difference: ${levelDifference}, Reduction factor: ${reductionFactor}`,
         );
 
         const scaledMinHp = Math.floor(
-            randomCurrentLevelMonster.minHp * reductionFactor,
+            monstersAtCurrentLevel[0].minHp * reductionFactor,
         );
         const scaledMaxHp = Math.floor(
-            randomCurrentLevelMonster.maxHp * reductionFactor,
+            monstersAtCurrentLevel[0].maxHp * reductionFactor,
         );
         const scaledMinDamage = Math.floor(
-            randomCurrentLevelMonster.minDamage * reductionFactor,
+            monstersAtCurrentLevel[0].minDamage * reductionFactor,
         );
         const scaledMaxDamage = Math.floor(
-            randomCurrentLevelMonster.maxDamage * reductionFactor,
+            monstersAtCurrentLevel[0].maxDamage * reductionFactor,
         );
 
         log(`Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`);
@@ -183,24 +207,24 @@ export async function getRandomMonster(worldLevel: number, location: string) {
             `Scaled Min Damage: ${scaledMinDamage}, Scaled Max Damage: ${scaledMaxDamage}`,
         );
 
-        randomMonster.minHp = scaledMinHp;
-        randomMonster.maxHp = scaledMaxHp;
-        randomMonster.minDamage = scaledMinDamage;
-        randomMonster.maxDamage = scaledMaxDamage;
+        selectedMonster.minHp = scaledMinHp;
+        selectedMonster.maxHp = scaledMaxHp;
+        selectedMonster.minDamage = scaledMinDamage;
+        selectedMonster.maxDamage = scaledMaxDamage;
     }
 
     if (scalingFactor > 1) {
         const scaledMinHp = Math.floor(
-            randomCurrentLevelMonster.minHp * scalingFactor,
+            monstersAtCurrentLevel[0].minHp * scalingFactor,
         );
         const scaledMaxHp = Math.floor(
-            randomCurrentLevelMonster.maxHp * scalingFactor,
+            monstersAtCurrentLevel[0].maxHp * scalingFactor,
         );
         const scaledMinDamage = Math.floor(
-            randomCurrentLevelMonster.minDamage * scalingFactor,
+            monstersAtCurrentLevel[0].minDamage * scalingFactor,
         );
         const scaledMaxDamage = Math.floor(
-            randomCurrentLevelMonster.maxDamage * scalingFactor,
+            monstersAtCurrentLevel[0].maxDamage * scalingFactor,
         );
 
         log(`Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`);
@@ -208,13 +232,13 @@ export async function getRandomMonster(worldLevel: number, location: string) {
             `Scaled Min Damage: ${scaledMinDamage}, Scaled Max Damage: ${scaledMaxDamage}`,
         );
 
-        randomMonster.minHp = scaledMinHp;
-        randomMonster.maxHp = scaledMaxHp;
-        randomMonster.minDamage = scaledMinDamage;
-        randomMonster.maxDamage = scaledMaxDamage;
+        selectedMonster.minHp = scaledMinHp;
+        selectedMonster.maxHp = scaledMaxHp;
+        selectedMonster.minDamage = scaledMinDamage;
+        selectedMonster.maxDamage = scaledMaxDamage;
     }
 
-    return randomMonster;
+    return selectedMonster;
 }
 
 export async function getRandomBoss(

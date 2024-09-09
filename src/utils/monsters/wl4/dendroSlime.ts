@@ -1,5 +1,6 @@
 const dendroSlime = {
     name: "Dendro Slime",
+    group: "Slime",
     minHp: 45,
     maxHp: 60,
     minDamage: 8,

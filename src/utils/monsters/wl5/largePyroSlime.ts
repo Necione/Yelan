@@ -1,5 +1,6 @@
 const largePyroSlime = {
     name: "Large Pyro Slime",
+    group: "Slime",
     minHp: 40,
     maxHp: 55,
     minDamage: 9,

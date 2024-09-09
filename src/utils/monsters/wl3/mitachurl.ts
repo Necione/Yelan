@@ -1,5 +1,6 @@
 const mitachurl = {
     name: "Mitachurl",
+    group: "Hilichurl",
     minHp: 30,
     maxHp: 50,
     minDamage: 6,

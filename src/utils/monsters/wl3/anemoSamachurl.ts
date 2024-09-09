@@ -1,5 +1,6 @@
 const anemoSamachurl = {
     name: "Anemo Samachurl",
+    group: "Hilichurl",
     minHp: 22,
     maxHp: 45,
     minDamage: 5,

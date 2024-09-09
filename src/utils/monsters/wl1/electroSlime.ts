@@ -1,5 +1,6 @@
 const electroSlime = {
     name: "Electro Slime",
+    group: "Silme",
     minHp: 15,
     maxHp: 22,
     minDamage: 3,

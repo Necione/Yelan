@@ -1,5 +1,6 @@
 const electroSamachurl = {
     name: "Electro Samachurl",
+    group: "Hilichurl",
     minHp: 32,
     maxHp: 55,
     minDamage: 8,

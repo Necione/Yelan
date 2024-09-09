@@ -1,5 +1,6 @@
 const pyroHilichurlBerserker = {
     name: "Pyro Hilichurl Berserker",
+    group: "Hilichurl",
     minHp: 20,
     maxHp: 25,
     minDamage: 5,

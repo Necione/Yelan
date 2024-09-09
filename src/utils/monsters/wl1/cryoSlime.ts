@@ -1,5 +1,6 @@
 const cryoSlime = {
     name: "Cryo Slime",
+    group: "Silme",
     minHp: 12,
     maxHp: 18,
     minDamage: 2,

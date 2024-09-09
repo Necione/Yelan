@@ -1,5 +1,6 @@
 const frostarmLawachurl = {
     name: "Frostarm Lawachurl",
+    group: "Hilichurl",
     minHp: 75,
     maxHp: 125,
     minDamage: 10,

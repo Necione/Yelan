@@ -1,5 +1,6 @@
 const electroHilichurlShooter = {
     name: "Electro Hilichurl Shooter",
+    group: "Hilichurl",
     minHp: 20,
     maxHp: 25,
     minDamage: 4,

@@ -1,5 +1,6 @@
 const stonehideLawachurl = {
     name: "Stonehide Lawachurl",
+    group: "Hilichurl",
     minHp: 150,
     maxHp: 200,
     minDamage: 10,

@@ -1,5 +1,6 @@
 const hilichurl = {
     name: "Hilichurl",
+    group: "Hilichurl",
     minHp: 20,
     maxHp: 25,
     minDamage: 2,

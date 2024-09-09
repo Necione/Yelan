@@ -1,5 +1,6 @@
 const cryoAbyssMage = {
     name: "Cryo Abyss Mage",
+    group: "Abyss",
     minHp: 200,
     maxHp: 250,
     minDamage: 10,
