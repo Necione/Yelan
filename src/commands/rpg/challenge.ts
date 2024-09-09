@@ -226,11 +226,11 @@ export const challenge = buildCommand<SlashCommand>({
                         embeds: [battleEmbed],
                     });
 
+                    let challengerVigilanceUsed = false;
+                    let opponentVigilanceUsed = false;
                     let turn = true;
 
                     while (challengerHp > 0 && opponentHp > 0) {
-                        let vigilanceUsed = false;
-
                         if (turn) {
                             const {
                                 currentDefenderHp: newOpponentHp,
@@ -240,10 +240,10 @@ export const challenge = buildCommand<SlashCommand>({
                                 challengerStats,
                                 opponentStats,
                                 opponentHp,
-                                vigilanceUsed,
+                                challengerVigilanceUsed,
                             );
                             opponentHp = newOpponentHp;
-                            vigilanceUsed = updatedVigilanceUsed;
+                            challengerVigilanceUsed = updatedVigilanceUsed;
                         } else {
                             const {
                                 currentDefenderHp: newChallengerHp,
@@ -253,19 +253,19 @@ export const challenge = buildCommand<SlashCommand>({
                                 opponentStats,
                                 challengerStats,
                                 challengerHp,
-                                vigilanceUsed,
+                                opponentVigilanceUsed,
                             );
                             challengerHp = newChallengerHp;
-                            vigilanceUsed = updatedVigilanceUsed;
+                            opponentVigilanceUsed = updatedVigilanceUsed;
                         }
 
                         const challengerHpBar = createHealthBar(
                             challengerHp,
-                            challengerStats.maxHP * 5,
+                            challengerStats.maxHP * 2,
                         );
                         const opponentHpBar = createHealthBar(
                             opponentHp,
-                            opponentStats.maxHP * 5,
+                            opponentStats.maxHP * 2,
                         );
 
                         const updatedEmbed = new EmbedBuilder()
