@@ -31,6 +31,11 @@ const availableSkills = [
         description: "Reduce your hunt cooldown from 30 minutes to 20 minutes",
         emoji: "🌙",
     },
+    {
+        name: "Kindle",
+        description: "Deal 10% of your Max HP as bonus damage per turn",
+        emoji: "💥",
+    },
 ];
 
 export const skills = buildCommand<SlashCommand>({

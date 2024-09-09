@@ -151,7 +151,7 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     const randomMonster =
         weightedMonsters[Math.floor(Math.random() * weightedMonsters.length)];
 
-    const hpScalingConstant = 0.5;
+    const hpScalingConstant = 0.4;
     const damageScalingConstant = 0.22;
 
     const levelDifference = worldLevel - randomMonster.minWorldLevel;

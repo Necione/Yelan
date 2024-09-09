@@ -18,7 +18,7 @@ import {
     type Monster,
 } from "../../../utils/hunt";
 
-async function handleVictory(
+export async function handleVictory(
     i: ChatInputCommandInteraction,
     thread: ThreadChannel,
     stats: UserStats,
@@ -89,7 +89,7 @@ async function handleVictory(
     await cooldowns.set(userWallet, "hunt", huntCooldown);
 }
 
-async function handleDefeat(
+export async function handleDefeat(
     i: ChatInputCommandInteraction,
     thread: ThreadChannel,
     stats: UserStats,
@@ -110,11 +110,15 @@ async function handleDefeat(
     });
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
-    await cooldowns.set(userWallet, "hunt", get.mins(30));
+    const hasInsomniaSkill = stats.skills.some(
+        (skill) => skill.name === "Insomnia",
+    );
+    const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
+    await cooldowns.set(userWallet, "hunt", huntCooldown);
     sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
 }
 
-async function playerAttack(
+export async function playerAttack(
     thread: ThreadChannel,
     stats: UserStats,
     monster: Monster,
@@ -175,6 +179,20 @@ async function playerAttack(
             )
             .catch(noop);
 
+        const hasKindle = stats.skills.some((skill) => skill.name === "Kindle");
+        if (hasKindle) {
+            const kindleBonusDamage = stats.maxHP * 0.1;
+            currentMonsterHp -= kindleBonusDamage;
+
+            await thread
+                .send(
+                    `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
+                        2,
+                    )}\` bonus damage with the Kindle skill!`,
+                )
+                .catch(noop);
+        }
+
         if (hasVigilance && !vigilanceUsed) {
             const vigilanceAttackPower = attackPower / 2;
             currentMonsterHp -= vigilanceAttackPower;
@@ -193,7 +211,7 @@ async function playerAttack(
     return { currentMonsterHp, vigilanceUsed };
 }
 
-async function monsterAttack(
+export async function monsterAttack(
     thread: ThreadChannel,
     stats: UserStats,
     monster: Monster,
