@@ -86,7 +86,9 @@ export const craft = buildCommand<SlashCommand>({
         ),
     async autocomplete(i) {
         let choices = getKeys(craftingMap).map((c) => ({
-            name: `${c} -> ${craftingMap[c]?.target || "UNKNOWN"}`,
+            name: `${craftingMap[c]?.source || "???"} -> ${
+                craftingMap[c]?.target || "????"
+            }`,
             value: c,
         }));
         const item = i.options.getString("item", false) ?? "";
