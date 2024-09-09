@@ -180,7 +180,9 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         return null;
     }
 
-    log(`Random monster chosen from group ${randomGroup}:`, selectedMonster);
+    log(
+        `Random monster chosen from group ${randomGroup}: ${selectedMonster.name}`,
+    );
 
     if (worldLevel > selectedMonster.minWorldLevel) {
         const levelDifference = worldLevel - selectedMonster.minWorldLevel;
