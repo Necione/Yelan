@@ -232,7 +232,7 @@ export const artifacts = {
         sellPrice: 10,
         attackPower: 2,
         critChance: 20,
-        critValue: 1,
+        critValue: 0.25,
         maxHP: -10,
         defChance: 0,
         defValue: 0,
