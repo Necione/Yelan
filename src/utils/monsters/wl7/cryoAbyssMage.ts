@@ -33,7 +33,7 @@ const cryoAbyssMage = {
         "Guili Plains",
         "Jueyun Karst",
     ],
-    
+
     critChance: 10,
     critValue: 1.5,
     defChance: 30,

@@ -44,11 +44,11 @@ async function playerVsPlayerAttack(
 
     await thread
         .send(
-            `>>> \`⚔️\` <@${attackerStats.userId}> dealt \`${attackPower.toFixed(
-                2,
-            )}\` damage to <@${defenderStats.userId}>${
-                isCrit ? " 💢 (Critical Hit!)" : ""
-            }${
+            `>>> \`⚔️\` <@${
+                attackerStats.userId
+            }> dealt \`${attackPower.toFixed(2)}\` damage to <@${
+                defenderStats.userId
+            }>${isCrit ? " 💢 (Critical Hit!)" : ""}${
                 defenderDefended ? ` 🛡️ (Defended: -${defenderDefValue})` : ""
             }.`,
         )
@@ -65,7 +65,9 @@ async function playerVsPlayerAttack(
 
         await thread
             .send(
-                `>>> \`⚔️\` Vigilance activated! <@${attackerStats.userId}> dealt an additional \`${vigilanceAttackPower.toFixed(
+                `>>> \`⚔️\` Vigilance activated! <@${
+                    attackerStats.userId
+                }> dealt an additional \`${vigilanceAttackPower.toFixed(
                     2,
                 )}\` damage to <@${defenderStats.userId}>.`,
             )

@@ -1,3 +1,4 @@
+import { log } from "@elara-services/utils";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -48,10 +49,7 @@ async function loadMonsters(dir: string): Promise<void> {
                     monsters.push(monster);
                 }
             } catch (error) {
-                console.error(
-                    `Error loading monster from file: ${fullPath}`,
-                    error,
-                );
+                log(`Error loading monster from file: ${fullPath}`, error);
             }
         }
     }
@@ -63,7 +61,7 @@ export async function initializeMonsters(): Promise<void> {
     if (!monstersLoaded) {
         await loadMonsters(monstersDir);
         monstersLoaded = true;
-        console.log(`Total monsters loaded: ${monsters.length}`);
+        log(`Total monsters loaded: ${monsters.length}`);
     }
 }
 
@@ -102,16 +100,14 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         return null;
     }
 
-    let availableMonsters = monsters.filter(
+    const availableMonsters = monsters.filter(
         (monster) =>
             worldLevel >= monster.minWorldLevel &&
             monster.locations.includes(location),
     );
 
     if (availableMonsters.length === 0) {
-        console.error(
-            "No available monsters found for this location and world level.",
-        );
+        log("No available monsters found for this location and world level.");
         return null;
     }
 
@@ -122,21 +118,21 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     let scalingFactor = 1;
 
     if (monstersAtCurrentLevel.length === 0) {
-        console.warn(
+        log(
             `No monsters found for world level ${worldLevel}. Searching for the closest lower world level...`,
         );
 
-        let highestDefinedLevel = Math.max(
+        const highestDefinedLevel = Math.max(
             ...monsters.map((monster) => monster.minWorldLevel),
         );
         if (worldLevel > highestDefinedLevel) {
-            console.log(
+            log(
                 `Using monsters from the highest available world level: ${highestDefinedLevel}`,
             );
 
             const levelDifference = worldLevel - highestDefinedLevel;
             scalingFactor = Math.pow(1.1, levelDifference);
-            console.log(
+            log(
                 `Scaling factor due to world level difference: ${scalingFactor}`,
             );
 
@@ -144,7 +140,7 @@ export async function getRandomMonster(worldLevel: number, location: string) {
                 (monster) => monster.minWorldLevel === highestDefinedLevel,
             );
         } else {
-            console.error("No higher level monsters available.");
+            log("No higher level monsters available.");
             return null;
         }
     }
@@ -154,7 +150,7 @@ export async function getRandomMonster(worldLevel: number, location: string) {
             Math.floor(Math.random() * monstersAtCurrentLevel.length)
         ];
 
-    console.log(
+    log(
         `Random monster chosen from world level (${randomCurrentLevelMonster.minWorldLevel}):`,
         randomCurrentLevelMonster,
     );
@@ -162,12 +158,12 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     const randomMonster =
         availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
 
-    console.log(`Randomly encountered monster:`, randomMonster);
+    log(`Randomly encountered monster:`, randomMonster);
 
     if (worldLevel > randomMonster.minWorldLevel) {
         const levelDifference = worldLevel - randomMonster.minWorldLevel;
         const reductionFactor = Math.max(0.85, 1 - 0.05 * levelDifference);
-        console.log(
+        log(
             `Level difference: ${levelDifference}, Reduction factor: ${reductionFactor}`,
         );
 
@@ -184,10 +180,8 @@ export async function getRandomMonster(worldLevel: number, location: string) {
             randomCurrentLevelMonster.maxDamage * reductionFactor,
         );
 
-        console.log(
-            `Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`,
-        );
-        console.log(
+        log(`Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`);
+        log(
             `Scaled Min Damage: ${scaledMinDamage}, Scaled Max Damage: ${scaledMaxDamage}`,
         );
 
@@ -211,10 +205,8 @@ export async function getRandomMonster(worldLevel: number, location: string) {
             randomCurrentLevelMonster.maxDamage * scalingFactor,
         );
 
-        console.log(
-            `Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`,
-        );
-        console.log(
+        log(`Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`);
+        log(
             `Scaled Min Damage: ${scaledMinDamage}, Scaled Max Damage: ${scaledMaxDamage}`,
         );
 
@@ -247,10 +239,7 @@ export async function getRandomBoss(
                     bosses.push(boss);
                 }
             } catch (error) {
-                console.error(
-                    `Error loading boss from file: ${fullPath}`,
-                    error,
-                );
+                log(`Error loading boss from file: ${fullPath}`, error);
             }
         }
     }
