@@ -102,73 +102,126 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         return null;
     }
 
-    const availableMonsters = monsters.filter(
+    let availableMonsters = monsters.filter(
         (monster) =>
             worldLevel >= monster.minWorldLevel &&
-            monster.locations.includes(location) &&
-            worldLevel - monster.minWorldLevel <= 5,
+            monster.locations.includes(location),
     );
 
     if (availableMonsters.length === 0) {
+        console.error(
+            "No available monsters found for this location and world level.",
+        );
         return null;
     }
 
-    const groups: { [groupName: string]: Monster[] } = {
-        Slime: [],
-        HilichurlGroup: [],
-        Treasure: [],
-        Others: [],
-    };
-
-    availableMonsters.forEach((monster) => {
-        if (monster.name.includes("Slime")) {
-            groups.Slime.push(monster);
-        } else if (
-            monster.name.includes("Samachurl") ||
-            monster.name.includes("Hilichurl") ||
-            monster.name.includes("Lawachurl")
-        ) {
-            groups.HilichurlGroup.push(monster);
-        } else if (monster.name.includes("Treasure")) {
-            groups.Treasure.push(monster);
-        } else {
-            groups.Others.push(monster);
-        }
-    });
-
-    const activeGroups = Object.keys(groups).filter(
-        (groupName) => groups[groupName].length > 0,
+    let monstersAtCurrentLevel = monsters.filter(
+        (monster) => monster.minWorldLevel === worldLevel,
     );
-    const randomGroupName =
-        activeGroups[Math.floor(Math.random() * activeGroups.length)];
-    const selectedGroup = groups[randomGroupName];
 
-    const weightedMonsters: Monster[] = selectedGroup.flatMap((monster) => {
-        const weight = monster.minWorldLevel;
-        return Array(weight).fill(monster);
-    });
+    let scalingFactor = 1;
+
+    if (monstersAtCurrentLevel.length === 0) {
+        console.warn(
+            `No monsters found for world level ${worldLevel}. Searching for the closest lower world level...`,
+        );
+
+        let highestDefinedLevel = Math.max(
+            ...monsters.map((monster) => monster.minWorldLevel),
+        );
+        if (worldLevel > highestDefinedLevel) {
+            console.log(
+                `Using monsters from the highest available world level: ${highestDefinedLevel}`,
+            );
+
+            const levelDifference = worldLevel - highestDefinedLevel;
+            scalingFactor = Math.pow(1.1, levelDifference);
+            console.log(
+                `Scaling factor due to world level difference: ${scalingFactor}`,
+            );
+
+            monstersAtCurrentLevel = monsters.filter(
+                (monster) => monster.minWorldLevel === highestDefinedLevel,
+            );
+        } else {
+            console.error("No higher level monsters available.");
+            return null;
+        }
+    }
+
+    const randomCurrentLevelMonster =
+        monstersAtCurrentLevel[
+            Math.floor(Math.random() * monstersAtCurrentLevel.length)
+        ];
+
+    console.log(
+        `Random monster chosen from world level (${randomCurrentLevelMonster.minWorldLevel}):`,
+        randomCurrentLevelMonster,
+    );
 
     const randomMonster =
-        weightedMonsters[Math.floor(Math.random() * weightedMonsters.length)];
+        availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
 
-    const hpScalingConstant = 0.4;
-    const damageScalingConstant = 0.22;
+    console.log(`Randomly encountered monster:`, randomMonster);
 
-    const levelDifference = worldLevel - randomMonster.minWorldLevel;
-
-    if (levelDifference > 0) {
-        const hpScalingFactor = 1 + hpScalingConstant * levelDifference;
-        const damageScalingFactor = 1 + damageScalingConstant * levelDifference;
-
-        randomMonster.minHp = Math.floor(randomMonster.minHp * hpScalingFactor);
-        randomMonster.maxHp = Math.floor(randomMonster.maxHp * hpScalingFactor);
-
-        randomMonster.minDamage = Math.floor(
-            randomMonster.minDamage * damageScalingFactor,
+    if (worldLevel > randomMonster.minWorldLevel) {
+        const levelDifference = worldLevel - randomMonster.minWorldLevel;
+        const reductionFactor = Math.max(0.85, 1 - 0.05 * levelDifference);
+        console.log(
+            `Level difference: ${levelDifference}, Reduction factor: ${reductionFactor}`,
         );
-        randomMonster.maxDamage = Math.floor(
-            randomMonster.maxDamage * damageScalingFactor,
+
+        const scaledMinHp = Math.floor(
+            randomCurrentLevelMonster.minHp * reductionFactor,
         );
+        const scaledMaxHp = Math.floor(
+            randomCurrentLevelMonster.maxHp * reductionFactor,
+        );
+        const scaledMinDamage = Math.floor(
+            randomCurrentLevelMonster.minDamage * reductionFactor,
+        );
+        const scaledMaxDamage = Math.floor(
+            randomCurrentLevelMonster.maxDamage * reductionFactor,
+        );
+
+        console.log(
+            `Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`,
+        );
+        console.log(
+            `Scaled Min Damage: ${scaledMinDamage}, Scaled Max Damage: ${scaledMaxDamage}`,
+        );
+
+        randomMonster.minHp = scaledMinHp;
+        randomMonster.maxHp = scaledMaxHp;
+        randomMonster.minDamage = scaledMinDamage;
+        randomMonster.maxDamage = scaledMaxDamage;
+    }
+
+    if (scalingFactor > 1) {
+        const scaledMinHp = Math.floor(
+            randomCurrentLevelMonster.minHp * scalingFactor,
+        );
+        const scaledMaxHp = Math.floor(
+            randomCurrentLevelMonster.maxHp * scalingFactor,
+        );
+        const scaledMinDamage = Math.floor(
+            randomCurrentLevelMonster.minDamage * scalingFactor,
+        );
+        const scaledMaxDamage = Math.floor(
+            randomCurrentLevelMonster.maxDamage * scalingFactor,
+        );
+
+        console.log(
+            `Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`,
+        );
+        console.log(
+            `Scaled Min Damage: ${scaledMinDamage}, Scaled Max Damage: ${scaledMaxDamage}`,
+        );
+
+        randomMonster.minHp = scaledMinHp;
+        randomMonster.maxHp = scaledMaxHp;
+        randomMonster.minDamage = scaledMinDamage;
+        randomMonster.maxDamage = scaledMaxDamage;
     }
 
     return randomMonster;
