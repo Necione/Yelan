@@ -91,4 +91,3 @@ export const monster = buildCommand<SlashCommand>({
         });
     },
 });
-

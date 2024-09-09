@@ -119,7 +119,6 @@ async function playerAttack(
     stats: UserStats,
     monster: Monster,
     currentMonsterHp: number,
-    initialMonsterHp: number,
     hasVigilance: boolean,
     vigilanceUsed: boolean,
 ): Promise<{ currentMonsterHp: number; vigilanceUsed: boolean }> {
@@ -138,6 +137,19 @@ async function playerAttack(
 
     if (monsterDefended) {
         attackPower = Math.max(attackPower - monsterDefValue, 0);
+    }
+
+    const isLawachurlOrElectro =
+        monster.name.includes("Lawachurl") || monster.name.includes("Electro");
+    const stunChance = Math.random() < 0.25;
+
+    if (isLawachurlOrElectro && stunChance) {
+        await thread
+            .send(
+                `>>> \`💫\` The ${monster.name} stunned you! You missed your attack.`,
+            )
+            .catch(noop);
+        return { currentMonsterHp, vigilanceUsed };
     }
 
     const isAnemo = monster.name.includes("Anemo");
@@ -378,7 +390,6 @@ export async function handleHunt(
             stats,
             monster,
             currentMonsterHp,
-            initialMonsterHp,
             hasVigilance,
             vigilanceUsed,
         );

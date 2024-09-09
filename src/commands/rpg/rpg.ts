@@ -52,7 +52,9 @@ export const rpg = buildCommand<SlashCommand>({
         const embed = new EmbedBuilder()
             .setColor("Aqua")
             .setTitle(`${i.user.username}'s RPG Stats`)
-            .setDescription(`Use the </bag:1282456807100387411> command to see your inventory`)
+            .setDescription(
+                `Use the </bag:1282456807100387411> command to see your inventory`,
+            )
             .setThumbnail(i.user.displayAvatarURL())
             .addFields({
                 name: "Your Stats",

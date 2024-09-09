@@ -105,7 +105,8 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     const availableMonsters = monsters.filter(
         (monster) =>
             worldLevel >= monster.minWorldLevel &&
-            monster.locations.includes(location),
+            monster.locations.includes(location) &&
+            worldLevel - monster.minWorldLevel <= 5,
     );
 
     if (availableMonsters.length === 0) {
