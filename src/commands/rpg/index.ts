@@ -1,4 +1,5 @@
 export * from "./bag";
+export * from "./challenge";
 export * from "./craft";
 export * from "./daily";
 export * from "./downgrade";
