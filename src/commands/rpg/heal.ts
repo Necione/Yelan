@@ -67,7 +67,7 @@ export const heal = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `The Statue of The Seven took ${customEmoji.a.z_coins} \`${healCost} ${texts.c.u}\` and healed you for \`${healAmount} HP\`! Your current HP is \`${newHp}/${maxHP}\`.`,
+                `The Statue of The Seven took ${customEmoji.a.z_coins} \`${healCost} ${texts.c.u}\` and healed you for \`${healAmount} HP\`! Your current HP is \`${newHp}/${maxHP}\`\n-# TIP: You can also use </diffuse:1283111946488647813>`,
                 "Green",
             ),
         );

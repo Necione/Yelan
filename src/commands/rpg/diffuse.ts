@@ -10,7 +10,7 @@ import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 export const diffuse = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("diffuse")
-        .setDescription("[RPG] diffuse an item or weapon from your inventory.")
+        .setDescription("[RPG] Trade an item in your bag for HP")
         .setDMPermission(false)
         .addStringOption((option) =>
             option
@@ -137,7 +137,7 @@ export const diffuse = buildCommand<SlashCommand>({
         }
 
         let totaldiffusePrice = itemData.sellPrice * amountTodiffuse;
-        let totalHeal = Math.round(totaldiffusePrice / 2);
+        let totalHeal = Math.round(totaldiffusePrice * 1.5);
         const maxHP = stats.maxHP;
         const newHp = Math.min(stats.hp + totalHeal, maxHP);
 
