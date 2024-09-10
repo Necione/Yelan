@@ -3,6 +3,7 @@ import type { UserStats, UserWallet } from "@prisma/client";
 import type {
     ChatInputCommandInteraction,
     Message,
+    PublicThreadChannel,
     ThreadChannel,
 } from "discord.js";
 import { EmbedBuilder } from "discord.js";
@@ -22,13 +23,26 @@ export async function handleVictory(
     i: ChatInputCommandInteraction,
     thread: ThreadChannel,
     stats: UserStats,
-    monster: Monster,
+    monstersEncountered: Monster[],
     currentPlayerHp: number,
     userWallet: UserWallet,
 ) {
     const finalEmbed = new EmbedBuilder();
-    const expGained = calculateExp(monster.minExp, monster.maxExp);
-    let newExp = stats.exp + expGained;
+    let totalExpGained = 0;
+    let dropsCollected: { item: string; amount: number }[] = [];
+
+    for (const monster of monstersEncountered) {
+        const expGained = calculateExp(monster.minExp, monster.maxExp);
+        totalExpGained += expGained;
+
+        const drops = calculateDrop(monster.drops);
+        if (is.array(drops)) {
+            dropsCollected = dropsCollected.concat(drops);
+            await addItemToInventory(i.user.id, drops);
+        }
+    }
+
+    let newExp = stats.exp + totalExpGained;
     let expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
 
     while (newExp >= expRequired) {
@@ -42,13 +56,19 @@ export async function handleVictory(
         worldLevel: stats.worldLevel,
     });
 
+    const monstersFought = monstersEncountered
+        .map((monster) => monster.name)
+        .join(", ");
+
     finalEmbed
         .setColor("Green")
         .setTitle(`Victory in ${stats.location}!`)
         .setDescription(
-            `You defeated the ${monster.name}!\n-# \`⭐\` \`+${expGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
+            `You defeated the following monsters: \`${monstersFought}\`!\n-# \`⭐\` \`+${totalExpGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
         )
-        .setThumbnail(monster.image);
+        .setThumbnail(
+            monstersEncountered[monstersEncountered.length - 1].image,
+        );
 
     const hasTotemSkill = stats.skills.some((skill) => skill.name === "Totem");
     if (hasTotemSkill) {
@@ -65,11 +85,8 @@ export async function handleVictory(
         });
     }
 
-    const drops = calculateDrop(monster.drops);
-    if (is.array(drops)) {
-        await addItemToInventory(i.user.id, drops);
-
-        const dropsDescription = drops
+    if (dropsCollected.length > 0) {
+        const dropsDescription = dropsCollected
             .map((drop) => `\`${drop.amount}x\` ${drop.item}`)
             .join(", ");
         finalEmbed.addFields({
@@ -293,161 +310,209 @@ export async function handleHunt(
 ) {
     await initializeMonsters();
 
-    const monster = await getRandomMonster(stats.worldLevel, stats.location);
+    const numberOfMonsters =
+        stats.worldLevel >= 6 ? Math.floor(Math.random() * 3) + 1 : 1;
+    let monstersEncountered: Monster[] = [];
 
-    if (!monster) {
-        await i
-            .editReply(
-                embedComment(
-                    `This area (${stats.location}) has no monsters to encounter.\nTry to </travel:1281778318160691301> to another location!`,
-                ),
-            )
-            .catch(noop);
-
-        await updateUserStats(i.user.id, {
-            isHunting: false,
-        });
-
-        return;
-    }
-
-    const selectedDescription = getEncounterDescription(
-        monster.name,
-        stats.location,
-    );
-    let currentPlayerHp = stats.hp;
-    let currentMonsterHp = Math.floor(
-        getRandomValue(monster.minHp, monster.maxHp),
-    );
-    const initialMonsterHp = currentMonsterHp;
-
-    const createHealthBar = (
-        current: number,
-        max: number,
-        length: number = 20,
-    ): string => {
-        current = Math.max(0, Math.min(current, max));
-        const filledLength = Math.round((current / max) * length);
-        const emptyLength = Math.max(length - filledLength, 0);
-
-        const bar = "█".repeat(filledLength) + "░".repeat(emptyLength);
-        return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
-    };
-
-    const battleEmbed = new EmbedBuilder()
-        .setColor("Aqua")
-        .setTitle(`You encountered a ${monster.name}!`)
-        .setDescription(selectedDescription)
-        .setThumbnail(monster.image)
-        .addFields(
-            {
-                name: "Your HP",
-                value: createHealthBar(currentPlayerHp, stats.hp),
-                inline: true,
-            },
-            {
-                name: "Monster HP",
-                value: createHealthBar(currentMonsterHp, initialMonsterHp),
-                inline: true,
-            },
+    for (let encounter = 0; encounter < numberOfMonsters; encounter++) {
+        const monster = await getRandomMonster(
+            stats.worldLevel,
+            stats.location,
         );
 
-    await i
-        .editReply({
-            embeds: [battleEmbed],
-        })
-        .catch(noop);
+        if (!monster) {
+            await i
+                .editReply(
+                    embedComment(
+                        `This area (${stats.location}) has no monsters to encounter.\nTry to </travel:1281778318160691301> to another location!`,
+                    ),
+                )
+                .catch(noop);
 
-    const thread = await r
-        .startThread({
-            name: `Battle with ${monster.name}`,
-            autoArchiveDuration: 60,
-        })
-        .catch(noop);
-
-    if (!thread) {
-        return i
-            .editReply(embedComment(`Unable to create the thread.`))
-            .catch(noop);
-    }
-
-    const hasVigilance = stats.skills.some(
-        (skill) => skill.name === "Vigilance",
-    );
-    let vigilanceUsed = false;
-
-    const battleInterval = setInterval(async () => {
-        if (currentPlayerHp <= 0 || currentMonsterHp <= 0) {
-            clearInterval(battleInterval);
-
-            if (currentPlayerHp > 0) {
-                await handleVictory(
-                    i,
-                    thread,
-                    stats,
-                    monster,
-                    currentPlayerHp,
-                    userWallet,
-                );
-            } else {
-                await handleDefeat(
-                    i,
-                    thread,
-                    stats,
-                    monster,
-                    currentPlayerHp,
-                    userWallet,
-                );
-            }
+            await updateUserStats(i.user.id, {
+                isHunting: false,
+            });
 
             return;
         }
 
-        const result = await playerAttack(
-            thread,
-            stats,
-            monster,
-            currentMonsterHp,
-            hasVigilance,
-            vigilanceUsed,
+        monstersEncountered.push(monster);
+    }
+
+    let currentMonsterIndex = 0;
+
+    const handleMonsterBattle = async (thread?: PublicThreadChannel<false>) => {
+        const monster = monstersEncountered[currentMonsterIndex];
+        const selectedDescription = getEncounterDescription(
+            monster.name,
+            stats.location,
         );
-
-        currentMonsterHp = result.currentMonsterHp;
-        vigilanceUsed = result.vigilanceUsed;
-
-        if (currentMonsterHp > 0) {
-            currentPlayerHp = await monsterAttack(
-                thread,
-                stats,
-                monster,
-                currentPlayerHp,
-            );
-        }
-
-        const playerHpBar = createHealthBar(currentPlayerHp, stats.hp);
-        const monsterHpBar = createHealthBar(
-            currentMonsterHp,
-            initialMonsterHp,
+        let currentPlayerHp = stats.hp;
+        let currentMonsterHp = Math.floor(
+            getRandomValue(monster.minHp, monster.maxHp),
         );
+        const initialMonsterHp = currentMonsterHp;
 
-        if (
-            typeof playerHpBar === "string" &&
-            typeof monsterHpBar === "string"
-        ) {
-            battleEmbed.setFields([
+        const createHealthBar = (
+            current: number,
+            max: number,
+            length: number = 20,
+        ): string => {
+            current = Math.max(0, Math.min(current, max));
+            const filledLength = Math.round((current / max) * length);
+            const emptyLength = Math.max(length - filledLength, 0);
+
+            const bar = "█".repeat(filledLength) + "░".repeat(emptyLength);
+            return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
+        };
+
+        const battleEmbed = new EmbedBuilder()
+            .setColor("Aqua")
+            .setTitle(`You encountered a ${monster.name}!`)
+            .setDescription(selectedDescription)
+            .setThumbnail(monster.image)
+            .addFields(
                 {
                     name: "Your HP",
-                    value: playerHpBar,
+                    value: createHealthBar(currentPlayerHp, stats.hp),
                     inline: true,
                 },
                 {
                     name: "Monster HP",
-                    value: monsterHpBar,
+                    value: createHealthBar(currentMonsterHp, initialMonsterHp),
                     inline: true,
                 },
-            ]);
+            );
+
+        await i
+            .editReply({
+                embeds: [battleEmbed],
+            })
+            .catch(noop);
+
+        if (!thread) {
+            thread =
+                (await r
+                    .startThread({
+                        name: `Battle with ${monster.name}`,
+                        autoArchiveDuration: 60,
+                    })
+                    .catch(noop)) || undefined;
+
+            if (!thread) {
+                await i
+                    .editReply(embedComment(`Unable to create the thread.`))
+                    .catch(noop);
+                return;
+            }
+        } else {
+            await thread.send(
+                `Another monster has appeared! You are now facing ${monster.name}.`,
+            );
         }
 
-        await i.editReply({ embeds: [battleEmbed] }).catch(noop);
-    }, get.secs(4));
+        const hasVigilance = stats.skills.some(
+            (skill) => skill.name === "Vigilance",
+        );
+        let vigilanceUsed = false;
+
+        let isMonsterFirst = Math.random() < 0.5;
+
+        const battleInterval = setInterval(async () => {
+            if (currentPlayerHp <= 0 || currentMonsterHp <= 0) {
+                clearInterval(battleInterval);
+
+                if (currentPlayerHp > 0) {
+                    if (currentMonsterIndex < monstersEncountered.length - 1) {
+                        currentMonsterIndex++;
+                        await handleMonsterBattle(thread);
+                    } else {
+                        if (thread) {
+                            await handleVictory(
+                                i,
+                                thread,
+                                stats,
+                                monstersEncountered,
+                                currentPlayerHp,
+                                userWallet,
+                            );
+                        }
+                    }
+                } else {
+                    if (thread) {
+                        await handleDefeat(
+                            i,
+                            thread,
+                            stats,
+                            monstersEncountered[currentMonsterIndex],
+                            currentPlayerHp,
+                            userWallet,
+                        );
+                    }
+                }
+
+                return;
+            }
+
+            if (isMonsterFirst && currentMonsterHp > 0) {
+                currentPlayerHp = await monsterAttack(
+                    thread!,
+                    stats,
+                    monstersEncountered[currentMonsterIndex],
+                    currentPlayerHp,
+                );
+
+                isMonsterFirst = false;
+            } else {
+                const result = await playerAttack(
+                    thread!,
+                    stats,
+                    monstersEncountered[currentMonsterIndex],
+                    currentMonsterHp,
+                    hasVigilance,
+                    vigilanceUsed,
+                );
+
+                currentMonsterHp = result.currentMonsterHp;
+                vigilanceUsed = result.vigilanceUsed;
+
+                if (currentMonsterHp > 0) {
+                    currentPlayerHp = await monsterAttack(
+                        thread!,
+                        stats,
+                        monstersEncountered[currentMonsterIndex],
+                        currentPlayerHp,
+                    );
+                }
+            }
+
+            const playerHpBar = createHealthBar(currentPlayerHp, stats.hp);
+            const monsterHpBar = createHealthBar(
+                currentMonsterHp,
+                initialMonsterHp,
+            );
+
+            if (
+                typeof playerHpBar === "string" &&
+                typeof monsterHpBar === "string"
+            ) {
+                battleEmbed.setFields([
+                    {
+                        name: "Your HP",
+                        value: playerHpBar,
+                        inline: true,
+                    },
+                    {
+                        name: "Monster HP",
+                        value: monsterHpBar,
+                        inline: true,
+                    },
+                ]);
+            }
+
+            await i.editReply({ embeds: [battleEmbed] }).catch(noop);
+        }, get.secs(4));
+    };
+
+    await handleMonsterBattle();
 }
