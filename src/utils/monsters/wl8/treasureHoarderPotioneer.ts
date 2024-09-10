@@ -15,7 +15,7 @@ const treasureHoarderGravedigger = {
     defValue: 8,
     drops: [
         {
-            item: "Silver Hoarder Insignia",
+            item: "Silver Raven Insignia",
             minAmount: 1,
             maxAmount: 3,
             chance: 100,
