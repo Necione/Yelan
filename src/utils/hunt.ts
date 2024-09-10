@@ -3,6 +3,7 @@ import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 
 export interface Monster {
+    currentHp: number;
     name: string;
     group: string;
     minHp: number;
@@ -173,19 +174,31 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         );
 
         if (encounterAverages) {
-            selectedMonster.minHp = encounterAverages.minHp;
-            selectedMonster.maxHp = encounterAverages.maxHp;
-            selectedMonster.minDamage = encounterAverages.minDamage;
-            selectedMonster.maxDamage = encounterAverages.maxDamage;
+            selectedMonster.minHp = Math.max(
+                encounterAverages.minHp,
+                selectedMonster.minHp,
+            );
+            selectedMonster.maxHp = Math.max(
+                encounterAverages.maxHp,
+                selectedMonster.maxHp,
+            );
+            selectedMonster.minDamage = Math.max(
+                encounterAverages.minDamage,
+                selectedMonster.minDamage,
+            );
+            selectedMonster.maxDamage = Math.max(
+                encounterAverages.maxDamage,
+                selectedMonster.maxDamage,
+            );
 
             log(
                 `Stats replaced with low encounter averages for world level ${worldLevel}`,
             );
             log(
-                `Min HP: ${encounterAverages.minHp}, Max HP: ${encounterAverages.maxHp}`,
+                `Min HP: ${selectedMonster.minHp}, Max HP: ${selectedMonster.maxHp}`,
             );
             log(
-                `Min Damage: ${encounterAverages.minDamage}, Max Damage: ${encounterAverages.maxDamage}`,
+                `Min Damage: ${selectedMonster.minDamage}, Max Damage: ${selectedMonster.maxDamage}`,
             );
         } else {
             log(
