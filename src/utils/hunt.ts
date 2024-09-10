@@ -154,7 +154,7 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     for (const monster of monstersInGroup) {
         randomWeight -= monster.minWorldLevel;
         if (randomWeight <= 0) {
-            selectedMonster = monster;
+            selectedMonster = JSON.parse(JSON.stringify(monster));
             break;
         }
     }
