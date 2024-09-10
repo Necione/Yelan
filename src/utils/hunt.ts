@@ -174,22 +174,10 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         );
 
         if (encounterAverages) {
-            selectedMonster.minHp = Math.max(
-                encounterAverages.minHp,
-                selectedMonster.minHp,
-            );
-            selectedMonster.maxHp = Math.max(
-                encounterAverages.maxHp,
-                selectedMonster.maxHp,
-            );
-            selectedMonster.minDamage = Math.max(
-                encounterAverages.minDamage,
-                selectedMonster.minDamage,
-            );
-            selectedMonster.maxDamage = Math.max(
-                encounterAverages.maxDamage,
-                selectedMonster.maxDamage,
-            );
+            selectedMonster.minHp = encounterAverages.minHp;
+            selectedMonster.maxHp = encounterAverages.maxHp;
+            selectedMonster.minDamage = encounterAverages.minDamage;
+            selectedMonster.maxDamage = encounterAverages.maxDamage;
 
             log(
                 `Stats replaced with low encounter averages for world level ${worldLevel}`,
