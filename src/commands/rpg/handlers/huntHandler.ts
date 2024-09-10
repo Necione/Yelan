@@ -42,6 +42,10 @@ export async function handleVictory(
         }
     }
 
+    const numberOfMonsters = monstersEncountered.length;
+    const xpReductionFactor = Math.max(0, 1 - (numberOfMonsters - 1) * 0.25);
+    totalExpGained = Math.round(totalExpGained * xpReductionFactor);
+
     let newExp = stats.exp + totalExpGained;
     let expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
 
@@ -313,6 +317,7 @@ export async function handleHunt(
     const numberOfMonsters =
         stats.worldLevel >= 6 ? Math.floor(Math.random() * 3) + 1 : 1;
     let monstersEncountered: Monster[] = [];
+    let currentPlayerHp = stats.hp;
 
     for (let encounter = 0; encounter < numberOfMonsters; encounter++) {
         const monster = await getRandomMonster(
@@ -347,7 +352,6 @@ export async function handleHunt(
             monster.name,
             stats.location,
         );
-        let currentPlayerHp = stats.hp;
         let currentMonsterHp = Math.floor(
             getRandomValue(monster.minHp, monster.maxHp),
         );
