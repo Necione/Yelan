@@ -136,8 +136,8 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
-        let totaldiffusePrice = itemData.sellPrice * amountTodiffuse;
-        let totalHeal = Math.round(totaldiffusePrice * 1.5);
+        const totaldiffusePrice = itemData.sellPrice * amountTodiffuse;
+        const totalHeal = Math.round(totaldiffusePrice * 1.5);
         const maxHP = stats.maxHP;
         const newHp = Math.min(stats.hp + totalHeal, maxHP);
 
