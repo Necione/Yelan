@@ -81,22 +81,36 @@ export async function syncStats(userId: string) {
         additionalArtifactStats.maxHP += circlet.maxHP;
     }
 
-    const calculatedAttackPower =
+    let calculatedAttackPower =
         calculatedBaseAttack +
         additionalWeaponAttackPower +
         additionalArtifactStats.attackPower;
 
-    const calculatedCritChance =
+    if (calculatedAttackPower < 0) {
+        calculatedAttackPower = 0;
+    }
+
+    let calculatedCritChance =
         additionalWeaponCritChance + additionalArtifactStats.critChance;
+    if (calculatedCritChance < 0) {
+        calculatedCritChance = 0;
+    }
 
     let calculatedCritValue =
         additionalWeaponCritValue + additionalArtifactStats.critValue;
     if (calculatedCritValue < 1) {
-        calculatedCritValue = 1 + (calculatedCritValue % 1);
+        calculatedCritValue = 1;
     }
 
-    const calculatedDefChance = additionalArtifactStats.defChance;
-    const calculatedDefValue = additionalArtifactStats.defValue;
+    let calculatedDefChance = additionalArtifactStats.defChance;
+    if (calculatedDefChance < 0) {
+        calculatedDefChance = 0;
+    }
+
+    let calculatedDefValue = additionalArtifactStats.defValue;
+    if (calculatedDefValue < 0) {
+        calculatedDefValue = 0;
+    }
 
     const finalMaxHP =
         calculatedMaxHP + additionalArtifactStats.maxHP + additionalWeaponHP;
