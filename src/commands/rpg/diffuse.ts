@@ -1,7 +1,11 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, get, getKeys, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { getProfileByUserId, getUserStats, updateUserStats } from "../../services";
+import {
+    getProfileByUserId,
+    getUserStats,
+    updateUserStats,
+} from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";

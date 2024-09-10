@@ -1,0 +1,60 @@
+import { AbyssMonster } from "../hunt";
+
+const abyssFloor3Monsters: AbyssMonster[] = [
+    {
+        name: "Electro Slime",
+        minHp: 70,
+        maxHp: 100,
+        minDamage: 10,
+        maxDamage: 20,
+        image: "https://lh.elara.workers.dev/rpg/monsters/electro_slime.png",
+        critChance: 25,
+        critValue: 1.5,
+        defChance: 20,
+        defValue: 5,
+        quantity: 1,
+    },
+    {
+        name: "Pyro Slime",
+        minHp: 70,
+        maxHp: 100,
+        minDamage: 10,
+        maxDamage: 20,
+        image: "https://lh.elara.workers.dev/rpg/monsters/pyro_slime.png",
+        critChance: 25,
+        critValue: 1.5,
+        defChance: 20,
+        defValue: 5,
+        quantity: 1,
+    },
+    {
+        name: "Cryo Slime",
+        minHp: 70,
+        maxHp: 100,
+        minDamage: 10,
+        maxDamage: 20,
+        image: "https://lh.elara.workers.dev/rpg/monsters/cryo_slime.png",
+        critChance: 25,
+        critValue: 1.5,
+        defChance: 20,
+        defValue: 5,
+        quantity: 1,
+    },
+    {
+        name: "Anemo Slime",
+        minHp: 70,
+        maxHp: 100,
+        minDamage: 10,
+        maxDamage: 20,
+        image: "https://lh.elara.workers.dev/rpg/monsters/anemo_slime.png",
+        critChance: 25,
+        critValue: 1.5,
+        defChance: 20,
+        defValue: 5,
+        quantity: 1,
+    },
+];
+
+const abyssFloor3Drops = [{ item: "Wanderer's Advice", amount: 2 }];
+
+export { abyssFloor3Drops, abyssFloor3Monsters };

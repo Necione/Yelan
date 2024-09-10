@@ -253,3 +253,122 @@ export function formatChange(value: number): string {
     }
     return `+${value.toFixed(2)}`;
 }
+
+export interface AbyssMonster {
+    name: string;
+    minHp: number;
+    maxHp: number;
+    minDamage: number;
+    maxDamage: number;
+    image: string;
+    critChance: number;
+    critValue: number;
+    defChance: number;
+    defValue: number;
+    quantity: number;
+}
+
+const abyssMonsters: AbyssMonster[] = [];
+let abyssMonstersLoaded = false;
+
+async function loadAbyssMonsters(dir: string): Promise<void> {
+    const files = readdirSync(dir);
+
+    for (const file of files) {
+        const fullPath = join(dir, file);
+
+        if (statSync(fullPath).isDirectory()) {
+            await loadAbyssMonsters(fullPath);
+        } else if ([".ts", ".js"].some((c) => file.endsWith(c))) {
+            try {
+                const abyssMonster = (await import(fullPath))
+                    .default as AbyssMonster;
+                if (
+                    abyssMonster &&
+                    !abyssMonsters.some((m) => m.name === abyssMonster.name)
+                ) {
+                    abyssMonsters.push(abyssMonster);
+                }
+            } catch (error) {
+                log(
+                    `Error loading abyss monster from file: ${fullPath}`,
+                    error,
+                );
+            }
+        }
+    }
+}
+
+const abyssMonstersDir = resolve(__dirname, "./abyss");
+const abyssDropsDir = resolve(__dirname, "./abyss");
+
+export async function initializeAbyssMonsters(): Promise<void> {
+    if (!abyssMonstersLoaded) {
+        await loadAbyssMonsters(abyssMonstersDir);
+        abyssMonstersLoaded = true;
+        log(`Total abyss monsters loaded: ${abyssMonsters.length}`);
+    }
+}
+
+export async function getMonstersForAbyssFloor(
+    abyssFloor: number,
+): Promise<AbyssMonster[]> {
+    if (!abyssMonstersLoaded) {
+        await initializeAbyssMonsters();
+    }
+
+    const floorFile = resolve(abyssMonstersDir, `abyssFloor${abyssFloor}.js`);
+
+    try {
+        const module = await import(floorFile);
+
+        const monsters = module[`abyssFloor${abyssFloor}Monsters`];
+
+        if (monsters) {
+            log(`Monsters retrieved for Abyss Floor ${abyssFloor}:`);
+
+            const expandedMonsters: AbyssMonster[] = [];
+
+            monsters.forEach((monster: AbyssMonster) => {
+                const quantity = monster.quantity || 1;
+                for (let i = 0; i < quantity; i++) {
+                    expandedMonsters.push(JSON.parse(JSON.stringify(monster)));
+                }
+            });
+
+            expandedMonsters.forEach((monster) => log(monster.name));
+
+            return expandedMonsters;
+        } else {
+            log(`No monsters found for Abyss Floor ${abyssFloor}`);
+            return [];
+        }
+    } catch (error) {
+        log(`Error loading monsters for Abyss Floor ${abyssFloor}:`, error);
+        return [];
+    }
+}
+
+export async function getDropsForAbyssFloor(
+    abyssFloor: number,
+): Promise<{ item: string; amount: number }[]> {
+    const floorFile = resolve(abyssDropsDir, `abyssFloor${abyssFloor}.js`);
+
+    try {
+        const module = await import(floorFile);
+
+        const drops = module[`abyssFloor${abyssFloor}Drops`];
+
+        if (drops) {
+            return drops;
+        } else {
+            log(`No drops found for Abyss Floor ${abyssFloor}`);
+            return [];
+        }
+    } catch (error) {
+        log(`Error loading drops for Abyss Floor ${abyssFloor}:`, error);
+        return [];
+    }
+}
+
+export { abyssMonsters, abyssMonstersLoaded };
