@@ -13,18 +13,25 @@ export async function syncStats(userId: string) {
     const calculatedBaseAttack = 5 + (stats.worldLevel - 1) * 0.5;
     const calculatedMaxHP = 100 + (stats.worldLevel - 1) * 5;
 
-    const additionalWeaponAttackPower = stats.equippedWeapon
-        ? weapons[stats.equippedWeapon as WeaponName]?.attackPower || 0
-        : 0;
-    const additionalWeaponCritChance = stats.equippedWeapon
-        ? weapons[stats.equippedWeapon as WeaponName]?.critChance || 0
-        : 0;
-    const additionalWeaponCritValue = stats.equippedWeapon
-        ? weapons[stats.equippedWeapon as WeaponName]?.critValue || 0
-        : 0;
-    const additionalWeaponHP = stats.equippedWeapon
-        ? weapons[stats.equippedWeapon as WeaponName]?.additionalHP || 0
-        : 0;
+    const additionalWeaponAttackPower =
+        stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
+            ? weapons[stats.equippedWeapon as WeaponName].attackPower || 0
+            : 0;
+
+    const additionalWeaponCritChance =
+        stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
+            ? weapons[stats.equippedWeapon as WeaponName].critChance || 0
+            : 0;
+
+    const additionalWeaponCritValue =
+        stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
+            ? weapons[stats.equippedWeapon as WeaponName].critValue || 0
+            : 0;
+
+    const additionalWeaponHP =
+        stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
+            ? weapons[stats.equippedWeapon as WeaponName].additionalHP || 0
+            : 0;
 
     const additionalArtifactStats = {
         attackPower: 0,
@@ -35,50 +42,63 @@ export async function syncStats(userId: string) {
         maxHP: 0,
     };
 
-    if (stats.equippedFlower) {
+    if (
+        stats.equippedFlower &&
+        artifacts[stats.equippedFlower as ArtifactName]
+    ) {
         const flower = artifacts[stats.equippedFlower as ArtifactName];
-        additionalArtifactStats.attackPower += flower.attackPower;
-        additionalArtifactStats.critChance += flower.critChance;
-        additionalArtifactStats.critValue += flower.critValue;
-        additionalArtifactStats.defChance += flower.defChance;
-        additionalArtifactStats.defValue += flower.defValue;
-        additionalArtifactStats.maxHP += flower.maxHP;
+        additionalArtifactStats.attackPower += flower.attackPower || 0;
+        additionalArtifactStats.critChance += flower.critChance || 0;
+        additionalArtifactStats.critValue += flower.critValue || 0;
+        additionalArtifactStats.defChance += flower.defChance || 0;
+        additionalArtifactStats.defValue += flower.defValue || 0;
+        additionalArtifactStats.maxHP += flower.maxHP || 0;
     }
-    if (stats.equippedPlume) {
+
+    if (stats.equippedPlume && artifacts[stats.equippedPlume as ArtifactName]) {
         const plume = artifacts[stats.equippedPlume as ArtifactName];
-        additionalArtifactStats.attackPower += plume.attackPower;
-        additionalArtifactStats.critChance += plume.critChance;
-        additionalArtifactStats.critValue += plume.critValue;
-        additionalArtifactStats.defChance += plume.defChance;
-        additionalArtifactStats.defValue += plume.defValue;
-        additionalArtifactStats.maxHP += plume.maxHP;
+        additionalArtifactStats.attackPower += plume.attackPower || 0;
+        additionalArtifactStats.critChance += plume.critChance || 0;
+        additionalArtifactStats.critValue += plume.critValue || 0;
+        additionalArtifactStats.defChance += plume.defChance || 0;
+        additionalArtifactStats.defValue += plume.defValue || 0;
+        additionalArtifactStats.maxHP += plume.maxHP || 0;
     }
-    if (stats.equippedSands) {
+
+    if (stats.equippedSands && artifacts[stats.equippedSands as ArtifactName]) {
         const sands = artifacts[stats.equippedSands as ArtifactName];
-        additionalArtifactStats.attackPower += sands.attackPower;
-        additionalArtifactStats.critChance += sands.critChance;
-        additionalArtifactStats.critValue += sands.critValue;
-        additionalArtifactStats.defChance += sands.defChance;
-        additionalArtifactStats.defValue += sands.defValue;
-        additionalArtifactStats.maxHP += sands.maxHP;
+        additionalArtifactStats.attackPower += sands.attackPower || 0;
+        additionalArtifactStats.critChance += sands.critChance || 0;
+        additionalArtifactStats.critValue += sands.critValue || 0;
+        additionalArtifactStats.defChance += sands.defChance || 0;
+        additionalArtifactStats.defValue += sands.defValue || 0;
+        additionalArtifactStats.maxHP += sands.maxHP || 0;
     }
-    if (stats.equippedGoblet) {
+
+    if (
+        stats.equippedGoblet &&
+        artifacts[stats.equippedGoblet as ArtifactName]
+    ) {
         const goblet = artifacts[stats.equippedGoblet as ArtifactName];
-        additionalArtifactStats.attackPower += goblet.attackPower;
-        additionalArtifactStats.critChance += goblet.critChance;
-        additionalArtifactStats.critValue += goblet.critValue;
-        additionalArtifactStats.defChance += goblet.defChance;
-        additionalArtifactStats.defValue += goblet.defValue;
-        additionalArtifactStats.maxHP += goblet.maxHP;
+        additionalArtifactStats.attackPower += goblet.attackPower || 0;
+        additionalArtifactStats.critChance += goblet.critChance || 0;
+        additionalArtifactStats.critValue += goblet.critValue || 0;
+        additionalArtifactStats.defChance += goblet.defChance || 0;
+        additionalArtifactStats.defValue += goblet.defValue || 0;
+        additionalArtifactStats.maxHP += goblet.maxHP || 0;
     }
-    if (stats.equippedCirclet) {
+
+    if (
+        stats.equippedCirclet &&
+        artifacts[stats.equippedCirclet as ArtifactName]
+    ) {
         const circlet = artifacts[stats.equippedCirclet as ArtifactName];
-        additionalArtifactStats.attackPower += circlet.attackPower;
-        additionalArtifactStats.critChance += circlet.critChance;
-        additionalArtifactStats.critValue += circlet.critValue;
-        additionalArtifactStats.defChance += circlet.defChance;
-        additionalArtifactStats.defValue += circlet.defValue;
-        additionalArtifactStats.maxHP += circlet.maxHP;
+        additionalArtifactStats.attackPower += circlet.attackPower || 0;
+        additionalArtifactStats.critChance += circlet.critChance || 0;
+        additionalArtifactStats.critValue += circlet.critValue || 0;
+        additionalArtifactStats.defChance += circlet.defChance || 0;
+        additionalArtifactStats.defValue += circlet.defValue || 0;
+        additionalArtifactStats.maxHP += circlet.maxHP || 0;
     }
 
     let calculatedAttackPower =
