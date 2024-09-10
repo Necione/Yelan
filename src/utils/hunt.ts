@@ -94,6 +94,23 @@ export function calculateExp(minExp: number, maxExp: number): number {
     return getRandomValue(minExp, maxExp);
 }
 
+const lowEncounterAverages = [
+    { worldLevel: 1, minHp: 12, maxHp: 20, minDamage: 2, maxDamage: 6 },
+    { worldLevel: 2, minHp: 14, maxHp: 25, minDamage: 4, maxDamage: 8 },
+    { worldLevel: 3, minHp: 22, maxHp: 50, minDamage: 5, maxDamage: 10 },
+    { worldLevel: 4, minHp: 32, maxHp: 65, minDamage: 8, maxDamage: 13 },
+    { worldLevel: 5, minHp: 40, maxHp: 100, minDamage: 9, maxDamage: 16 },
+    { worldLevel: 6, minHp: 75, maxHp: 200, minDamage: 14, maxDamage: 25 },
+    { worldLevel: 7, minHp: 100, maxHp: 250, minDamage: 18, maxDamage: 35 },
+    { worldLevel: 8, minHp: 150, maxHp: 450, minDamage: 25, maxDamage: 40 },
+    { worldLevel: 9, minHp: 200, maxHp: 600, minDamage: 30, maxDamage: 50 },
+    { worldLevel: 10, minHp: 250, maxHp: 600, minDamage: 40, maxDamage: 60 },
+    { worldLevel: 11, minHp: 325, maxHp: 700, minDamage: 50, maxDamage: 70 },
+    { worldLevel: 12, minHp: 400, maxHp: 800, minDamage: 65, maxDamage: 85 },
+    { worldLevel: 13, minHp: 500, maxHp: 900, minDamage: 70, maxDamage: 90 },
+    { worldLevel: 14, minHp: 600, maxHp: 1200, minDamage: 80, maxDamage: 95 },
+];
+
 export async function getRandomMonster(worldLevel: number, location: string) {
     if (!monstersLoaded) {
         return null;
@@ -113,40 +130,6 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     const uniqueGroups = [
         ...new Set(availableMonsters.map((monster) => monster.group)),
     ];
-
-    let monstersAtCurrentLevel = monsters.filter(
-        (monster) => monster.minWorldLevel === worldLevel,
-    );
-
-    let scalingFactor = 1;
-
-    if (monstersAtCurrentLevel.length === 0) {
-        log(
-            `No monsters found for world level ${worldLevel}. Searching for the closest lower world level...`,
-        );
-
-        const highestDefinedLevel = Math.max(
-            ...monsters.map((monster) => monster.minWorldLevel),
-        );
-        if (worldLevel > highestDefinedLevel) {
-            log(
-                `Using monsters from the highest available world level: ${highestDefinedLevel}`,
-            );
-
-            const levelDifference = worldLevel - highestDefinedLevel;
-            scalingFactor = Math.pow(1.1, levelDifference);
-            log(
-                `Scaling factor due to world level difference: ${scalingFactor}`,
-            );
-
-            monstersAtCurrentLevel = monsters.filter(
-                (monster) => monster.minWorldLevel === highestDefinedLevel,
-            );
-        } else {
-            log("No higher level monsters available.");
-            return null;
-        }
-    }
 
     const randomGroup =
         uniqueGroups[Math.floor(Math.random() * uniqueGroups.length)];
@@ -185,59 +168,32 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     );
 
     if (worldLevel > selectedMonster.minWorldLevel) {
-        const levelDifference = worldLevel - selectedMonster.minWorldLevel;
-        const reductionFactor = Math.max(0.85, 1 - 0.05 * levelDifference);
-        log(
-            `Level difference: ${levelDifference}, Reduction factor: ${reductionFactor}`,
+        const encounterAverages = lowEncounterAverages.find(
+            (avg) => avg.worldLevel === worldLevel,
         );
 
-        const scaledMinHp = Math.floor(
-            monstersAtCurrentLevel[0].minHp * reductionFactor,
-        );
-        const scaledMaxHp = Math.floor(
-            monstersAtCurrentLevel[0].maxHp * reductionFactor,
-        );
-        const scaledMinDamage = Math.floor(
-            monstersAtCurrentLevel[0].minDamage * reductionFactor,
-        );
-        const scaledMaxDamage = Math.floor(
-            monstersAtCurrentLevel[0].maxDamage * reductionFactor,
-        );
+        if (encounterAverages) {
+            selectedMonster.minHp = encounterAverages.minHp;
+            selectedMonster.maxHp = encounterAverages.maxHp;
+            selectedMonster.minDamage = encounterAverages.minDamage;
+            selectedMonster.maxDamage = encounterAverages.maxDamage;
 
-        log(`Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`);
-        log(
-            `Scaled Min Damage: ${scaledMinDamage}, Scaled Max Damage: ${scaledMaxDamage}`,
-        );
-
-        selectedMonster.minHp = scaledMinHp;
-        selectedMonster.maxHp = scaledMaxHp;
-        selectedMonster.minDamage = scaledMinDamage;
-        selectedMonster.maxDamage = scaledMaxDamage;
-    }
-
-    if (scalingFactor > 1) {
-        const scaledMinHp = Math.floor(
-            monstersAtCurrentLevel[0].minHp * scalingFactor,
-        );
-        const scaledMaxHp = Math.floor(
-            monstersAtCurrentLevel[0].maxHp * scalingFactor,
-        );
-        const scaledMinDamage = Math.floor(
-            monstersAtCurrentLevel[0].minDamage * scalingFactor,
-        );
-        const scaledMaxDamage = Math.floor(
-            monstersAtCurrentLevel[0].maxDamage * scalingFactor,
-        );
-
-        log(`Scaled Min HP: ${scaledMinHp}, Scaled Max HP: ${scaledMaxHp}`);
-        log(
-            `Scaled Min Damage: ${scaledMinDamage}, Scaled Max Damage: ${scaledMaxDamage}`,
-        );
-
-        selectedMonster.minHp = scaledMinHp;
-        selectedMonster.maxHp = scaledMaxHp;
-        selectedMonster.minDamage = scaledMinDamage;
-        selectedMonster.maxDamage = scaledMaxDamage;
+            log(
+                `Stats replaced with low encounter averages for world level ${worldLevel}`,
+            );
+            log(
+                `Min HP: ${encounterAverages.minHp}, Max HP: ${encounterAverages.maxHp}`,
+            );
+            log(
+                `Min Damage: ${encounterAverages.minDamage}, Max Damage: ${encounterAverages.maxDamage}`,
+            );
+        } else {
+            log(
+                `No encounter averages found for world level ${worldLevel}. Using monster's base stats.`,
+            );
+        }
+    } else {
+        log(`Using monster's base stats for world level ${worldLevel}.`);
     }
 
     return selectedMonster;

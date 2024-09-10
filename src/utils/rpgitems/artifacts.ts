@@ -8,7 +8,7 @@ export const artifacts = {
         maxHP: 10,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 2,
+        minWorldLevel: 1,
         chestChance: 15,
     },
     "Adventurer's Tail Feather": {
@@ -20,7 +20,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 2,
+        minWorldLevel: 1,
         chestChance: 15,
     },
     "Adventurer's Pocket Watch": {
@@ -32,7 +32,7 @@ export const artifacts = {
         maxHP: 5,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 2,
+        minWorldLevel: 1,
         chestChance: 15,
     },
     "Adventurer's Golden Goblet": {
@@ -44,7 +44,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 10,
         defValue: 1.5,
-        minWorldLevel: 2,
+        minWorldLevel: 1,
         chestChance: 15,
     },
     "Adventurer's Bandana": {
@@ -56,7 +56,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 2,
+        minWorldLevel: 1,
         chestChance: 15,
     },
     "Travelling Doctor's Silver Lotus": {
@@ -68,7 +68,7 @@ export const artifacts = {
         maxHP: 15,
         defChance: 5,
         defValue: 8,
-        minWorldLevel: 3,
+        minWorldLevel: 2,
         chestChance: 15,
     },
     "Travelling Doctor's Owl Feather": {
@@ -80,7 +80,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 5,
         defValue: 4,
-        minWorldLevel: 3,
+        minWorldLevel: 2,
         chestChance: 15,
     },
     "Travelling Doctor's Pocket Watch": {
@@ -92,7 +92,7 @@ export const artifacts = {
         maxHP: 10,
         defChance: 5,
         defValue: 3,
-        minWorldLevel: 3,
+        minWorldLevel: 2,
         chestChance: 15,
     },
     "Travelling Doctor's Medicine Pot": {
@@ -104,7 +104,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 15,
         defValue: 2,
-        minWorldLevel: 3,
+        minWorldLevel: 2,
         chestChance: 15,
     },
     "Travelling Doctor's Handkerchief": {
@@ -116,7 +116,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 30,
         defValue: 1,
-        minWorldLevel: 3,
+        minWorldLevel: 2,
         chestChance: 15,
     },
     "Berserker's Rose": {

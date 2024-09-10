@@ -315,8 +315,8 @@ export async function handleHunt(
     await initializeMonsters();
 
     const numberOfMonsters =
-        stats.worldLevel >= 6 ? Math.floor(Math.random() * 3) + 1 : 1;
-    let monstersEncountered: Monster[] = [];
+        stats.worldLevel >= 5 ? Math.floor(Math.random() * 3) + 1 : 1;
+    const monstersEncountered: Monster[] = [];
     let currentPlayerHp = stats.hp;
 
     for (let encounter = 0; encounter < numberOfMonsters; encounter++) {
