@@ -1,4 +1,4 @@
-import { AbyssMonster } from "../hunt";
+import { type AbyssMonster } from "../hunt";
 
 const abyssFloor5Monsters: AbyssMonster[] = [
     {
@@ -32,3 +32,4 @@ const abyssFloor5Monsters: AbyssMonster[] = [
 const abyssFloor5Drops = [{ item: "Wanderer's Advice", amount: 2 }];
 
 export { abyssFloor5Drops, abyssFloor5Monsters };
+

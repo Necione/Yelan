@@ -1,5 +1,5 @@
 import { embedComment, get, noop, sleep } from "@elara-services/utils";
-import type { UserStats, UserWallet } from "@prisma/client";
+import type { UserStats } from "@prisma/client";
 import type {
     ChatInputCommandInteraction,
     Message,
@@ -20,9 +20,6 @@ export async function handleAbyssVictory(
     i: ChatInputCommandInteraction,
     thread: ThreadChannel,
     stats: UserStats,
-    monstersEncountered: Monster[],
-    currentPlayerHp: number,
-    userWallet: UserWallet,
 ) {
     const finalEmbed = new EmbedBuilder();
     let dropsCollected: { item: string; amount: number }[] = [];
@@ -34,15 +31,11 @@ export async function handleAbyssVictory(
         await addItemToInventory(i.user.id, customFloorDrops);
     }
 
-    let newAbyssFloor = stats.abyssFloor + 1;
+    const newAbyssFloor = stats.abyssFloor + 1;
 
     await updateUserStats(i.user.id, {
         abyssFloor: newAbyssFloor,
     });
-
-    const monstersFought = monstersEncountered
-        .map((monster) => monster.name)
-        .join(", ");
 
     finalEmbed
         .setColor("DarkPurple")
@@ -68,10 +61,7 @@ export async function handleAbyssVictory(
 export async function handleAbyssDefeat(
     i: ChatInputCommandInteraction,
     thread: ThreadChannel,
-    stats: UserStats,
-    monster: Monster,
     currentPlayerHp: number,
-    userWallet: UserWallet,
 ) {
     const finalEmbed = new EmbedBuilder()
         .setColor("DarkPurple")
@@ -268,7 +258,6 @@ export async function handleAbyssHunt(
     i: ChatInputCommandInteraction,
     r: Message,
     stats: UserStats,
-    userWallet: UserWallet,
 ) {
     await initializeAbyssMonsters();
 
@@ -397,26 +386,12 @@ export async function handleAbyssHunt(
                         await handleAbyssMonsterBattle(thread);
                     } else {
                         if (thread) {
-                            await handleAbyssVictory(
-                                i,
-                                thread,
-                                stats,
-                                abyssMonstersEncountered,
-                                currentPlayerHp,
-                                userWallet,
-                            );
+                            await handleAbyssVictory(i, thread, stats);
                         }
                     }
                 } else {
                     if (thread) {
-                        await handleAbyssDefeat(
-                            i,
-                            thread,
-                            stats,
-                            abyssMonstersEncountered[currentMonsterIndex],
-                            currentPlayerHp,
-                            userWallet,
-                        );
+                        await handleAbyssDefeat(i, thread, currentPlayerHp);
                     }
                 }
 
