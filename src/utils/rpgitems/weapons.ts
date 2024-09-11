@@ -217,7 +217,7 @@ export const weapons = {
         critValue: 0,
         additionalHP: 0,
         minWorldLevel: 6,
-        chestChance: 1,
+        chestChance: 75, // Temporary i wnt to see someone get it befor ei sleep
         emoji: "<:Weapon_Aqua_Simulacra:1283303723082190902>",
     },
 };
