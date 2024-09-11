@@ -182,6 +182,7 @@ type Roles {
 model UserStats {
   id             String         @id @default(auto()) @map("_id") @db.ObjectId
   userId         String         @unique
+  rebirths       Int            @default(0)
   hp             Float          @default(100)
   maxHP          Float          @default(100)
   baseAttack     Float          @default(5)

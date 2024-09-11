@@ -57,7 +57,7 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         await updateUserStats(i.user.id, { isHunting: true });
-        await handleAbyssHunt(i, message, stats, userWallet);
+        await handleAbyssHunt(i, message, stats);
 
         locked.del(i.user.id);
     },

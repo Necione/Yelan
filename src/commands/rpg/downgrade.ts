@@ -124,6 +124,7 @@ export const downgrade = buildCommand<SlashCommand>({
             `Your world level has been downgraded to ${selectedLevel} and your EXP has been reset to 0.`,
             "Green",
         );
+        
         return r.edit({
             embeds: successEmbed.embeds,
             components: [],

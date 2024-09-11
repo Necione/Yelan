@@ -122,7 +122,10 @@ export const sell = buildCommand<SlashCommand>({
             );
         }
 
-        let totalSellPrice = itemData.sellPrice * amountToSell;
+        const rebirthMultiplier = 1 + (Math.min(stats.rebirths, 3) * 0.5);
+        const rebirthBonus = (rebirthMultiplier - 1) * itemData.sellPrice * amountToSell;
+
+        let totalSellPrice = itemData.sellPrice * amountToSell * rebirthMultiplier;
         let appraiseBonusMessage = "";
         let appraiseBonus = 0;
 
@@ -161,7 +164,7 @@ export const sell = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You sold \`${amountToSell}x\` **${itemName}** for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\`${appraiseBonusMessage}!`,
+                `You sold \`${amountToSell}x\` **${itemName}** for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\` ( +${Math.round(rebirthBonus)} Coins from [${stats.rebirths}] Rebirth${stats.rebirths > 1 ? 's' : ''})${appraiseBonusMessage}!`,
                 "Green",
             ),
         );
