@@ -60,9 +60,9 @@ export const rpg = buildCommand<SlashCommand>({
                 name: "Your Stats",
                 value: `🌍 World Level: \`${stats.worldLevel}\` | ⭐ EXP: \`${
                     stats.exp
-                }/${expRequired.toFixed(
-                    0,
-                )}\`\n🔻 Abyss Floor: \`${stats.abyssFloor}\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
+                }/${expRequired.toFixed(0)}\`\n🔻 Abyss Floor: \`${
+                    stats.abyssFloor
+                }\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
                     2,
                 )} (${formatChange(stats.attackPower - stats.baseAttack)})\`${
                     stats.critChance > 0 || stats.critValue > 0

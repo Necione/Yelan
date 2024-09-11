@@ -11,7 +11,8 @@ export async function syncStats(userId: string) {
     }
 
     const calculatedBaseAttack = 5 + (stats.worldLevel - 1) * 0.5;
-    const calculatedMaxHP = 100 + (stats.worldLevel - 1) * 5 + (stats.rebirths || 0) * 50;
+    const calculatedMaxHP =
+        100 + (stats.worldLevel - 1) * 5 + (stats.rebirths || 0) * 50;
 
     const additionalWeaponAttackPower =
         stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
