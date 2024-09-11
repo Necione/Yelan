@@ -209,6 +209,17 @@ export const weapons = {
         chestChance: 5,
         emoji: "<:Weapon_The_Flute:1282504448538837013>",
     },
+    // 5* weapons
+    "Aqua Simulacra": {
+        sellPrice: 50,
+        attackPower: 0,
+        critChance: -100,
+        critValue: 0,
+        additionalHP: 0,
+        minWorldLevel: 6,
+        chestChance: 1,
+        emoji: "<:Weapon_Aqua_Simulacra:1283303723082190902>",
+    },
 };
 
 export type WeaponName = keyof typeof weapons;

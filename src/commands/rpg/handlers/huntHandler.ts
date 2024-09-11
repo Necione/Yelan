@@ -147,58 +147,77 @@ export async function playerAttack(
     hasVigilance: boolean,
     vigilanceUsed: boolean,
 ): Promise<{ currentMonsterHp: number; vigilanceUsed: boolean }> {
-    let attackPower = stats.attackPower;
-    const critChance = stats.critChance || 0;
-    const critValue = stats.critValue || 1;
+    if (stats.equippedWeapon === "Aqua Simulacra") {
+        const emojis = ["💎", "🍒", "🪙", "🍀", "🍉"];
 
-    const isCrit = Math.random() * 100 < critChance;
-    if (isCrit) {
-        attackPower *= critValue;
-    }
+        const roll = [
+            emojis[Math.floor(Math.random() * emojis.length)],
+            emojis[Math.floor(Math.random() * emojis.length)],
+            emojis[Math.floor(Math.random() * emojis.length)],
+        ];
 
-    const monsterDefChance = monster.defChance || 0;
-    const monsterDefValue = monster.defValue || 0;
-    const monsterDefended = Math.random() * 100 < monsterDefChance;
-
-    if (monsterDefended) {
-        attackPower = Math.max(attackPower - monsterDefValue, 0);
-    }
-
-    const isLawachurlOrElectro =
-        monster.name.includes("Lawachurl") || monster.name.includes("Electro");
-    const stunChance = Math.random() < 0.25;
-
-    if (isLawachurlOrElectro && stunChance) {
         await thread
-            .send(
-                `>>> \`💫\` The ${monster.name} stunned you! You missed your attack.`,
-            )
+            .send(`>>> \`🎰\` You rolled: ${roll.join(" ")}`)
             .catch(noop);
-        return { currentMonsterHp, vigilanceUsed };
-    }
 
-    const isAnemo = monster.name.includes("Anemo");
-    const dodgeChance = Math.random() < 0.25;
+        const emojiCount = roll.reduce(
+            (acc, emoji) => {
+                acc[emoji] = (acc[emoji] || 0) + 1;
+                return acc;
+            },
+            {} as Record<string, number>,
+        );
 
-    if (isAnemo && dodgeChance) {
-        await thread
-            .send(
-                `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
-            )
-            .catch(noop);
-    } else {
-        currentMonsterHp -= attackPower;
-        await thread
-            .send(
-                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                    2,
-                )}\` damage to the ${monster.name}${
-                    isCrit ? " 💢 (Critical Hit!)" : ""
-                }${
-                    monsterDefended ? ` 🛡️ (Defended: -${monsterDefValue})` : ""
-                }.`,
-            )
-            .catch(noop);
+        let attackPower = stats.attackPower;
+        let bonusDamage = 0;
+
+        if (emojiCount["💎"]) {
+            bonusDamage += attackPower * 0.5 * emojiCount["💎"];
+        }
+
+        if (emojiCount["🍀"]) {
+            attackPower *= 2 ** emojiCount["🍀"];
+        }
+
+        if (Object.values(emojiCount).includes(3)) {
+            attackPower *= 100;
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name}`,
+                )
+                .catch(noop);
+        } else if (Object.values(emojiCount).includes(2)) {
+            attackPower *= stats.critValue || 1;
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name}`,
+                )
+                .catch(noop);
+        } else {
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name}.`,
+                )
+                .catch(noop);
+        }
+
+        currentMonsterHp -= attackPower + bonusDamage;
+
+        if (bonusDamage > 0) {
+            await thread
+                .send(
+                    `>>> \`💎\` You dealt an additional \`${bonusDamage.toFixed(
+                        2,
+                    )}\` bonus damage from diamonds!`,
+                )
+                .catch(noop);
+        }
 
         const hasKindle = stats.skills.some((skill) => skill.name === "Kindle");
         if (hasKindle) {
@@ -214,22 +233,99 @@ export async function playerAttack(
                 .catch(noop);
         }
 
-        if (hasVigilance && !vigilanceUsed) {
-            const vigilanceAttackPower = attackPower / 2;
-            currentMonsterHp -= vigilanceAttackPower;
-            vigilanceUsed = true;
+        return { currentMonsterHp, vigilanceUsed };
+    } else {
+        let attackPower = stats.attackPower;
+        const critChance = stats.critChance || 0;
+        const critValue = stats.critValue || 1;
 
+        const isCrit = Math.random() * 100 < critChance;
+        if (isCrit) {
+            attackPower *= critValue;
+        }
+
+        const monsterDefChance = monster.defChance || 0;
+        const monsterDefValue = monster.defValue || 0;
+        const monsterDefended = Math.random() * 100 < monsterDefChance;
+
+        if (monsterDefended) {
+            attackPower = Math.max(attackPower - monsterDefValue, 0);
+        }
+
+        const isLawachurlOrElectro =
+            monster.name.includes("Lawachurl") ||
+            monster.name.includes("Electro");
+        const stunChance = Math.random() < 0.25;
+
+        if (isLawachurlOrElectro && stunChance) {
             await thread
                 .send(
-                    `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name} ✨ (Vigilance Skill).`,
+                    `>>> \`💫\` The ${monster.name} stunned you! You missed your attack.`,
                 )
                 .catch(noop);
+            return { currentMonsterHp, vigilanceUsed };
         }
-    }
 
-    return { currentMonsterHp, vigilanceUsed };
+        const isAnemo = monster.name.includes("Anemo");
+        const dodgeChance = Math.random() < 0.25;
+
+        if (isAnemo && dodgeChance) {
+            await thread
+                .send(
+                    `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
+                )
+                .catch(noop);
+        } else {
+            currentMonsterHp -= attackPower;
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name}${
+                        isCrit ? " 💢 (Critical Hit!)" : ""
+                    }${
+                        monsterDefended
+                            ? ` 🛡️ (Defended: -${monsterDefValue})`
+                            : ""
+                    }.`,
+                )
+                .catch(noop);
+
+            const hasKindle = stats.skills.some(
+                (skill) => skill.name === "Kindle",
+            );
+            if (hasKindle) {
+                const kindleBonusDamage = stats.maxHP * 0.1;
+                currentMonsterHp -= kindleBonusDamage;
+
+                await thread
+                    .send(
+                        `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
+                            2,
+                        )}\` bonus damage with the Kindle skill!`,
+                    )
+                    .catch(noop);
+            }
+
+            if (hasVigilance && !vigilanceUsed) {
+                const vigilanceAttackPower = attackPower / 2;
+                currentMonsterHp -= vigilanceAttackPower;
+                vigilanceUsed = true;
+
+                await thread
+                    .send(
+                        `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                            2,
+                        )}\` damage to the ${
+                            monster.name
+                        } ✨ (Vigilance Skill).`,
+                    )
+                    .catch(noop);
+            }
+        }
+
+        return { currentMonsterHp, vigilanceUsed };
+    }
 }
 
 export async function monsterAttack(
