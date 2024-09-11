@@ -147,93 +147,22 @@ export async function playerAttack(
     hasVigilance: boolean,
     vigilanceUsed: boolean,
 ): Promise<{ currentMonsterHp: number; vigilanceUsed: boolean }> {
-    if (stats.equippedWeapon === "Aqua Simulacra") {
-        const emojis = ["💎", "🍒", "🪙", "🍀", "🍉"];
-
-        const roll = [
-            emojis[Math.floor(Math.random() * emojis.length)],
-            emojis[Math.floor(Math.random() * emojis.length)],
-            emojis[Math.floor(Math.random() * emojis.length)],
-        ];
-
-        await thread
-            .send(`>>> \`🎰\` You rolled: ${roll.join(" ")}`)
-            .catch(noop);
-
-        const emojiCount = roll.reduce(
-            (acc, emoji) => {
-                acc[emoji] = (acc[emoji] || 0) + 1;
-                return acc;
-            },
-            {} as Record<string, number>,
+    if (stats.equippedWeapon === "Staff of Homa") {
+        return handleStaffOfHomaAttack(
+            thread,
+            stats,
+            monster,
+            currentMonsterHp,
+            vigilanceUsed,
         );
-
-        let attackPower = stats.attackPower;
-        let bonusDamage = 0;
-
-        if (emojiCount["💎"]) {
-            bonusDamage += attackPower * 0.5 * emojiCount["💎"];
-        }
-
-        if (emojiCount["🍀"]) {
-            attackPower *= 2 ** emojiCount["🍀"];
-        }
-
-        if (Object.values(emojiCount).includes(3)) {
-            attackPower *= 100;
-            await thread
-                .send(
-                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name}`,
-                )
-                .catch(noop);
-        } else if (Object.values(emojiCount).includes(2)) {
-            attackPower *= stats.critValue || 1;
-            await thread
-                .send(
-                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name}`,
-                )
-                .catch(noop);
-        } else {
-            await thread
-                .send(
-                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name}.`,
-                )
-                .catch(noop);
-        }
-
-        currentMonsterHp -= attackPower + bonusDamage;
-
-        if (bonusDamage > 0) {
-            await thread
-                .send(
-                    `>>> \`💎\` You dealt an additional \`${bonusDamage.toFixed(
-                        2,
-                    )}\` bonus damage from diamonds!`,
-                )
-                .catch(noop);
-        }
-
-        const hasKindle = stats.skills.some((skill) => skill.name === "Kindle");
-        if (hasKindle) {
-            const kindleBonusDamage = stats.maxHP * 0.1;
-            currentMonsterHp -= kindleBonusDamage;
-
-            await thread
-                .send(
-                    `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
-                        2,
-                    )}\` bonus damage with the Kindle skill!`,
-                )
-                .catch(noop);
-        }
-
-        return { currentMonsterHp, vigilanceUsed };
+    } else if (stats.equippedWeapon === "Aqua Simulacra") {
+        return handleAquaSimulacraAttack(
+            thread,
+            stats,
+            monster,
+            currentMonsterHp,
+            vigilanceUsed,
+        );
     } else {
         let attackPower = stats.attackPower;
         const critChance = stats.critChance || 0;
@@ -327,7 +256,6 @@ export async function playerAttack(
         return { currentMonsterHp, vigilanceUsed };
     }
 }
-
 export async function monsterAttack(
     thread: ThreadChannel,
     stats: UserStats,
@@ -620,4 +548,175 @@ export async function handleHunt(
     };
 
     await handleMonsterBattle();
+}
+
+async function handleAquaSimulacraAttack(
+    thread: ThreadChannel,
+    stats: UserStats,
+    monster: Monster,
+    currentMonsterHp: number,
+    vigilanceUsed: boolean,
+): Promise<{ currentMonsterHp: number; vigilanceUsed: boolean }> {
+    const emojis = ["💎", "🍒", "🪙", "🍀", "🍉"];
+
+    const roll = [
+        emojis[Math.floor(Math.random() * emojis.length)],
+        emojis[Math.floor(Math.random() * emojis.length)],
+        emojis[Math.floor(Math.random() * emojis.length)],
+    ];
+
+    await thread.send(`>>> \`🎰\` You rolled: ${roll.join(" ")}`).catch(noop);
+
+    const emojiCount = roll.reduce(
+        (acc, emoji) => {
+            acc[emoji] = (acc[emoji] || 0) + 1;
+            return acc;
+        },
+        {} as Record<string, number>,
+    );
+
+    let attackPower = stats.attackPower;
+    let bonusDamage = 0;
+
+    if (emojiCount["💎"]) {
+        bonusDamage += attackPower * 0.5 * emojiCount["💎"];
+    }
+
+    if (emojiCount["🍀"]) {
+        attackPower *= 2 ** emojiCount["🍀"];
+    }
+
+    if (Object.values(emojiCount).includes(3)) {
+        attackPower *= 100;
+        await thread
+            .send(
+                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name}`,
+            )
+            .catch(noop);
+    } else if (Object.values(emojiCount).includes(2)) {
+        attackPower *= stats.critValue || 1;
+        await thread
+            .send(
+                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name}`,
+            )
+            .catch(noop);
+    } else {
+        await thread
+            .send(
+                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name}.`,
+            )
+            .catch(noop);
+    }
+
+    currentMonsterHp -= attackPower + bonusDamage;
+
+    if (bonusDamage > 0) {
+        await thread
+            .send(
+                `>>> \`💎\` You dealt an additional \`${bonusDamage.toFixed(
+                    2,
+                )}\` bonus damage from diamonds!`,
+            )
+            .catch(noop);
+    }
+
+    const hasKindle = stats.skills.some((skill) => skill.name === "Kindle");
+    if (hasKindle) {
+        const kindleBonusDamage = stats.maxHP * 0.1;
+        currentMonsterHp -= kindleBonusDamage;
+
+        await thread
+            .send(
+                `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
+                    2,
+                )}\` bonus damage with the Kindle skill!`,
+            )
+            .catch(noop);
+    }
+
+    return { currentMonsterHp, vigilanceUsed };
+}
+
+async function handleStaffOfHomaAttack(
+    thread: ThreadChannel,
+    stats: UserStats,
+    monster: Monster,
+    currentMonsterHp: number,
+    vigilanceUsed: boolean,
+): Promise<{ currentMonsterHp: number; vigilanceUsed: boolean }> {
+    const getHeartIcon = (currentHp: number, maxHp: number): string => {
+        const currentHpPercentage = currentHp / maxHp;
+        if (currentHpPercentage > 1) {
+            return "💜";
+        } else if (currentHpPercentage > 0.75) {
+            return "💚";
+        } else if (currentHpPercentage > 0.5) {
+            return "💛";
+        } else if (currentHpPercentage > 0.25) {
+            return "🧡";
+        } else if (currentHpPercentage > 0.05) {
+            return "💗";
+        } else {
+            return "☠️";
+        }
+    };
+
+    let currentHpPercentage = stats.hp / stats.maxHP;
+    let heartIcon = getHeartIcon(stats.hp, stats.maxHP);
+
+    let damageMultiplier = Math.pow(1 / currentHpPercentage, 2);
+
+    if (currentHpPercentage > 1) {
+        damageMultiplier = 0.5;
+    }
+
+    let attackPower = stats.attackPower * damageMultiplier;
+
+    const critChance = stats.critChance || 0;
+    const critValue = stats.critValue || 1;
+    const isCrit = Math.random() * 100 < critChance;
+    if (isCrit) {
+        attackPower *= critValue;
+    }
+
+    const monsterDefChance = monster.defChance || 0;
+    const monsterDefValue = monster.defValue || 0;
+    const monsterDefended = Math.random() * 100 < monsterDefChance;
+    if (monsterDefended) {
+        attackPower = Math.max(attackPower - monsterDefValue, 0);
+    }
+
+    currentMonsterHp -= attackPower;
+
+    await thread
+        .send(
+            `>>> \`${heartIcon}\` You dealt \`${attackPower.toFixed(
+                2,
+            )}\` damage to the ${monster.name}${
+                isCrit ? " 💢 (Critical Hit!)" : ""
+            }${monsterDefended ? ` 🛡️ (Defended: -${monsterDefValue})` : ""}.`,
+        )
+        .catch(noop);
+
+    const hasKindle = stats.skills.some((skill) => skill.name === "Kindle");
+    if (hasKindle) {
+        const kindleBonusDamage = stats.maxHP * 0.1;
+        currentMonsterHp -= kindleBonusDamage;
+
+        await thread
+            .send(
+                `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
+                    2,
+                )}\` bonus damage with the Kindle skill!`,
+            )
+            .catch(noop);
+    }
+
+    return { currentMonsterHp, vigilanceUsed };
 }

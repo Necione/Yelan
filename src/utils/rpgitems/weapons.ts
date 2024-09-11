@@ -217,8 +217,18 @@ export const weapons = {
         critValue: 0,
         additionalHP: 0,
         minWorldLevel: 6,
-        chestChance: 1,
+        chestChance: 75,
         emoji: "<:Weapon_Aqua_Simulacra:1283303723082190902>",
+    },
+    "Staff of Homa": {
+        sellPrice: 50,
+        attackPower: 0,
+        critChance: -100,
+        critValue: 0,
+        additionalHP: 0,
+        minWorldLevel: 5,
+        chestChance: 1,
+        emoji: "<:Weapon_Staff_of_Homa:1283341597425008640>",
     },
 };
 
