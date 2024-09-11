@@ -58,11 +58,15 @@ export const rpg = buildCommand<SlashCommand>({
             .setThumbnail(i.user.displayAvatarURL())
             .addFields({
                 name: "Your Stats",
-                value: `🌍 World Level: \`${stats.worldLevel}\` | ⭐ EXP: \`${
-                    stats.exp
-                }/${expRequired.toFixed(
+                value: `🌍 World Level: \`${stats.worldLevel}\`${
+                    stats.rebirths > 0
+                        ? `\n**${getRebirthString(stats.rebirths)}**`
+                        : ""
+                } | ⭐ EXP: \`${stats.exp}/${expRequired.toFixed(
                     0,
-                )}\`\n🔻 Abyss Floor: \`${stats.abyssFloor}\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
+                )}\`\n🔻 Abyss Floor: \`${
+                    stats.abyssFloor
+                }\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
                     2,
                 )} (${formatChange(stats.attackPower - stats.baseAttack)})\`${
                     stats.critChance > 0 || stats.critValue > 0
@@ -134,3 +138,26 @@ export const rpg = buildCommand<SlashCommand>({
         await r.edit({ embeds: [embed] });
     },
 });
+
+function getRebirthString(rebirths: number): string {
+    const rebirthNames = [
+        "☀️ FIRST REBIRTH",
+        "🌑 SECOND REBIRTH",
+        "🌕 THIRD REBIRTH",
+        "🌟 FOURTH REBIRTH",
+        "🌌 FIFTH REBIRTH",
+        "🌠 SIXTH REBIRTH",
+        "🌍 SEVENTH REBIRTH",
+        "🌙 EIGHTH REBIRTH",
+        "🚀 NINTH REBIRTH",
+        "🛰️ TENTH REBIRTH",
+    ];
+
+    if (rebirths > 0 && rebirths <= 10) {
+        return rebirthNames[rebirths - 1];
+    } else if (rebirths > 10) {
+        return `✨ ${rebirths} REBIRTHS`;
+    } else {
+        return "";
+    }
+}
