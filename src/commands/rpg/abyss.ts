@@ -26,24 +26,36 @@ export const abyss = buildCommand<SlashCommand>({
         const message = await i.fetchReply().catch(noop);
         if (!message) {
             locked.del(i.user.id);
-            return r.edit(embedComment("Unable to fetch the original message."));
+            return r.edit(
+                embedComment("Unable to fetch the original message."),
+            );
         }
 
         const userWallet = await getProfileByUserId(i.user.id);
         if (!userWallet) {
             locked.del(i.user.id);
-            return r.edit(embedComment("Unable to find/create your user profile."));
+            return r.edit(
+                embedComment("Unable to find/create your user profile."),
+            );
         }
 
         const stats = await getUserStats(i.user.id);
         if (!stats) {
             locked.del(i.user.id);
-            return r.edit(embedComment("No stats found for you, please set up your profile."));
+            return r.edit(
+                embedComment(
+                    "No stats found for you, please set up your profile.",
+                ),
+            );
         }
 
         if (stats.isTravelling) {
             locked.del(i.user.id);
-            return r.edit(embedComment("You cannot go on a hunt while you are travelling!"));
+            return r.edit(
+                embedComment(
+                    "You cannot go on a hunt while you are travelling!",
+                ),
+            );
         }
 
         if (stats.isHunting) {
@@ -53,7 +65,9 @@ export const abyss = buildCommand<SlashCommand>({
 
         if (stats.hp <= 0) {
             locked.del(i.user.id);
-            return r.edit(embedComment("You don't have enough HP to go on a hunt :("));
+            return r.edit(
+                embedComment("You don't have enough HP to go on a hunt :("),
+            );
         }
 
         await updateUserStats(i.user.id, { isHunting: true });

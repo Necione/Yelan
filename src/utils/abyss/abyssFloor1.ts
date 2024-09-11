@@ -32,4 +32,3 @@ const abyssFloor1Monsters: AbyssMonster[] = [
 const abyssFloor1Drops = [{ item: "Wanderer's Advice", amount: 2 }];
 
 export { abyssFloor1Drops, abyssFloor1Monsters };
-
