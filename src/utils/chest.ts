@@ -80,6 +80,12 @@ export function generateChestLoot(worldLevel: number) {
 
     let totalUniqueItems = 0;
 
+    loot.push({
+        item: "Aqua Simulacra" as WeaponName,
+        amount: 1,
+    });
+    totalUniqueItems++;
+
     const eligibleLoot = chestLoot.filter(
         (lootItem) => worldLevel >= lootItem.minWorldLevel,
     );
