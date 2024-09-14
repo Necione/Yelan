@@ -36,7 +36,32 @@ const availableSkills = [
         description: "Deal 10% of your Max HP as bonus damage per turn",
         emoji: "💥",
     },
+    {
+        name: "Resurrect",
+        description: "Next time you would die, you don't.",
+        emoji: "👼",
+    },
+    {
+        name: "Scrounge",
+        description: "In addition to drops, earn Coins per hunt.",
+        emoji: "💸",
+    },
+    {
+        name: "Focus",
+        description: "Increase your Crit % exponentially on low HP",
+        emoji: "👁️",
+    },
+    {
+        name: "Doppelganger",
+        description: "Hunt twice in a row with the same initial stats",
+        emoji: "👥",
+    },
 ];
+
+const getSkillEmoji = (skillName: string) => {
+    const skill = availableSkills.find((s) => s.name === skillName);
+    return skill ? skill.emoji : "";
+};
 
 export const skills = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -58,10 +83,30 @@ export const skills = buildCommand<SlashCommand>({
         }
 
         const learnedSkills = stats.skills || [];
+        const activeSkills = stats.activeSkills || [];
+
+        const activeList = activeSkills.length
+            ? activeSkills
+                  .map((activeSkill) => {
+                      const learnedSkill = learnedSkills.find(
+                          (skill) => skill.name === activeSkill,
+                      );
+                      const emoji = getSkillEmoji(activeSkill);
+                      return learnedSkill
+                          ? `${emoji} **${learnedSkill.name}** (Level: ${learnedSkill.level})`
+                          : `${emoji} **${activeSkill}**`;
+                  })
+                  .join("\n")
+            : "You have no active skills.";
 
         const skillsList = learnedSkills.length
             ? learnedSkills
-                  .map((skill) => `**${skill.name}** (Level: ${skill.level})`)
+                  .map(
+                      (skill) =>
+                          `${getSkillEmoji(skill.name)} **${
+                              skill.name
+                          }** (Level: ${skill.level})`,
+                  )
                   .join("\n")
             : "You haven't learned any skills yet.";
 
@@ -83,8 +128,9 @@ export const skills = buildCommand<SlashCommand>({
             .setColor("Aqua")
             .setTitle(`${i.user.username}'s Skills`)
             .addFields(
-                { name: "Skills Learned", value: skillsList },
-                { name: "Skills Available", value: availableSkillsList },
+                { name: "Active Skills", value: activeList },
+                { name: "Learned Skills", value: skillsList },
+                { name: "Available Skills", value: availableSkillsList },
             );
 
         await r.edit({ embeds: [embed] });

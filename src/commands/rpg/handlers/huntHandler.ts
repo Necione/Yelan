@@ -74,7 +74,10 @@ export async function handleVictory(
             monstersEncountered[monstersEncountered.length - 1].image,
         );
 
-    const hasTotemSkill = stats.skills.some((skill) => skill.name === "Totem");
+    const hasTotemSkill =
+        stats.skills.some((skill) => skill.name === "Totem") &&
+        stats.activeSkills.includes("Totem");
+
     if (hasTotemSkill) {
         const healAmount = Math.ceil(stats.maxHP * 0.05);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
@@ -103,9 +106,10 @@ export async function handleVictory(
     await updateUserStats(i.user.id, { isHunting: false });
     sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
 
-    const hasInsomniaSkill = stats.skills.some(
-        (skill) => skill.name === "Insomnia",
-    );
+    const hasInsomniaSkill =
+        stats.skills.some((skill) => skill.name === "Insomnia") &&
+        stats.activeSkills.includes("Insomnia");
+
     const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
     await cooldowns.set(userWallet, "hunt", huntCooldown);
 }
@@ -131,9 +135,10 @@ export async function handleDefeat(
     });
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
-    const hasInsomniaSkill = stats.skills.some(
-        (skill) => skill.name === "Insomnia",
-    );
+    const hasInsomniaSkill =
+        stats.skills.some((skill) => skill.name === "Insomnia") &&
+        stats.activeSkills.includes("Insomnia");
+
     const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
     await cooldowns.set(userWallet, "hunt", huntCooldown);
     sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
@@ -236,9 +241,10 @@ export async function playerAttack(
                 )
                 .catch(noop);
 
-            const hasKindle = stats.skills.some(
-                (skill) => skill.name === "Kindle",
-            );
+            const hasKindle =
+                stats.skills.some((skill) => skill.name === "Kindle") &&
+                stats.activeSkills.includes("Kindle");
+
             if (hasKindle) {
                 const kindleBonusDamage = stats.maxHP * 0.1;
                 currentMonsterHp -= kindleBonusDamage;
@@ -331,7 +337,10 @@ export async function monsterAttack(
         currentPlayerHp = 0;
     }
 
-    const hasLeechSkill = stats.skills.some((skill) => skill.name === "Leech");
+    const hasLeechSkill =
+        stats.skills.some((skill) => skill.name === "Leech") &&
+        stats.activeSkills.includes("Leech");
+
     const leechTriggered = Math.random() < 0.5;
     if (hasLeechSkill && leechTriggered) {
         const healAmount = Math.ceil(monster.maxHp * 0.05);
@@ -472,9 +481,10 @@ export async function handleHunt(
             );
         }
 
-        const hasVigilance = stats.skills.some(
-            (skill) => skill.name === "Vigilance",
-        );
+        const hasVigilance =
+            stats.skills.some((skill) => skill.name === "Vigilance") &&
+            stats.activeSkills.includes("Vigilance");
+
         let vigilanceUsed = false;
 
         let isMonsterFirst = Math.random() < 0.5;
@@ -654,7 +664,10 @@ async function handleAquaSimulacraAttack(
             .catch(noop);
     }
 
-    const hasKindle = stats.skills.some((skill) => skill.name === "Kindle");
+    const hasKindle =
+        stats.skills.some((skill) => skill.name === "Kindle") &&
+        stats.activeSkills.includes("Kindle");
+
     if (hasKindle) {
         const kindleBonusDamage = stats.maxHP * 0.1;
         currentMonsterHp -= kindleBonusDamage;
@@ -732,7 +745,10 @@ async function handleStaffOfHomaAttack(
         )
         .catch(noop);
 
-    const hasKindle = stats.skills.some((skill) => skill.name === "Kindle");
+    const hasKindle =
+        stats.skills.some((skill) => skill.name === "Kindle") &&
+        stats.activeSkills.includes("Kindle");
+
     if (hasKindle) {
         const kindleBonusDamage = stats.maxHP * 0.1;
         currentMonsterHp -= kindleBonusDamage;

@@ -1,4 +1,5 @@
 export * from "./abyss";
+export * from "./activate";
 export * from "./bag";
 export * from "./challenge";
 export * from "./craft";

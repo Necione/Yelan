@@ -38,7 +38,7 @@ export const rebirth = buildCommand<SlashCommand>({
 
         const rebirthRequirements = [10, 10, 20, 20, 30, 30, 40, 40];
         const requiredWorldLevel = rebirthRequirements[stats.rebirths] || 50;
-        
+
         if (stats.worldLevel < requiredWorldLevel) {
             return r.edit(
                 embedComment(
@@ -46,7 +46,7 @@ export const rebirth = buildCommand<SlashCommand>({
                     "Red",
                 ),
             );
-        }        
+        }
 
         const confirmEmbed = new EmbedBuilder()
             .setColor("Yellow")

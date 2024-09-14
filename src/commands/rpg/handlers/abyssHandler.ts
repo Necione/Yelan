@@ -148,7 +148,10 @@ async function playerAttack(
             )
             .catch(noop);
 
-        const hasKindle = stats.skills.some((skill) => skill.name === "Kindle");
+        const hasKindle =
+            stats.skills.some((skill) => skill.name === "Kindle") &&
+            stats.activeSkills.includes("Kindle");
+
         if (hasKindle) {
             const kindleBonusDamage = stats.maxHP * 0.1;
             currentMonsterHp -= kindleBonusDamage;
@@ -227,7 +230,10 @@ async function monsterAttack(
         currentPlayerHp = 0;
     }
 
-    const hasLeechSkill = stats.skills.some((skill) => skill.name === "Leech");
+    const hasLeechSkill =
+        stats.skills.some((skill) => skill.name === "Leech") &&
+        stats.activeSkills.includes("Leech");
+
     const leechTriggered = Math.random() < 0.5;
     if (hasLeechSkill && leechTriggered) {
         const healAmount = Math.ceil(monster.maxHp * 0.05);
@@ -368,9 +374,10 @@ export async function handleAbyssHunt(
             );
         }
 
-        const hasVigilance = stats.skills.some(
-            (skill) => skill.name === "Vigilance",
-        );
+        const hasVigilance =
+            stats.skills.some((skill) => skill.name === "Vigilance") &&
+            stats.activeSkills.includes("Vigilance");
+
         let vigilanceUsed = false;
 
         const battleInterval = setInterval(async () => {

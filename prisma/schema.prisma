@@ -193,6 +193,7 @@ model UserStats {
   defValue       Float          @default(0)
   inventory      UserStatsInv[]
   skills         UserSkill[]
+  activeSkills   String[]       @default([]) 
   exp            Int            @default(0)
   worldLevel     Int            @default(1)
   highestWL      Int            @default(1)
