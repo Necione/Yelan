@@ -36,14 +36,17 @@ export const rebirth = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.worldLevel < 10) {
+        const rebirthRequirements = [10, 10, 20, 20, 30, 30, 40, 40];
+        const requiredWorldLevel = rebirthRequirements[stats.rebirths] || 50;
+        
+        if (stats.worldLevel < requiredWorldLevel) {
             return r.edit(
                 embedComment(
-                    `You must be World Level 10 or higher to rebirth.`,
+                    `You must be World Level ${requiredWorldLevel} or higher to rebirth.`,
                     "Red",
                 ),
             );
-        }
+        }        
 
         const confirmEmbed = new EmbedBuilder()
             .setColor("Yellow")

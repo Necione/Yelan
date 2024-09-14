@@ -164,15 +164,16 @@ export const sell = buildCommand<SlashCommand>({
             ),
         ]);
 
+        const rebirthBonusMessage =
+            stats.rebirths > 0
+                ? ` ( +${Math.round(rebirthBonus)} Coins from [${
+                      stats.rebirths
+                  }] Rebirth${stats.rebirths > 1 ? "s" : ""})`
+                : "";
+
         return r.edit(
             embedComment(
-                `You sold \`${amountToSell}x\` **${itemName}** for ${
-                    customEmoji.a.z_coins
-                } \`${totalSellPrice} ${texts.c.u}\` ( +${Math.round(
-                    rebirthBonus,
-                )} Coins from [${stats.rebirths}] Rebirth${
-                    stats.rebirths > 1 ? "s" : ""
-                })${appraiseBonusMessage}!`,
+                `You sold \`${amountToSell}x\` **${itemName}** for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\`${rebirthBonusMessage}${appraiseBonusMessage}!`,
                 "Green",
             ),
         );
