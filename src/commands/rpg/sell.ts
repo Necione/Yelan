@@ -122,7 +122,7 @@ export const sell = buildCommand<SlashCommand>({
             );
         }
 
-        const rebirthMultiplier = 1 + Math.min(stats.rebirths, 3) * 0.5;
+        const rebirthMultiplier = 1 + Math.min(stats.rebirths, 3) * 0.25;
         const rebirthBonus =
             (rebirthMultiplier - 1) * itemData.sellPrice * amountToSell;
 
@@ -166,7 +166,7 @@ export const sell = buildCommand<SlashCommand>({
 
         const rebirthBonusMessage =
             stats.rebirths > 0
-                ? ` ( +${Math.round(rebirthBonus)} Coins from [${
+                ? ` (+${Math.round(rebirthBonus)} Coins from [${
                       stats.rebirths
                   }] Rebirth${stats.rebirths > 1 ? "s" : ""})`
                 : "";
