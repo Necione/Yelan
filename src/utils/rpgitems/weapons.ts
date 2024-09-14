@@ -219,6 +219,26 @@ export const weapons = {
         chestChance: 5,
         emoji: "<:Weapon_Blackcliff_Agate:1284390885836066847>",
     },
+    "Chain Breaker": {
+        sellPrice: 45,
+        attackPower: 20,
+        critChance: 20,
+        critValue: 2,
+        additionalHP: 0,
+        minWorldLevel: 10,
+        chestChance: 5,
+        emoji: "<:Weapon_Chain_Breaker:1284617740899844176>",
+    },
+    "Deathmatch": {
+        sellPrice: 45,
+        attackPower: 12,
+        critChance: -50,
+        critValue: 4,
+        additionalHP: -10,
+        minWorldLevel: 10,
+        chestChance: 5,
+        emoji: "<:Weapon_Deathmatch:1284617953509245082>",
+    },
     // 5* weapons
     "Aqua Simulacra": {
         sellPrice: 50,
