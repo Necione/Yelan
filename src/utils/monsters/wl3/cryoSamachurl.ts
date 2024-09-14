@@ -12,6 +12,12 @@ const cryoSamachurl = {
     drops: [
         { item: "Divining Scroll", minAmount: 1, maxAmount: 2, chance: 80 },
         { item: "Sealed Scroll", minAmount: 1, maxAmount: 1, chance: 45 },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
     ],
     locations: ["Tianqiu Valley", "Jueyun Karst", "Guili Plains"],
 

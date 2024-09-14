@@ -22,6 +22,12 @@ const mutantElectroSlime = {
             maxAmount: 2,
             chance: 75,
         },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
     ],
     locations: [
         "Qingxu Pool",

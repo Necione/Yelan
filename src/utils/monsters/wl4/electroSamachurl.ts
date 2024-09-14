@@ -12,6 +12,12 @@ const electroSamachurl = {
     drops: [
         { item: "Divining Scroll", minAmount: 1, maxAmount: 3, chance: 85 },
         { item: "Sealed Scroll", minAmount: 1, maxAmount: 2, chance: 35 },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
     ],
     locations: ["Luhua Pool", "Jueyun Karst", "Lumberpick Valley"],
 

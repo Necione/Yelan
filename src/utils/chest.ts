@@ -70,7 +70,7 @@ export function generateChestLoot(worldLevel: number) {
 
     const maxUniqueItems = Math.min(
         2 + rarities.findIndex((r) => r.rarity === selectedRarity.rarity),
-        6,
+        5,
     );
 
     const loot: {

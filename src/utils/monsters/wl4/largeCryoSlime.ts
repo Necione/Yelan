@@ -22,6 +22,12 @@ const largeCryoSlime = {
             maxAmount: 1,
             chance: 50,
         },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
     ],
     locations: [
         "Qingxu Pool",

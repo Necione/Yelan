@@ -12,6 +12,12 @@ const fatuiHydrogunner = {
     drops: [
         { item: "Recruit's Insignia", minAmount: 1, maxAmount: 2, chance: 75 },
         { item: "Sergeant's Insignia", minAmount: 1, maxAmount: 2, chance: 25 },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
     ],
     locations: [
         "Qingxu Pool",

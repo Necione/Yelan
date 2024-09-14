@@ -14,6 +14,12 @@ const stonehideLawachurl = {
         { item: "Ominous Mask", minAmount: 1, maxAmount: 2, chance: 75 },
         { item: "Heavy Horn", minAmount: 1, maxAmount: 2, chance: 50 },
         { item: "Black Bronze Horn", minAmount: 1, maxAmount: 2, chance: 25 },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
     ],
     locations: ["Lingju Pass", "Dunyu Ruins", "Guili Plains"],
 };

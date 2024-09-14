@@ -12,6 +12,12 @@ const mitachurl = {
     drops: [
         { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 100 },
         { item: "Ominous Mask", minAmount: 1, maxAmount: 1, chance: 50 },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
     ],
     locations: ["Dunyu Ruins", "Luhua Pool", "Guili Plains"],
 
