@@ -25,7 +25,7 @@ export const daily = buildCommand<SlashCommand>({
             return r.edit(embedComment(updatedUser.message));
         }
 
-        await cooldowns.set(p, "daily", get.days(1)); // 1 day in milliseconds
+        await cooldowns.set(p, "daily", get.days(1));
         return r.edit({
             embeds: [
                 {

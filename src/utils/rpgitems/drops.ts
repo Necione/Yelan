@@ -147,14 +147,14 @@ export const drops = {
         chestChance: 0,
     },
     "Recruit's Insignia": {
-        sellPrice: 35,
+        sellPrice: 30,
         minAmount: 1,
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 5,
     },
     "Sergeant's Insignia": {
-        sellPrice: 40,
+        sellPrice: 35,
         minAmount: 1,
         maxAmount: 2,
         minWorldLevel: 11,

@@ -35,5 +35,11 @@ export async function handleChest(
 
     await i.editReply(embedComment(message, "Green")).catch(noop);
 
-    await cooldowns.set(userWallet, "explore", get.mins(30));
+    const hasEnergizeSkill =
+        stats.skills.some((skill) => skill.name === "Energize") &&
+        stats.activeSkills.includes("Energize");
+
+    const exploreCooldown = hasEnergizeSkill ? get.mins(20) : get.mins(30);
+
+    await cooldowns.set(userWallet, "explore", exploreCooldown);
 }

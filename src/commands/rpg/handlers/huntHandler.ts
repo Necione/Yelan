@@ -111,7 +111,7 @@ export async function handleVictory(
         stats.activeSkills.includes("Scrounge");
 
     if (hasScroungeSkill) {
-        const coinsEarned = Math.floor(Math.random() * (15 - 5 + 1)) + 5;
+        const coinsEarned = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
 
         await addBalance(
             i.user.id,

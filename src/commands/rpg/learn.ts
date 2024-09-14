@@ -14,6 +14,7 @@ type SkillName =
     | "Appraise"
     | "Totem"
     | "Insomnia"
+    | "Energize"
     | "Scrounge"
     | "Kindle";
 
@@ -59,6 +60,14 @@ const skillRequirements: Record<
             { item: "Sealed Scroll", amount: 5 },
         ],
     },
+    Energize: {
+        worldLevel: 4,
+        coins: 250,
+        items: [
+            { item: "Ominous Mask", amount: 5 },
+            { item: "Sealed Scroll", amount: 10 },
+        ],
+    },
     Scrounge: {
         worldLevel: 3,
         coins: 250,
@@ -94,6 +103,8 @@ export const learn = buildCommand<SlashCommand>({
                     { name: "Totem", value: "Totem" },
                     { name: "Insomnia", value: "Insomnia" },
                     { name: "Kindle", value: "Kindle" },
+                    { name: "Scrounge", value: "Scrounge" },
+                    { name: "Energize", value: "Energize" },
                 ),
         ),
     defer: { silent: false },
