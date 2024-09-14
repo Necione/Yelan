@@ -146,7 +146,12 @@ export async function playerAttack(
     currentMonsterHp: number,
     hasVigilance: boolean,
     vigilanceUsed: boolean,
-): Promise<{ currentMonsterHp: number; vigilanceUsed: boolean }> {
+    displaced: boolean = false,
+): Promise<{
+    currentMonsterHp: number;
+    vigilanceUsed: boolean;
+    displaced?: boolean;
+}> {
     if (stats.equippedWeapon === "Staff of Homa") {
         return handleStaffOfHomaAttack(
             thread,
@@ -165,6 +170,17 @@ export async function playerAttack(
         );
     } else {
         let attackPower = stats.attackPower;
+
+        if (displaced) {
+            attackPower *= 0.5;
+            displaced = false;
+            await thread
+                .send(
+                    `>>> \`〽️\` You are displaced! Your attack power is reduced by 50%.`,
+                )
+                .catch(noop);
+        }
+
         const critChance = stats.critChance || 0;
         const critValue = stats.critValue || 1;
 
@@ -192,7 +208,7 @@ export async function playerAttack(
                     `>>> \`💫\` The ${monster.name} stunned you! You missed your attack.`,
                 )
                 .catch(noop);
-            return { currentMonsterHp, vigilanceUsed };
+            return { currentMonsterHp, vigilanceUsed, displaced };
         }
 
         const isAnemo = monster.name.includes("Anemo");
@@ -253,9 +269,21 @@ export async function playerAttack(
             }
         }
 
-        return { currentMonsterHp, vigilanceUsed };
+        const isFatui = monster.name.includes("Fatui");
+        const displacementChance = Math.random() < 0.25;
+        if (isFatui && displacementChance) {
+            displaced = true;
+            await thread
+                .send(
+                    `>>> \`〽️\` The ${monster.name} displaced you! You will deal 50% less damage next turn.`,
+                )
+                .catch(noop);
+        }
+
+        return { currentMonsterHp, vigilanceUsed, displaced };
     }
 }
+
 export async function monsterAttack(
     thread: ThreadChannel,
     stats: UserStats,
