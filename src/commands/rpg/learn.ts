@@ -14,6 +14,7 @@ type SkillName =
     | "Appraise"
     | "Totem"
     | "Insomnia"
+    | "Scrounge"
     | "Kindle";
 
 const skillRequirements: Record<
@@ -56,6 +57,14 @@ const skillRequirements: Record<
         items: [
             { item: "Firm Arrowhead", amount: 3 },
             { item: "Sealed Scroll", amount: 5 },
+        ],
+    },
+    Scrounge: {
+        worldLevel: 3,
+        coins: 250,
+        items: [
+            { item: "Sealed Scroll", amount: 3 },
+            { item: "Slime Concentrate", amount: 5 },
         ],
     },
     Kindle: {

@@ -38,12 +38,12 @@ const availableSkills = [
     },
     {
         name: "Resurrect",
-        description: "Next time you would die, you don't.",
+        description: "Next time you would die, you don't",
         emoji: "👼",
     },
     {
         name: "Scrounge",
-        description: "In addition to drops, earn Coins per hunt.",
+        description: "In addition to drops, earn Coins per hunt",
         emoji: "💸",
     },
     {
@@ -55,6 +55,21 @@ const availableSkills = [
         name: "Doppelganger",
         description: "Hunt twice in a row with the same initial stats",
         emoji: "👥",
+    },
+    {
+        name: "Foresight",
+        description: "Know what enemies are in your next hunt before hunting. Choose to reroll monsters for 50 Coins",
+        emoji: "🔮",
+    },
+    {
+        name: "Energize",
+        description: "Reduce your explore cooldown from 30 minutes to 20 minutes",
+        emoji: "⚡",
+    },
+    {
+        name: "Crystalize",
+        description: "Enemies do less damage for the first rounds, but deals double damage during later rounds",
+        emoji: "❄️",
     },
 ];
 
@@ -87,15 +102,7 @@ export const skills = buildCommand<SlashCommand>({
 
         const activeList = activeSkills.length
             ? activeSkills
-                  .map((activeSkill) => {
-                      const learnedSkill = learnedSkills.find(
-                          (skill) => skill.name === activeSkill,
-                      );
-                      const emoji = getSkillEmoji(activeSkill);
-                      return learnedSkill
-                          ? `${emoji} **${learnedSkill.name}** (Level: ${learnedSkill.level})`
-                          : `${emoji} **${activeSkill}**`;
-                  })
+                  .map((skill) => `${getSkillEmoji(skill)} **${skill}**`)
                   .join("\n")
             : "You have no active skills.";
 

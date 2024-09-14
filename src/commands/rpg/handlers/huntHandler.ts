@@ -1,4 +1,4 @@
-import { embedComment, get, is, noop, sleep } from "@elara-services/utils";
+import { embedComment, get, noop, sleep } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type {
     ChatInputCommandInteraction,
@@ -7,7 +7,11 @@ import type {
     ThreadChannel,
 } from "discord.js";
 import { EmbedBuilder } from "discord.js";
-import { addItemToInventory, updateUserStats } from "../../../services";
+import {
+    addBalance,
+    addItemToInventory,
+    updateUserStats,
+} from "../../../services";
 import { cooldowns } from "../../../utils";
 import {
     calculateDrop,
@@ -36,7 +40,7 @@ export async function handleVictory(
         totalExpGained += expGained;
 
         const drops = calculateDrop(monster.drops);
-        if (is.array(drops)) {
+        if (Array.isArray(drops)) {
             dropsCollected = dropsCollected.concat(drops);
             await addItemToInventory(i.user.id, drops);
         }
@@ -99,6 +103,26 @@ export async function handleVictory(
         finalEmbed.addFields({
             name: "Drops",
             value: dropsDescription,
+        });
+    }
+
+    const hasScroungeSkill =
+        stats.skills.some((skill) => skill.name === "Scrounge") &&
+        stats.activeSkills.includes("Scrounge");
+
+    if (hasScroungeSkill) {
+        const coinsEarned = Math.floor(Math.random() * (15 - 5 + 1)) + 5;
+
+        await addBalance(
+            i.user.id,
+            coinsEarned,
+            true,
+            `Earned from the Scrounge skill`,
+        );
+
+        finalEmbed.addFields({
+            name: "Scrounge Skill",
+            value: `\`💸\` You earned \`${coinsEarned}\` coins with the Scrounge skill.`,
         });
     }
 
