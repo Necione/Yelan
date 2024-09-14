@@ -150,14 +150,14 @@ export const drops = {
         sellPrice: 35,
         minAmount: 1,
         maxAmount: 2,
-        minWorldLevel: 10,
+        minWorldLevel: 11,
         chestChance: 5,
     },
     "Sergeant's Insignia": {
         sellPrice: 40,
         minAmount: 1,
         maxAmount: 2,
-        minWorldLevel: 10,
+        minWorldLevel: 11,
         chestChance: 2,
     },
     "Elemental Core": {

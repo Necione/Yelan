@@ -209,6 +209,16 @@ export const weapons = {
         chestChance: 5,
         emoji: "<:Weapon_The_Flute:1282504448538837013>",
     },
+    "Blackcliff Agate": {
+        sellPrice: 45,
+        attackPower: 15,
+        critChance: 20,
+        critValue: 2,
+        additionalHP: 75,
+        minWorldLevel: 10,
+        chestChance: 5,
+        emoji: "<:Weapon_Blackcliff_Agate:1284390885836066847>",
+    },
     // 5* weapons
     "Aqua Simulacra": {
         sellPrice: 50,

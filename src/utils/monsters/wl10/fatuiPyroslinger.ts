@@ -7,7 +7,7 @@ const fatuiPyroslinger = {
     maxDamage: 100,
     minExp: 5,
     maxExp: 10,
-    minWorldLevel: 10,
+    minWorldLevel: 11,
     image: "https://lh.elara.workers.dev/rpg/monsters/fatui_pyroslinger.png",
     drops: [
         { item: "Recruit's Insignia", minAmount: 1, maxAmount: 2, chance: 75 },
