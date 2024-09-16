@@ -5,6 +5,7 @@ import {
     embedComment,
     is,
     noop,
+    type ButtonOptions,
 } from "@elara-services/utils";
 import type { UserWallet } from "@prisma/client";
 import {
@@ -12,9 +13,9 @@ import {
     ButtonStyle,
     Colors,
     EmbedBuilder,
+    User,
     type ButtonBuilder,
     type GuildMember,
-    type User,
 } from "discord.js";
 import { mainServerId, roles } from "../../config";
 import { getProfileByUserId } from "../../services";
@@ -256,4 +257,19 @@ export async function fetchData(
         files: [{ name: "profile.png", attachment: data }],
         components: row.components.length ? [row] : [],
     };
+}
+
+export function createProfileButton(
+    user?: User | string,
+    options?: ButtonOptions,
+) {
+    return addButton({
+        id: `profile|view${
+            user ? `|${user instanceof User ? user.id : user}` : ""
+        }`,
+        label: options?.label || "Profile",
+        style: options?.style || ButtonStyle.Secondary,
+        disabled: options?.disabled || false,
+        emoji: options?.emoji,
+    });
 }
