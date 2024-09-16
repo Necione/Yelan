@@ -79,9 +79,7 @@ const createAlchemyBar = (
 export const alchemy = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("alchemy")
-        .setDescription(
-            "[RPG] Not sure what this does exactly",
-        )
+        .setDescription("[RPG] Not sure what this does exactly")
         .setDMPermission(false)
         .addStringOption((option) =>
             option

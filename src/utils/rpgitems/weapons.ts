@@ -229,7 +229,7 @@ export const weapons = {
         chestChance: 5,
         emoji: "<:Weapon_Chain_Breaker:1284617740899844176>",
     },
-    "Deathmatch": {
+    Deathmatch: {
         sellPrice: 45,
         attackPower: 12,
         critChance: -50,

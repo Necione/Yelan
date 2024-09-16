@@ -58,17 +58,20 @@ const availableSkills = [
     },
     {
         name: "Foresight",
-        description: "Know what enemies are in your next hunt before hunting. Choose to reroll monsters for 50 Coins",
+        description:
+            "Know what enemies are in your next hunt before hunting. Choose to reroll monsters for 50 Coins",
         emoji: "🔮",
     },
     {
         name: "Energize",
-        description: "Reduce your explore cooldown from 30 minutes to 20 minutes",
+        description:
+            "Reduce your explore cooldown from 30 minutes to 20 minutes",
         emoji: "⚡",
     },
     {
         name: "Crystalize",
-        description: "Enemies do less damage for the first rounds, but deals double damage during later rounds",
+        description:
+            "Enemies do less damage for the first rounds, but deals double damage during later rounds",
         emoji: "❄️",
     },
 ];

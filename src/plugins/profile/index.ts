@@ -1,5 +1,6 @@
 import {
     addButtonRow,
+    discord,
     embedComment,
     getInteractionResponder,
     noop,
@@ -14,7 +15,7 @@ import {
 } from "discord.js";
 import { loadImage } from "skia-canvas";
 import { getProfileByUserId, updateUserProfile } from "../../services";
-import { allowedDomains, createCanvasProfile } from "./utils";
+import { allowedDomains, createCanvasProfile, fetchData } from "./utils";
 
 export async function onInteraction(interaction: RepliableInteraction) {
     if (!interaction.inCachedGuild()) {
@@ -210,6 +211,26 @@ export async function onInteraction(interaction: RepliableInteraction) {
                     ]),
                 ],
             });
+        }
+
+        default: {
+            await responder.defer({ ephemeral: true });
+            let user = interaction.user;
+            if (deferType) {
+                const u = await discord.user(interaction.client, deferType, {
+                    fetch: true,
+                    mock: false,
+                });
+                if (!u) {
+                    return responder.edit(
+                        embedComment(`Unable to find (${deferType}) user.`),
+                    );
+                }
+                user = u;
+            }
+            return responder.edit(
+                await fetchData(user, interaction.member, false),
+            );
         }
     }
 }

@@ -50,7 +50,7 @@ const draw = (
 
 // For this only use the raw.githubusercontent.com domain, the redirect isn't needed since this isn't being displayed to the user.
 const icon = (path: string, ext = "png") =>
-    `https://raw.githubusercontent.com/LiyueHarbor/cdn/main/profiles/icons/${path}.${ext}`;
+    `https://raw.githubusercontent.com/LiyueHarbor/cdn/main/profiles/icons/${path}.${ext}` as const;
 
 /**
  * A function to create the canvas image, convert to command class.
@@ -176,7 +176,7 @@ export async function createProfile(user: CanvasProfile) {
     ctx.arc(130, 515, 20, 0, Math.PI * 2);
     ctx.fill();
     if (user.icons.messages) {
-        await rectangle(ctx, 95, 460, 75, 75, 0, icon(`messages`), false);
+        await rectangle(ctx, 95, 460, 75, 75, 0, icon("messages"), false);
     }
 
     ctx.fillStyle = user.icons.staff ? "#fefefe" : "#c0c0c0";
