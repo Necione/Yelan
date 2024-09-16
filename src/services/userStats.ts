@@ -11,6 +11,9 @@ export async function syncStats(userId: string) {
     }
 
     const calculatedBaseAttack = 5 + (stats.worldLevel - 1) * 0.5;
+    const alchemyBaseAttack = stats.alchemyProgress * 0.5;
+    const finalBaseAttack = calculatedBaseAttack + alchemyBaseAttack;
+
     const calculatedMaxHP =
         100 + (stats.worldLevel - 1) * 5 + (stats.rebirths || 0) * 50;
 
@@ -103,7 +106,7 @@ export async function syncStats(userId: string) {
     }
 
     let calculatedAttackPower =
-        calculatedBaseAttack +
+        finalBaseAttack +
         additionalWeaponAttackPower +
         additionalArtifactStats.attackPower;
 
@@ -137,8 +140,8 @@ export async function syncStats(userId: string) {
         calculatedMaxHP + additionalArtifactStats.maxHP + additionalWeaponHP;
 
     let needsUpdate = false;
-    if (stats.baseAttack !== calculatedBaseAttack) {
-        stats.baseAttack = calculatedBaseAttack;
+    if (stats.baseAttack !== finalBaseAttack) {
+        stats.baseAttack = finalBaseAttack;
         needsUpdate = true;
     }
     if (stats.attackPower !== calculatedAttackPower) {
@@ -168,7 +171,7 @@ export async function syncStats(userId: string) {
 
     if (needsUpdate) {
         return await updateUserStats(userId, {
-            baseAttack: { set: calculatedBaseAttack },
+            baseAttack: { set: finalBaseAttack },
             attackPower: { set: calculatedAttackPower },
             maxHP: { set: finalMaxHP },
             critChance: { set: calculatedCritChance },

@@ -1,10 +1,10 @@
 export * from "./abyss";
 export * from "./activate";
+export * from "./alchemy";
 export * from "./bag";
 export * from "./challenge";
 export * from "./craft";
 export * from "./daily";
-export * from "./diffuse";
 export * from "./downgrade";
 export * from "./equip";
 export * from "./explore";
@@ -18,3 +18,4 @@ export * from "./sell";
 export * from "./skills";
 export * from "./travel";
 export * from "./unequip";
+

@@ -180,33 +180,34 @@ type Roles {
 }
 
 model UserStats {
-  id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String         @unique
-  rebirths       Int            @default(0)
-  hp             Float          @default(100)
-  maxHP          Float          @default(100)
-  baseAttack     Float          @default(5)
-  attackPower    Float          @default(5)
-  critChance     Float          @default(0)
-  critValue      Float          @default(0)
-  defChance      Float          @default(0)
-  defValue       Float          @default(0)
-  inventory      UserStatsInv[]
-  skills         UserSkill[]
-  activeSkills   String[]       @default([]) 
-  exp            Int            @default(0)
-  worldLevel     Int            @default(1)
-  highestWL      Int            @default(1)
-  abyssFloor     Int            @default(0)
-  equippedWeapon String?
-  equippedFlower String?
-  equippedPlume  String?
-  equippedSands  String?
-  equippedGoblet String?
-  equippedCirclet String?
-  location       String         @default("Liyue Harbor")
-  isTravelling   Boolean        @default(false)
-  isHunting      Boolean        @default(false)
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String         @unique
+  rebirths         Int            @default(0)
+  hp               Float          @default(100)
+  maxHP            Float          @default(100)
+  baseAttack       Float          @default(5)
+  attackPower      Float          @default(5)
+  critChance       Float          @default(0)
+  critValue        Float          @default(0)
+  defChance        Float          @default(0)
+  defValue         Float          @default(0)
+  inventory        UserStatsInv[]
+  skills           UserSkill[]
+  activeSkills     String[]       @default([]) 
+  exp              Int            @default(0)
+  worldLevel       Int            @default(1)
+  highestWL        Int            @default(1)
+  abyssFloor       Int            @default(0)
+  equippedWeapon   String?
+  equippedFlower   String?
+  equippedPlume    String?
+  equippedSands    String?
+  equippedGoblet   String?
+  equippedCirclet  String?
+  location         String         @default("Liyue Harbor")
+  isTravelling     Boolean        @default(false)
+  isHunting        Boolean        @default(false)
+  alchemyProgress  Int            @default(0)
 }
 
 type UserStatsInv {
