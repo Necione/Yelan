@@ -2,7 +2,12 @@ import { embedComment, get, noop } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
-import { addBalance, addItemToInventory } from "../../../services";
+import {
+    addBalance,
+    addItemToInventory,
+    removeBalance,
+    updateUserStats,
+} from "../../../services";
 import { cooldowns } from "../../../utils";
 import { generateChestLoot } from "../../../utils/chest";
 
@@ -11,6 +16,41 @@ export async function handleChest(
     stats: UserStats,
     userWallet: UserWallet,
 ) {
+    const fallsIntoTrap = Math.random() < 0.1;
+
+    if (fallsIntoTrap) {
+        const trapDamage = 20;
+        const coinLoss = 50;
+
+        const newHP = Math.max(stats.hp - trapDamage, 0);
+        await updateUserStats(i.user.id, { hp: { set: newHP } });
+
+        await removeBalance(
+            i.user.id,
+            coinLoss,
+            true,
+            `Lost ${coinLoss} coins after falling into a trap`,
+        );
+
+        await i
+            .editReply(
+                embedComment(
+                    `You fell into a trap while exploring!\nYou lost ${customEmoji.a.z_coins} \`${coinLoss} Coins\` and took \`${trapDamage} HP\` damage.`,
+                    "Red",
+                ),
+            )
+            .catch(noop);
+
+        const hasEnergizeSkill =
+            stats.skills.some((skill) => skill.name === "Energize") &&
+            stats.activeSkills.includes("Energize");
+
+        const exploreCooldown = hasEnergizeSkill ? get.mins(20) : get.mins(30);
+        await cooldowns.set(userWallet, "explore", exploreCooldown);
+
+        return;
+    }
+
     const { rarity, loot, coins } = generateChestLoot(stats.worldLevel);
 
     await addBalance(
