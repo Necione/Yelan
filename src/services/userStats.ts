@@ -15,7 +15,7 @@ export async function syncStats(userId: string) {
     const finalBaseAttack = calculatedBaseAttack + alchemyBaseAttack;
 
     const calculatedMaxHP =
-        100 + (stats.worldLevel - 1) * 5 + (stats.rebirths || 0) * 50;
+        100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
 
     const additionalWeaponAttackPower =
         stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
@@ -115,16 +115,13 @@ export async function syncStats(userId: string) {
     }
 
     let calculatedCritChance =
-        additionalWeaponCritChance + additionalArtifactStats.critChance;
+        1 + additionalWeaponCritChance + additionalArtifactStats.critChance;
     if (calculatedCritChance < 0) {
         calculatedCritChance = 0;
     }
 
     let calculatedCritValue =
-        additionalWeaponCritValue + additionalArtifactStats.critValue;
-    if (calculatedCritValue < 1) {
-        calculatedCritValue = 1;
-    }
+        1 + additionalWeaponCritValue + additionalArtifactStats.critValue;
 
     let calculatedDefChance = additionalArtifactStats.defChance;
     if (calculatedDefChance < 0) {
@@ -184,6 +181,7 @@ export async function syncStats(userId: string) {
     return stats;
 }
 
+
 export const getUserStats = async (userId: string) => {
     return await prisma.userStats
         .upsert({
@@ -192,10 +190,9 @@ export const getUserStats = async (userId: string) => {
                 userId,
                 hp: 100,
                 maxHP: 100,
-                attackPower: 5,
                 baseAttack: 5,
-                critChance: 0,
-                critValue: 0,
+                critChance: 0.01,
+                critValue: 1,
                 inventory: [],
                 exp: 0,
                 worldLevel: 1,
