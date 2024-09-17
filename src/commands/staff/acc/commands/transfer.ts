@@ -3,7 +3,6 @@ import {
     embedComment,
     get,
     getConfirmPrompt,
-    log,
     noop,
 } from "@elara-services/utils";
 import { mainServerId, roles } from "../../../../config";
@@ -66,9 +65,7 @@ export const transfer = buildCommand({
             return;
         }
         if (!col.deferred) {
-            await col
-                .deferUpdate()
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            await col.deferUpdate().catch(noop);
         }
         const msg = await logs.backup({
             content: `> \`${i.user.displayName}\` (${

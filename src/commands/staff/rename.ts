@@ -3,7 +3,7 @@ import {
     getStr,
     type SlashCommand,
 } from "@elara-services/botbuilder";
-import { embedComment, error, is, log } from "@elara-services/utils";
+import { embedComment, error, is } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
 import { logs } from "../../utils";
@@ -24,22 +24,18 @@ export const rename = buildCommand<SlashCommand>({
         roles: [roles.staff, ...roles.main, "1090489193454633090"],
     },
     defer: { silent: true },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild()) {
             return;
         }
         const newName = i.options.getString("name");
 
         if (!is.string(newName)) {
-            return i
-                .editReply(embedComment("Please provide a valid channel name."))
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(embedComment("Please provide a valid channel name."));
         }
 
         if (!i.channel || !i.member || !i.channel.manageable) {
-            return i
-                .editReply(embedComment("I cannot rename this channel."))
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(embedComment("I cannot rename this channel."));
         }
         const before = `${i.channel.name.toString()}`;
         const rr = await i.channel
@@ -50,13 +46,9 @@ export const rename = buildCommand<SlashCommand>({
             .catch((e) => e);
         if (is.error(rr)) {
             error(rr);
-            return i
-                .editReply(
-                    embedComment(
-                        "An error occurred while renaming the channel.",
-                    ),
-                )
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(
+                embedComment("An error occurred while renaming the channel."),
+            );
         }
         await logs.misc({
             embeds: embedComment(
@@ -69,8 +61,6 @@ export const rename = buildCommand<SlashCommand>({
             ).embeds,
         });
 
-        return i
-            .editReply(embedComment(`Channel renamed to ${newName}.`, "Green"))
-            .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+        return r.edit(embedComment(`Channel renamed to ${newName}.`, "Green"));
     },
 });

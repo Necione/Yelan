@@ -1,4 +1,4 @@
-import { is, log, noop } from "@elara-services/utils";
+import { is, noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { artifacts, type ArtifactName } from "../utils/rpgitems/artifacts";
@@ -214,7 +214,7 @@ export const updateUserStats = async (
             where: { userId },
             data,
         })
-        .catch((e) => log(`[DATABASE:updateUserStats:${userId}]: ERROR`, e));
+        .catch(noop);
 };
 
 export const addItemToInventory = async (

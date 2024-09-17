@@ -5,7 +5,7 @@ import {
     getUser,
     type SlashCommand,
 } from "@elara-services/botbuilder";
-import { embedComment, is, log, proper } from "@elara-services/utils";
+import { embedComment, is, proper } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { mainServerId, roles } from "../../config";
 import { getProfileByUserId, updateUserProfile } from "../../services";
@@ -46,7 +46,7 @@ export const card = buildCommand<SlashCommand>({
     locked: {
         roles: roles.main,
     },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild()) {
             return;
         }
@@ -55,38 +55,28 @@ export const card = buildCommand<SlashCommand>({
         const amount = i.options.getInteger("amount", false) || 1;
         const type = i.options.getString("type", false) || "add";
         if (!is.number(amount)) {
-            return i
-                .editReply(embedComment(`You provided an invalid amount.`))
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(embedComment(`You provided an invalid amount.`));
         }
         if (user.bot) {
-            return i
-                .editReply(embedComment(`Bots don't have a user profile.`))
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(embedComment(`Bots don't have a user profile.`));
         }
         const db = await getCollectables(mainServerId);
         if (!db || !is.array(db.items)) {
-            return i
-                .editReply(
-                    embedComment(`There is no cards added to the server.`),
-                )
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`There is no cards added to the server.`),
+            );
         }
         const find = db.items.find((c) => c.id === id);
         if (!find) {
-            return i
-                .editReply(embedComment(`Unable to find card (${id})`))
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(embedComment(`Unable to find card (${id})`));
         }
         const p = await getProfileByUserId(user.id);
         if (!p || p.locked) {
-            return i
-                .editReply(
-                    embedComment(
-                        `Unable to find/create the user's profile or it's locked.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(
+                    `Unable to find/create the user's profile or it's locked.`,
+                ),
+            );
         }
         let str = "";
         const f = p.collectables.find((c) => c.name === find.name);
@@ -113,27 +103,21 @@ export const card = buildCommand<SlashCommand>({
                 });
                 str += `Added +${amount} of \`${find.name}\` card to the user.`;
             } else {
-                return i
-                    .editReply(
-                        embedComment(
-                            `The card you selected the user doesn't have, so there isn't anything to remove.`,
-                        ),
-                    )
-                    .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+                return r.edit(
+                    embedComment(
+                        `The card you selected the user doesn't have, so there isn't anything to remove.`,
+                    ),
+                );
             }
         }
         if (!str) {
-            return i
-                .editReply(embedComment(`Nothing needed to be updated?`))
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(embedComment(`Nothing needed to be updated?`));
         }
         await updateUserProfile(user.id, {
             collectables: {
                 set: p.collectables,
             },
         });
-        return i
-            .editReply(embedComment(str, "Green"))
-            .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+        return r.edit(embedComment(str, "Green"));
     },
 });

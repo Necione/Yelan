@@ -4,7 +4,7 @@ import {
     type SlashCommand,
 } from "@elara-services/botbuilder";
 import { Duration } from "@elara-services/packages";
-import { embedComment, error, is, log, ms } from "@elara-services/utils";
+import { embedComment, error, is, ms } from "@elara-services/utils";
 import { ChannelType, SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
 
@@ -47,29 +47,25 @@ export const slowmode = buildCommand<SlashCommand>({
         roles: [roles.moderator, roles.moderator, ...roles.main],
     },
     defer: { silent: true },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
         }
         const channel =
             i.options.getChannel("channel", false, channelTypes) || i.channel;
         if (!("rateLimitPerUser" in channel)) {
-            return i
-                .editReply(
-                    embedComment(`Channel provided doesn't support slowmode?`),
-                )
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`Channel provided doesn't support slowmode?`),
+            );
         }
         const duration = i.options.getString("duration", false) || null;
         if (is.null(duration)) {
             if (!channel.rateLimitPerUser) {
-                return i
-                    .editReply(
-                        embedComment(
-                            `${channel.toString()} doesn't have a slowmode set.`,
-                        ),
-                    )
-                    .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+                return r.edit(
+                    embedComment(
+                        `${channel.toString()} doesn't have a slowmode set.`,
+                    ),
+                );
             }
             return channel
                 .edit({
@@ -77,45 +73,35 @@ export const slowmode = buildCommand<SlashCommand>({
                     reason: `Slowmode turned off by: @${i.user.username} (${i.user.id})`,
                 })
                 .then(() => {
-                    return i
-                        .editReply(
-                            embedComment(
-                                `Slowmode has been turned off for ${channel.toString()}`,
-                                "Green",
-                            ),
-                        )
-                        .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+                    return r.edit(
+                        embedComment(
+                            `Slowmode has been turned off for ${channel.toString()}`,
+                            "Green",
+                        ),
+                    );
                 })
                 .catch((err) => {
                     error(
                         `Unable to remove the slowmode for ${channel.name} (${channel.id})`,
                         err,
                     );
-                    return i
-                        .editReply(
-                            embedComment(
-                                `Unable to remove the slowmode for the channel, try again later?`,
-                            ),
-                        )
-                        .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+                    return r.edit(
+                        embedComment(
+                            `Unable to remove the slowmode for the channel, try again later?`,
+                        ),
+                    );
                 });
         }
         if (!Duration.validate(duration)) {
-            return i
-                .editReply(
-                    embedComment(
-                        `The custom duration (${duration}) isn't valid.`,
-                    ),
-                )
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`The custom duration (${duration}) isn't valid.`),
+            );
         }
         let time = Duration.parse(duration);
         if (!is.number(time)) {
-            return i
-                .editReply(
-                    embedComment(`Unable to parse the duration provided.`),
-                )
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(
+                embedComment(`Unable to parse the duration provided.`),
+            );
         }
         if (time > 2332800000) {
             time = 2332800000;
@@ -125,9 +111,7 @@ export const slowmode = buildCommand<SlashCommand>({
             slowmode = 0;
         }
         if (slowmode > 21600) {
-            return i
-                .editReply(embedComment(`The max slowmode is 6 hours (21600)`))
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(embedComment(`The max slowmode is 6 hours (21600)`));
         }
         const format = ms.get(time, true);
         return channel
@@ -136,27 +120,23 @@ export const slowmode = buildCommand<SlashCommand>({
                 reason: `Added slowmode by: @${i.user.username} (${i.user.id})`,
             })
             .then(() =>
-                i
-                    .editReply(
-                        embedComment(
-                            `I've set slowmode for ${channel.toString()} to ${format}`,
-                            "Green",
-                        ),
-                    )
-                    .catch((e) => log(`[${this.command.name}]: ERROR`, e)),
+                r.edit(
+                    embedComment(
+                        `I've set slowmode for ${channel.toString()} to ${format}`,
+                        "Green",
+                    ),
+                ),
             )
             .catch((err) => {
                 error(
                     `Unable to set the slowmode in #${channel.name} (${channel.id}) by: ${i.user.tag} (${i.user.id})`,
                     err,
                 );
-                return i
-                    .editReply(
-                        embedComment(
-                            `Unable to set the slowmode for ${channel.toString()}`,
-                        ),
-                    )
-                    .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+                return r.edit(
+                    embedComment(
+                        `Unable to set the slowmode for ${channel.toString()}`,
+                    ),
+                );
             });
     },
 });

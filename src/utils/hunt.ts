@@ -124,7 +124,6 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     );
 
     if (availableMonsters.length === 0) {
-        log("No available monsters found for this location and world level.");
         return null;
     }
 
@@ -140,7 +139,6 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     );
 
     if (monstersInGroup.length === 0) {
-        log(`No monsters found for group ${randomGroup} at this world level.`);
         return null;
     }
 
@@ -160,13 +158,8 @@ export async function getRandomMonster(worldLevel: number, location: string) {
     }
 
     if (!selectedMonster) {
-        log("No monster selected after applying weights.");
         return null;
     }
-
-    log(
-        `Random monster chosen from group ${randomGroup}: ${selectedMonster.name}`,
-    );
 
     if (worldLevel > selectedMonster.minWorldLevel) {
         const encounterAverages = lowEncounterAverages.find(
@@ -178,23 +171,7 @@ export async function getRandomMonster(worldLevel: number, location: string) {
             selectedMonster.maxHp = encounterAverages.maxHp;
             selectedMonster.minDamage = encounterAverages.minDamage;
             selectedMonster.maxDamage = encounterAverages.maxDamage;
-
-            log(
-                `Stats replaced with low encounter averages for world level ${worldLevel}`,
-            );
-            log(
-                `Min HP: ${selectedMonster.minHp}, Max HP: ${selectedMonster.maxHp}`,
-            );
-            log(
-                `Min Damage: ${selectedMonster.minDamage}, Max Damage: ${selectedMonster.maxDamage}`,
-            );
-        } else {
-            log(
-                `No encounter averages found for world level ${worldLevel}. Using monster's base stats.`,
-            );
         }
-    } else {
-        log(`Using monster's base stats for world level ${worldLevel}.`);
     }
 
     return selectedMonster;
@@ -325,8 +302,6 @@ export async function getMonstersForAbyssFloor(
         const monsters = module[`abyssFloor${abyssFloor}Monsters`];
 
         if (monsters) {
-            log(`Monsters retrieved for Abyss Floor ${abyssFloor}:`);
-
             const expandedMonsters: AbyssMonster[] = [];
 
             monsters.forEach((monster: AbyssMonster) => {
@@ -336,15 +311,11 @@ export async function getMonstersForAbyssFloor(
                 }
             });
 
-            expandedMonsters.forEach((monster) => log(monster.name));
-
             return expandedMonsters;
         } else {
-            log(`No monsters found for Abyss Floor ${abyssFloor}`);
             return [];
         }
     } catch (error) {
-        log(`Error loading monsters for Abyss Floor ${abyssFloor}:`, error);
         return [];
     }
 }
@@ -362,11 +333,9 @@ export async function getDropsForAbyssFloor(
         if (drops) {
             return drops;
         } else {
-            log(`No drops found for Abyss Floor ${abyssFloor}`);
             return [];
         }
     } catch (error) {
-        log(`Error loading drops for Abyss Floor ${abyssFloor}:`, error);
         return [];
     }
 }

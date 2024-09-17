@@ -5,7 +5,6 @@ import {
     get,
     getConfirmPrompt,
     is,
-    log,
     noop,
     time,
 } from "@elara-services/utils";
@@ -130,13 +129,13 @@ export const restore = buildCommand({
                 embedComment(
                     `[${time.short.time(
                         new Date(),
-                    )}]: Profile restored by: \`@${i.user.username}\` (${
-                        i.user.id
-                    })`,
+                    )}]: Profile restored for: \`@${user.username}\` (${
+                        user.id
+                    })\n-# By: \`@${i.user.username}\` (${i.user.id})`,
                     "Yellow",
                 ),
             )
-            .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+            .catch(noop);
         return r.edit(
             embedComment(
                 `Restored <@${obj.userId}>'s profile to the file data you provided.`,

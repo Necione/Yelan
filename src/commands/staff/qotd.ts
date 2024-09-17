@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, log, noop } from "@elara-services/utils";
+import { embedComment, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder, type Message } from "discord.js";
 import { channels, roles } from "../../config";
 import { images } from "../../utils/images";
@@ -31,7 +31,7 @@ export const qotd = buildCommand<SlashCommand>({
     locked: {
         roles: [...roles.main, roles.moderator],
     },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild()) {
             return;
         }
@@ -40,9 +40,7 @@ export const qotd = buildCommand<SlashCommand>({
         const num = i.options.getInteger("num", true);
         const channel = i.guild.channels.resolve(channels.qotd);
         if (!channel || !channel.isTextBased()) {
-            return i
-                .editReply(embedComment(`Unable to find the QOTD channel.`))
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(embedComment(`Unable to find the QOTD channel.`));
         }
         const message: Message<true> | Error = await channel
             .send({
@@ -64,9 +62,7 @@ export const qotd = buildCommand<SlashCommand>({
             })
             .catch((e) => e);
         if (is.error(message)) {
-            return i
-                .editReply(embedComment(message.message))
-                .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+            return r.edit(embedComment(message.message));
         }
         await message.crosspost().catch(noop);
         await message
@@ -75,13 +71,11 @@ export const qotd = buildCommand<SlashCommand>({
                 reason: `Created for QOTD`,
             })
             .catch(noop);
-        return i
-            .editReply(
-                embedComment(
-                    `Daily question posted!\n> [View](${message.url})`,
-                    "Green",
-                ),
-            )
-            .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+        return r.edit(
+            embedComment(
+                `Daily question posted!\n> [View](${message.url})`,
+                "Green",
+            ),
+        );
     },
 });

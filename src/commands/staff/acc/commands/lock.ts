@@ -4,7 +4,7 @@ import {
     getReason,
     getUser,
 } from "@elara-services/botbuilder";
-import { embedComment, is, log, proper } from "@elara-services/utils";
+import { embedComment, is, noop, proper } from "@elara-services/utils";
 import { EmbedBuilder } from "discord.js";
 import { roles } from "../../../../config";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
@@ -53,7 +53,7 @@ export const lock = buildCommand({
                         type ? "Red" : "Green",
                     ),
                 )
-                .catch((e) => log(`[${this.subCommand.name}]: ERROR`, e));
+                .catch(noop);
         }
         await Promise.all([
             logs.misc({

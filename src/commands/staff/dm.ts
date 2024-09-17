@@ -4,7 +4,7 @@ import {
     getUser,
     type SlashCommand,
 } from "@elara-services/botbuilder";
-import { discord, log, noop } from "@elara-services/utils";
+import { discord, noop } from "@elara-services/utils";
 import { Colors, SlashCommandBuilder, type User } from "discord.js";
 import { roles } from "../../config";
 
@@ -32,7 +32,7 @@ export const dm = buildCommand<SlashCommand>({
         ),
     defer: { silent: true },
     locked: { roles: [...roles.main, roles.management.econ] },
-    async execute(i) {
+    async execute(i, r) {
         const user = i.options.getUser("user", true);
         const message = i.options.getString("message", true);
         const other = i.options.getString("other_users", false);
@@ -55,17 +55,15 @@ export const dm = buildCommand<SlashCommand>({
             description.push(`\`${dm ? "🟢" : "🔴"} ${user.username}\``);
         }
 
-        return i
-            .editReply({
-                embeds: [
-                    {
-                        color: Colors.Aqua,
-                        timestamp: new Date().toISOString(),
-                        title: `DMs`,
-                        description: description.join("\n"),
-                    },
-                ],
-            })
-            .catch((e) => log(`[${this.command.name}]: ERROR`, e));
+        return r.edit({
+            embeds: [
+                {
+                    color: Colors.Aqua,
+                    timestamp: new Date().toISOString(),
+                    title: `DMs`,
+                    description: description.join("\n"),
+                },
+            ],
+        });
     },
 });

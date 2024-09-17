@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, log, noop } from "@elara-services/utils";
+import { embedComment, formatNumber, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
@@ -31,7 +31,7 @@ export const addStrike = buildCommand<SlashCommand>({
     locked: {
         roles: [roles.moderator],
     },
-    async execute(i) {
+    async execute(i, r) {
         if (!i.inCachedGuild()) {
             return;
         }
@@ -42,9 +42,7 @@ export const addStrike = buildCommand<SlashCommand>({
 
         const profile = await getProfileByUserId(user.id);
         if (!profile) {
-            return i
-                .editReply(embedComment("Unable to find/create user profile."))
-                .catch(noop);
+            return r.edit(embedComment("Unable to find/create user profile."));
         }
 
         const updatedStrikes = (profile.strikes || 0) + 1;
@@ -58,23 +56,19 @@ export const addStrike = buildCommand<SlashCommand>({
             `Fine for strike ${updatedStrikes} issued by staff. Reason: ${reason}`,
         );
 
-        try {
-            const dmEmbed = new EmbedBuilder()
-                .setColor(0xff5856)
-                .setTitle("`🔥` You have received a strike!")
-                .setDescription(
-                    `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${
-                        customEmoji.a.z_coins
-                    } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
-                )
-                .setFooter({
-                    text: `⚠️ You will be banned permanently at 5 Strikes`,
-                });
+        const dmEmbed = new EmbedBuilder()
+            .setColor(0xff5856)
+            .setTitle("`🔥` You have received a strike!")
+            .setDescription(
+                `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${
+                    customEmoji.a.z_coins
+                } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
+            )
+            .setFooter({
+                text: `⚠️ You will be banned permanently at 5 Strikes`,
+            });
 
-            await user.send({ embeds: [dmEmbed] });
-        } catch (error) {
-            log("Failed to send a DM to the user", error);
-        }
+        await user.send({ embeds: [dmEmbed] }).catch(noop);
 
         await logs.strikes({
             embeds: [
@@ -96,14 +90,12 @@ export const addStrike = buildCommand<SlashCommand>({
             ],
         });
 
-        return i
-            .editReply(
-                embedComment(
-                    `${user.toString()} has been given a strike and fined ${
-                        customEmoji.a.z_coins
-                    } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
-                ),
-            )
-            .catch(noop);
+        return r.edit(
+            embedComment(
+                `${user.toString()} has been given a strike and fined ${
+                    customEmoji.a.z_coins
+                } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
+            ),
+        );
     },
 });
