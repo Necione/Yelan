@@ -120,7 +120,7 @@ export async function syncStats(userId: string) {
         calculatedCritChance = 0;
     }
 
-    let calculatedCritValue =
+    const calculatedCritValue =
         1 + additionalWeaponCritValue + additionalArtifactStats.critValue;
 
     let calculatedDefChance = additionalArtifactStats.defChance;
