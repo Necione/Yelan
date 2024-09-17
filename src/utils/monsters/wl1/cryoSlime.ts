@@ -1,4 +1,4 @@
-const cryoSlime = {
+export default {
     name: "Cryo Slime",
     group: "Silme",
     minHp: 12,
@@ -41,5 +41,3 @@ const cryoSlime = {
         "Jueyun Karst",
     ],
 };
-
-export default cryoSlime;

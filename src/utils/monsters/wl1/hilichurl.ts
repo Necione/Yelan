@@ -1,4 +1,4 @@
-const hilichurl = {
+export default {
     name: "Hilichurl",
     group: "Hilichurl",
     minHp: 20,
@@ -21,5 +21,3 @@ const hilichurl = {
     ],
     locations: ["Qingxu Pool", "Lingju Pass", "Tianqiu Valley"],
 };
-
-export default hilichurl;

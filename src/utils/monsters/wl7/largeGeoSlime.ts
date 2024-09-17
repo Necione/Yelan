@@ -1,4 +1,4 @@
-const largeGeoSlime = {
+export default {
     name: "Large Geo Slime",
     group: "Slime",
     minHp: 150,
@@ -46,5 +46,3 @@ const largeGeoSlime = {
     defChance: 30,
     defValue: 30,
 };
-
-export default largeGeoSlime;

@@ -1,4 +1,4 @@
-const largeCryoSlime = {
+export default {
     name: "Large Cryo Slime",
     group: "Slime",
     minHp: 50,
@@ -46,5 +46,3 @@ const largeCryoSlime = {
     defChance: 20,
     defValue: 6,
 };
-
-export default largeCryoSlime;

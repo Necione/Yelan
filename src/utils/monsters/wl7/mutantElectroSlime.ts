@@ -1,4 +1,4 @@
-const mutantElectroSlime = {
+export default {
     name: "Mutant Electro Slime",
     group: "Slime",
     minHp: 150,
@@ -46,5 +46,3 @@ const mutantElectroSlime = {
     defChance: 20,
     defValue: 10,
 };
-
-export default mutantElectroSlime;

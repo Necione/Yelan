@@ -1,4 +1,4 @@
-const treasureHoarderCrusher = {
+export default {
     name: "Treasure Hoarder Crusher",
     group: "Human",
     minHp: 100,
@@ -41,5 +41,3 @@ const treasureHoarderCrusher = {
         "Nantianmen",
     ],
 };
-
-export default treasureHoarderCrusher;

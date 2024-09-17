@@ -1,4 +1,4 @@
-const hydroAbyssMage = {
+export default {
     name: "Hydro Abyss Mage",
     group: "Abyss",
     minHp: 100,
@@ -46,5 +46,3 @@ const hydroAbyssMage = {
     defChance: 90,
     defValue: 50,
 };
-
-export default hydroAbyssMage;

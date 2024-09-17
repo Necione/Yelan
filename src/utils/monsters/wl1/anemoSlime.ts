@@ -1,4 +1,4 @@
-const anemoSlime = {
+export default {
     name: "Anemo Slime",
     group: "Silme",
     minHp: 10,
@@ -41,5 +41,3 @@ const anemoSlime = {
         "Jueyun Karst",
     ],
 };
-
-export default anemoSlime;

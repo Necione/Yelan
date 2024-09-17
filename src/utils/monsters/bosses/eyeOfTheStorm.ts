@@ -1,4 +1,4 @@
-const eyeOfTheStorm = {
+export default {
     name: "Eye of the Storm",
     minHp: 500,
     maxHp: 800,
@@ -28,5 +28,3 @@ const eyeOfTheStorm = {
         "Jueyun Karst",
     ],
 };
-
-export default eyeOfTheStorm;

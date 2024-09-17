@@ -1,4 +1,4 @@
-const electroSlime = {
+export default {
     name: "Electro Slime",
     group: "Silme",
     minHp: 15,
@@ -41,5 +41,3 @@ const electroSlime = {
         "Jueyun Karst",
     ],
 };
-
-export default electroSlime;

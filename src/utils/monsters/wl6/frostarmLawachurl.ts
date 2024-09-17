@@ -1,4 +1,4 @@
-const frostarmLawachurl = {
+export default {
     name: "Frostarm Lawachurl",
     group: "Hilichurl",
     minHp: 75,
@@ -23,5 +23,3 @@ const frostarmLawachurl = {
     ],
     locations: ["Tianqiu Valley", "Qingxu Pool", "Lumberpick Valley"],
 };
-
-export default frostarmLawachurl;

@@ -27,8 +27,8 @@ export interface Monster {
     locations: string[];
 }
 
-const monsters: Monster[] = [];
-let monstersLoaded = false;
+export const monsters: Monster[] = [];
+export let monstersLoaded = false;
 
 async function loadMonsters(dir: string): Promise<void> {
     const files = readdirSync(dir);
@@ -64,8 +64,6 @@ export async function initializeMonsters(): Promise<void> {
         log(`Total monsters loaded: ${monsters.length}`);
     }
 }
-
-export { monsters, monstersLoaded };
 
 export function getRandomValue(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;

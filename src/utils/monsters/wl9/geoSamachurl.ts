@@ -1,4 +1,4 @@
-const geoSamachurl = {
+export default {
     name: "Geo Samachurl",
     group: "Hilichurl",
     minHp: 300,
@@ -32,5 +32,3 @@ const geoSamachurl = {
     defChance: 100,
     defValue: 20,
 };
-
-export default geoSamachurl;

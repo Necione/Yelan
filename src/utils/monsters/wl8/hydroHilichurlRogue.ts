@@ -1,4 +1,4 @@
-const hydroHilichurlRogue = {
+export default {
     name: "Hydro Hilichurl Rogue",
     group: "Hilichurl",
     minHp: 200,
@@ -36,5 +36,3 @@ const hydroHilichurlRogue = {
     defChance: 75,
     defValue: 25,
 };
-
-export default hydroHilichurlRogue;

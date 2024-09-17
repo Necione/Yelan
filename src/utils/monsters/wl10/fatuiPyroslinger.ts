@@ -1,4 +1,4 @@
-const fatuiPyroslinger = {
+export default {
     name: "Fatui Pyroslinger",
     group: "Fatui",
     minHp: 400,
@@ -36,5 +36,3 @@ const fatuiPyroslinger = {
     defChance: 50,
     defValue: 75,
 };
-
-export default fatuiPyroslinger;

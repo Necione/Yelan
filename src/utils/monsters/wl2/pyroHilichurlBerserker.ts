@@ -1,4 +1,4 @@
-const pyroHilichurlBerserker = {
+export default {
     name: "Pyro Hilichurl Berserker",
     group: "Hilichurl",
     minHp: 20,
@@ -27,5 +27,3 @@ const pyroHilichurlBerserker = {
     defChance: 20,
     defValue: 2,
 };
-
-export default pyroHilichurlBerserker;

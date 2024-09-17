@@ -1,4 +1,4 @@
-const electroSamachurl = {
+export default {
     name: "Electro Samachurl",
     group: "Hilichurl",
     minHp: 32,
@@ -26,5 +26,3 @@ const electroSamachurl = {
     defChance: 20,
     defValue: 6,
 };
-
-export default electroSamachurl;

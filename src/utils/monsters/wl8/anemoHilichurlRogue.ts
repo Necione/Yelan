@@ -1,4 +1,4 @@
-const anemoHilichurlRogue = {
+export default {
     name: "Anemo Hilichurl Rogue",
     group: "Hilichurl",
     minHp: 200,
@@ -35,5 +35,3 @@ const anemoHilichurlRogue = {
     defChance: 75,
     defValue: 25,
 };
-
-export default anemoHilichurlRogue;

@@ -1,6 +1,6 @@
 import { type AbyssMonster } from "../hunt";
 
-const abyssFloor6Monsters: AbyssMonster[] = [
+export const abyssFloor6Monsters: AbyssMonster[] = [
     {
         name: "Frostarm Lawachurl",
         minHp: 75,
@@ -42,6 +42,4 @@ const abyssFloor6Monsters: AbyssMonster[] = [
     },
 ];
 
-const abyssFloor6Drops = [{ item: "Wanderer's Advice", amount: 2 }];
-
-export { abyssFloor6Drops, abyssFloor6Monsters };
+export const abyssFloor6Drops = [{ item: "Wanderer's Advice", amount: 2 }];

@@ -1,4 +1,4 @@
-const stonehideLawachurl = {
+export default {
     name: "Stonehide Lawachurl",
     group: "Hilichurl",
     minHp: 150,
@@ -23,5 +23,3 @@ const stonehideLawachurl = {
     ],
     locations: ["Lingju Pass", "Dunyu Ruins", "Guili Plains"],
 };
-
-export default stonehideLawachurl;

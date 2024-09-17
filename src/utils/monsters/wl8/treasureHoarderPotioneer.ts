@@ -1,4 +1,4 @@
-const treasureHoarderGravedigger = {
+export default {
     name: "Treasure Hoarder Potioneer",
     group: "Human",
     minHp: 150,
@@ -41,5 +41,3 @@ const treasureHoarderGravedigger = {
         "Lumberpick Valley",
     ],
 };
-
-export default treasureHoarderGravedigger;

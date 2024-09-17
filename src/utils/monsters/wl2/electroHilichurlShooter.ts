@@ -1,4 +1,4 @@
-const electroHilichurlShooter = {
+export default {
     name: "Electro Hilichurl Shooter",
     group: "Hilichurl",
     minHp: 20,
@@ -36,5 +36,3 @@ const electroHilichurlShooter = {
     defChance: 20,
     defValue: 2,
 };
-
-export default electroHilichurlShooter;

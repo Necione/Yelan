@@ -1,4 +1,4 @@
-const mitachurl = {
+export default {
     name: "Mitachurl",
     group: "Hilichurl",
     minHp: 30,
@@ -26,5 +26,3 @@ const mitachurl = {
     defChance: 15,
     defValue: 10,
 };
-
-export default mitachurl;

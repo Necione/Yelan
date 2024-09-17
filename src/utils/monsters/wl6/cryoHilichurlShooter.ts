@@ -1,4 +1,4 @@
-const cryoHilichurlShooter = {
+export default {
     name: "Cryo Hilichurl Shooter",
     group: "Hilichurl",
     minHp: 100,
@@ -41,5 +41,3 @@ const cryoHilichurlShooter = {
     ],
     locations: ["Tianqiu Valley", "Jueyun Karst", "Guili Plains"],
 };
-
-export default cryoHilichurlShooter;

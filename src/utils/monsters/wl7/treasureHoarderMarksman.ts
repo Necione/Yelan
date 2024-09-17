@@ -1,4 +1,4 @@
-const treasureHoarderMarksman = {
+export default {
     name: "Treasure Hoarder Marksman",
     group: "Human",
     minHp: 85,
@@ -41,5 +41,3 @@ const treasureHoarderMarksman = {
         "Guili Plains",
     ],
 };
-
-export default treasureHoarderMarksman;

@@ -1,4 +1,4 @@
-const cryoSamachurl = {
+export default {
     name: "Cryo Samachurl",
     group: "Hilichurl",
     minHp: 28,
@@ -26,5 +26,3 @@ const cryoSamachurl = {
     defChance: 20,
     defValue: 4,
 };
-
-export default cryoSamachurl;

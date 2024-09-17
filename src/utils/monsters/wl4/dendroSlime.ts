@@ -1,4 +1,4 @@
-const dendroSlime = {
+export default {
     name: "Dendro Slime",
     group: "Slime",
     minHp: 45,
@@ -46,5 +46,3 @@ const dendroSlime = {
     defChance: 20,
     defValue: 6,
 };
-
-export default dendroSlime;

@@ -1,4 +1,4 @@
-const fatuiHydrogunner = {
+export default {
     name: "Fatui Hydrogunner",
     group: "Fatui",
     minHp: 100,
@@ -36,5 +36,3 @@ const fatuiHydrogunner = {
     defChance: 90,
     defValue: 100,
 };
-
-export default fatuiHydrogunner;
