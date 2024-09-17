@@ -158,7 +158,14 @@ export const drops = {
         minAmount: 1,
         maxAmount: 2,
         minWorldLevel: 11,
-        chestChance: 2,
+        chestChance: 0,
+    },
+    "A Flower Yet to Bloom": {
+        sellPrice: 30,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 11,
+        chestChance: 0,
     },
 };
 

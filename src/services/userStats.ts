@@ -181,7 +181,6 @@ export async function syncStats(userId: string) {
     return stats;
 }
 
-
 export const getUserStats = async (userId: string) => {
     return await prisma.userStats
         .upsert({
