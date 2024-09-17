@@ -401,7 +401,7 @@ export async function handleHunt(
 
     const numberOfMonsters =
         stats.worldLevel >= 10
-            ? Math.floor(Math.random() * 3) + 1
+            ? Math.floor(Math.random() * 2) + 2
             : stats.worldLevel >= 5
               ? Math.floor(Math.random() * 2) + 1
               : 1;

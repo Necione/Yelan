@@ -102,12 +102,12 @@ const lowEncounterAverages = [
     { worldLevel: 6, minHp: 75, maxHp: 200, minDamage: 14, maxDamage: 25 },
     { worldLevel: 7, minHp: 100, maxHp: 250, minDamage: 18, maxDamage: 35 },
     { worldLevel: 8, minHp: 150, maxHp: 450, minDamage: 25, maxDamage: 40 },
-    { worldLevel: 9, minHp: 200, maxHp: 600, minDamage: 30, maxDamage: 50 },
-    { worldLevel: 10, minHp: 250, maxHp: 600, minDamage: 40, maxDamage: 60 },
-    { worldLevel: 11, minHp: 325, maxHp: 700, minDamage: 50, maxDamage: 70 },
-    { worldLevel: 12, minHp: 400, maxHp: 800, minDamage: 65, maxDamage: 85 },
-    { worldLevel: 13, minHp: 500, maxHp: 900, minDamage: 70, maxDamage: 90 },
-    { worldLevel: 14, minHp: 600, maxHp: 1200, minDamage: 80, maxDamage: 95 },
+    { worldLevel: 9, minHp: 200, maxHp: 350, minDamage: 30, maxDamage: 50 },
+    { worldLevel: 10, minHp: 250, maxHp: 400, minDamage: 40, maxDamage: 60 },
+    { worldLevel: 11, minHp: 325, maxHp: 500, minDamage: 50, maxDamage: 65 },
+    { worldLevel: 12, minHp: 400, maxHp: 500, minDamage: 65, maxDamage: 80 },
+    { worldLevel: 13, minHp: 500, maxHp: 600, minDamage: 70, maxDamage: 85 },
+    { worldLevel: 14, minHp: 600, maxHp: 700, minDamage: 75, maxDamage: 90 },
 ];
 
 export async function getRandomMonster(worldLevel: number, location: string) {
@@ -339,3 +339,4 @@ export async function getDropsForAbyssFloor(
 }
 
 export { abyssMonsters, abyssMonstersLoaded };
+
