@@ -31,7 +31,7 @@ export const sell = buildCommand<SlashCommand>({
             ...getKeys(drops),
             ...getKeys(weapons),
             ...getKeys(artifacts),
-        ].map((c) => ({ name: c, value: c }));
+        ].map((c) => ({ name: String(c), value: c }));
         const item = i.options.getString("item", false) ?? "";
         if (!item) {
             return i.respond(list.slice(0, 25)).catch(noop);

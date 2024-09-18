@@ -96,6 +96,20 @@ async function playerAttack(
     const abyssLevel = stats.abyssFloor || 0;
     const damageReductionMultiplier = Math.max(1 - abyssLevel * 0.01, 0);
 
+    if (hasVigilance && !vigilanceUsed) {
+        const vigilanceAttackPower = attackPower / 2;
+        currentMonsterHp -= vigilanceAttackPower;
+        vigilanceUsed = true;
+
+        await thread
+            .send(
+                `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name} ✨ (Vigilance).`,
+            )
+            .catch(noop);
+    }
+
     const isCrit = Math.random() * 100 < critChance;
     if (isCrit) {
         attackPower *= critValue;
@@ -161,20 +175,6 @@ async function playerAttack(
                     `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
                         2,
                     )}\` bonus damage with the Kindle skill!`,
-                )
-                .catch(noop);
-        }
-
-        if (hasVigilance && !vigilanceUsed) {
-            const vigilanceAttackPower = attackPower / 2;
-            currentMonsterHp -= vigilanceAttackPower;
-            vigilanceUsed = true;
-
-            await thread
-                .send(
-                    `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name} ✨ (Vigilance Skill).`,
                 )
                 .catch(noop);
         }

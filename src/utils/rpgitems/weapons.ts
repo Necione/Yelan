@@ -1,4 +1,15 @@
-export const weapons = {
+interface WeaponData {
+    sellPrice: number;
+    attackPower: number;
+    critChance: number;
+    critValue: number;
+    additionalHP: number;
+    minWorldLevel: number;
+    chestChance: number;
+    emoji: string;
+}
+
+const baseWeapons: { [key: string]: WeaponData } = {
     "Dull Blade": {
         sellPrice: 5,
         attackPower: 2,
@@ -239,7 +250,7 @@ export const weapons = {
         chestChance: 5,
         emoji: "<:Weapon_Deathmatch:1284617953509245082>",
     },
-    // 5* weapons
+
     "Aqua Simulacra": {
         sellPrice: 50,
         attackPower: 0,
@@ -262,4 +273,27 @@ export const weapons = {
     },
 };
 
-export type WeaponName = keyof typeof weapons;
+const prefixes: { [key: string]: number } = {
+    "": 1,
+    Old: 0.75,
+    Sharp: 1.25,
+    Godly: 1.5,
+    Worthless: 0.5,
+};
+
+export const weapons: { [key: string]: WeaponData } = {};
+
+for (const weaponName in baseWeapons) {
+    const weaponData = baseWeapons[weaponName];
+    for (const prefix in prefixes) {
+        const multiplier = prefixes[prefix];
+        const newWeaponName = prefix ? `${prefix} ${weaponName}` : weaponName;
+        weapons[newWeaponName] = {
+            ...weaponData,
+            attackPower: weaponData.attackPower * multiplier,
+            sellPrice: prefix === "Worthless" ? 0 : weaponData.sellPrice,
+        };
+    }
+}
+
+export type WeaponName = keyof typeof weapons & string;

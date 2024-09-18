@@ -35,6 +35,8 @@ export async function handleVictory(
     let totalExpGained = 0;
     let dropsCollected: { item: string; amount: number }[] = [];
 
+    let skillsActivated = "";
+
     for (const monster of monstersEncountered) {
         const expGained = calculateExp(monster.minExp, monster.maxExp);
         totalExpGained += expGained;
@@ -72,7 +74,7 @@ export async function handleVictory(
         .setColor("Green")
         .setTitle(`Victory in ${stats.location}!`)
         .setDescription(
-            `You defeated the following monsters: \`${monstersFought}\`!\n-# \`⭐\` \`+${totalExpGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
+            `You defeated the following monsters:\n\`${monstersFought}\`!\n-# \`⭐\` \`+${totalExpGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
         )
         .setThumbnail(
             monstersEncountered[monstersEncountered.length - 1].image,
@@ -86,23 +88,10 @@ export async function handleVictory(
         const healAmount = Math.ceil(stats.maxHP * 0.05);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
 
-        finalEmbed.addFields({
-            name: "Totem Skill",
-            value: `\`💖\` You healed \`${healAmount}\` HP due to the Totem skill.`,
-        });
+        skillsActivated += `\`💖\` Healed \`${healAmount}\` HP due to the Totem skill.\n`;
 
         await updateUserStats(i.user.id, {
             hp: currentPlayerHp,
-        });
-    }
-
-    if (dropsCollected.length > 0) {
-        const dropsDescription = dropsCollected
-            .map((drop) => `\`${drop.amount}x\` ${drop.item}`)
-            .join(", ");
-        finalEmbed.addFields({
-            name: "Drops",
-            value: dropsDescription,
         });
     }
 
@@ -120,9 +109,23 @@ export async function handleVictory(
             `Earned from the Scrounge skill`,
         );
 
+        skillsActivated += `\`💸\` Earned \`${coinsEarned}\` coins with the Scrounge skill.\n`;
+    }
+
+    if (skillsActivated) {
         finalEmbed.addFields({
-            name: "Scrounge Skill",
-            value: `\`💸\` You earned \`${coinsEarned}\` coins with the Scrounge skill.`,
+            name: "Skills Activated",
+            value: skillsActivated,
+        });
+    }
+
+    if (dropsCollected.length > 0) {
+        const dropsDescription = dropsCollected
+            .map((drop) => `\`${drop.amount}x\` ${drop.item}`)
+            .join(", ");
+        finalEmbed.addFields({
+            name: "Drops",
+            value: dropsDescription,
         });
     }
 
@@ -210,6 +213,20 @@ export async function playerAttack(
                 .catch(noop);
         }
 
+        if (hasVigilance && !vigilanceUsed) {
+            const vigilanceAttackPower = attackPower / 2;
+            currentMonsterHp -= vigilanceAttackPower;
+            vigilanceUsed = true;
+
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name} ✨ (Vigilance).`,
+                )
+                .catch(noop);
+        }
+
         const critChance = stats.critChance || 0;
         const critValue = stats.critValue || 1;
 
@@ -278,22 +295,6 @@ export async function playerAttack(
                         `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
                             2,
                         )}\` bonus damage with the Kindle skill!`,
-                    )
-                    .catch(noop);
-            }
-
-            if (hasVigilance && !vigilanceUsed) {
-                const vigilanceAttackPower = attackPower / 2;
-                currentMonsterHp -= vigilanceAttackPower;
-                vigilanceUsed = true;
-
-                await thread
-                    .send(
-                        `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                            2,
-                        )}\` damage to the ${
-                            monster.name
-                        } ✨ (Vigilance Skill).`,
                     )
                     .catch(noop);
             }

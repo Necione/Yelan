@@ -95,7 +95,9 @@ export const activate = buildCommand<SlashCommand>({
         });
 
         return r.edit(
-            embedComment(`The skill "${skillName}" has been activated!`),
+            embedComment(
+                `The skill "${skillName}" has been activated!\nUse the command again to deactivate.`,
+            ),
         );
     },
 });

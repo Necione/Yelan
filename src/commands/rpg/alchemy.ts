@@ -138,7 +138,7 @@ export const alchemy = buildCommand<SlashCommand>({
                         .setDescription(
                             `Alchemy Rank: ${alchemyRankWithEmoji}\n` +
                                 `🍃 Essence: ${alchemyBar}\n\n` +
-                                `Base ATK Bonus: \`+${alchemyAttackIncrease} ATK\``,
+                                `Base ATK: \`+${alchemyAttackIncrease} ATK\``,
                         )
                         .setColor(0x4b52bb),
                 ],

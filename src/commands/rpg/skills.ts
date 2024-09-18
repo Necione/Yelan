@@ -7,7 +7,7 @@ const availableSkills = [
     {
         name: "Vigilance",
         description:
-            "Attack twice at the start of battle, the second attack dealing 50% your normal ATK",
+            "Attack twice at the start of battle, the second attack dealing 50% your base ATK",
         emoji: "✨",
     },
     {

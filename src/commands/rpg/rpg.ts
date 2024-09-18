@@ -47,7 +47,9 @@ export const rpg = buildCommand<SlashCommand>({
         const hpDisplay =
             stats.hp > stats.maxHP
                 ? `💜 \`${stats.hp}/${stats.maxHP}\` **OVERHEALED**`
-                : `❤️ \`${stats.hp}/${stats.maxHP}\``;
+                : stats.hp < stats.maxHP * 0.2
+                  ? `💛 \`${stats.hp}/${stats.maxHP}\``
+                  : `🧡 \`${stats.hp}/${stats.maxHP}\` **LOW HP**`;
 
         const embed = new EmbedBuilder()
             .setColor("Aqua")
@@ -58,13 +60,9 @@ export const rpg = buildCommand<SlashCommand>({
             .setThumbnail(i.user.displayAvatarURL())
             .addFields({
                 name: "Your Stats",
-                value: `🌍 World Level: \`${stats.worldLevel}\`${
-                    stats.rebirths > 0
-                        ? `\n**${getRebirthString(stats.rebirths)}**`
-                        : ""
-                } | ⭐ EXP: \`${stats.exp}/${expRequired.toFixed(
-                    0,
-                )}\`\n🔻 Abyss Floor: \`${
+                value: `🌍 World Level: \`${stats.worldLevel}\` | ⭐ EXP: \`${
+                    stats.exp
+                }/${expRequired.toFixed(0)}\`\n🔻 Abyss Floor: \`${
                     stats.abyssFloor
                 }\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
                     2,
@@ -84,6 +82,12 @@ export const rpg = buildCommand<SlashCommand>({
                         : ""
                 }`,
                 inline: false,
+            })
+            .setFooter({
+                text:
+                    stats.rebirths > 0
+                        ? `${getRebirthString(stats.rebirths)}`
+                        : "",
             });
 
         if (stats.equippedWeapon) {
@@ -94,7 +98,7 @@ export const rpg = buildCommand<SlashCommand>({
                 name: "Equipped Weapon",
                 value: `${equippedWeapon.emoji} ${
                     stats.equippedWeapon
-                } (ATK Bonus: ${formatChange(weaponBonusAttack)})`,
+                } (${formatChange(weaponBonusAttack)} ATK)`,
                 inline: false,
             });
         }

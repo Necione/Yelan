@@ -27,7 +27,7 @@ export const equip = buildCommand<SlashCommand>({
     defer: { silent: false },
     async autocomplete(i) {
         const list = [...getKeys(weapons), ...getKeys(artifacts)].map((c) => ({
-            name: c,
+            name: String(c),
             value: c,
         }));
         const item = i.options.getString("item", false) ?? "";
