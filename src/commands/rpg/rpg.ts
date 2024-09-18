@@ -82,13 +82,12 @@ export const rpg = buildCommand<SlashCommand>({
                         : ""
                 }`,
                 inline: false,
-            })
-            .setFooter({
-                text:
-                    stats.rebirths > 0
-                        ? `${getRebirthString(stats.rebirths)}`
-                        : "",
             });
+        if (stats.rebirths > 0) {
+            embed.setFooter({
+                text: getRebirthString(stats.rebirths),
+            });
+        }
 
         if (stats.equippedWeapon) {
             const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
