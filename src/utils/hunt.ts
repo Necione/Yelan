@@ -110,7 +110,20 @@ const lowEncounterAverages = [
     { worldLevel: 14, minHp: 600, maxHp: 700, minDamage: 75, maxDamage: 85 },
 ];
 
-export async function getRandomMonster(worldLevel: number, location: string) {
+export async function getRandomMonster(
+    worldLevel: number,
+    location: string,
+    playerStats: {
+        currentHp: number;
+        minDamage: number;
+        maxDamage: number;
+        critChance: number;
+        critValue: number;
+        defChance: number;
+        defValue: number;
+        maxHp: number;
+    },
+) {
     if (!monstersLoaded) {
         return null;
     }
@@ -159,7 +172,22 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         return null;
     }
 
-    if (worldLevel > selectedMonster.minWorldLevel) {
+    if (selectedMonster.name === "Mirror Maiden") {
+        selectedMonster.currentHp = playerStats.currentHp;
+        selectedMonster.minDamage = playerStats.minDamage;
+        selectedMonster.maxDamage = playerStats.maxDamage;
+        selectedMonster.critChance = playerStats.critChance;
+        selectedMonster.critValue = playerStats.critValue;
+        selectedMonster.defChance = playerStats.defChance;
+        selectedMonster.defValue = playerStats.defValue;
+        selectedMonster.minHp = playerStats.maxHp;
+        selectedMonster.maxHp = playerStats.maxHp;
+    }
+
+    if (
+        worldLevel > selectedMonster.minWorldLevel &&
+        selectedMonster.name !== "Mirror Maiden"
+    ) {
         const encounterAverages = lowEncounterAverages.find(
             (avg) => avg.worldLevel === worldLevel,
         );

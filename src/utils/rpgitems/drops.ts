@@ -160,6 +160,20 @@ export const drops = {
         minWorldLevel: 11,
         chestChance: 0,
     },
+    "Dismal Prism": {
+        sellPrice: 30,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 11,
+        chestChance: 5,
+    },
+    "Crystal Prism": {
+        sellPrice: 35,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 11,
+        chestChance: 0,
+    },
     "A Flower Yet to Bloom": {
         sellPrice: 30,
         minAmount: 1,

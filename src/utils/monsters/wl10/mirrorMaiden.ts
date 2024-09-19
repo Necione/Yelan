@@ -1,0 +1,38 @@
+export default {
+    name: "Mirror Maiden",
+    group: "Abyss",
+    minHp: 200,
+    maxHp: 400,
+    minDamage: 60,
+    maxDamage: 80,
+    minExp: 5,
+    maxExp: 10,
+    minWorldLevel: 11,
+    image: "https://lh.elara.workers.dev/rpg/monsters/mirror_maiden.png",
+    drops: [
+        { item: "Dismal Prism", minAmount: 1, maxAmount: 2, chance: 75 },
+        { item: "Crystal Prism", minAmount: 1, maxAmount: 2, chance: 25 },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
+    ],
+    locations: [
+        "Qingxu Pool",
+        "Lingju Pass",
+        "Lumberpick Valley",
+        "Dunyu Ruins",
+        "Nantianmen",
+        "Tianqiu Valley",
+        "Luhua Pool",
+        "Guili Plains",
+        "Jueyun Karst",
+    ],
+
+    critChance: 50,
+    critValue: 2,
+    defChance: 90,
+    defValue: 100,
+};
