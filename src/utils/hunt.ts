@@ -115,8 +115,7 @@ export async function getRandomMonster(
     location: string,
     playerStats: {
         currentHp: number;
-        minDamage: number;
-        maxDamage: number;
+        attackPower: number;
         critChance: number;
         critValue: number;
         defChance: number;
@@ -174,8 +173,8 @@ export async function getRandomMonster(
 
     if (selectedMonster.name === "Mirror Maiden") {
         selectedMonster.currentHp = playerStats.currentHp;
-        selectedMonster.minDamage = playerStats.minDamage;
-        selectedMonster.maxDamage = playerStats.maxDamage;
+        selectedMonster.minDamage = playerStats.attackPower;
+        selectedMonster.maxDamage = playerStats.attackPower;
         selectedMonster.critChance = playerStats.critChance;
         selectedMonster.critValue = playerStats.critValue;
         selectedMonster.defChance = playerStats.defChance;

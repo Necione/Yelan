@@ -414,6 +414,15 @@ export async function handleHunt(
         const monster = await getRandomMonster(
             stats.worldLevel,
             stats.location,
+            {
+                currentHp: stats.hp,
+                attackPower: stats.attackPower,
+                critChance: stats.critChance,
+                critValue: stats.critValue,
+                defChance: stats.defChance,
+                defValue: stats.defValue,
+                maxHp: stats.maxHP,
+            }
         );
 
         if (!monster) {
