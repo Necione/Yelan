@@ -8,6 +8,7 @@ import moment from "moment-timezone";
 import * as events from "./events";
 import { checkIfDeploy } from "./scripts/checks";
 import { getProfileByUserId, updateRankedUID } from "./services";
+import type { InviteClient } from "@elara-services/invite";
 if (process.env.timeZone) {
     moment.tz.setDefault(process.env.timeZone);
     times.timeZone = process.env.timeZone;
@@ -17,6 +18,7 @@ declare module "discord.js" {
     export interface Client {
         prefix?: string;
         enka: EnkaVerificationClient;
+        invites: InviteClient;
     }
 }
 

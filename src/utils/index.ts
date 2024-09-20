@@ -1,10 +1,16 @@
-import type { getInteractionResponders } from "@elara-services/utils";
+import type { InviteClient } from "@elara-services/invite";
+import type {
+    FetchedMemberInvitesResponse,
+    getInteractionResponders,
+} from "@elara-services/utils";
 import {
     embedComment,
     formatNumber,
     get,
     getInteractionResponder,
     is,
+    log,
+    make,
     noop,
     proper,
     status,
@@ -24,23 +30,77 @@ import type {
     GuildMember,
     MessageCreateOptions,
 } from "discord.js";
-import { CommandInteraction, ComponentType, User } from "discord.js";
-import { channels, economy, isMainBot, mainBotId } from "../config";
+import {
+    Collection,
+    CommandInteraction,
+    ComponentType,
+    User,
+} from "discord.js";
+import client from "../client";
+import {
+    channels,
+    economy,
+    isMainBot,
+    mainBotId,
+    mainServerId,
+} from "../config";
 import { getProfileByUserId, updateUserProfile } from "../services";
 import { getBotFromId } from "../services/bot";
 const webhook = new Webhook(process.env.TOKEN as string);
 
+// eslint-disable-next-line prefer-const
+export let inviteCache = new Collection<
+    string,
+    FetchedMemberInvitesResponse["members"]
+>();
+// eslint-disable-next-line prefer-const
+export let inviteCacheUpdates = {
+    last: "",
+    next: "",
+};
 export const tradeTimeout = new Set();
 export const mutableGlobals = {
-    locked: [] as { id: string; name: string; added: number }[],
-    fights: [] as { userId: string; createdAt: number }[],
+    locked: make.array<{ id: string; name: string; added: number }>(),
+    fights: make.array<{ userId: string; createdAt: number }>(),
     rr: {
         reward: 0,
         active: false,
-        players: [] as string[],
+        players: make.array<string>(),
         date: 0,
     },
 };
+
+export async function updateInvitesCache(
+    invites: InviteClient,
+    fromInterval?: boolean,
+) {
+    const g = await client.guilds.fetch(mainServerId).catch(noop);
+    if (!g) {
+        return log(
+            `[UPDATE:INVITE:CACHE]: Unable to fetch the main server (${mainServerId})`,
+        );
+    }
+    const r = await invites.fetchAll(g, true, false, (m) => {
+        if (
+            Date.now() - new Date(m.member.joined_at as string).getTime() >
+            get.days(30)
+        ) {
+            // If the member was invited a month+ ago then ignore.
+            return false;
+        }
+        return true;
+    });
+    if (!r.status) {
+        return log(r.message);
+    }
+    if (fromInterval) {
+        inviteCacheUpdates.last = new Date().toISOString();
+        inviteCacheUpdates.next = new Date(
+            Date.now() + get.mins(10),
+        ).toISOString();
+    }
+    inviteCache = invites.formatAll(r.data);
+}
 
 export function displayTradeInAction(user: User) {
     return {

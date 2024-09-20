@@ -422,7 +422,7 @@ export async function handleHunt(
                 defChance: stats.defChance,
                 defValue: stats.defValue,
                 maxHp: stats.maxHP,
-            }
+            },
         );
 
         if (!monster) {
