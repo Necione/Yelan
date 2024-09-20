@@ -21,7 +21,10 @@ export async function updateUserStreak(userId: string) {
     }
 
     // Reset the streak if the last claim was not within 24 hours
-    newStreak = lastDateClaim && isWithin24Hours(lastDateClaim, now) ? newStreak + 1 : 1;
+    newStreak =
+        lastDateClaim && isWithin24Hours(lastDateClaim, now)
+            ? newStreak + 1
+            : 1;
     if (newStreak === 1) {
         newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
     } else {
@@ -34,7 +37,9 @@ export async function updateUserStreak(userId: string) {
         lastDateClaim: { set: now },
     });
     if (!db) {
-        return status.error("Unknown error while trying to save your daily info.");
+        return status.error(
+            "Unknown error while trying to save your daily info.",
+        );
     }
 
     await addBalance(
