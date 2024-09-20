@@ -6,7 +6,7 @@ import { addBalance } from "./userProfile";
 export async function updateUserStreak(userId: string) {
     const dailyCommand = await getDailyCommandByUserId(userId);
     if (!dailyCommand) {
-        return status.error(`Unable to find/create your daily info.`);
+        return status.error("Unable to find/create your daily info.");
     }
 
     const now = new Date();
@@ -15,12 +15,13 @@ export async function updateUserStreak(userId: string) {
     let newStreak = dailyCommand.dailyStreak;
     let newTotal = dailyCommand.dailyTotal;
 
-    if (lastDateClaim && isSameDay(lastDateClaim, now)) {
-        // If the user has already claimed their daily reward for the current day, don't increment the streak and total
-        return status.error(`Come back tomorrow to claim your daily.`);
+    if (lastDateClaim && isWithin24Hours(lastDateClaim, now)) {
+        // If the user has already claimed their daily reward within the last 24 hours, don't increment the streak and total
+        return status.error("Come back tomorrow to claim your daily.");
     }
-    newStreak =
-        lastDateClaim && isYesterday(lastDateClaim, now) ? newStreak + 1 : 1;
+
+    // Reset the streak if the last claim was not within 24 hours
+    newStreak = lastDateClaim && isWithin24Hours(lastDateClaim, now) ? newStreak + 1 : 1;
     if (newStreak === 1) {
         newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
     } else {
@@ -33,33 +34,22 @@ export async function updateUserStreak(userId: string) {
         lastDateClaim: { set: now },
     });
     if (!db) {
-        return status.error(
-            `Unknown error while trying to save your daily info.`,
-        );
+        return status.error("Unknown error while trying to save your daily info.");
     }
 
     await addBalance(
         userId,
         50 + (newStreak - 1),
         true,
-        `Daily check-in reward`,
+        "Daily check-in reward",
     );
 
     return status.data(db);
 }
 
-function isSameDay(date1: Date, date2: Date) {
-    return (
-        date1.getFullYear() === date2.getFullYear() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getDate() === date2.getDate()
-    );
-}
-
-function isYesterday(date1: Date, date2: Date) {
-    const yesterday = new Date(date2);
-    yesterday.setDate(yesterday.getDate() - 1);
-    return isSameDay(date1, yesterday);
+function isWithin24Hours(date1: Date, date2: Date) {
+    const diff = date2.getTime() - date1.getTime();
+    return diff < 24 * 60 * 60 * 1000;
 }
 
 async function getDailyCommandByUserId(userId: string) {
