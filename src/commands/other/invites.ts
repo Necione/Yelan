@@ -8,7 +8,6 @@ import { type GuildMember, SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
 import { generateInviteInfo } from "../../plugins/other/invites";
 import { getProfileByUserId } from "../../services";
-import { cooldowns } from "../../utils";
 
 export const invites = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -39,14 +38,6 @@ export const invites = buildCommand<SlashCommand>({
                     `You're user profile is locked, you can't use this command.`,
                 ),
             );
-        }
-        const cool = cooldowns.get(
-            p,
-            "invites",
-            `You can't lookup anyone until %DURATION%`,
-        ); // Leave this in bitches, don't want Discord to get pissed at the bot and block it from using the endpoint.
-        if (!cool.status) {
-            return r.edit(embedComment(cool.message));
         }
         let user = i.user;
         const u = i.options.getUser("user", false);

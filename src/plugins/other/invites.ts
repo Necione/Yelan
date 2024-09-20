@@ -6,7 +6,6 @@ import {
     embedComment,
     field,
     formatNumber,
-    get,
     getInteractionResponder,
     is,
     make,
@@ -29,7 +28,6 @@ import {
 } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import {
-    cooldowns,
     inviteCache,
     inviteCacheUpdates,
     logs,
@@ -221,7 +219,6 @@ export async function generateInviteInfo(
         );
     }
     const { invited, total } = getInviteData(m);
-    await cooldowns.set(p, "invites", get.mins(2)); // Leave this in bitches, don't want Discord to get pissed at the bot and block it from using the endpoint.
     const rewards: string[] = [];
     if (is.array(conf.rewards)) {
         const add: Role[] = [];
