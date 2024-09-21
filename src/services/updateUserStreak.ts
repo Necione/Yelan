@@ -15,22 +15,17 @@ export async function updateUserStreak(userId: string) {
     let newStreak = dailyCommand.dailyStreak;
     let newTotal = dailyCommand.dailyTotal;
 
-    if (lastDateClaim && isWithin24Hours(lastDateClaim, now)) {
-        // If the user has already claimed their daily reward within the last 24 hours, don't increment the streak and total
-        return status.error("Come back tomorrow to claim your daily.");
-    }
-
-    // Reset the streak if the last claim was not within 24 hours
-    newStreak =
-        lastDateClaim && isWithin24Hours(lastDateClaim, now)
-            ? newStreak + 1
-            : 1;
-    if (newStreak === 1) {
-        newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
+    if (
+        !lastDateClaim ||
+        now.getTime() - lastDateClaim.getTime() > 24 * 60 * 60 * 1000
+    ) {
+        // Reset the streak if the last claim was more than 24 hours ago
+        newStreak = 1;
+        newTotal = 50;
     } else {
+        newStreak = newStreak + 1;
         newTotal = 50 + (newStreak - 1);
     }
-
     const db = await updateDailyCommand(userId, {
         dailyStreak: { set: newStreak },
         dailyTotal: { set: newTotal },
@@ -48,13 +43,7 @@ export async function updateUserStreak(userId: string) {
         true,
         "Daily check-in reward",
     );
-
     return status.data(db);
-}
-
-function isWithin24Hours(date1: Date, date2: Date) {
-    const diff = date2.getTime() - date1.getTime();
-    return diff < 24 * 60 * 60 * 1000;
 }
 
 async function getDailyCommandByUserId(userId: string) {
@@ -74,14 +63,18 @@ async function getDailyCommandByUserId(userId: string) {
 
 async function updateDailyCommand(
     userId: string,
+
     data: Prisma.DailyCommandUpdateInput,
 ) {
     return await prisma.dailyCommand
+
         .update({
             where: {
                 userId,
             },
+
             data,
         })
+
         .catch(noop);
 }
