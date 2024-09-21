@@ -4,8 +4,7 @@ import {
     type SlashCommand,
 } from "@elara-services/botbuilder";
 import { discord, embedComment } from "@elara-services/utils";
-import { type GuildMember, SlashCommandBuilder } from "discord.js";
-import { roles } from "../../config";
+import { SlashCommandBuilder } from "discord.js";
 import { generateInviteInfo } from "../../plugins/other/invites";
 import { getProfileByUserId } from "../../services";
 
@@ -17,7 +16,7 @@ export const invites = buildCommand<SlashCommand>({
         .addUserOption((o) =>
             getUser(o, {
                 name: "user",
-                description: `[STAFF]: What user do you want to look at?`,
+                description: `What user do you want to look at?`,
                 required: false,
             }),
         ),
@@ -26,38 +25,13 @@ export const invites = buildCommand<SlashCommand>({
         if (!i.inCachedGuild()) {
             return;
         }
-        const p = await getProfileByUserId(i.user.id);
-        if (!p) {
-            return r.edit(
-                embedComment(`Unable to find/create your user profile.`),
-            );
-        }
-        if (p.locked) {
-            return r.edit(
-                embedComment(
-                    `You're user profile is locked, you can't use this command.`,
-                ),
-            );
-        }
-        let user = i.user;
-        const u = i.options.getUser("user", false);
-        const isStaff = i.member.roles.cache.hasAny(
-            ...[...roles.main, roles.moderator],
-        );
-        if (isStaff && u) {
-            user = u;
-        }
+        const user = i.options.getUser("user", false) || i.user;
         if (!user || user.bot) {
             return r.edit(
                 embedComment(`Unable to find that user or it's a bot account.`),
             );
         }
-        const member = (await discord.member(
-            i.guild,
-            user.id,
-            true,
-            true,
-        )) as GuildMember;
+        const member = await discord.member(i.guild, user.id, true, true);
         if (!member) {
             return r.edit(
                 embedComment(
@@ -65,23 +39,18 @@ export const invites = buildCommand<SlashCommand>({
                 ),
             );
         }
-        const isSame = user.id === i.user.id;
-        if (!isSame) {
-            const pp = await getProfileByUserId(user.id);
-            if (!pp) {
-                return r.edit(
-                    embedComment(
-                        `Unable to find/create ${user.toString()}'s user profile.`,
-                    ),
-                );
-            }
-            if (pp.locked) {
-                return r.edit(
-                    embedComment(
-                        `${user.toString()}'s user profile is locked, they don't have access to this command.`,
-                    ),
-                );
-            }
+        const p = await getProfileByUserId(user.id);
+        if (!p) {
+            return r.edit(
+                embedComment(
+                    `Unable to find/create ${user.toString()}'s user profile.`,
+                ),
+            );
+        }
+        if (p.locked) {
+            return r.edit(
+                embedComment(`${user.toString()}'s user profile is locked.`),
+            );
         }
         return generateInviteInfo(i.guild, user.id, r);
     },

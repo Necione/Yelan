@@ -1,4 +1,5 @@
 import {
+    addButtonRow,
     embedComment,
     formatNumber,
     getKeys,
@@ -8,7 +9,12 @@ import {
     is,
     time,
 } from "@elara-services/utils";
-import { EmbedBuilder, type GuildMember, type User } from "discord.js";
+import {
+    ButtonStyle,
+    EmbedBuilder,
+    type GuildMember,
+    type User,
+} from "discord.js";
 import { economy } from "../../config";
 import { /* getAllUserProfiles, */ getProfileByUserId } from "../../services";
 // import { sortLB } from "../../services/bot";
@@ -23,7 +29,6 @@ export async function fetchData(
     user: User,
     requestedMember: GuildMember | null = null,
 ) {
-    requestedMember;
     // const profiles = await getAllUserProfiles();
     // if (!is.array(profiles)) {
     //     return embedComment(
@@ -138,6 +143,14 @@ export async function fetchData(
 
     return {
         embeds: [embed],
+        components: [
+            addButtonRow({
+                id: `ifaq:invite_info:${user.id}`,
+                label: `Invite Rewards`,
+                emoji: { id: `1091219256395452517` },
+                style: ButtonStyle.Primary,
+            }),
+        ],
     };
 }
 

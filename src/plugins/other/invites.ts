@@ -53,6 +53,14 @@ export async function handleInviteInteraction(i: ButtonInteraction) {
     }
     const r = getInteractionResponder(i);
     const [, type, userId] = i.customId.split(":");
+    if (!isOriginalMessageUser(i)) {
+        return r.reply({
+            ...embedComment(
+                `Only the original interaction user can use this button!`,
+            ),
+            ephemeral: true,
+        });
+    }
     if (type === "invites") {
         return r.update({
             embeds: [
@@ -146,6 +154,19 @@ export async function handleInviteInteraction(i: ButtonInteraction) {
     }
 }
 
+export function isOriginalMessageUser(i: Interaction) {
+    if (!("message" in i)) {
+        return false;
+    }
+    const original =
+        i.message?.interactionMetadata?.user.id ??
+        i.message?.interaction?.user.id;
+    if (!original) {
+        return false;
+    }
+    return original === i.user.id;
+}
+
 export function getComponents(
     userId: string,
     options?: {
@@ -219,7 +240,7 @@ export async function generateInviteInfo(
         );
     }
     const { invited, total } = getInviteData(m);
-    const rewards: string[] = [];
+    const rewards = make.array<string>();
     if (is.array(conf.rewards)) {
         const add: Role[] = [];
         for (const r of conf.rewards.sort((a, b) => b.invites - a.invites)) {
