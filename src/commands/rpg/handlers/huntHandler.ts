@@ -519,9 +519,13 @@ export async function handleHunt(
             stats.skills.some((skill) => skill.name === "Vigilance") &&
             stats.activeSkills.includes("Vigilance");
 
+        const hasDistraction =
+            stats.skills.some((skill) => skill.name === "Distraction") &&
+            stats.activeSkills.includes("Distraction");
+
         let vigilanceUsed = false;
 
-        let isMonsterFirst = Math.random() < 0.5;
+        let isMonsterFirst = hasDistraction ? false : Math.random() < 0.5;
 
         const battleInterval = setInterval(async () => {
             if (currentPlayerHp <= 0 || currentMonsterHp <= 0) {

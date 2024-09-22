@@ -47,6 +47,12 @@ const availableSkills = [
             "Reduce your explore cooldown from 20 minutes to 15 minutes",
         emoji: "⚡",
     },
+    {
+        name: "Distraction",
+        description:
+            "Always go first when hunting",
+        emoji: "💫",
+    },
 ];
 
 const getSkillEmoji = (skillName: string) => {

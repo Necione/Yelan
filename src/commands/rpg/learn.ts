@@ -16,6 +16,7 @@ type SkillName =
     | "Insomnia"
     | "Energize"
     | "Scrounge"
+    | "Distraction"
     | "Kindle";
 
 const skillRequirements: Record<
@@ -85,6 +86,11 @@ const skillRequirements: Record<
             { item: "Silver Raven Insignia", amount: 3 },
         ],
     },
+    Distraction: {
+        worldLevel: 10,
+        coins: 250,
+        items: [{ item: "Dismal Prism", amount: 2 }],
+    },
 };
 
 export const learn = buildCommand<SlashCommand>({
@@ -105,6 +111,7 @@ export const learn = buildCommand<SlashCommand>({
                     { name: "Kindle", value: "Kindle" },
                     { name: "Scrounge", value: "Scrounge" },
                     { name: "Energize", value: "Energize" },
+                    { name: "Distraction", value: "Distraction" },
                 ),
         ),
     defer: { silent: false },
