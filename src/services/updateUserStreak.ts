@@ -1,4 +1,4 @@
-import { noop, status } from "@elara-services/utils";
+import { get, noop, status } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { addBalance } from "./userProfile";
@@ -55,7 +55,7 @@ export async function updateUserStreak(userId: string) {
 
 function getTimeDiffInHours(date1: Date, date2: Date) {
     const diffInMs = Math.abs(date2.getTime() - date1.getTime());
-    return diffInMs / (1000 * 60 * 60);
+    return diffInMs / get.days(1);
 }
 
 async function getDailyCommandByUserId(userId: string) {
