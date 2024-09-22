@@ -184,7 +184,7 @@ export async function playerAttack(
     vigilanceUsed: boolean;
     displaced?: boolean;
 }> {
-    if (stats.equippedWeapon === "Staff of Homa") {
+    if (stats.equippedWeapon?.toLowerCase().includes("staff of homa")) {
         return handleStaffOfHomaAttack(
             thread,
             stats,
@@ -192,7 +192,7 @@ export async function playerAttack(
             currentMonsterHp,
             vigilanceUsed,
         );
-    } else if (stats.equippedWeapon === "Aqua Simulacra") {
+    } else if (stats.equippedWeapon?.toLowerCase().includes("aqua simulacra")) {
         return handleAquaSimulacraAttack(
             thread,
             stats,
