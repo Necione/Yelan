@@ -1,6 +1,7 @@
 import { getRandomValue } from "./hunt";
 import { type ArtifactName, artifacts } from "./rpgitems/artifacts";
 import { type DropName, drops } from "./rpgitems/drops";
+import { type MiscName, misc } from "./rpgitems/misc";
 import { type WeaponName, weapons } from "./rpgitems/weapons";
 
 type LootItem = {
@@ -123,5 +124,48 @@ export function generateChestLoot(worldLevel: number) {
         rarity: selectedRarity.rarity,
         loot,
         coins,
+    };
+}
+
+type MaterialItem = {
+    name: MiscName;
+    minAmount: number;
+    maxAmount: number;
+    dropChance: number;
+};
+
+const materialLoot: MaterialItem[] = [
+    ...Object.keys(misc).map((item) => ({
+        name: item as MiscName,
+        minAmount: misc[item as MiscName].minAmount || 1,
+        maxAmount: misc[item as MiscName].maxAmount || 1,
+        dropChance: misc[item as MiscName].dropChance || 100,
+    })),
+];
+
+export function generateRawMaterials() {
+    const uniqueMaterialsCount = getRandomValue(2, 5);
+    const materials: { item: MiscName; amount: number }[] = [];
+
+    const availableLoot = [...materialLoot];
+
+    for (let i = 0; i < uniqueMaterialsCount && availableLoot.length > 0; i++) {
+        const randomIndex = Math.floor(Math.random() * availableLoot.length);
+        const material = availableLoot[randomIndex];
+
+        const amount = getRandomValue(material.minAmount, material.maxAmount);
+
+        if (amount > 0) {
+            materials.push({
+                item: material.name,
+                amount: Math.floor(amount),
+            });
+
+            availableLoot.splice(randomIndex, 1);
+        }
+    }
+
+    return {
+        materials,
     };
 }

@@ -42,14 +42,9 @@ const availableSkills = [
         emoji: "💸",
     },
     {
-        name: "Focus",
-        description: "Increase your Crit % exponentially on low HP",
-        emoji: "👁️",
-    },
-    {
         name: "Energize",
         description:
-            "Reduce your explore cooldown from 30 minutes to 20 minutes",
+            "Reduce your explore cooldown from 20 minutes to 15 minutes",
         emoji: "⚡",
     },
 ];

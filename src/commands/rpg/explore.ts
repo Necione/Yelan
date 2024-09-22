@@ -3,7 +3,7 @@ import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, getUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
-import { handleChest } from "./handlers/chestHandler";
+import { handleChest } from "./handlers/exploreHandler";
 
 export const explore = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
