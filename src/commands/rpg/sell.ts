@@ -5,6 +5,7 @@ import { SlashCommandBuilder } from "discord.js";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
+import { misc, type MiscName } from "../../utils/rpgitems/misc";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 export const sell = buildCommand<SlashCommand>({
@@ -31,6 +32,7 @@ export const sell = buildCommand<SlashCommand>({
             ...getKeys(drops),
             ...getKeys(weapons),
             ...getKeys(artifacts),
+            ...getKeys(misc),
         ].map((c) => ({ name: String(c), value: c }));
         const item = i.options.getString("item", false) ?? "";
         if (!item) {
@@ -57,7 +59,8 @@ export const sell = buildCommand<SlashCommand>({
         const itemData =
             drops[itemName as DropName] ||
             weapons[itemName as WeaponName] ||
-            artifacts[itemName as ArtifactName];
+            artifacts[itemName as ArtifactName] ||
+            misc[itemName as MiscName];
 
         if (!itemData) {
             return r.edit(
