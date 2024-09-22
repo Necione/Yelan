@@ -15,6 +15,7 @@ const skillChoices = [
     { name: "Scrounge", value: "Scrounge", emoji: "💸" },
     { name: "Distraction", value: "Distraction", emoji: "💫" },
     { name: "Energize", value: "Energize", emoji: "🔮" },
+    { name: "Backstab", value: "Backstab", emoji: "🔪" },
 ];
 
 export const activate = buildCommand<SlashCommand>({

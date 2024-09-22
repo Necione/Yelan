@@ -203,6 +203,22 @@ export async function playerAttack(
     } else {
         let attackPower = stats.attackPower;
 
+        const hasBackstab =
+            stats.skills.some((skill) => skill.name === "Backstab") &&
+            stats.activeSkills.includes("Backstab");
+
+        const isHumanOrFatui =
+            monster.group === "Human" || monster.group === "Fatui";
+
+        if (hasBackstab && isHumanOrFatui) {
+            attackPower *= 2;
+            await thread
+                .send(
+                    `>>> \`🗡️\` Backstab skill activated! You deal 200% more DMG!`,
+                )
+                .catch(noop);
+        }
+
         if (displaced) {
             attackPower *= 0.5;
             displaced = false;

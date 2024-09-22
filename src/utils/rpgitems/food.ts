@@ -45,7 +45,7 @@ export const food = {
     },
     "Jade Parcels": {
         sellAmount: 20,
-        healAmount: 60,
+        healAmount: 100,
     },
     "Universal Peace": {
         sellAmount: 15,
@@ -53,7 +53,7 @@ export const food = {
     },
     "Almond Tofu": {
         sellAmount: 12,
-        healAmount: 30,
+        healAmount: 75,
     },
     Goulash: {
         sellAmount: 14,
@@ -61,7 +61,7 @@ export const food = {
     },
     "Golden Shrimp Balls": {
         sellAmount: 18,
-        healAmount: 75,
+        healAmount: 100,
     },
     "Jewelry Soup": {
         sellAmount: 10,
@@ -73,7 +73,7 @@ export const food = {
     },
     "Crab Roe Tofu": {
         sellAmount: 15,
-        healAmount: 100,
+        healAmount: 200,
     },
 };
 

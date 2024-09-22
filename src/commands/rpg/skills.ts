@@ -53,6 +53,12 @@ const availableSkills = [
             "Always go first when hunting",
         emoji: "💫",
     },
+    {
+        name: "Backstab",
+        description:
+            "Deal 200% more DMG to humans",
+        emoji: "🔪",
+    },
 ];
 
 const getSkillEmoji = (skillName: string) => {
