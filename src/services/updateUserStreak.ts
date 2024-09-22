@@ -1,4 +1,4 @@
-import { noop, status } from "@elara-services/utils";
+import { get, noop, status } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { addBalance } from "./userProfile";
@@ -17,7 +17,7 @@ export async function updateUserStreak(userId: string) {
 
     if (
         !lastDateClaim ||
-        now.getTime() - lastDateClaim.getTime() > 24 * 60 * 60 * 1000
+        now.getTime() - lastDateClaim.getTime() > get.days(1)
     ) {
         // Reset the streak if the last claim was more than 24 hours ago
         newStreak = 1;
