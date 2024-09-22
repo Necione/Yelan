@@ -54,10 +54,13 @@ export const heal = buildCommand<SlashCommand>({
         }
 
         const maxHP = stats.maxHP;
-        const healAmount = Math.floor(
-            Math.random() * (0.75 - 0.25 + 0.01) * maxHP + 0.25 * maxHP,
-        );
-        const newHp = Math.min(stats.hp + healAmount, maxHP);
+        const healAmount = maxHP - stats.hp;
+
+        if (healAmount <= 0) {
+            return r.edit(embedComment("Your HP is already at maximum."));
+        }
+
+        const newHp = maxHP;
 
         await Promise.all([
             updateUserStats(i.user.id, { hp: newHp }),
@@ -71,7 +74,7 @@ export const heal = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `The Statue of The Seven took ${customEmoji.a.z_coins} \`${healCost} ${texts.c.u}\` and healed you for \`${healAmount} HP\`!\nYour current HP is \`${newHp}/${maxHP}\``,
+                `The Statue of The Seven took ${customEmoji.a.z_coins} \`${healCost} ${texts.c.u}\` and healed you!\nYour current HP is \`${newHp}/${maxHP}\``,
                 "Green",
             ),
         );

@@ -89,13 +89,20 @@ export const eat = buildCommand<SlashCommand>({
         if (!inventoryItem || inventoryItem.amount < amountToEat) {
             return r.edit(
                 embedComment(
-                    `You don't have enough "${itemName}" to eat.\n-# You need \`${amountToEat}x\` ${itemName}.`,
+                    `You don't have enough "${itemName}" to eat.\nYou need \`${amountToEat}x\` ${itemName}.`,
                 ),
             );
         }
 
-        const totalHealAmount = foodItem.healAmount * amountToEat;
-        const newHp = Math.min(stats.hp + totalHealAmount, stats.maxHP);
+        const maxHP = stats.maxHP;
+        const healPercentage = foodItem.healAmount / 100;
+        const healPerItem = Math.ceil(maxHP * healPercentage);
+        const totalHealAmount = healPerItem * amountToEat;
+        const newHp = Math.min(stats.hp + totalHealAmount, maxHP);
+
+        if (stats.hp >= maxHP) {
+            return r.edit(embedComment("Your HP is already at maximum."));
+        }
 
         inventoryItem.amount -= amountToEat;
         if (inventoryItem.amount <= 0) {
@@ -111,7 +118,7 @@ export const eat = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You ate \`${amountToEat}x\` **${itemName}** and restored \`${totalHealAmount} HP\`!\nYour current HP is \`${newHp}/${stats.maxHP}\`.`,
+                `You ate \`${amountToEat}x\` **${itemName}** and restored \`${totalHealAmount} HP\`!\nYour current HP is \`${newHp}/${maxHP}\`.`,
                 "Green",
             ),
         );

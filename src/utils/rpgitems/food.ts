@@ -13,7 +13,7 @@ export const food = {
     },
     Steak: {
         sellAmount: 3,
-        healAmount: 50,
+        healAmount: 25,
     },
     "Fisherman's Toast": {
         sellAmount: 8,
@@ -73,7 +73,7 @@ export const food = {
     },
     "Crab Roe Tofu": {
         sellAmount: 15,
-        healAmount: 200,
+        healAmount: 50,
     },
 };
 
