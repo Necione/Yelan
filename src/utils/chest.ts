@@ -117,7 +117,7 @@ export function generateChestLoot(worldLevel: number) {
         }
     }
 
-    const coins = getRandomValue(4, 8) * selectedRarity.multiplier;
+    const coins = getRandomValue(2, 4) * selectedRarity.multiplier;
 
     return {
         rarity: selectedRarity.rarity,

@@ -5,8 +5,8 @@ export default {
     maxHp: 500,
     minDamage: 75,
     maxDamage: 100,
-    minExp: 5,
-    maxExp: 10,
+    minExp: 10,
+    maxExp: 20,
     minWorldLevel: 11,
     image: "https://lh.elara.workers.dev/rpg/monsters/fatui_pyroslinger.png",
     drops: [

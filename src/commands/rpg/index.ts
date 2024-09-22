@@ -2,7 +2,6 @@ export * from "./abyss";
 export * from "./activate";
 export * from "./alchemy";
 export * from "./bag";
-export * from "./challenge";
 export * from "./craft";
 export * from "./daily";
 export * from "./diffuse";

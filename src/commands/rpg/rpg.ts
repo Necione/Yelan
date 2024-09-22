@@ -47,9 +47,9 @@ export const rpg = buildCommand<SlashCommand>({
         const hpDisplay =
             stats.hp > stats.maxHP
                 ? `💜 \`${stats.hp}/${stats.maxHP}\` **OVERHEALED**`
-                : stats.hp < stats.maxHP * 0.5
-                  ? `💛 \`${stats.hp}/${stats.maxHP}\``
-                  : `🧡 \`${stats.hp}/${stats.maxHP}\``;
+                : stats.hp < stats.maxHP * 0.3
+                  ? `🧡 \`${stats.hp}/${stats.maxHP}\` **LOW HP**`
+                  : `❤️ \`${stats.hp}/${stats.maxHP}\``;
 
         const embed = new EmbedBuilder()
             .setColor("Aqua")

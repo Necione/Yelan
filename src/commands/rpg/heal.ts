@@ -25,16 +25,6 @@ export const heal = buildCommand<SlashCommand>({
             );
         }
 
-        const healCost = Math.floor(Math.random() * (50 - 40 + 1)) + 40;
-
-        if (userProfile.balance < 50) {
-            return r.edit(
-                embedComment(
-                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal. You need at least 50 coins.`,
-                ),
-            );
-        }
-
         const stats = await getUserStats(i.user.id);
 
         if (!stats) {
@@ -47,6 +37,17 @@ export const heal = buildCommand<SlashCommand>({
 
         if (stats.isHunting) {
             return r.edit(embedComment("You cannot heal while hunting!"));
+        }
+
+        const baseHealCost = Math.floor(Math.random() * (50 - 40 + 1)) + 40;
+        const healCost = baseHealCost + stats.worldLevel * 5;
+
+        if (userProfile.balance < healCost) {
+            return r.edit(
+                embedComment(
+                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal. You need at least \`${healCost}\` coins.`,
+                ),
+            );
         }
 
         const maxHP = stats.maxHP;
@@ -67,7 +68,7 @@ export const heal = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `The Statue of The Seven took ${customEmoji.a.z_coins} \`${healCost} ${texts.c.u}\` and healed you for \`${healAmount} HP\`! Your current HP is \`${newHp}/${maxHP}\`\n-# TIP: You can also use </diffuse:1283111946488647813>`,
+                `The Statue of The Seven took ${customEmoji.a.z_coins} \`${healCost} ${texts.c.u}\` and healed you for \`${healAmount} HP\`!\nYour current HP is \`${newHp}/${maxHP}\``,
                 "Green",
             ),
         );

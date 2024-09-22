@@ -36,7 +36,7 @@ export const rebirth = buildCommand<SlashCommand>({
             );
         }
 
-        const rebirthRequirements = [10, 10, 20, 20, 30, 30, 40, 40];
+        const rebirthRequirements = [5, 10, 15, 20, 25, 30, 35, 40];
         const requiredWorldLevel = rebirthRequirements[stats.rebirths] || 50;
 
         if (stats.worldLevel < requiredWorldLevel) {
