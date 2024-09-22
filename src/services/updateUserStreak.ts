@@ -20,16 +20,14 @@ export async function updateUserStreak(userId: string) {
         now,
     );
 
-    newStreak =
-        timeDiffInHours > 24
-            ? lastDateClaim
-                ? newStreak + 1
-                : 1
-            : newStreak + 1;
-    if (newStreak === 1) {
-        newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
-    } else {
+    if (timeDiffInHours > 48) {
+        newStreak = 1;
+        newTotal = 50;
+    } else if (timeDiffInHours > 24) {
+        newStreak += 1;
         newTotal = 50 + (newStreak - 1);
+    } else {
+        return status.error(`💫Come back later to claim your daily check-in reward.`);
     }
 
     const db = await updateDailyCommand(userId, {
