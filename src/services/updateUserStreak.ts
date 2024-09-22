@@ -1,4 +1,4 @@
-import { get, noop, status } from "@elara-services/utils";
+import { noop, status } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { addBalance } from "./userProfile";
@@ -6,7 +6,7 @@ import { addBalance } from "./userProfile";
 export async function updateUserStreak(userId: string) {
     const dailyCommand = await getDailyCommandByUserId(userId);
     if (!dailyCommand) {
-        return status.error("Unable to find/create your daily info.");
+        return status.error(`Unable to find/create your daily info.`);
     }
 
     const now = new Date();
@@ -15,17 +15,15 @@ export async function updateUserStreak(userId: string) {
     let newStreak = dailyCommand.dailyStreak;
     let newTotal = dailyCommand.dailyTotal;
 
-    if (
-        !lastDateClaim ||
-        now.getTime() - lastDateClaim.getTime() > get.days(1)
-    ) {
-        // Reset the streak if the last claim was more than 24 hours ago
-        newStreak = 1;
-        newTotal = 50;
+    const timeDiffInHours = getTimeDiffInHours(lastDateClaim ?? new Date(0), now);
+
+    newStreak = timeDiffInHours > 24 ? (lastDateClaim ? newStreak + 1 : 1) : newStreak + 1;
+    if (newStreak === 1) {
+        newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
     } else {
-        newStreak = newStreak + 1;
         newTotal = 50 + (newStreak - 1);
     }
+
     const db = await updateDailyCommand(userId, {
         dailyStreak: { set: newStreak },
         dailyTotal: { set: newTotal },
@@ -33,7 +31,7 @@ export async function updateUserStreak(userId: string) {
     });
     if (!db) {
         return status.error(
-            "Unknown error while trying to save your daily info.",
+            `Unknown error while trying to save your daily info.`,
         );
     }
 
@@ -41,9 +39,15 @@ export async function updateUserStreak(userId: string) {
         userId,
         50 + (newStreak - 1),
         true,
-        "Daily check-in reward",
+        `Daily check-in reward`,
     );
+
     return status.data(db);
+}
+
+function getTimeDiffInHours(date1: Date, date2: Date) {
+    const diffInMs = Math.abs(date2.getTime() - date1.getTime());
+    return diffInMs / (1000 * 60 * 60);
 }
 
 async function getDailyCommandByUserId(userId: string) {
