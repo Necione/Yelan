@@ -27,7 +27,9 @@ export async function updateUserStreak(userId: string) {
         newStreak += 1;
         newTotal = 50 + (newStreak - 1);
     } else {
-        return status.error(`💫Come back later to claim your daily check-in reward.`);
+        return status.error(
+            `💫Come back later to claim your daily check-in reward.`,
+        );
     }
 
     const db = await updateDailyCommand(userId, {
