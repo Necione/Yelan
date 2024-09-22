@@ -36,12 +36,18 @@ export const misc = {
         dropChance: 18,
     },
     Mushroom: {
-        sellPrice: 1,
+        sellPssrice: 1,
         minAmount: 1,
         maxAmount: 6,
         dropChance: 18,
     },
     Raddish: {
+        sellPrice: 1,
+        minAmount: 1,
+        maxAmount: 3,
+        dropChance: 10,
+    },
+    Mint: {
         sellPrice: 1,
         minAmount: 1,
         maxAmount: 3,

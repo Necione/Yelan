@@ -9,7 +9,7 @@ export const food = {
     },
     "Teyvat Fried Egg": {
         sellAmount: 3,
-        healAmount: 100,
+        healAmount: 25,
     },
     Steak: {
         sellAmount: 3,
@@ -25,7 +25,7 @@ export const food = {
     },
     "Mushroom Pizza": {
         sellAmount: 18,
-        healAmount: 34,
+        healAmount: 50,
     },
     "Fried Radish Balls": {
         sellAmount: 6,
@@ -61,11 +61,11 @@ export const food = {
     },
     "Golden Shrimp Balls": {
         sellAmount: 18,
-        healAmount: 38,
+        healAmount: 75,
     },
     "Jewelry Soup": {
         sellAmount: 10,
-        healAmount: 28,
+        healAmount: 75,
     },
     "Matsutake Meat Rolls": {
         sellAmount: 12,
@@ -73,7 +73,7 @@ export const food = {
     },
     "Crab Roe Tofu": {
         sellAmount: 15,
-        healAmount: 34,
+        healAmount: 100,
     },
 };
 
