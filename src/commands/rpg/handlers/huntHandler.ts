@@ -10,6 +10,7 @@ import { EmbedBuilder } from "discord.js";
 import {
     addBalance,
     addItemToInventory,
+    removeBalance,
     updateUserStats,
 } from "../../../services";
 import { cooldowns } from "../../../utils";
@@ -156,18 +157,35 @@ export async function handleDefeat(
             `Oh no :( You were defeated by the ${monster.name}...\n-# Use </downgrade:1282035993242767450> if this WL is too hard`,
         );
 
+    const amountToDeduct = Math.min(25, userWallet.balance);
+    if (amountToDeduct > 0) {
+        await removeBalance(
+            i.user.id,
+            amountToDeduct,
+            true,
+            `Lost due to defeat`,
+        );
+
+        finalEmbed.addFields({
+            name: "Loss",
+            value: `You lost \`${amountToDeduct}\` coins due to your defeat.`,
+        });
+    }
+
     await updateUserStats(i.user.id, {
         hp: Math.max(currentPlayerHp, 0),
         isHunting: false,
     });
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+
     const hasInsomniaSkill =
         stats.skills.some((skill) => skill.name === "Insomnia") &&
         stats.activeSkills.includes("Insomnia");
 
     const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
     await cooldowns.set(userWallet, "hunt", huntCooldown);
+
     sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
 }
 
@@ -178,11 +196,11 @@ export async function playerAttack(
     currentMonsterHp: number,
     hasVigilance: boolean,
     vigilanceUsed: boolean,
-    displaced: boolean = false,
+    monsterState: { displaced: boolean; vanishedUsed: boolean },
 ): Promise<{
     currentMonsterHp: number;
     vigilanceUsed: boolean;
-    displaced?: boolean;
+    monsterState: { displaced: boolean; vanishedUsed: boolean };
 }> {
     if (stats.equippedWeapon?.toLowerCase().includes("staff of homa")) {
         return handleStaffOfHomaAttack(
@@ -191,6 +209,7 @@ export async function playerAttack(
             monster,
             currentMonsterHp,
             vigilanceUsed,
+            monsterState,
         );
     } else if (stats.equippedWeapon?.toLowerCase().includes("aqua simulacra")) {
         return handleAquaSimulacraAttack(
@@ -199,35 +218,45 @@ export async function playerAttack(
             monster,
             currentMonsterHp,
             vigilanceUsed,
+            monsterState,
         );
     } else {
         let attackPower = stats.attackPower;
 
-        const hasBackstab =
-            stats.skills.some((skill) => skill.name === "Backstab") &&
-            stats.activeSkills.includes("Backstab");
+        const modifiersResult = await applyAttackModifiers(
+            attackPower,
+            stats,
+            monster,
+            thread,
+            monsterState,
+        );
+        attackPower = modifiersResult.attackPower;
+        monsterState = modifiersResult.monsterState;
 
-        const isHumanOrFatui =
-            monster.group === "Human" || monster.group === "Fatui";
-
-        if (hasBackstab && isHumanOrFatui) {
-            attackPower *= 2;
-            await thread
-                .send(
-                    `>>> \`🗡️\` Backstab skill activated! You deal 200% more DMG!`,
-                )
-                .catch(noop);
+        const critChance = stats.critChance || 0;
+        const critValue = stats.critValue || 1;
+        const isCrit = Math.random() * 100 < critChance;
+        if (isCrit) {
+            attackPower *= critValue;
         }
 
-        if (displaced) {
-            attackPower *= 0.5;
-            displaced = false;
-            await thread
-                .send(
-                    `>>> \`〽️\` You are displaced! Your attack power is reduced by 50%.`,
-                )
-                .catch(noop);
+        const defenseResult = await checkMonsterDefenses(
+            attackPower,
+            stats,
+            monster,
+            thread,
+            monsterState,
+        );
+        attackPower = defenseResult.attackPower;
+        const attackMissed = defenseResult.attackMissed;
+        monsterState = defenseResult.monsterState;
+
+        if (attackMissed) {
+            return { currentMonsterHp, vigilanceUsed, monsterState };
         }
+
+        const monsterDefended = attackPower < stats.attackPower;
+        const monsterDefValue = monster.defValue || 0;
 
         if (hasVigilance && !vigilanceUsed) {
             const vigilanceAttackPower = attackPower / 2;
@@ -243,91 +272,38 @@ export async function playerAttack(
                 .catch(noop);
         }
 
-        const critChance = stats.critChance || 0;
-        const critValue = stats.critValue || 1;
+        currentMonsterHp -= attackPower;
 
-        const isCrit = Math.random() * 100 < critChance;
-        if (isCrit) {
-            attackPower *= critValue;
-        }
+        await thread
+            .send(
+                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name}${
+                    isCrit ? " 💢 (Critical Hit!)" : ""
+                }${
+                    monsterDefended ? ` 🛡️ (Defended: -${monsterDefValue})` : ""
+                }.`,
+            )
+            .catch(noop);
 
-        const monsterDefChance = monster.defChance || 0;
-        const monsterDefValue = monster.defValue || 0;
-        const monsterDefended = Math.random() * 100 < monsterDefChance;
+        const hasKindle =
+            stats.skills.some((skill) => skill.name === "Kindle") &&
+            stats.activeSkills.includes("Kindle");
 
-        if (monsterDefended) {
-            attackPower = Math.max(attackPower - monsterDefValue, 0);
-        }
+        if (hasKindle) {
+            const kindleBonusDamage = stats.maxHP * 0.1;
+            currentMonsterHp -= kindleBonusDamage;
 
-        const isLawachurlOrElectro =
-            monster.name.includes("Lawachurl") ||
-            monster.name.includes("Electro");
-        const stunChance = Math.random() < 0.25;
-
-        if (isLawachurlOrElectro && stunChance) {
             await thread
                 .send(
-                    `>>> \`💫\` The ${monster.name} stunned you! You missed your attack.`,
-                )
-                .catch(noop);
-            return { currentMonsterHp, vigilanceUsed, displaced };
-        }
-
-        const isAnemo = monster.name.includes("Anemo");
-        const dodgeChance = Math.random() < 0.25;
-
-        if (isAnemo && dodgeChance) {
-            await thread
-                .send(
-                    `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
-                )
-                .catch(noop);
-        } else {
-            currentMonsterHp -= attackPower;
-            await thread
-                .send(
-                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                    `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
                         2,
-                    )}\` damage to the ${monster.name}${
-                        isCrit ? " 💢 (Critical Hit!)" : ""
-                    }${
-                        monsterDefended
-                            ? ` 🛡️ (Defended: -${monsterDefValue})`
-                            : ""
-                    }.`,
-                )
-                .catch(noop);
-
-            const hasKindle =
-                stats.skills.some((skill) => skill.name === "Kindle") &&
-                stats.activeSkills.includes("Kindle");
-
-            if (hasKindle) {
-                const kindleBonusDamage = stats.maxHP * 0.1;
-                currentMonsterHp -= kindleBonusDamage;
-
-                await thread
-                    .send(
-                        `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
-                            2,
-                        )}\` bonus damage with the Kindle skill!`,
-                    )
-                    .catch(noop);
-            }
-        }
-
-        const isFatui = monster.name.includes("Fatui");
-        const displacementChance = Math.random() < 0.25;
-        if (isFatui && displacementChance) {
-            displaced = true;
-            await thread
-                .send(
-                    `>>> \`〽️\` The ${monster.name} displaced you! You will deal 50% less damage next turn.`,
+                    )}\` bonus damage with the Kindle skill!`,
                 )
                 .catch(noop);
         }
 
-        return { currentMonsterHp, vigilanceUsed, displaced };
+        return { currentMonsterHp, vigilanceUsed, monsterState };
     }
 }
 
@@ -473,6 +449,8 @@ export async function handleHunt(
         );
         const initialMonsterHp = currentMonsterHp;
 
+        const initialPlayerHp = currentPlayerHp;
+
         const createHealthBar = (
             current: number,
             max: number,
@@ -494,7 +472,7 @@ export async function handleHunt(
             .addFields(
                 {
                     name: "Your HP",
-                    value: createHealthBar(currentPlayerHp, stats.hp),
+                    value: createHealthBar(currentPlayerHp, initialPlayerHp),
                     inline: true,
                 },
                 {
@@ -543,6 +521,11 @@ export async function handleHunt(
 
         let isMonsterFirst = hasDistraction ? false : Math.random() < 0.5;
 
+        let monsterState = {
+            displaced: false,
+            vanishedUsed: false,
+        };
+
         const battleInterval = setInterval(async () => {
             if (currentPlayerHp <= 0 || currentMonsterHp <= 0) {
                 clearInterval(battleInterval);
@@ -583,57 +566,61 @@ export async function handleHunt(
                 currentPlayerHp = await monsterAttack(
                     thread!,
                     stats,
-                    monstersEncountered[currentMonsterIndex],
+                    monster,
                     currentPlayerHp,
                 );
+
+                stats.hp = currentPlayerHp;
 
                 isMonsterFirst = false;
             } else {
                 const result = await playerAttack(
                     thread!,
                     stats,
-                    monstersEncountered[currentMonsterIndex],
+                    monster,
                     currentMonsterHp,
                     hasVigilance,
                     vigilanceUsed,
+                    monsterState,
                 );
 
                 currentMonsterHp = result.currentMonsterHp;
                 vigilanceUsed = result.vigilanceUsed;
+                monsterState = result.monsterState;
 
                 if (currentMonsterHp > 0) {
                     currentPlayerHp = await monsterAttack(
                         thread!,
                         stats,
-                        monstersEncountered[currentMonsterIndex],
+                        monster,
                         currentPlayerHp,
                     );
                 }
+
+                stats.hp = currentPlayerHp;
             }
 
-            const playerHpBar = createHealthBar(currentPlayerHp, stats.hp);
+            const playerHpBar = createHealthBar(
+                currentPlayerHp,
+                initialPlayerHp,
+            );
             const monsterHpBar = createHealthBar(
                 currentMonsterHp,
                 initialMonsterHp,
             );
 
-            if (
-                typeof playerHpBar === "string" &&
-                typeof monsterHpBar === "string"
-            ) {
-                battleEmbed.setFields([
-                    {
-                        name: "Your HP",
-                        value: playerHpBar,
-                        inline: true,
-                    },
-                    {
-                        name: "Monster HP",
-                        value: monsterHpBar,
-                        inline: true,
-                    },
-                ]);
-            }
+            battleEmbed.setFields([
+                {
+                    name: "Your HP",
+                    value: playerHpBar,
+                    inline: true,
+                },
+                {
+                    name: "Monster HP",
+                    value: monsterHpBar,
+                    inline: true,
+                },
+            ]);
 
             await i.editReply({ embeds: [battleEmbed] }).catch(noop);
         }, get.secs(4));
@@ -648,7 +635,12 @@ async function handleAquaSimulacraAttack(
     monster: Monster,
     currentMonsterHp: number,
     vigilanceUsed: boolean,
-): Promise<{ currentMonsterHp: number; vigilanceUsed: boolean }> {
+    monsterState: { displaced: boolean; vanishedUsed: boolean },
+): Promise<{
+    currentMonsterHp: number;
+    vigilanceUsed: boolean;
+    monsterState: { displaced: boolean; vanishedUsed: boolean };
+}> {
     const emojis = ["💎", "🍒", "🪙", "🍀", "🍉"];
 
     const roll = [
@@ -678,13 +670,52 @@ async function handleAquaSimulacraAttack(
         attackPower *= 2 ** emojiCount["🍀"];
     }
 
+    const modifiersResult = await applyAttackModifiers(
+        attackPower,
+        stats,
+        monster,
+        thread,
+        monsterState,
+    );
+    attackPower = modifiersResult.attackPower;
+    monsterState = modifiersResult.monsterState;
+
+    const critChance = stats.critChance || 0;
+    const critValue = stats.critValue || 1;
+    const isCrit = Math.random() * 100 < critChance;
+    if (isCrit) {
+        attackPower *= critValue;
+    }
+
+    const defenseResult = await checkMonsterDefenses(
+        attackPower,
+        stats,
+        monster,
+        thread,
+        monsterState,
+    );
+    attackPower = defenseResult.attackPower;
+    const attackMissed = defenseResult.attackMissed;
+    monsterState = defenseResult.monsterState;
+
+    if (attackMissed) {
+        return { currentMonsterHp, vigilanceUsed, monsterState };
+    }
+
+    const monsterDefended = attackPower < stats.attackPower;
+    const monsterDefValue = monster.defValue || 0;
+
     if (Object.values(emojiCount).includes(3)) {
         attackPower *= 100;
         await thread
             .send(
                 `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
                     2,
-                )}\` damage to the ${monster.name}`,
+                )}\` damage to the ${monster.name} 💯 (Jackpot!)${
+                    isCrit ? " 💢 (Critical Hit!)" : ""
+                }${
+                    monsterDefended ? ` 🛡️ (Defended: -${monsterDefValue})` : ""
+                }.`,
             )
             .catch(noop);
     } else if (Object.values(emojiCount).includes(2)) {
@@ -693,7 +724,11 @@ async function handleAquaSimulacraAttack(
             .send(
                 `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
                     2,
-                )}\` damage to the ${monster.name}`,
+                )}\` damage to the ${monster.name} 💢 (Lucky Hit!)${
+                    isCrit ? " 💢 (Critical Hit!)" : ""
+                }${
+                    monsterDefended ? ` 🛡️ (Defended: -${monsterDefValue})` : ""
+                }.`,
             )
             .catch(noop);
     } else {
@@ -701,7 +736,11 @@ async function handleAquaSimulacraAttack(
             .send(
                 `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
                     2,
-                )}\` damage to the ${monster.name}.`,
+                )}\` damage to the ${monster.name}${
+                    isCrit ? " 💢 (Critical Hit!)" : ""
+                }${
+                    monsterDefended ? ` 🛡️ (Defended: -${monsterDefValue})` : ""
+                }.`,
             )
             .catch(noop);
     }
@@ -714,6 +753,24 @@ async function handleAquaSimulacraAttack(
                 `>>> \`💎\` You dealt an additional \`${bonusDamage.toFixed(
                     2,
                 )}\` bonus damage from diamonds!`,
+            )
+            .catch(noop);
+    }
+
+    const hasVigilance =
+        stats.skills.some((skill) => skill.name === "Vigilance") &&
+        stats.activeSkills.includes("Vigilance");
+
+    if (hasVigilance && !vigilanceUsed) {
+        const vigilanceAttackPower = attackPower / 2;
+        currentMonsterHp -= vigilanceAttackPower;
+        vigilanceUsed = true;
+
+        await thread
+            .send(
+                `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name} ✨ (Vigilance).`,
             )
             .catch(noop);
     }
@@ -735,7 +792,7 @@ async function handleAquaSimulacraAttack(
             .catch(noop);
     }
 
-    return { currentMonsterHp, vigilanceUsed };
+    return { currentMonsterHp, vigilanceUsed, monsterState };
 }
 
 async function handleStaffOfHomaAttack(
@@ -744,7 +801,12 @@ async function handleStaffOfHomaAttack(
     monster: Monster,
     currentMonsterHp: number,
     vigilanceUsed: boolean,
-): Promise<{ currentMonsterHp: number; vigilanceUsed: boolean }> {
+    monsterState: { displaced: boolean; vanishedUsed: boolean },
+): Promise<{
+    currentMonsterHp: number;
+    vigilanceUsed: boolean;
+    monsterState: { displaced: boolean; vanishedUsed: boolean };
+}> {
     const getHeartIcon = (currentHp: number, maxHp: number): string => {
         const currentHpPercentage = currentHp / maxHp;
         if (currentHpPercentage > 1) {
@@ -773,6 +835,16 @@ async function handleStaffOfHomaAttack(
 
     let attackPower = stats.attackPower * damageMultiplier;
 
+    const modifiersResult = await applyAttackModifiers(
+        attackPower,
+        stats,
+        monster,
+        thread,
+        monsterState,
+    );
+    attackPower = modifiersResult.attackPower;
+    monsterState = modifiersResult.monsterState;
+
     const critChance = stats.critChance || 0;
     const critValue = stats.critValue || 1;
     const isCrit = Math.random() * 100 < critChance;
@@ -780,11 +852,40 @@ async function handleStaffOfHomaAttack(
         attackPower *= critValue;
     }
 
-    const monsterDefChance = monster.defChance || 0;
+    const defenseResult = await checkMonsterDefenses(
+        attackPower,
+        stats,
+        monster,
+        thread,
+        monsterState,
+    );
+    attackPower = defenseResult.attackPower;
+    const attackMissed = defenseResult.attackMissed;
+    monsterState = defenseResult.monsterState;
+
+    if (attackMissed) {
+        return { currentMonsterHp, vigilanceUsed, monsterState };
+    }
+
+    const monsterDefended = attackPower < stats.attackPower * damageMultiplier;
     const monsterDefValue = monster.defValue || 0;
-    const monsterDefended = Math.random() * 100 < monsterDefChance;
-    if (monsterDefended) {
-        attackPower = Math.max(attackPower - monsterDefValue, 0);
+
+    const hasVigilance =
+        stats.skills.some((skill) => skill.name === "Vigilance") &&
+        stats.activeSkills.includes("Vigilance");
+
+    if (hasVigilance && !vigilanceUsed) {
+        const vigilanceAttackPower = attackPower / 2;
+        currentMonsterHp -= vigilanceAttackPower;
+        vigilanceUsed = true;
+
+        await thread
+            .send(
+                `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                    2,
+                )}\` damage to the ${monster.name} ✨ (Vigilance).`,
+            )
+            .catch(noop);
     }
 
     currentMonsterHp -= attackPower;
@@ -816,5 +917,113 @@ async function handleStaffOfHomaAttack(
             .catch(noop);
     }
 
-    return { currentMonsterHp, vigilanceUsed };
+    return { currentMonsterHp, vigilanceUsed, monsterState };
+}
+
+async function applyAttackModifiers(
+    attackPower: number,
+    stats: UserStats,
+    monster: Monster,
+    thread: ThreadChannel,
+    monsterState: { displaced: boolean; vanishedUsed: boolean },
+): Promise<{
+    attackPower: number;
+    monsterState: { displaced: boolean; vanishedUsed: boolean };
+}> {
+    const hasBackstab =
+        stats.skills.some((skill) => skill.name === "Backstab") &&
+        stats.activeSkills.includes("Backstab");
+
+    const isHumanOrFatui =
+        monster.group === "Human" || monster.group === "Fatui";
+
+    if (hasBackstab && isHumanOrFatui) {
+        attackPower *= 2;
+        await thread
+            .send(
+                `>>> \`🗡️\` Backstab skill activated! You deal 200% more DMG!`,
+            )
+            .catch(noop);
+    }
+
+    if (monsterState.displaced) {
+        attackPower *= 0.5;
+        monsterState.displaced = false;
+        await thread
+            .send(
+                `>>> \`〽️\` You are displaced! Your attack power is reduced by 50%.`,
+            )
+            .catch(noop);
+    }
+
+    return { attackPower, monsterState };
+}
+
+async function checkMonsterDefenses(
+    attackPower: number,
+    stats: UserStats,
+    monster: Monster,
+    thread: ThreadChannel,
+    monsterState: { displaced: boolean; vanishedUsed: boolean },
+): Promise<{
+    attackPower: number;
+    attackMissed: boolean;
+    monsterState: { displaced: boolean; vanishedUsed: boolean };
+}> {
+    let attackMissed = false;
+
+    if (monster.name.includes("Agent") && !monsterState.vanishedUsed) {
+        attackMissed = true;
+        monsterState.vanishedUsed = true;
+        await thread
+            .send(
+                `>>> \`👤\` The ${monster.name} has vanished, dodging your attack!`,
+            )
+            .catch(noop);
+    }
+
+    const isLawachurlOrElectro =
+        monster.name.includes("Lawachurl") || monster.name.includes("Electro");
+    const stunChance = Math.random() < 0.25;
+
+    if (isLawachurlOrElectro && stunChance) {
+        await thread
+            .send(
+                `>>> \`💫\` The ${monster.name} stunned you! You missed your attack.`,
+            )
+            .catch(noop);
+        attackMissed = true;
+    }
+
+    const isAnemo = monster.name.includes("Anemo");
+    const dodgeChance = Math.random() < 0.25;
+
+    if (isAnemo && dodgeChance) {
+        await thread
+            .send(
+                `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
+            )
+            .catch(noop);
+        attackMissed = true;
+    }
+
+    const isFatui = monster.name.includes("Fatui");
+    const displacementChance = Math.random() < 0.25;
+    if (isFatui && displacementChance) {
+        monsterState.displaced = true;
+        await thread
+            .send(
+                `>>> \`〽️\` The ${monster.name} displaced you! You will deal 50% less damage next turn.`,
+            )
+            .catch(noop);
+    }
+
+    const monsterDefChance = monster.defChance || 0;
+    const monsterDefValue = monster.defValue || 0;
+    const monsterDefended = Math.random() * 100 < monsterDefChance;
+    if (monsterDefended) {
+        attackPower = Math.max(attackPower - monsterDefValue, 0);
+    }
+
+    return { attackPower, attackMissed, monsterState };
 }
