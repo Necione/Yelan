@@ -42,10 +42,13 @@ export const heal = buildCommand<SlashCommand>({
         const baseHealCost = Math.floor(Math.random() * (50 - 40 + 1)) + 40;
         const healCost = baseHealCost + stats.worldLevel * 5;
 
+        const maxBaseHealCost = 50;
+        const maxHealCost = maxBaseHealCost + stats.worldLevel * 5;
+
         if (userProfile.balance < healCost) {
             return r.edit(
                 embedComment(
-                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal. You need at least \`${healCost}\` coins.`,
+                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal. You need at least \`${maxHealCost}\` coins.`,
                 ),
             );
         }
