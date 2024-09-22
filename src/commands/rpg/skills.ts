@@ -114,11 +114,14 @@ export const skills = buildCommand<SlashCommand>({
 
         const embed = new EmbedBuilder()
             .setColor("Aqua")
+            .setDescription(
+                `Use the </learn:1282044626408308736> command to get new skills`,
+            )
             .setTitle(`${i.user.username}'s Skills`)
             .addFields(
-                { name: "Active Skills", value: activeList },
-                { name: "Learned Skills", value: skillsList },
-                { name: "Available Skills", value: availableSkillsList },
+                { name: "Active Skills", value: activeList, inline: true },
+                { name: "Learned Skills", value: skillsList, inline: true },
+                { name: "Learnable Skills", value: availableSkillsList },
             );
 
         await r.edit({ embeds: [embed] });

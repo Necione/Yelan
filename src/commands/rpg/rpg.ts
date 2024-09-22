@@ -60,9 +60,13 @@ export const rpg = buildCommand<SlashCommand>({
             .setThumbnail(i.user.displayAvatarURL())
             .addFields({
                 name: "Your Stats",
-                value: `🌍 World Level: \`${stats.worldLevel}\` | ⭐ EXP: \`${
+                value: `🌍 World Level: \`${
+                    stats.worldLevel
+                }\` | <:Item_Adventure_EXP:1287247325135114356> EXP: \`${
                     stats.exp
-                }/${expRequired.toFixed(0)}\`\n🔻 Abyss Floor: \`${
+                }/${expRequired.toFixed(
+                    0,
+                )}\`\n<:Achievement_Domains_and_Spiral_A:1287247461399662622> Abyss Floor: \`${
                     stats.abyssFloor
                 }\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
                     2,
