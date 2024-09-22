@@ -209,6 +209,7 @@ model UserStats {
   isTravelling     Boolean        @default(false)
   isHunting        Boolean        @default(false)
   alchemyProgress  Int            @default(0)
+  faith            Int            @default(0)
 }
 
 type UserStatsInv {

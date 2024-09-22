@@ -9,8 +9,6 @@ export default {
     maxExp: 0,
     minWorldLevel: 2,
     image: "https://lh.elara.workers.dev/rpg/animals/forest_boar.png",
-    drops: [
-        { item: "Raw Meat", minAmount: 1, maxAmount: 3, chance: 100 },
-    ],
+    drops: [{ item: "Raw Meat", minAmount: 1, maxAmount: 3, chance: 100 }],
     locations: ["Liyue Harbor"],
 };

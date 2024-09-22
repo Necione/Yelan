@@ -3,7 +3,7 @@ import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, getUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
-import { handleChest } from "./handlers/exploreHandler";
+import { handleChest, handleMaterials } from "./handlers/exploreHandler";
 
 export const explore = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -11,7 +11,17 @@ export const explore = buildCommand<SlashCommand>({
         .setDescription(
             "[RPG] Go on an exploration to find traders or treasure.",
         )
-        .setDMPermission(false),
+        .setDMPermission(false)
+        .addStringOption((option) =>
+            option
+                .setName("type")
+                .setDescription("Type of exploration")
+                .setRequired(true)
+                .addChoices(
+                    { name: "Chest", value: "chest" },
+                    { name: "Materials", value: "materials" },
+                ),
+        ),
     only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
     async execute(i, r) {
@@ -74,7 +84,15 @@ export const explore = buildCommand<SlashCommand>({
             );
         }
 
-        await handleChest(i, stats, userWallet);
+        const exploreType = i.options.getString("type", true);
+
+        if (exploreType === "chest") {
+            await handleChest(i, stats, userWallet);
+        } else if (exploreType === "materials") {
+            await handleMaterials(i, stats, userWallet);
+        } else {
+            await i.editReply(embedComment("Invalid exploration type."));
+        }
 
         locked.del(i.user.id);
     },

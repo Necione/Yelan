@@ -108,6 +108,7 @@ const lowEncounterAverages = [
     { worldLevel: 12, minHp: 400, maxHp: 500, minDamage: 65, maxDamage: 70 },
     { worldLevel: 13, minHp: 500, maxHp: 600, minDamage: 70, maxDamage: 80 },
     { worldLevel: 14, minHp: 600, maxHp: 700, minDamage: 75, maxDamage: 85 },
+    { worldLevel: 15, minHp: 700, maxHp: 800, minDamage: 80, maxDamage: 95 },
 ];
 
 export async function getRandomMonster(

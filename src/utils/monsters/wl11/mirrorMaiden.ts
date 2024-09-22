@@ -1,6 +1,6 @@
 export default {
     name: "Mirror Maiden",
-    group: "Abyss",
+    group: "Fatui",
     minHp: 200,
     maxHp: 400,
     minDamage: 60,

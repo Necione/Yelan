@@ -118,7 +118,7 @@ export const eat = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You ate \`${amountToEat}x\` **${itemName}** and restored \`${totalHealAmount} HP\`!\nYour current HP is \`${newHp}/${maxHP}\`.`,
+                `You ate \`${amountToEat}x\` **${itemName}** and restored \`❤️\` \`${totalHealAmount} HP\`!\nYour current HP is \`${newHp}/${maxHP}\`.`,
                 "Green",
             ),
         );

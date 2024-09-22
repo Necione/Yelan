@@ -49,14 +49,12 @@ const availableSkills = [
     },
     {
         name: "Distraction",
-        description:
-            "Always go first when hunting",
+        description: "Always go first when hunting",
         emoji: "💫",
     },
     {
         name: "Backstab",
-        description:
-            "Deal 200% more DMG to humans",
+        description: "Deal 200% more DMG to humans",
         emoji: "🔪",
     },
 ];
