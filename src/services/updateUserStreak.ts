@@ -15,9 +15,17 @@ export async function updateUserStreak(userId: string) {
     let newStreak = dailyCommand.dailyStreak;
     let newTotal = dailyCommand.dailyTotal;
 
-    const timeDiffInHours = getTimeDiffInHours(lastDateClaim ?? new Date(0), now);
+    const timeDiffInHours = getTimeDiffInHours(
+        lastDateClaim ?? new Date(0),
+        now,
+    );
 
-    newStreak = timeDiffInHours > 24 ? (lastDateClaim ? newStreak + 1 : 1) : newStreak + 1;
+    newStreak =
+        timeDiffInHours > 24
+            ? lastDateClaim
+                ? newStreak + 1
+                : 1
+            : newStreak + 1;
     if (newStreak === 1) {
         newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
     } else {
