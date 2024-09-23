@@ -53,13 +53,22 @@ export const heal = buildCommand<SlashCommand>({
         }
 
         let faith = stats.faith ?? 0;
-        if (faith < 100) {
-            faith += 1;
+
+        if (faith >= 50) {
+            return r.edit({
+                embeds: [
+                    new EmbedBuilder()
+                        .setDescription("Thank you for supporting the Archons.")
+                        .setColor("Green"),
+                ],
+            });
         }
+
+        faith = Math.min(faith + 1, 50);
 
         const maxHP = stats.maxHP;
 
-        const healPercentage = 0.4 + (faith / 100) * 0.6;
+        const healPercentage = 0.4 + (faith / 50) * 0.6;
 
         const healAmount = Math.floor(maxHP * healPercentage);
 
@@ -108,7 +117,7 @@ export const heal = buildCommand<SlashCommand>({
             return `[${"█".repeat(filledBars)}${"░".repeat(emptyBars)}]`;
         };
 
-        const faithProgressBar = createProgressBar(faith, 100, 20);
+        const faithProgressBar = createProgressBar(faith, 50, 20);
 
         await Promise.all([
             updateUserStats(i.user.id, { hp: newHp, faith }),
@@ -120,7 +129,7 @@ export const heal = buildCommand<SlashCommand>({
             ),
         ]);
 
-        const faithBuffPercentage = Math.round((faith / 100) * 60);
+        const faithBuffPercentage = Math.round((faith / 50) * 60);
         const faithDiscountAmount =
             baseHealCost + stats.worldLevel * 5 - healCost;
 
@@ -129,9 +138,9 @@ export const heal = buildCommand<SlashCommand>({
             .setDescription(
                 `The world blesses those with noble hearts.\n\n` +
                     `You healed \`❤️\` \`+${actualHealAmount} HP\` for ${customEmoji.a.z_coins} \`${healCost} ${texts.c.s}\`, ` +
-                    `(\`${faithDiscountAmount}\` discount, \`${faithBuffPercentage}%\` buff thanks to your faith.\n` +
+                    `(\`${faithDiscountAmount}\` discount, \`${faithBuffPercentage}%\` buff thanks to your faith).\n` +
                     `Your HP is now \`❤️\` \`${newHp}/${maxHP}\`.\n\n` +
-                    `**Faith Progress**: \`${faith}/100\`\n${faithProgressBar}`,
+                    `**Faith Progress**: \`${faith}/50\`\n${faithProgressBar}`,
             )
             .setColor("Green")
             .setThumbnail("https://lh.elara.workers.dev/rpg/seven.png");
