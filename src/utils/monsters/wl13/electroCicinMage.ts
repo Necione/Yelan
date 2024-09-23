@@ -1,0 +1,42 @@
+export default {
+    name: "Electro Cicin Mage",
+    group: "Fatui",
+    minHp: 400,
+    maxHp: 500,
+    minDamage: 60,
+    maxDamage: 100,
+    minExp: 10,
+    maxExp: 25,
+    minWorldLevel: 13,
+    image: "https://lh.elara.workers.dev/rpg/monsters/electro_cicin_mage.png",
+    drops: [
+        {
+            item: "Mist Grass Pollen",
+            minAmount: 1,
+            maxAmount: 2,
+            chance: 75,
+        },
+        {
+            item: "Mist Grass",
+            minAmount: 1,
+            maxAmount: 2,
+            chance: 25,
+        },
+    ],
+    locations: [
+        "Qingxu Pool",
+        "Lingju Pass",
+        "Lumberpick Valley",
+        "Dunyu Ruins",
+        "Nantianmen",
+        "Tianqiu Valley",
+        "Luhua Pool",
+        "Guili Plains",
+        "Jueyun Karst",
+    ],
+
+    critChance: 50,
+    critValue: 2,
+    defChance: 90,
+    defValue: 100,
+};

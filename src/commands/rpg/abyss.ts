@@ -1,13 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import {
-    getProfileByUserId,
-    getUserStats,
-    updateUserStats,
-} from "../../services";
+import { getProfileByUserId, getUserStats } from "../../services";
 import { locked } from "../../utils";
-import { handleAbyssHunt } from "./handlers/abyssHandler";
 
 export const abyss = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -70,8 +65,14 @@ export const abyss = buildCommand<SlashCommand>({
             );
         }
 
-        await updateUserStats(i.user.id, { isHunting: true });
-        await handleAbyssHunt(i, message, stats);
+        return r.edit(
+            embedComment(
+                "The Spiral Abyss is currently resetting and will be avaliable soon",
+            ),
+        );
+
+        //await updateUserStats(i.user.id, { isHunting: true });
+        //await handleAbyssHunt(i, message, stats);
 
         locked.del(i.user.id);
     },

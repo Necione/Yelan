@@ -824,7 +824,20 @@ async function handleStaffOfHomaAttack(
         }
     };
 
-    const currentHpPercentage = stats.hp / stats.maxHP;
+    stats.hp -= 5;
+    if (stats.hp < 0) {
+        stats.hp = 0;
+    }
+
+    await thread
+        .send(`>>> \`💔\` You sacrificed 5 HP to use the Staff of Homa.`)
+        .catch(noop);
+
+    let currentHpPercentage = stats.hp / stats.maxHP;
+    if (currentHpPercentage <= 0) {
+        currentHpPercentage = 0.05;
+    }
+
     const heartIcon = getHeartIcon(stats.hp, stats.maxHP);
 
     let damageMultiplier = Math.pow(1 / currentHpPercentage, 2);
@@ -947,11 +960,11 @@ async function applyAttackModifiers(
     }
 
     if (monsterState.displaced) {
-        attackPower *= 0.5;
+        attackPower *= 0.2;
         monsterState.displaced = false;
         await thread
             .send(
-                `>>> \`〽️\` You are displaced! Your attack power is reduced by 50%.`,
+                `>>> \`〽️\` You are displaced! Your attack power is reduced by 80%.`,
             )
             .catch(noop);
     }
@@ -1007,13 +1020,13 @@ async function checkMonsterDefenses(
         attackMissed = true;
     }
 
-    const isFatui = monster.name.includes("Fatui");
+    const isFatui = monster.group && monster.group.includes("Fatui");
     const displacementChance = Math.random() < 0.25;
     if (isFatui && displacementChance) {
         monsterState.displaced = true;
         await thread
             .send(
-                `>>> \`〽️\` The ${monster.name} displaced you! You will deal 50% less damage next turn.`,
+                `>>> \`〽️\` The ${monster.name} displaced you! You will deal 80% less damage next turn.`,
             )
             .catch(noop);
     }
