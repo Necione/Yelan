@@ -2,10 +2,15 @@ import { buildCommand, getStr, getUser } from "@elara-services/botbuilder";
 import { embedComment, get, getConfirmPrompt } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { roles } from "../../../../config";
-import { getProfileByUserId, updateUserProfile } from "../../../../services";
+import {
+    getProfileByUserId,
+    updateUserProfile,
+    updateUserStats,
+} from "../../../../services";
 import { cooldowns } from "../../../../utils";
 
 const choices = [
+    "hunting",
     "elo",
     "daily",
     "backgroundUrl",
@@ -90,6 +95,11 @@ export const reset = buildCommand({
         if (type === "rakeback") {
             data = { rakeback: { amount: 0, claimed: 0 } };
             str = "rakeback amount and claim timer is now 0";
+        }
+        if (type === "hunting") {
+            await cooldowns.del(p, "hunt");
+            await updateUserStats(p.userId, { isHunting: { set: false } });
+            str = `hunting cooldown & isHunting`;
         }
         if (type === "daily") {
             await cooldowns.set(p, "daily", 0);

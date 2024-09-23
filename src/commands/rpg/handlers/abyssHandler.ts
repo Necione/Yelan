@@ -369,9 +369,11 @@ export async function handleAbyssHunt(
                 return;
             }
         } else {
-            await thread.send(
-                `Another monster has appeared! You are now facing ${abyssMonster.name}.`,
-            );
+            await thread
+                .send(
+                    `Another monster has appeared! You are now facing ${abyssMonster.name}.`,
+                )
+                .catch(noop);
         }
 
         const hasVigilance =

@@ -504,9 +504,11 @@ export async function handleHunt(
                 return;
             }
         } else {
-            await thread.send(
-                `Another monster has appeared! You are now facing ${monster.name}.`,
-            );
+            await thread
+                .send(
+                    `Another monster has appeared! You are now facing ${monster.name}.`,
+                )
+                .catch(noop);
         }
 
         const hasVigilance =

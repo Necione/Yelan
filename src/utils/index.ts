@@ -314,6 +314,14 @@ export const cooldowns = {
             ...extra,
         });
     },
+
+    del: async (p: UserWallet, command: string) => {
+        return await updateUserProfile(p.userId, {
+            cooldowns: {
+                set: p.cooldowns.filter((c) => c.command !== command),
+            },
+        });
+    },
 };
 
 export function getPaginatedMessage(
