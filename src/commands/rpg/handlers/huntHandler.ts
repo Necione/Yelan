@@ -588,6 +588,8 @@ export async function handleHunt(
                 vigilanceUsed = result.vigilanceUsed;
                 monsterState = result.monsterState;
 
+                currentPlayerHp = stats.hp;
+
                 if (currentMonsterHp > 0) {
                     currentPlayerHp = await monsterAttack(
                         thread!,
@@ -829,8 +831,10 @@ async function handleStaffOfHomaAttack(
         stats.hp = 0;
     }
 
+    await updateUserStats(stats.userId, { hp: stats.hp });
+
     await thread
-        .send(`>>> \`💔\` You sacrificed 5 HP to use the Staff of Homa.`)
+        .send(`>>> \`💔\` You sacrificed \`5 HP\` to use the Staff of Homa.`)
         .catch(noop);
 
     let currentHpPercentage = stats.hp / stats.maxHP;
@@ -947,8 +951,7 @@ async function applyAttackModifiers(
         stats.skills.some((skill) => skill.name === "Backstab") &&
         stats.activeSkills.includes("Backstab");
 
-    const isHumanOrFatui =
-        monster.group === "Human" || monster.group === "Fatui";
+    const isHumanOrFatui = ["Human", "Fatui"].includes(monster.group);
 
     if (hasBackstab && isHumanOrFatui) {
         attackPower *= 2;
@@ -1020,7 +1023,7 @@ async function checkMonsterDefenses(
         attackMissed = true;
     }
 
-    const isFatui = monster.group && monster.group.includes("Fatui");
+    const isFatui = ["Fatui"].includes(monster.group);
     const displacementChance = Math.random() < 0.25;
     if (isFatui && displacementChance) {
         monsterState.displaced = true;

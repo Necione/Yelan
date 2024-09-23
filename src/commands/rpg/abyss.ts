@@ -65,15 +65,15 @@ export const abyss = buildCommand<SlashCommand>({
             );
         }
 
-        return r.edit(
+        r.edit(
             embedComment(
                 "The Spiral Abyss is currently resetting and will be avaliable soon",
             ),
         );
 
+        locked.del(i.user.id);
+
         //await updateUserStats(i.user.id, { isHunting: true });
         //await handleAbyssHunt(i, message, stats);
-
-        locked.del(i.user.id);
     },
 });

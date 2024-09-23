@@ -41,7 +41,7 @@ export const eat = buildCommand<SlashCommand>({
             .filter((c) => c.name.toLowerCase().includes(focusedValue))
             .slice(0, 25);
 
-        if (!is.array(filteredItems) || filteredItems.length === 0) {
+        if (!is.array(filteredItems)) {
             return i
                 .respond([{ name: "No matching food items", value: "n/a" }])
                 .catch(noop);
