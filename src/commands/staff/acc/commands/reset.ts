@@ -121,7 +121,7 @@ export const reset = buildCommand({
             await updateUserStats(p.userId, { isHunting: { set: false } });
         }
         if (type === "daily") {
-            await cooldowns.set(p, "daily", 0);
+            await cooldowns.del(p, "daily");
         }
         if (getKeys(data).length) {
             await updateUserProfile(user.id, data);
