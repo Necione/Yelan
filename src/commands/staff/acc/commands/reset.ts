@@ -1,5 +1,10 @@
 import { buildCommand, getStr, getUser } from "@elara-services/botbuilder";
-import { embedComment, get, getConfirmPrompt } from "@elara-services/utils";
+import {
+    embedComment,
+    get,
+    getConfirmPrompt,
+    getKeys,
+} from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { roles } from "../../../../config";
 import {
@@ -97,12 +102,9 @@ export const reset = buildCommand({
             str = "rakeback amount and claim timer is now 0";
         }
         if (type === "hunting") {
-            await cooldowns.del(p, "hunt");
-            await updateUserStats(p.userId, { isHunting: { set: false } });
             str = `hunting cooldown & isHunting`;
         }
         if (type === "daily") {
-            await cooldowns.set(p, "daily", 0);
             str = "daily cooldown";
         } //for testing the daily check-in
         const col = await getConfirmPrompt(
@@ -114,7 +116,16 @@ export const reset = buildCommand({
         if (!col) {
             return;
         }
-        await updateUserProfile(user.id, data);
+        if (type === "hunting") {
+            await cooldowns.del(p, "hunt");
+            await updateUserStats(p.userId, { isHunting: { set: false } });
+        }
+        if (type === "daily") {
+            await cooldowns.set(p, "daily", 0);
+        }
+        if (getKeys(data).length) {
+            await updateUserProfile(user.id, data);
+        }
         return r.edit(
             embedComment(
                 `I've reset ${user.toString()}'s (${type}) ${str}`,
