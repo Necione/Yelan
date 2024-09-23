@@ -844,7 +844,11 @@ async function handleStaffOfHomaAttack(
 
     const heartIcon = getHeartIcon(stats.hp, stats.maxHP);
 
-    let damageMultiplier = Math.pow(1 / currentHpPercentage, 2);
+    let damageMultiplier = Math.pow(1 / currentHpPercentage, 1.661);
+
+    if (damageMultiplier > 10) {
+        damageMultiplier = 10;
+    }
 
     if (currentHpPercentage > 1) {
         damageMultiplier = 0.5;
