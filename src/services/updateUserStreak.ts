@@ -1,30 +1,34 @@
-import { noop, status } from "@elara-services/utils";
+import { get, noop, status } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { addBalance } from "./userProfile";
 
 export async function updateUserStreak(userId: string) {
-    const dailyCommand = await getDailyCommandByUserId(userId);
-    if (!dailyCommand) {
+    const p = await getDailyCommandByUserId(userId);
+    if (!p) {
         return status.error(`Unable to find/create your daily info.`);
     }
 
     const now = new Date();
-    const lastDateClaim = dailyCommand.lastDateClaim;
 
-    let newStreak = dailyCommand.dailyStreak;
-    let newTotal = dailyCommand.dailyTotal;
+    let newStreak = p.dailyStreak;
+    let newTotal = p.dailyTotal;
 
-    if (lastDateClaim && isSameDay(lastDateClaim, now)) {
-        // If the user has already claimed their daily reward for the current day, don't increment the streak and total
-        return status.error(`Come back tomorrow to claim your daily.`);
-    }
-    newStreak =
-        lastDateClaim && isYesterday(lastDateClaim, now) ? newStreak + 1 : 1;
-    if (newStreak === 1) {
-        newTotal = 50; // Reset dailyTotal to 50 when the streak is broken
-    } else {
+    const timeDiffInHours = getTimeDiffInHours(
+        p.lastDateClaim ?? new Date(),
+        now,
+    );
+
+    if (timeDiffInHours > 48) {
+        newStreak = 1;
+        newTotal = 50;
+    } else if (timeDiffInHours > 24) {
+        newStreak += 1;
         newTotal = 50 + (newStreak - 1);
+    } else {
+        return status.error(
+            `💫Come back later to claim your daily check-in reward.`,
+        );
     }
 
     const db = await updateDailyCommand(userId, {
@@ -48,18 +52,9 @@ export async function updateUserStreak(userId: string) {
     return status.data(db);
 }
 
-function isSameDay(date1: Date, date2: Date) {
-    return (
-        date1.getFullYear() === date2.getFullYear() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getDate() === date2.getDate()
-    );
-}
-
-function isYesterday(date1: Date, date2: Date) {
-    const yesterday = new Date(date2);
-    yesterday.setDate(yesterday.getDate() - 1);
-    return isSameDay(date1, yesterday);
+function getTimeDiffInHours(date1: Date, date2: Date) {
+    const diffInMs = Math.abs(date2.getTime() - date1.getTime());
+    return Math.floor(diffInMs / get.hrs(1));
 }
 
 async function getDailyCommandByUserId(userId: string) {
@@ -83,9 +78,7 @@ async function updateDailyCommand(
 ) {
     return await prisma.dailyCommand
         .update({
-            where: {
-                userId,
-            },
+            where: { userId },
             data,
         })
         .catch(noop);
