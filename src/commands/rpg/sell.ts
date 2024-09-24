@@ -169,7 +169,7 @@ export const sell = buildCommand<SlashCommand>({
 
         const rebirthBonusMessage =
             stats.rebirths > 0
-                ? ` (+${Math.round(rebirthBonus)} Coins from [${
+                ? ` (+${Math.round(rebirthBonus)} ${texts.c.u} from [${
                       stats.rebirths
                   }] Rebirth${stats.rebirths > 1 ? "s" : ""})`
                 : "";

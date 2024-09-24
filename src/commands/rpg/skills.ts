@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats } from "../../services";
 
@@ -38,7 +39,7 @@ const availableSkills = [
     },
     {
         name: "Scrounge",
-        description: "In addition to drops, earn Coins per hunt",
+        description: `In addition to drops, earn ${texts.c.u} per hunt`,
         emoji: "💸",
     },
     {
@@ -56,6 +57,11 @@ const availableSkills = [
         name: "Backstab",
         description: "Deal 200% more DMG to humans",
         emoji: "🔪",
+    },
+    {
+        name: "Heartbroken",
+        description: "Deal your Current HP as bonus DMG on your first turn",
+        emoji: "💔",
     },
 ];
 
@@ -120,11 +126,15 @@ export const skills = buildCommand<SlashCommand>({
         const embed = new EmbedBuilder()
             .setColor("Aqua")
             .setDescription(
-                `Use the </learn:1282044626408308736> command to get new skills`,
+                `- Use </learn:1282044626408308736> command to get new skills\n- Use </activate:1284399993897353292> to enable/disable a skill`,
             )
             .setTitle(`${i.user.username}'s Skills`)
             .addFields(
-                { name: "Active Skills", value: activeList, inline: true },
+                {
+                    name: `Active Skills (${activeSkills.length}/5`,
+                    value: activeList,
+                    inline: true,
+                },
                 { name: "Learned Skills", value: skillsList, inline: true },
                 { name: "Learnable Skills", value: availableSkillsList },
             );

@@ -1,5 +1,5 @@
 import { embedComment, get, noop } from "@elara-services/utils";
-import { customEmoji } from "@liyueharbor/econ";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
 import {
@@ -115,13 +115,13 @@ async function handleTrap(
         i.user.id,
         coinLoss,
         true,
-        `Lost ${coinLoss} coins after falling into a trap`,
+        `Lost ${coinLoss} ${texts.c.u} after falling into a trap`,
     );
 
     await i
         .editReply(
             embedComment(
-                `You fell into a trap while exploring!\nYou lost ${customEmoji.a.z_coins} \`${coinLoss} Coins\` and took \`${trapDamage} HP\` damage.`,
+                `You fell into a trap while exploring!\nYou lost ${customEmoji.a.z_coins} \`${coinLoss} ${texts.c.u}\` and took \`${trapDamage} HP\` damage.`,
                 "Red",
             ),
         )

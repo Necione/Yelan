@@ -20,12 +20,12 @@ export const bag = buildCommand<SlashCommand>({
                 .setDescription("The type of items to show.")
                 .setRequired(true)
                 .addChoices(
-                    { name: "All", value: "all" },
-                    { name: "Drops", value: "drops" },
-                    { name: "Weapons", value: "weapons" },
-                    { name: "Artifacts", value: "artifacts" },
-                    { name: "Misc", value: "misc" },
-                    { name: "Food", value: "food" },
+                    { name: "All", value: "All" },
+                    { name: "Drops", value: "Drops" },
+                    { name: "Weapons", value: "Weapons" },
+                    { name: "Artifacts", value: "Artifacts" },
+                    { name: "Misc", value: "Misc" },
+                    { name: "Food", value: "Food" },
                 ),
         )
         .setDMPermission(false),
@@ -68,22 +68,22 @@ export const bag = buildCommand<SlashCommand>({
         let filteredItems = items;
 
         switch (category) {
-            case "drops":
+            case "Drops":
                 filteredItems = items.filter((item) => item.item in drops);
                 break;
-            case "weapons":
+            case "Weapons":
                 filteredItems = items.filter((item) => item.item in weapons);
                 break;
-            case "artifacts":
+            case "Artifacts":
                 filteredItems = items.filter((item) => item.item in artifacts);
                 break;
-            case "misc":
+            case "Misc":
                 filteredItems = items.filter((item) => item.item in misc);
                 break;
-            case "food":
+            case "Food":
                 filteredItems = items.filter((item) => item.item in food);
                 break;
-            case "all":
+            case "All":
             default:
                 filteredItems = items;
                 break;

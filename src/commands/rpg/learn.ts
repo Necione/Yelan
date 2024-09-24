@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
@@ -18,6 +19,7 @@ type SkillName =
     | "Scrounge"
     | "Distraction"
     | "Backstab"
+    | "Heartbroken"
     | "Kindle";
 
 const skillRequirements: Record<
@@ -95,6 +97,14 @@ const skillRequirements: Record<
             { item: "Sealed Scroll", amount: 1 },
         ],
     },
+    Heartbroken: {
+        worldLevel: 10,
+        coins: 500,
+        items: [
+            { item: "Mist Grass", amount: 2 },
+            { item: "Agent's Sacrificial Knife", amount: 2 },
+        ],
+    },
     Distraction: {
         worldLevel: 10,
         coins: 250,
@@ -122,6 +132,7 @@ export const learn = buildCommand<SlashCommand>({
                     { name: "Energize", value: "Energize" },
                     { name: "Distraction", value: "Distraction" },
                     { name: "Backstab", value: "Backstab" },
+                    { name: "Heartbroken", value: "Heartbroken" },
                 ),
         ),
     defer: { silent: false },
@@ -177,7 +188,7 @@ export const learn = buildCommand<SlashCommand>({
 
         if (userProfile.balance < skillData.coins) {
             missingRequirements.push(
-                `**Coins**: You need at least **${skillData.coins} coins**.`,
+                `**${texts.c.u}**: You need at least **${skillData.coins} ${texts.c.u}**.`,
             );
         }
 
