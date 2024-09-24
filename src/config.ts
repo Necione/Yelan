@@ -153,6 +153,11 @@ export const roles = {
     graders: "1142915623400243350",
     qotd: "1114590871212523540",
     restrictedColors: ["1089061615133016074"],
-    main: ["1090489182994038864", "835328759128260626", "1278979938128756748", "1280912574728372246"], // Role IDs is for the testing servers, do not remove or replace it.
+    main: [
+        "1090489182994038864",
+        "835328759128260626",
+        "1278979938128756748",
+        "1280912574728372246",
+    ], // Role IDs is for the testing servers, do not remove or replace it.
 };
 roles.main.push(roles.admin, roles.devs); // This inserts the 'admin' role ID for the main server.

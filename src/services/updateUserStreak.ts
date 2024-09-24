@@ -4,19 +4,18 @@ import { prisma } from "../prisma";
 import { addBalance } from "./userProfile";
 
 export async function updateUserStreak(userId: string) {
-    const dailyCommand = await getDailyCommandByUserId(userId);
-    if (!dailyCommand) {
+    const p = await getDailyCommandByUserId(userId);
+    if (!p) {
         return status.error(`Unable to find/create your daily info.`);
     }
 
     const now = new Date();
-    const lastDateClaim = dailyCommand.lastDateClaim;
 
-    let newStreak = dailyCommand.dailyStreak;
-    let newTotal = dailyCommand.dailyTotal;
+    let newStreak = p.dailyStreak;
+    let newTotal = p.dailyTotal;
 
     const timeDiffInHours = getTimeDiffInHours(
-        lastDateClaim ?? new Date(0),
+        p.lastDateClaim ?? new Date(),
         now,
     );
 
@@ -55,7 +54,7 @@ export async function updateUserStreak(userId: string) {
 
 function getTimeDiffInHours(date1: Date, date2: Date) {
     const diffInMs = Math.abs(date2.getTime() - date1.getTime());
-    return diffInMs / get.days(1);
+    return Math.floor(diffInMs / get.hrs(1));
 }
 
 async function getDailyCommandByUserId(userId: string) {
@@ -75,18 +74,12 @@ async function getDailyCommandByUserId(userId: string) {
 
 async function updateDailyCommand(
     userId: string,
-
     data: Prisma.DailyCommandUpdateInput,
 ) {
     return await prisma.dailyCommand
-
         .update({
-            where: {
-                userId,
-            },
-
+            where: { userId },
             data,
         })
-
         .catch(noop);
 }
