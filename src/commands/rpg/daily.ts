@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get } from "@elara-services/utils";
+import { embedComment, get, getPluralTxt } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, updateUserStreak } from "../../services";
 import { cooldowns, getAmount } from "../../utils";
@@ -39,7 +39,9 @@ export const daily = buildCommand<SlashCommand>({
                             name: "❤️ Current Streak:",
                             value: `${
                                 updatedUser.data.dailyStreak ?? 0
-                            } Day(s)`,
+                            } Day${getPluralTxt(
+                                updatedUser.data.dailyStreak ?? 0,
+                            )}`,
                         },
                         {
                             name: "💫 Next Check-in reward:",

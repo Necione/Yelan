@@ -14,21 +14,23 @@ export async function updateUserStreak(userId: string) {
     let newStreak = p.dailyStreak;
     let newTotal = p.dailyTotal;
 
-    const timeDiffInHours = getTimeDiffInHours(
-        p.lastDateClaim ?? new Date(),
-        now,
-    );
+    if (p.lastDateClaim) {
+        const timeDiffInHours = getTimeDiffInHours(p.lastDateClaim, now);
 
-    if (timeDiffInHours > 48) {
+        if (timeDiffInHours > 48) {
+            newStreak = 1;
+            newTotal = 50;
+        } else if (timeDiffInHours > 24) {
+            newStreak += 1;
+            newTotal = 50 + (newStreak - 1);
+        } else {
+            return status.error(
+                `💫Come back later to claim your daily check-in reward.`,
+            );
+        }
+    } else {
         newStreak = 1;
         newTotal = 50;
-    } else if (timeDiffInHours > 24) {
-        newStreak += 1;
-        newTotal = 50 + (newStreak - 1);
-    } else {
-        return status.error(
-            `💫Come back later to claim your daily check-in reward.`,
-        );
     }
 
     const db = await updateDailyCommand(userId, {
