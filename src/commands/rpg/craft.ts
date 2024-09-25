@@ -64,6 +64,14 @@ const craftingMap: Record<string, { source: DropName; target: DropName }> = {
         source: "Dead Ley Line Leaves",
         target: "Ley Line Sprout",
     },
+    MistGrass: {
+        source: "Mist Grass Pollen",
+        target: "Mist Grass",
+    },
+    AgentsSacrificalKnife: {
+        source: "Hunter's Sacrificial Knife",
+        target: "Agent's Sacrificial Knife",
+    },
 };
 
 export const craft = buildCommand<SlashCommand>({
