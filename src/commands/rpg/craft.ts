@@ -115,6 +115,11 @@ export const craft = buildCommand<SlashCommand>({
         }
 
         const craftingRecipe = craftingMap[craftOption];
+        if (!craftingRecipe) {
+            return r.edit(
+                embedComment(`Unable to find "${craftOption}" crafting recipe`),
+            );
+        }
         const stats = await getUserStats(i.user.id);
 
         if (!stats) {
