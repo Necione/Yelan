@@ -16,11 +16,10 @@ export async function updateUserStreak(userId: string) {
 
     if (p.lastDateClaim) {
         const timeDiffInHours = getTimeDiffInHours(p.lastDateClaim, now);
-
         if (timeDiffInHours > 48) {
             newStreak = 1;
             newTotal = 50;
-        } else if (timeDiffInHours > 24) {
+        } else if (timeDiffInHours >= 24) {
             newStreak += 1;
             newTotal = 50 + (newStreak - 1);
         } else {
