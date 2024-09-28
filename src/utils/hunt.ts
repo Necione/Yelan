@@ -107,6 +107,27 @@ const lowEncounterAverages = [
     { worldLevel: 15, minHp: 700, maxHp: 800, minDamage: 80, maxDamage: 95 },
     { worldLevel: 16, minHp: 800, maxHp: 900, minDamage: 85, maxDamage: 100 },
     { worldLevel: 17, minHp: 900, maxHp: 1000, minDamage: 100, maxDamage: 110 },
+    {
+        worldLevel: 18,
+        minHp: 1000,
+        maxHp: 1100,
+        minDamage: 110,
+        maxDamage: 130,
+    },
+    {
+        worldLevel: 19,
+        minHp: 1100,
+        maxHp: 1200,
+        minDamage: 120,
+        maxDamage: 140,
+    },
+    {
+        worldLevel: 20,
+        minHp: 1200,
+        maxHp: 1300,
+        minDamage: 130,
+        maxDamage: 150,
+    },
 ];
 
 export async function getRandomMonster(
@@ -180,9 +201,15 @@ export async function getRandomMonster(
         selectedMonster.defValue = playerStats.defValue;
         selectedMonster.minHp = playerStats.maxHp;
         selectedMonster.maxHp = playerStats.maxHp;
-    }
-
-    if (
+    } else if (worldLevel >= 16 && selectedMonster.minWorldLevel >= 16) {
+        const levelDifference = worldLevel - selectedMonster.minWorldLevel;
+        if (levelDifference > 0) {
+            selectedMonster.minHp += 50 * levelDifference;
+            selectedMonster.maxHp += 50 * levelDifference;
+            selectedMonster.minDamage += 10 * levelDifference;
+            selectedMonster.maxDamage += 10 * levelDifference;
+        }
+    } else if (
         worldLevel > selectedMonster.minWorldLevel &&
         selectedMonster.name !== "Mirror Maiden" &&
         selectedMonster.group !== "Chasm"

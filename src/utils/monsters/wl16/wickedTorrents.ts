@@ -1,0 +1,48 @@
+export default {
+    name: "Wicked Torrents",
+    group: "Abyss",
+    minHp: 800,
+    maxHp: 1200,
+    minDamage: 120,
+    maxDamage: 150,
+    minExp: 10,
+    maxExp: 25,
+    minWorldLevel: 16,
+    image: "https://lh.elara.workers.dev/rpg/monsters/wicked_torrents.png",
+    drops: [
+        {
+            item: "Dead Ley Line Branch",
+            minAmount: 1,
+            maxAmount: 2,
+            chance: 75,
+        },
+        {
+            item: "Dead Ley Line Leaves",
+            minAmount: 1,
+            maxAmount: 2,
+            chance: 25,
+        },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
+    ],
+    locations: [
+        "Qingxu Pool",
+        "Lingju Pass",
+        "Lumberpick Valley",
+        "Dunyu Ruins",
+        "Nantianmen",
+        "Tianqiu Valley",
+        "Luhua Pool",
+        "Guili Plains",
+        "Jueyun Karst",
+    ],
+
+    critChance: 50,
+    critValue: 2,
+    defChance: 90,
+    defValue: 100,
+};
