@@ -38,6 +38,22 @@ export async function playerAttack(
     if (monster.group === "Chasm") {
         let attackPower = stats.baseAttack;
 
+        const hasHeartbroken =
+            stats.skills.some((skill) => skill.name === "Heartbroken") &&
+            stats.activeSkills.includes("Heartbroken");
+
+        let bonusDamage = 0;
+        if (hasHeartbroken && isFirstTurn) {
+            bonusDamage = stats.hp;
+            await thread
+                .send(
+                    `>>> \`💔\` You will deal an additional \`${bonusDamage.toFixed(
+                        2,
+                    )}\` bonus DMG (Heartbroken).`,
+                )
+                .catch(noop);
+        }
+
         const modifiersResult = await applyAttackModifiers(
             attackPower,
             stats,
@@ -92,6 +108,17 @@ export async function playerAttack(
             )
             .catch(noop);
 
+        if (bonusDamage > 0) {
+            currentMonsterHp -= bonusDamage;
+            await thread
+                .send(
+                    `>>> \`💔\` You dealt an additional \`${bonusDamage.toFixed(
+                        2,
+                    )}\` bonus damage with the Heartbroken skill!`,
+                )
+                .catch(noop);
+        }
+
         const hasKindle =
             stats.skills.some((skill) => skill.name === "Kindle") &&
             stats.activeSkills.includes("Kindle");
@@ -140,16 +167,9 @@ export async function playerAttack(
                 stats.skills.some((skill) => skill.name === "Heartbroken") &&
                 stats.activeSkills.includes("Heartbroken");
 
+            let bonusDamage = 0;
             if (hasHeartbroken && isFirstTurn) {
-                const bonusDamage = stats.hp;
-                attackPower += bonusDamage;
-                await thread
-                    .send(
-                        `>>> \`💔\` You will deal an additional \`${bonusDamage.toFixed(
-                            2,
-                        )}\` bonus DMG (Heartbroken).`,
-                    )
-                    .catch(noop);
+                bonusDamage = stats.hp;
             }
 
             const modifiersResult = await applyAttackModifiers(
@@ -216,6 +236,17 @@ export async function playerAttack(
                     }.`,
                 )
                 .catch(noop);
+
+            if (bonusDamage > 0) {
+                currentMonsterHp -= bonusDamage;
+                await thread
+                    .send(
+                        `>>> \`💔\` You dealt an additional \`${bonusDamage.toFixed(
+                            2,
+                        )}\` bonus damage (Heartbroken)`,
+                    )
+                    .catch(noop);
+            }
 
             const hasKindle =
                 stats.skills.some((skill) => skill.name === "Kindle") &&

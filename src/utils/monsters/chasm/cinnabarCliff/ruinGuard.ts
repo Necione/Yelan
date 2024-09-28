@@ -8,7 +8,7 @@ export default {
     minExp: 1,
     maxExp: 2,
     minWorldLevel: 1,
-    image: "https://lh.elara.workers.dev/rpg/monsters/ruin_guard/png",
+    image: "https://lh.elara.workers.dev/rpg/monsters/ruin_guard.png",
     drops: [
         {
             item: "Metal Scrap",

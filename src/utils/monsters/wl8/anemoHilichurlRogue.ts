@@ -8,7 +8,7 @@ export default {
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 8,
-    image: "https://lh.elara.workers.dev/rpg/mosnters/anemo_hilichurl_rouge.png",
+    image: "https://lh.elara.workers.dev/rpg/monsters/anemo_hilichurl_rouge.png",
     drops: [
         {
             item: "A Flower Yet to Bloom",
