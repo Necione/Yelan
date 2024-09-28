@@ -280,6 +280,16 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Blackcliff_Warbow:1289483143304314940>",
     },
+    "Roy­al Gri­moire": {
+        sellPrice: 45,
+        attackPower: 50,
+        critChance: 0,
+        critValue: 2,
+        additionalHP: -250,
+        minWorldLevel: 15,
+        chestChance: 5,
+        emoji: "<:Weapon_Royal_Grimoire:1289486411061395517>",
+    },
     "Aqua Simulacra": {
         sellPrice: 50,
         attackPower: 0,

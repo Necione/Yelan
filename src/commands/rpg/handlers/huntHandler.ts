@@ -630,7 +630,7 @@ export async function applyAttackModifiers(
         attackPower *= 1.5;
         await thread
             .send(
-                `>>> \`🗡️\` Backstab skill activated! You deal 200% more DMG!`,
+                `>>> \`🗡️\` Backstab skill activated! You deal 150% more DMG!`,
             )
             .catch(noop);
     }
