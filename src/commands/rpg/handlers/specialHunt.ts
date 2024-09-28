@@ -219,7 +219,7 @@ export async function handleStaffOfHomaAttack(
         }
     };
 
-    stats.hp -= 20;
+    stats.hp -= 10;
     if (stats.hp < 0) {
         stats.hp = 0;
     }
@@ -227,7 +227,7 @@ export async function handleStaffOfHomaAttack(
     await updateUserStats(stats.userId, { hp: stats.hp });
 
     await thread
-        .send(`>>> \`💔\` You sacrificed \`20 HP\` to use the Staff of Homa.`)
+        .send(`>>> \`💔\` You sacrificed \`10 HP\` to use the Staff of Homa.`)
         .catch(noop);
 
     let currentHpPercentage = stats.hp / stats.maxHP;

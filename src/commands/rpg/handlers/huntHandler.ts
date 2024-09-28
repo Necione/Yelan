@@ -486,7 +486,12 @@ export async function handleHunt(
 
         let vigilanceUsed = false;
 
-        let isMonsterFirst = hasDistraction ? false : Math.random() < 0.5;
+        let isMonsterFirst: boolean;
+        if (hasDistraction) {
+            isMonsterFirst = Math.random() >= 0.75;
+        } else {
+            isMonsterFirst = Math.random() < 0.5;
+        }
 
         let monsterState = {
             displaced: false,
@@ -622,7 +627,7 @@ export async function applyAttackModifiers(
     const isHumanOrFatui = ["Human", "Fatui"].includes(monster.group);
 
     if (hasBackstab && isHumanOrFatui) {
-        attackPower *= 2;
+        attackPower *= 1.5;
         await thread
             .send(
                 `>>> \`🗡️\` Backstab skill activated! You deal 200% more DMG!`,
