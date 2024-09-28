@@ -1,8 +1,8 @@
 export default {
     name: "Ruin Grader",
     group: "Chasm",
-    minHp: 500,
-    maxHp: 600,
+    minHp: 200,
+    maxHp: 300,
     minDamage: 70,
     maxDamage: 100,
     minExp: 1,

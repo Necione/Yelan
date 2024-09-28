@@ -1,9 +1,9 @@
 export default {
     name: "Ruin Guard",
     group: "Chasm",
-    minHp: 300,
-    maxHp: 350,
-    minDamage: 50,
+    minHp: 100,
+    maxHp: 150,
+    minDamage: 40,
     maxDamage: 60,
     minExp: 1,
     maxExp: 2,

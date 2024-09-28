@@ -41,7 +41,7 @@ export const misc = {
         maxAmount: 6,
         dropChance: 18,
     },
-    Raddish: {
+    Radish: {
         sellPrice: 1,
         minAmount: 1,
         maxAmount: 3,
@@ -83,7 +83,7 @@ export const misc = {
         maxAmount: 2,
         dropChance: 17,
     },
-    Violetgras: {
+    Violetgrass: {
         sellPrice: 3,
         minAmount: 1,
         maxAmount: 2,

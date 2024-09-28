@@ -1,10 +1,10 @@
 export default {
     name: "Ruin Destroyer",
     group: "Chasm",
-    minHp: 200,
+    minHp: 150,
     maxHp: 300,
-    minDamage: 70,
-    maxDamage: 150,
+    minDamage: 50,
+    maxDamage: 140,
     minExp: 1,
     maxExp: 2,
     minWorldLevel: 1,

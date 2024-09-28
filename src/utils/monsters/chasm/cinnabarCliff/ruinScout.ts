@@ -1,8 +1,8 @@
 export default {
     name: "Ruin Scout",
     group: "Chasm",
-    minHp: 200,
-    maxHp: 300,
+    minHp: 100,
+    maxHp: 200,
     minDamage: 40,
     maxDamage: 50,
     minExp: 1,
