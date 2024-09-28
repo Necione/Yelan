@@ -13,11 +13,15 @@ type LocationName =
     | "Tianqiu Valley"
     | "Luhua Pool"
     | "Guili Plains"
-    | "Jueyun Karst";
+    | "Jueyun Karst"
+    | "Cinnabar Cliff"
+    | "Glaze Peak"
+    | "Tiangong Gorge";
 
 type LocationXY = {
     x: number;
     y: number;
+    requiredRebirths?: number;
 };
 
 const locations: Record<LocationName, LocationXY> = {
@@ -31,6 +35,10 @@ const locations: Record<LocationName, LocationXY> = {
     "Luhua Pool": { x: 13, y: 10 },
     "Guili Plains": { x: 15, y: 12 },
     "Jueyun Karst": { x: 7, y: 13 },
+
+    "Cinnabar Cliff": { x: 0, y: 0, requiredRebirths: 1 },
+    "Glaze Peak": { x: 0, y: 0, requiredRebirths: 2 },
+    "Tiangong Gorge": { x: 0, y: 0, requiredRebirths: 3 },
 };
 
 const locationEmojis: Record<LocationName, string> = {
@@ -44,6 +52,10 @@ const locationEmojis: Record<LocationName, string> = {
     "Luhua Pool": "🏖️",
     "Guili Plains": "🏞️",
     "Jueyun Karst": "🗻",
+
+    "Cinnabar Cliff": "⛔",
+    "Glaze Peak": "⛔",
+    "Tiangong Gorge": "⛔",
 };
 
 function calculateDistance(
@@ -118,11 +130,28 @@ export const travel = buildCommand<SlashCommand>({
             return r.edit(embedComment("Invalid location selected."));
         }
 
+        const requiredRebirths =
+            locations[selectedLocation].requiredRebirths || 0;
+        if (stats.rebirths < requiredRebirths) {
+            return r.edit(
+                embedComment(
+                    `You need at least ${requiredRebirths} rebirth${
+                        requiredRebirths > 1 ? "s" : ""
+                    } to travel to ${selectedLocation}.`,
+                ),
+            );
+        }
+
         const startCoords = locations[currentLocation];
         const endCoords = locations[selectedLocation];
 
-        const distance = calculateDistance(startCoords, endCoords);
-        const travelTime = distance * 5;
+        let travelTime: number;
+        if (requiredRebirths > 0) {
+            travelTime = 300;
+        } else {
+            const distance = calculateDistance(startCoords, endCoords);
+            travelTime = distance * 5;
+        }
 
         await updateUserStats(i.user.id, { isTravelling: true });
 

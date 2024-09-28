@@ -1,4 +1,4 @@
-import { embedComment, get, noop, sleep } from "@elara-services/utils";
+import { embedComment, get, noop } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type {
     ChatInputCommandInteraction,
@@ -7,191 +7,19 @@ import type {
     ThreadChannel,
 } from "discord.js";
 import { EmbedBuilder } from "discord.js";
+import { updateUserStats } from "../../../services";
 import {
-    addBalance,
-    addItemToInventory,
-    removeBalance,
-    updateUserStats,
-} from "../../../services";
-import { cooldowns, texts } from "../../../utils";
-import {
-    calculateDrop,
-    calculateExp,
     getEncounterDescription,
     getRandomMonster,
     getRandomValue,
     initializeMonsters,
     type Monster,
 } from "../../../utils/hunt";
+import { handleDefeat, handleVictory } from "./conditions";
 import {
     handleAquaSimulacraAttack,
     handleStaffOfHomaAttack,
 } from "./specialHunt";
-
-export async function handleVictory(
-    i: ChatInputCommandInteraction,
-    thread: ThreadChannel,
-    stats: UserStats,
-    monstersEncountered: Monster[],
-    currentPlayerHp: number,
-    userWallet: UserWallet,
-) {
-    const finalEmbed = new EmbedBuilder();
-    let totalExpGained = 0;
-    let dropsCollected: { item: string; amount: number }[] = [];
-
-    let skillsActivated = "";
-
-    for (const monster of monstersEncountered) {
-        const expGained = calculateExp(monster.minExp, monster.maxExp);
-        totalExpGained += expGained;
-
-        const drops = calculateDrop(monster.drops);
-        if (Array.isArray(drops)) {
-            dropsCollected = dropsCollected.concat(drops);
-            await addItemToInventory(i.user.id, drops);
-        }
-    }
-
-    const numberOfMonsters = monstersEncountered.length;
-    const xpReductionFactor = Math.max(0, 1 - (numberOfMonsters - 1) * 0.25);
-    totalExpGained = Math.round(totalExpGained * xpReductionFactor);
-
-    let newExp = stats.exp + totalExpGained;
-    let expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
-
-    while (newExp >= expRequired) {
-        newExp -= expRequired;
-        stats.worldLevel += 1;
-        expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
-    }
-
-    await updateUserStats(i.user.id, {
-        exp: newExp,
-        worldLevel: stats.worldLevel,
-    });
-
-    const monstersFought = monstersEncountered
-        .map((monster) => monster.name)
-        .join(", ");
-
-    finalEmbed
-        .setColor("Green")
-        .setTitle(`Victory in ${stats.location}!`)
-        .setDescription(
-            `You defeated the following monsters:\n\`${monstersFought}\`!\n-# \`⭐\` \`+${totalExpGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
-        )
-        .setThumbnail(
-            monstersEncountered[monstersEncountered.length - 1].image,
-        );
-
-    const hasTotemSkill =
-        stats.skills.some((skill) => skill.name === "Totem") &&
-        stats.activeSkills.includes("Totem");
-
-    if (hasTotemSkill) {
-        const healAmount = Math.ceil(stats.maxHP * 0.05);
-        currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
-
-        skillsActivated += `\`💖\` Healed \`${healAmount}\` HP due to the Totem skill.\n`;
-
-        await updateUserStats(i.user.id, {
-            hp: currentPlayerHp,
-        });
-    }
-
-    const hasScroungeSkill =
-        stats.skills.some((skill) => skill.name === "Scrounge") &&
-        stats.activeSkills.includes("Scrounge");
-
-    if (hasScroungeSkill) {
-        const coinsEarned = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
-
-        await addBalance(
-            i.user.id,
-            coinsEarned,
-            true,
-            `Earned from the Scrounge skill`,
-        );
-
-        skillsActivated += `\`💸\` Earned \`${coinsEarned}\` ${texts.c.u} with the Scrounge skill.\n`;
-    }
-
-    if (skillsActivated) {
-        finalEmbed.addFields({
-            name: "Skills Activated",
-            value: skillsActivated,
-        });
-    }
-
-    if (dropsCollected.length > 0) {
-        const dropsDescription = dropsCollected
-            .map((drop) => `\`${drop.amount}x\` ${drop.item}`)
-            .join(", ");
-        finalEmbed.addFields({
-            name: "Drops",
-            value: dropsDescription,
-        });
-    }
-
-    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
-    await updateUserStats(i.user.id, { isHunting: false });
-    sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
-
-    const hasInsomniaSkill =
-        stats.skills.some((skill) => skill.name === "Insomnia") &&
-        stats.activeSkills.includes("Insomnia");
-
-    const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
-    await cooldowns.set(userWallet, "hunt", huntCooldown);
-}
-
-export async function handleDefeat(
-    i: ChatInputCommandInteraction,
-    thread: ThreadChannel,
-    stats: UserStats,
-    monster: Monster,
-    currentPlayerHp: number,
-    userWallet: UserWallet,
-) {
-    const finalEmbed = new EmbedBuilder()
-        .setColor("Red")
-        .setTitle(`Defeat...`)
-        .setDescription(
-            `Oh no :( You were defeated by the ${monster.name}...\n-# Use </downgrade:1282035993242767450> if this WL is too hard`,
-        );
-
-    const amountToDeduct = Math.min(25, userWallet.balance);
-    if (amountToDeduct > 0) {
-        await removeBalance(
-            i.user.id,
-            amountToDeduct,
-            true,
-            `Lost due to defeat`,
-        );
-
-        finalEmbed.addFields({
-            name: "Loss",
-            value: `You lost \`${amountToDeduct}\` coins due to your defeat.`,
-        });
-    }
-
-    await updateUserStats(i.user.id, {
-        hp: Math.max(currentPlayerHp, 0),
-        isHunting: false,
-    });
-
-    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
-
-    const hasInsomniaSkill =
-        stats.skills.some((skill) => skill.name === "Insomnia") &&
-        stats.activeSkills.includes("Insomnia");
-
-    const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
-    await cooldowns.set(userWallet, "hunt", huntCooldown);
-
-    sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
-}
 
 export async function playerAttack(
     thread: ThreadChannel,
@@ -207,44 +35,8 @@ export async function playerAttack(
     vigilanceUsed: boolean;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
 }> {
-    if (stats.equippedWeapon?.toLowerCase().includes("staff of homa")) {
-        return handleStaffOfHomaAttack(
-            thread,
-            stats,
-            monster,
-            currentMonsterHp,
-            vigilanceUsed,
-            monsterState,
-            isFirstTurn,
-        );
-    } else if (stats.equippedWeapon?.toLowerCase().includes("aqua simulacra")) {
-        return handleAquaSimulacraAttack(
-            thread,
-            stats,
-            monster,
-            currentMonsterHp,
-            vigilanceUsed,
-            monsterState,
-            isFirstTurn,
-        );
-    } else {
-        let attackPower = stats.attackPower;
-
-        const hasHeartbroken =
-            stats.skills.some((skill) => skill.name === "Heartbroken") &&
-            stats.activeSkills.includes("Heartbroken");
-
-        if (hasHeartbroken && isFirstTurn) {
-            const bonusDamage = stats.hp;
-            attackPower += bonusDamage;
-            await thread
-                .send(
-                    `>>> \`💔\` You will deal an additional \`${bonusDamage.toFixed(
-                        2,
-                    )}\` bonus DMG (Heartbroken).`,
-                )
-                .catch(noop);
-        }
+    if (monster.group === "Chasm") {
+        let attackPower = stats.baseAttack;
 
         const modifiersResult = await applyAttackModifiers(
             attackPower,
@@ -255,13 +47,6 @@ export async function playerAttack(
         );
         attackPower = modifiersResult.attackPower;
         monsterState = modifiersResult.monsterState;
-
-        const critChance = stats.critChance || 0;
-        const critValue = stats.critValue || 1;
-        const isCrit = Math.random() * 100 < critChance;
-        if (isCrit) {
-            attackPower *= critValue;
-        }
 
         const defenseResult = await checkMonsterDefenses(
             attackPower,
@@ -278,7 +63,7 @@ export async function playerAttack(
             return { currentMonsterHp, vigilanceUsed, monsterState };
         }
 
-        const monsterDefended = attackPower < stats.attackPower;
+        const monsterDefended = attackPower < stats.baseAttack;
         const monsterDefValue = monster.defValue || 0;
 
         if (hasVigilance && !vigilanceUsed) {
@@ -302,8 +87,6 @@ export async function playerAttack(
                 `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
                     2,
                 )}\` damage to the ${monster.name}${
-                    isCrit ? " 💢 (Critical Hit!)" : ""
-                }${
                     monsterDefended ? ` 🛡️ (Defended: -${monsterDefValue})` : ""
                 }.`,
             )
@@ -327,6 +110,132 @@ export async function playerAttack(
         }
 
         return { currentMonsterHp, vigilanceUsed, monsterState };
+    } else {
+        if (stats.equippedWeapon?.toLowerCase().includes("staff of homa")) {
+            return handleStaffOfHomaAttack(
+                thread,
+                stats,
+                monster,
+                currentMonsterHp,
+                vigilanceUsed,
+                monsterState,
+                isFirstTurn,
+            );
+        } else if (
+            stats.equippedWeapon?.toLowerCase().includes("aqua simulacra")
+        ) {
+            return handleAquaSimulacraAttack(
+                thread,
+                stats,
+                monster,
+                currentMonsterHp,
+                vigilanceUsed,
+                monsterState,
+                isFirstTurn,
+            );
+        } else {
+            let attackPower = stats.attackPower;
+
+            const hasHeartbroken =
+                stats.skills.some((skill) => skill.name === "Heartbroken") &&
+                stats.activeSkills.includes("Heartbroken");
+
+            if (hasHeartbroken && isFirstTurn) {
+                const bonusDamage = stats.hp;
+                attackPower += bonusDamage;
+                await thread
+                    .send(
+                        `>>> \`💔\` You will deal an additional \`${bonusDamage.toFixed(
+                            2,
+                        )}\` bonus DMG (Heartbroken).`,
+                    )
+                    .catch(noop);
+            }
+
+            const modifiersResult = await applyAttackModifiers(
+                attackPower,
+                stats,
+                monster,
+                thread,
+                monsterState,
+            );
+            attackPower = modifiersResult.attackPower;
+            monsterState = modifiersResult.monsterState;
+
+            const critChance = stats.critChance || 0;
+            const critValue = stats.critValue || 1;
+            const isCrit = Math.random() * 100 < critChance;
+            if (isCrit) {
+                attackPower *= critValue;
+            }
+
+            const defenseResult = await checkMonsterDefenses(
+                attackPower,
+                stats,
+                monster,
+                thread,
+                monsterState,
+            );
+            attackPower = defenseResult.attackPower;
+            const attackMissed = defenseResult.attackMissed;
+            monsterState = defenseResult.monsterState;
+
+            if (attackMissed) {
+                return { currentMonsterHp, vigilanceUsed, monsterState };
+            }
+
+            const monsterDefended = attackPower < stats.attackPower;
+            const monsterDefValue = monster.defValue || 0;
+
+            if (hasVigilance && !vigilanceUsed) {
+                const vigilanceAttackPower = attackPower / 2;
+                currentMonsterHp -= vigilanceAttackPower;
+                vigilanceUsed = true;
+
+                await thread
+                    .send(
+                        `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                            2,
+                        )}\` damage to the ${monster.name} ✨ (Vigilance).`,
+                    )
+                    .catch(noop);
+            }
+
+            currentMonsterHp -= attackPower;
+
+            await thread
+                .send(
+                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
+                        2,
+                    )}\` damage to the ${monster.name}${
+                        isCrit ? " 💢 (Critical Hit!)" : ""
+                    }${
+                        monsterDefended
+                            ? ` 🛡️ (Defended: -${monsterDefValue})`
+                            : ""
+                    }.`,
+                )
+                .catch(noop);
+
+            const hasKindle =
+                stats.skills.some((skill) => skill.name === "Kindle") &&
+                stats.activeSkills.includes("Kindle");
+
+            if (hasKindle) {
+                const kindleBonusDamage = stats.maxHP * 0.1;
+                currentMonsterHp -= kindleBonusDamage;
+
+                await thread
+                    .send(
+                        `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
+                            2,
+                        )}\` bonus damage with the Kindle skill!`,
+                    )
+                    .catch(noop);
+            }
+
+            return { currentMonsterHp, vigilanceUsed, monsterState };
+        }
     }
 }
 
@@ -487,8 +396,10 @@ export async function handleHunt(
             return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
         };
 
+        const embedColor = monster.group === "Chasm" ? "Orange" : "Aqua";
+
         const battleEmbed = new EmbedBuilder()
-            .setColor("Aqua")
+            .setColor(embedColor)
             .setTitle(`You encountered a ${monster.name}!`)
             .setDescription(selectedDescription)
             .setThumbnail(monster.image)

@@ -36,10 +36,6 @@ async function loadMonsters(dir: string): Promise<void> {
     for (const file of files) {
         const fullPath = join(dir, file);
 
-        if (file === "bosses" && statSync(fullPath).isDirectory()) {
-            continue;
-        }
-
         if (statSync(fullPath).isDirectory()) {
             await loadMonsters(fullPath);
         } else if ([".ts", ".js"].some((c) => file.endsWith(c))) {
@@ -188,7 +184,8 @@ export async function getRandomMonster(
 
     if (
         worldLevel > selectedMonster.minWorldLevel &&
-        selectedMonster.name !== "Mirror Maiden"
+        selectedMonster.name !== "Mirror Maiden" &&
+        selectedMonster.group !== "Chasm"
     ) {
         const encounterAverages = lowEncounterAverages.find(
             (avg) => avg.worldLevel === worldLevel,
@@ -203,37 +200,6 @@ export async function getRandomMonster(
     }
 
     return selectedMonster;
-}
-
-export async function getRandomBoss(
-    worldLevel: number,
-): Promise<Monster | null> {
-    const bossDir = resolve(__dirname, "./monsters/bosses");
-    const bossFiles = readdirSync(bossDir);
-
-    const bosses: Monster[] = [];
-    for (const file of bossFiles) {
-        const fullPath = join(bossDir, file);
-        if (
-            statSync(fullPath).isFile() &&
-            (file.endsWith(".ts") || file.endsWith(".js"))
-        ) {
-            try {
-                const boss = (await import(fullPath)).default as Monster;
-                if (boss && worldLevel >= boss.minWorldLevel) {
-                    bosses.push(boss);
-                }
-            } catch (error) {
-                log(`Error loading boss from file: ${fullPath}`, error);
-            }
-        }
-    }
-
-    if (bosses.length === 0) {
-        return null;
-    }
-
-    return bosses[Math.floor(Math.random() * bosses.length)];
 }
 
 export function getEncounterDescription(monsterName: string, location: string) {

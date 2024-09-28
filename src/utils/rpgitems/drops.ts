@@ -209,6 +209,41 @@ export const drops = {
         minWorldLevel: 11,
         chestChance: 0,
     },
+    "Metal Scrap": {
+        sellPrice: 5,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 1,
+        chestChance: 0,
+    },
+    "Chaos Gear": {
+        sellPrice: 25,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 1,
+        chestChance: 0,
+    },
+    "Chaos Axis": {
+        sellPrice: 30,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 1,
+        chestChance: 0,
+    },
+    "Chaos Device": {
+        sellPrice: 25,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 1,
+        chestChance: 0,
+    },
+    "Chaos Circuit": {
+        sellPrice: 30,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 1,
+        chestChance: 0,
+    },
 };
 
 export type DropName = keyof typeof drops;
