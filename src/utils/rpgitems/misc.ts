@@ -23,12 +23,6 @@ export const misc = {
         maxAmount: 3,
         dropChance: 8,
     },
-    Sunsetta: {
-        sellPrice: 2,
-        minAmount: 2,
-        maxAmount: 5,
-        dropChance: 7,
-    },
     Wheat: {
         sellPrice: 1,
         minAmount: 1,
@@ -106,12 +100,6 @@ export const misc = {
         minAmount: 1,
         maxAmount: 2,
         dropChance: 10,
-    },
-    Onion: {
-        sellPrice: 1,
-        minAmount: 1,
-        maxAmount: 3,
-        dropChance: 14,
     },
     Fish: {
         sellPrice: 4,

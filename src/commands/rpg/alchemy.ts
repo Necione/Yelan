@@ -129,7 +129,7 @@ export const alchemy = buildCommand<SlashCommand>({
             const alchemyBar = createAlchemyBar(alchemyProgress, alchemyMax);
             const alchemyRankWithEmoji =
                 getAlchemyRankWithEmoji(alchemyProgress);
-            const alchemyAttackIncrease = alchemyProgress * 0.5;
+            const alchemyAttackIncrease = alchemyProgress * 0.25;
 
             return r.edit({
                 embeds: [
@@ -170,7 +170,7 @@ export const alchemy = buildCommand<SlashCommand>({
             );
         }
 
-        const alchemyAttackIncrease = newAlchemyProgress * 0.5;
+        const alchemyAttackIncrease = newAlchemyProgress * 0.25;
 
         await Promise.all([
             updateUserStats(i.user.id, {

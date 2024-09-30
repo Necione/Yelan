@@ -195,6 +195,7 @@ model UserStats {
   skills           UserSkill[]
   cooking          UserCooking[]
   activeSkills     String[]       @default([]) 
+  questsFinished   String[]       @default([])
   exp              Int            @default(0)
   worldLevel       Int            @default(1)
   highestWL        Int            @default(1)

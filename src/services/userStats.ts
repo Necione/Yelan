@@ -11,11 +11,11 @@ export async function syncStats(userId: string) {
     }
 
     const calculatedBaseAttack = 5 + (stats.worldLevel - 1) * 0.5;
-    const alchemyBaseAttack = stats.alchemyProgress * 0.5;
+    const alchemyBaseAttack = stats.alchemyProgress * 0.25;
     const finalBaseAttack = calculatedBaseAttack + alchemyBaseAttack;
 
     const calculatedMaxHP =
-        100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
+        100 + (stats.worldLevel - 1) * 25 + (stats.rebirths || 0) * 50;
 
     const additionalWeaponAttackPower =
         stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]

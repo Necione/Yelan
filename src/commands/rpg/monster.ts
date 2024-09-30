@@ -81,10 +81,6 @@ export const monster = buildCommand<SlashCommand>({
                 inline: false,
             })
             .setThumbnail(monster.image)
-            .setFooter({
-                text: `Requested by ${i.user.username}`,
-                iconURL: i.user.displayAvatarURL(),
-            });
 
         await r.edit({
             embeds: [embed],
