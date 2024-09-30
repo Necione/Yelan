@@ -44,7 +44,7 @@ export async function playerAttack(
 
         let bonusDamage = 0;
         if (hasHeartbroken && isFirstTurn) {
-            bonusDamage = stats.hp;
+            bonusDamage = Math.floor(stats.hp / 3);
             await thread
                 .send(
                     `>>> \`💔\` You will deal an additional \`${bonusDamage.toFixed(
@@ -124,7 +124,7 @@ export async function playerAttack(
             stats.activeSkills.includes("Kindle");
 
         if (hasKindle) {
-            const kindleBonusDamage = stats.maxHP * 0.1;
+            const kindleBonusDamage = stats.maxHP * 0.05;
             currentMonsterHp -= kindleBonusDamage;
 
             await thread

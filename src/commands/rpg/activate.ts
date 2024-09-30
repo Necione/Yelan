@@ -10,7 +10,6 @@ const skillChoices = [
     { name: "Leech", value: "Leech", emoji: "💖" },
     { name: "Appraise", value: "Appraise", emoji: "🔍" },
     { name: "Totem", value: "Totem", emoji: "⭐" },
-    { name: "Insomnia", value: "Insomnia", emoji: "🌙" },
     { name: "Kindle", value: "Kindle", emoji: "💥" },
     { name: "Scrounge", value: "Scrounge", emoji: "💸" },
     { name: "Distraction", value: "Distraction", emoji: "💫" },
