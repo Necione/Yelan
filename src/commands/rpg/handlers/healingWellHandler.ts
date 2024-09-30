@@ -1,12 +1,11 @@
 import { embedComment, noop } from "@elara-services/utils";
-import type { UserStats, UserWallet } from "@prisma/client";
+import type { UserStats } from "@prisma/client";
 import type { ButtonInteraction } from "discord.js";
 import { updateUserStats } from "../../../services";
 
 export async function handleHealingWell(
     collected: ButtonInteraction,
     stats: UserStats,
-    userWallet: UserWallet,
 ) {
     const healingPercentage = 0.25;
 
