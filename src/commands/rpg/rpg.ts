@@ -39,8 +39,7 @@ export const rpg = buildCommand<SlashCommand>({
             return r.edit(embedComment(`No stats found for you :(`));
         }
 
-        const huntCooldown = cooldowns.get(p, "hunt");
-        const exploreCooldown = cooldowns.get(p, "explore");
+        const adventureCooldown = cooldowns.get(p, "adventure");
 
         const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
 
@@ -135,9 +134,7 @@ export const rpg = buildCommand<SlashCommand>({
         embed.addFields({
             name: "Cooldowns",
             value: `Hunt: ${
-                huntCooldown.status ? "Ready" : huntCooldown.message
-            }\nExplore: ${
-                exploreCooldown.status ? "Ready" : exploreCooldown.message
+                adventureCooldown.status ? "Ready" : adventureCooldown.message
             }`,
             inline: false,
         });
