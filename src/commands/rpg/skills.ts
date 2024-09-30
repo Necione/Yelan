@@ -60,7 +60,7 @@ const availableSkills = [
     },
     {
         name: "Heartbroken",
-        description: "Deal your Current HP as bonus DMG on your first turn",
+        description: "Deal some of your HP as bonus DMG on your first turn",
         emoji: "💔",
     },
 ];

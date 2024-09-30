@@ -169,7 +169,7 @@ export async function playerAttack(
 
             let bonusDamage = 0;
             if (hasHeartbroken && isFirstTurn) {
-                bonusDamage = stats.hp;
+                bonusDamage = stats.hp / 4;
             }
 
             const modifiersResult = await applyAttackModifiers(
