@@ -30,15 +30,7 @@ export default {
         },
     ],
     locations: [
-        "Qingxu Pool",
-        "Lingju Pass",
-        "Lumberpick Valley",
-        "Dunyu Ruins",
-        "Nantianmen",
-        "Tianqiu Valley",
-        "Luhua Pool",
-        "Guili Plains",
-        "Jueyun Karst",
+        "Test",
     ],
 
     critChance: 10,
