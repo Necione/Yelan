@@ -51,8 +51,8 @@ export async function handleChest(
         stats.skills.some((skill) => skill.name === "Energize") &&
         stats.activeSkills.includes("Energize");
 
-    const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
-    await cooldowns.set(userWallet, "explore", exploreCooldown);
+    const exploreCooldown = hasEnergizeSkill ? get.mins(10) : get.mins(15);
+    await cooldowns.set(userWallet, "adventure", exploreCooldown);
 }
 
 export async function handleMaterials(
@@ -96,8 +96,8 @@ export async function handleMaterials(
         stats.skills.some((skill) => skill.name === "Energize") &&
         stats.activeSkills.includes("Energize");
 
-    const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
-    await cooldowns.set(userWallet, "explore", exploreCooldown);
+    const exploreCooldown = hasEnergizeSkill ? get.mins(10) : get.mins(15);
+    await cooldowns.set(userWallet, "adventure", exploreCooldown);
 }
 
 async function handleTrap(
@@ -131,6 +131,6 @@ async function handleTrap(
         stats.skills.some((skill) => skill.name === "Energize") &&
         stats.activeSkills.includes("Energize");
 
-    const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
-    await cooldowns.set(userWallet, "explore", exploreCooldown);
+    const exploreCooldown = hasEnergizeSkill ? get.mins(10) : get.mins(15);
+    await cooldowns.set(userWallet, "adventure", exploreCooldown);
 }
