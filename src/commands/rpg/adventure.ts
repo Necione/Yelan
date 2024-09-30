@@ -1,5 +1,4 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import type { Interaction } from "discord.js";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -191,7 +190,7 @@ export const adventure = buildCommand<SlashCommand>({
                         components: [actionRow],
                     });
 
-                    const filter = (i: Interaction) =>
+                    const filter = (i: any) =>
                         i.user.id === interaction.user.id;
                     const collected = await message
                         .awaitMessageComponent({
@@ -242,7 +241,11 @@ export const adventure = buildCommand<SlashCommand>({
                             adventureEnded = true;
                             break;
                         case "drink":
-                            await handleHealingWell(collected, stats);
+                            await handleHealingWell(
+                                collected,
+                                stats,
+                                userWallet,
+                            );
 
                             await new Promise((resolve) =>
                                 setTimeout(resolve, 5000),
@@ -324,7 +327,21 @@ export const adventure = buildCommand<SlashCommand>({
                     ],
                     components: [],
                 });
+            } else {
             }
+        } catch (error: any) {
+            await response.edit({
+                embeds: [
+                    new EmbedBuilder()
+                        .setDescription(error.message)
+                        .setColor(
+                            error.message.includes("cannot") ||
+                                error.message.includes("not")
+                                ? Colors.Yellow
+                                : Colors.Red,
+                        ),
+                ],
+            });
         } finally {
             locked.del(interaction.user.id);
             await updateUserStats(interaction.user.id, { isHunting: false });

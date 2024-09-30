@@ -133,7 +133,7 @@ export const rpg = buildCommand<SlashCommand>({
 
         embed.addFields({
             name: "Cooldowns",
-            value: `Adventure: ${
+            value: `Hunt: ${
                 adventureCooldown.status ? "Ready" : adventureCooldown.message
             }`,
             inline: false,
