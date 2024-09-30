@@ -122,11 +122,11 @@ export async function handleVictory(
     sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
 
     const hasInsomniaSkill =
-        stats.skills.some((skill) => skill.name === "Energize") &&
-        stats.activeSkills.includes("Energize");
+        stats.skills.some((skill) => skill.name === "Insomnia") &&
+        stats.activeSkills.includes("Insomnia");
 
-    const huntCooldown = hasInsomniaSkill ? get.mins(10) : get.mins(15);
-    await cooldowns.set(userWallet, "adventure", huntCooldown);
+    const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
+    await cooldowns.set(userWallet, "hunt", huntCooldown);
 }
 
 export async function handleDefeat(
@@ -167,11 +167,11 @@ export async function handleDefeat(
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
 
     const hasInsomniaSkill =
-        stats.skills.some((skill) => skill.name === "Energize") &&
-        stats.activeSkills.includes("Energize");
+        stats.skills.some((skill) => skill.name === "Insomnia") &&
+        stats.activeSkills.includes("Insomnia");
 
-    const huntCooldown = hasInsomniaSkill ? get.mins(10) : get.mins(15);
-    await cooldowns.set(userWallet, "adventure", huntCooldown);
+    const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
+    await cooldowns.set(userWallet, "hunt", huntCooldown);
 
     sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
 }
