@@ -114,10 +114,6 @@ export const adventure = buildCommand<SlashCommand>({
                     "No stats found for you, please set up your profile.",
                 );
             }
-            
-            if (stats.location === "Liyue Harbor") {
-                throw new Error("You cannot go on an adventure in Liyue Harbor!");
-            }            
 
             if (stats.isTravelling) {
                 throw new Error(
