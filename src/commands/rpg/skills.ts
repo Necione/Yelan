@@ -28,8 +28,13 @@ const availableSkills = [
         emoji: "⭐",
     },
     {
+        name: "Insomnia",
+        description: "Reduce your hunt cooldown from 30 minutes to 20 minutes",
+        emoji: "🌙",
+    },
+    {
         name: "Kindle",
-        description: "Deal 5% of your Max HP as bonus damage per turn",
+        description: "Deal 10% of your Max HP as bonus damage per turn",
         emoji: "💥",
     },
     {
@@ -40,7 +45,7 @@ const availableSkills = [
     {
         name: "Energize",
         description:
-            "Reduce your adventure cooldown from 15 minutes to 10 minutes",
+            "Reduce your explore cooldown from 20 minutes to 15 minutes",
         emoji: "⚡",
     },
     {
@@ -55,7 +60,7 @@ const availableSkills = [
     },
     {
         name: "Heartbroken",
-        description: "Deal some of your HP as bonus DMG on your first turn",
+        description: "Deal your Current HP as bonus DMG on your first turn",
         emoji: "💔",
     },
 ];

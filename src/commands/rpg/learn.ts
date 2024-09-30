@@ -14,6 +14,7 @@ type SkillName =
     | "Leech"
     | "Appraise"
     | "Totem"
+    | "Insomnia"
     | "Energize"
     | "Scrounge"
     | "Distraction"
@@ -55,12 +56,20 @@ const skillRequirements: Record<
         coins: 100,
         items: [{ item: "Stained Mask", amount: 5 }],
     },
+    Insomnia: {
+        worldLevel: 4,
+        coins: 250,
+        items: [
+            { item: "Firm Arrowhead", amount: 3 },
+            { item: "Sealed Scroll", amount: 5 },
+        ],
+    },
     Energize: {
         worldLevel: 4,
         coins: 250,
         items: [
-            { item: "Ominous Mask", amount: 2 },
-            { item: "Sealed Scroll", amount: 5 },
+            { item: "Ominous Mask", amount: 5 },
+            { item: "Sealed Scroll", amount: 10 },
         ],
     },
     Scrounge: {
