@@ -114,12 +114,10 @@ export const adventure = buildCommand<SlashCommand>({
                     "No stats found for you, please set up your profile.",
                 );
             }
-
+            
             if (stats.location === "Liyue Harbor") {
-                throw new Error(
-                    "You cannot go on an adventure in Liyue Harbor!",
-                );
-            }
+                throw new Error("You cannot go on an adventure in Liyue Harbor!");
+            }            
 
             if (stats.isTravelling) {
                 throw new Error(
@@ -329,30 +327,6 @@ export const adventure = buildCommand<SlashCommand>({
                             .setColor(Colors.Blue),
                     ],
                     components: [],
-                });
-            }
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                await response.edit({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setDescription(error.message)
-                            .setColor(
-                                error.message.includes("cannot") ||
-                                    error.message.includes("not")
-                                    ? Colors.Yellow
-                                    : Colors.Red,
-                            ),
-                    ],
-                });
-            } else {
-                console.error("Unexpected error type:", error);
-                await response.edit({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setDescription("An unexpected error occurred.")
-                            .setColor(Colors.Red),
-                    ],
                 });
             }
         } finally {
