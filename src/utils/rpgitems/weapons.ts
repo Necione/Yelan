@@ -317,6 +317,7 @@ const prefixes: { [key: string]: number } = {
     Old: 0.75,
     Sharp: 1.25,
     Godly: 1.5,
+    Perfect: 2,
     Worthless: 0.5,
 };
 
