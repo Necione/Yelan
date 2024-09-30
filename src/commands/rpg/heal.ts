@@ -40,7 +40,7 @@ export const heal = buildCommand<SlashCommand>({
         }
 
         const baseHealCost = Math.floor(Math.random() * (50 - 40 + 1)) + 40;
-        const healCost = baseHealCost + stats.worldLevel * 2;
+        const healCost = baseHealCost + stats.worldLevel * 1;
 
         if (userProfile.balance < healCost) {
             return r.edit(
