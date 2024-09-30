@@ -1,10 +1,7 @@
 export default {
+    currentHp: 0,
     name: "Violet Lightning",
     group: "Abyss",
-    minHp: 800,
-    maxHp: 1200,
-    minDamage: 130,
-    maxDamage: 160,
     minExp: 10,
     maxExp: 25,
     minWorldLevel: 16,
@@ -41,7 +38,48 @@ export default {
         "Jueyun Karst",
     ],
     critChance: 40,
-    critValue: 1.8,
+    critValue: 3,
     defChance: 85,
-    defValue: 90,
+    defValue: 0.5,
+    getStatsForWorldLevel(worldLevel: number) {
+        const stats = [
+            {
+                worldLevel: 16,
+                minHp: 860,
+                maxHp: 955,
+                minDamage: 52,
+                maxDamage: 67,
+            },
+            {
+                worldLevel: 17,
+                minHp: 960,
+                maxHp: 1060,
+                minDamage: 66,
+                maxDamage: 80,
+            },
+            {
+                worldLevel: 18,
+                minHp: 1055,
+                maxHp: 1155,
+                minDamage: 80,
+                maxDamage: 95,
+            },
+            {
+                worldLevel: 19,
+                minHp: 1150,
+                maxHp: 1245,
+                minDamage: 98,
+                maxDamage: 130,
+            },
+            {
+                worldLevel: 20,
+                minHp: 1300,
+                maxHp: 1630,
+                minDamage: 112,
+                maxDamage: 155,
+            },
+        ];
+
+        return stats.find((stat) => stat.worldLevel === worldLevel) || null;
+    },
 };
