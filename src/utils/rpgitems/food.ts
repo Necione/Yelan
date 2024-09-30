@@ -1,11 +1,11 @@
 export const food = {
     "Chicken-Mushroom Skewer": {
         sellAmount: 5,
-        healAmount: 10,
+        healAmount: 20,
     },
     "Sweet Madame": {
         sellAmount: 10,
-        healAmount: 30,
+        healAmount: 32,
     },
     "Teyvat Fried Egg": {
         sellAmount: 3,
@@ -13,23 +13,55 @@ export const food = {
     },
     Steak: {
         sellAmount: 3,
-        healAmount: 20,
+        healAmount: 25,
+    },
+    "Fisherman's Toast": {
+        sellAmount: 8,
+        healAmount: 26,
     },
     "Mondstadt Hash Brown": {
         sellAmount: 15,
         healAmount: 40,
     },
+    "Mushroom Pizza": {
+        sellAmount: 18,
+        healAmount: 50,
+    },
+    "Fried Radish Balls": {
+        sellAmount: 6,
+        healAmount: 22,
+    },
+    "Cream Stew": {
+        sellAmount: 12,
+        healAmount: 30,
+    },
     "Barbatos Ratatouille": {
         sellAmount: 10,
+        healAmount: 32,
+    },
+    "Calla Lily Seafood Soup": {
+        sellAmount: 12,
         healAmount: 30,
     },
     "Jade Parcels": {
         sellAmount: 20,
         healAmount: 100,
     },
+    "Universal Peace": {
+        sellAmount: 15,
+        healAmount: 40,
+    },
     "Almond Tofu": {
         sellAmount: 12,
         healAmount: 75,
+    },
+    Goulash: {
+        sellAmount: 14,
+        healAmount: 34,
+    },
+    "Golden Shrimp Balls": {
+        sellAmount: 18,
+        healAmount: 100,
     },
     "Jewelry Soup": {
         sellAmount: 10,
@@ -39,13 +71,9 @@ export const food = {
         sellAmount: 12,
         healAmount: 32,
     },
-    "Golden Crab": {
+    "Crab Roe Tofu": {
         sellAmount: 15,
         healAmount: 50,
-    },
-    "Fish and Chips": {
-        sellAmount: 15,
-        healAmount: 30,
     },
 };
 

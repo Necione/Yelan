@@ -275,10 +275,8 @@ export async function monsterAttack(
     stats: UserStats,
     monster: Monster,
     currentPlayerHp: number,
-    minDamage: number,
-    maxDamage: number,
 ): Promise<number> {
-    let monsterDamage = getRandomValue(minDamage, maxDamage);
+    let monsterDamage = getRandomValue(monster.minDamage, monster.maxDamage);
 
     const critChance = monster.critChance || 0;
     const critValue = monster.critValue || 1;
@@ -325,7 +323,7 @@ export async function monsterAttack(
 
     const leechTriggered = Math.random() < 0.5;
     if (hasLeechSkill && leechTriggered) {
-        const healAmount = Math.ceil(monster.baseHp * 0.05);
+        const healAmount = Math.ceil(monster.maxHp * 0.05);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
         await thread
             .send(
@@ -357,25 +355,12 @@ export async function handleHunt(
 ) {
     await initializeMonsters();
 
-    let numberOfMonsters;
-
-    switch (true) {
-        case stats.worldLevel >= 20:
-            numberOfMonsters = Math.floor(Math.random() * 2) + 4;
-            break;
-        case stats.worldLevel >= 15:
-            numberOfMonsters = Math.floor(Math.random() * 2) + 3;
-            break;
-        case stats.worldLevel >= 10:
-            numberOfMonsters = Math.floor(Math.random() * 2) + 2;
-            break;
-        case stats.worldLevel >= 5:
-            numberOfMonsters = Math.floor(Math.random() * 2) + 1;
-            break;
-        default:
-            numberOfMonsters = 1;
-            break;
-    }
+    const numberOfMonsters =
+        stats.worldLevel >= 10
+            ? Math.floor(Math.random() * 2) + 2
+            : stats.worldLevel >= 5
+              ? Math.floor(Math.random() * 2) + 1
+              : 1;
 
     const monstersEncountered: Monster[] = [];
     let currentPlayerHp = stats.hp;
@@ -422,27 +407,10 @@ export async function handleHunt(
             monster.name,
             stats.location,
         );
-
-        let scaledAtk = monster.baseAtk;
-
-        for (let i = monster.minWorldLevel; i < stats.worldLevel; i++) {
-            scaledAtk = scaledAtk * 1.1 + monster.atkConstant;
-        }
-
-        const minDamage = Math.floor(scaledAtk * 0.9);
-        const maxDamage = Math.ceil(scaledAtk * 1.1);
-
-        let scaledHp = monster.baseHp;
-
-        for (let i = monster.minWorldLevel; i < stats.worldLevel; i++) {
-            scaledHp = scaledHp * 1.1 + monster.hpConstant;
-        }
-
-        const monsterMinHp = Math.floor(scaledHp - scaledHp * 0.1);
-        const monsterMaxHp = Math.ceil(scaledHp + scaledHp * 0.1);
-
-        scaledHp = getRandomValue(monsterMinHp, monsterMaxHp);
-        const initialMonsterHp = scaledHp;
+        let currentMonsterHp = Math.floor(
+            getRandomValue(monster.minHp, monster.maxHp),
+        );
+        const initialMonsterHp = currentMonsterHp;
 
         const initialPlayerHp = currentPlayerHp;
 
@@ -474,7 +442,7 @@ export async function handleHunt(
                 },
                 {
                     name: "Monster HP",
-                    value: createHealthBar(scaledHp, initialMonsterHp),
+                    value: createHealthBar(currentMonsterHp, initialMonsterHp),
                     inline: true,
                 },
             );
@@ -533,7 +501,7 @@ export async function handleHunt(
         let isFirstTurn = true;
 
         const battleInterval = setInterval(async () => {
-            if (currentPlayerHp <= 0 || scaledHp <= 0) {
+            if (currentPlayerHp <= 0 || currentMonsterHp <= 0) {
                 clearInterval(battleInterval);
 
                 if (currentPlayerHp > 0) {
@@ -568,14 +536,12 @@ export async function handleHunt(
                 return;
             }
 
-            if (isMonsterFirst && scaledHp > 0) {
+            if (isMonsterFirst && currentMonsterHp > 0) {
                 currentPlayerHp = await monsterAttack(
                     thread!,
                     stats,
                     monster,
                     currentPlayerHp,
-                    minDamage,
-                    maxDamage,
                 );
 
                 stats.hp = currentPlayerHp;
@@ -586,27 +552,25 @@ export async function handleHunt(
                     thread!,
                     stats,
                     monster,
-                    scaledHp,
+                    currentMonsterHp,
                     hasVigilance,
                     vigilanceUsed,
                     monsterState,
                     isFirstTurn,
                 );
 
-                scaledHp = result.currentMonsterHp;
+                currentMonsterHp = result.currentMonsterHp;
                 vigilanceUsed = result.vigilanceUsed;
                 monsterState = result.monsterState;
 
                 currentPlayerHp = stats.hp;
 
-                if (scaledHp > 0) {
+                if (currentMonsterHp > 0) {
                     currentPlayerHp = await monsterAttack(
                         thread!,
                         stats,
                         monster,
                         currentPlayerHp,
-                        minDamage,
-                        maxDamage,
                     );
                 }
 
@@ -621,7 +585,10 @@ export async function handleHunt(
                 currentPlayerHp,
                 initialPlayerHp,
             );
-            const monsterHpBar = createHealthBar(scaledHp, initialMonsterHp);
+            const monsterHpBar = createHealthBar(
+                currentMonsterHp,
+                initialMonsterHp,
+            );
 
             battleEmbed.setFields([
                 {
@@ -741,9 +708,10 @@ export async function checkMonsterDefenses(
     }
 
     const monsterDefChance = monster.defChance || 0;
+    const monsterDefValue = monster.defValue || 0;
     const monsterDefended = Math.random() * 100 < monsterDefChance;
     if (monsterDefended) {
-        attackPower = Math.max(attackPower - monster.defValue, 0);
+        attackPower = Math.max(attackPower - monsterDefValue, 0);
     }
 
     return { attackPower, attackMissed, monsterState };
