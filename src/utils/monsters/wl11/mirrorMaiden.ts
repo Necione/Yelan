@@ -1,12 +1,12 @@
 export default {
     name: "Mirror Maiden",
     group: "Fatui",
-    minHp: 200,
-    maxHp: 400,
-    minDamage: 60,
-    maxDamage: 80,
+    minHp: 0,
+    maxHp: 0,
+    minDamage: 0,
+    maxDamage: 0,
     minExp: 10,
-    maxExp: 20,
+    maxExp: 15,
     minWorldLevel: 11,
     image: "https://lh.elara.workers.dev/rpg/monsters/mirror_maiden.png",
     drops: [
@@ -31,8 +31,8 @@ export default {
         "Jueyun Karst",
     ],
 
-    critChance: 50,
-    critValue: 2,
-    defChance: 90,
-    defValue: 100,
+    critChance: 0,
+    critValue: 0,
+    defChance: 0,
+    defValue: 0,
 };

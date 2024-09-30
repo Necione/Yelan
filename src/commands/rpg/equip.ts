@@ -228,10 +228,10 @@ export const equip = buildCommand<SlashCommand>({
             if (additionalDefValue !== 0) {
                 updatedStats.push(
                     `🛡️ Def Value: ${formatChange(
-                        additionalDefValue,
-                    )} (Total: ${formatChange(
-                        stats.defValue + additionalDefValue,
-                    )})`,
+                        additionalDefValue * 100,
+                    )}% (Total: ${formatChange(
+                        (stats.defValue + additionalDefValue) * 100,
+                    )}%)`,
                 );
             }
 

@@ -6,10 +6,6 @@ export interface Monster {
     currentHp: number;
     name: string;
     group: string;
-    minHp: number;
-    maxHp: number;
-    minDamage: number;
-    maxDamage: number;
     minExp: number;
     maxExp: number;
     critChance: number;
@@ -25,6 +21,19 @@ export interface Monster {
         chance: number;
     }[];
     locations: string[];
+    getStatsForWorldLevel: (worldLevel: number) => {
+        minHp: number;
+        maxHp: number;
+        minDamage: number;
+        maxDamage: number;
+    } | null;
+}
+
+export interface MonsterInstance extends Monster {
+    minHp: number;
+    maxHp: number;
+    minDamage: number;
+    maxDamage: number;
 }
 
 export const monsters: Monster[] = [];
@@ -89,47 +98,6 @@ export function calculateExp(minExp: number, maxExp: number): number {
     return getRandomValue(minExp, maxExp);
 }
 
-const lowEncounterAverages = [
-    { worldLevel: 1, minHp: 12, maxHp: 20, minDamage: 2, maxDamage: 6 },
-    { worldLevel: 2, minHp: 14, maxHp: 25, minDamage: 4, maxDamage: 8 },
-    { worldLevel: 3, minHp: 22, maxHp: 50, minDamage: 5, maxDamage: 10 },
-    { worldLevel: 4, minHp: 32, maxHp: 65, minDamage: 8, maxDamage: 13 },
-    { worldLevel: 5, minHp: 40, maxHp: 80, minDamage: 9, maxDamage: 16 },
-    { worldLevel: 6, minHp: 75, maxHp: 100, minDamage: 14, maxDamage: 20 },
-    { worldLevel: 7, minHp: 100, maxHp: 150, minDamage: 18, maxDamage: 25 },
-    { worldLevel: 8, minHp: 150, maxHp: 250, minDamage: 25, maxDamage: 33 },
-    { worldLevel: 9, minHp: 200, maxHp: 300, minDamage: 30, maxDamage: 37 },
-    { worldLevel: 10, minHp: 250, maxHp: 325, minDamage: 35, maxDamage: 40 },
-    { worldLevel: 11, minHp: 275, maxHp: 350, minDamage: 40, maxDamage: 50 },
-    { worldLevel: 12, minHp: 400, maxHp: 500, minDamage: 65, maxDamage: 70 },
-    { worldLevel: 13, minHp: 500, maxHp: 600, minDamage: 70, maxDamage: 80 },
-    { worldLevel: 14, minHp: 600, maxHp: 700, minDamage: 75, maxDamage: 85 },
-    { worldLevel: 15, minHp: 700, maxHp: 800, minDamage: 80, maxDamage: 95 },
-    { worldLevel: 16, minHp: 800, maxHp: 900, minDamage: 85, maxDamage: 100 },
-    { worldLevel: 17, minHp: 900, maxHp: 1000, minDamage: 100, maxDamage: 110 },
-    {
-        worldLevel: 18,
-        minHp: 1000,
-        maxHp: 1100,
-        minDamage: 110,
-        maxDamage: 130,
-    },
-    {
-        worldLevel: 19,
-        minHp: 1100,
-        maxHp: 1200,
-        minDamage: 120,
-        maxDamage: 140,
-    },
-    {
-        worldLevel: 20,
-        minHp: 1200,
-        maxHp: 1300,
-        minDamage: 130,
-        maxDamage: 150,
-    },
-];
-
 export async function getRandomMonster(
     worldLevel: number,
     location: string,
@@ -142,7 +110,7 @@ export async function getRandomMonster(
         defValue: number;
         maxHp: number;
     },
-) {
+): Promise<MonsterInstance | null> {
     if (!monstersLoaded) {
         return null;
     }
@@ -182,7 +150,7 @@ export async function getRandomMonster(
     for (const monster of monstersInGroup) {
         randomWeight -= monster.minWorldLevel;
         if (randomWeight <= 0) {
-            selectedMonster = JSON.parse(JSON.stringify(monster));
+            selectedMonster = monster; // Directly assign the monster object
             break;
         }
     }
@@ -191,42 +159,54 @@ export async function getRandomMonster(
         return null;
     }
 
-    if (selectedMonster.name === "Mirror Maiden") {
-        selectedMonster.currentHp = playerStats.currentHp;
-        selectedMonster.minDamage = playerStats.attackPower;
-        selectedMonster.maxDamage = playerStats.attackPower;
-        selectedMonster.critChance = playerStats.critChance;
-        selectedMonster.critValue = playerStats.critValue;
-        selectedMonster.defChance = playerStats.defChance;
-        selectedMonster.defValue = playerStats.defValue;
-        selectedMonster.minHp = playerStats.maxHp;
-        selectedMonster.maxHp = playerStats.maxHp;
-    } else if (worldLevel >= 16 && selectedMonster.minWorldLevel >= 16) {
-        const levelDifference = worldLevel - selectedMonster.minWorldLevel;
-        if (levelDifference > 0) {
-            selectedMonster.minHp += 50 * levelDifference;
-            selectedMonster.maxHp += 50 * levelDifference;
-            selectedMonster.minDamage += 10 * levelDifference;
-            selectedMonster.maxDamage += 10 * levelDifference;
-        }
-    } else if (
-        worldLevel > selectedMonster.minWorldLevel &&
-        selectedMonster.name !== "Mirror Maiden" &&
-        selectedMonster.group !== "Chasm"
-    ) {
-        const encounterAverages = lowEncounterAverages.find(
-            (avg) => avg.worldLevel === worldLevel,
+    // Check if getStatsForWorldLevel exists on the selectedMonster
+    if (typeof selectedMonster.getStatsForWorldLevel !== "function") {
+        console.error(
+            `getStatsForWorldLevel is not a function for monster: ${selectedMonster.name}`,
         );
-
-        if (encounterAverages) {
-            selectedMonster.minHp = encounterAverages.minHp;
-            selectedMonster.maxHp = encounterAverages.maxHp;
-            selectedMonster.minDamage = encounterAverages.minDamage;
-            selectedMonster.maxDamage = encounterAverages.maxDamage;
-        }
+        return null;
     }
 
-    return selectedMonster;
+    // Retrieve stats for the current world level using the helper method
+    const stats = selectedMonster.getStatsForWorldLevel(worldLevel);
+
+    if (stats) {
+        // Create a MonsterInstance with the selected stats
+        const monsterInstance: MonsterInstance = {
+            ...selectedMonster, // Shallow copy to include original methods
+            minHp: stats.minHp,
+            maxHp: stats.maxHp,
+            minDamage: stats.minDamage,
+            maxDamage: stats.maxDamage,
+            currentHp: stats.minHp, // Initialize currentHp to minHp or as needed
+        };
+
+        if (monsterInstance.name === "Mirror Maiden") {
+            monsterInstance.currentHp = playerStats.currentHp;
+            monsterInstance.minDamage = playerStats.attackPower;
+            monsterInstance.maxDamage = playerStats.attackPower;
+            monsterInstance.critChance = playerStats.critChance;
+            monsterInstance.critValue = playerStats.critValue;
+            monsterInstance.defChance = playerStats.defChance;
+            monsterInstance.defValue = playerStats.defValue;
+            monsterInstance.minHp = playerStats.maxHp;
+            monsterInstance.maxHp = playerStats.maxHp;
+        } else if (worldLevel >= 16 && monsterInstance.minWorldLevel >= 16) {
+            const levelDifference = worldLevel - monsterInstance.minWorldLevel;
+            if (levelDifference > 0) {
+                monsterInstance.currentHp += 50 * levelDifference;
+                monsterInstance.minDamage += 10 * levelDifference;
+                monsterInstance.maxDamage += 10 * levelDifference;
+            }
+        }
+
+        return monsterInstance;
+    } else {
+        console.error(
+            `Stats for world level ${worldLevel} not found for monster: ${selectedMonster.name}`,
+        );
+        return null;
+    }
 }
 
 export function getEncounterDescription(monsterName: string, location: string) {

@@ -82,9 +82,12 @@ export const rpg = buildCommand<SlashCommand>({
                     stats.defChance > 0 || stats.defValue > 0
                         ? `\n🛡️ DEF Chance: \`${
                               stats.defChance
-                          }%\` | 🛡️ DEF Value: \`${stats.defValue.toFixed(2)}\``
+                          }%\` | 🛡️ DEF Value: \`${(
+                              stats.defValue * 100
+                          ).toFixed(2)}%\``
                         : ""
                 }`,
+
                 inline: false,
             });
         if (stats.rebirths > 0) {

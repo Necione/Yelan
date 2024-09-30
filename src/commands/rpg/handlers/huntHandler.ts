@@ -64,6 +64,12 @@ export async function playerAttack(
         attackPower = modifiersResult.attackPower;
         monsterState = modifiersResult.monsterState;
 
+        const { isCrit, multiplier } = calculateCriticalHit(
+            stats.critChance || 0,
+            stats.critValue || 1,
+        );
+        attackPower *= multiplier;
+
         const defenseResult = await checkMonsterDefenses(
             attackPower,
             stats,
@@ -73,14 +79,12 @@ export async function playerAttack(
         );
         attackPower = defenseResult.attackPower;
         const attackMissed = defenseResult.attackMissed;
+        const monsterDefended = defenseResult.monsterDefended;
         monsterState = defenseResult.monsterState;
 
         if (attackMissed) {
             return { currentMonsterHp, vigilanceUsed, monsterState };
         }
-
-        const monsterDefended = attackPower < stats.baseAttack;
-        const monsterDefValue = monster.defValue || 0;
 
         if (hasVigilance && !vigilanceUsed) {
             const vigilanceAttackPower = attackPower / 2;
@@ -98,15 +102,14 @@ export async function playerAttack(
 
         currentMonsterHp -= attackPower;
 
-        await thread
-            .send(
-                `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                    2,
-                )}\` damage to the ${monster.name}${
-                    monsterDefended ? ` 🛡️ (Defended: -${monsterDefValue})` : ""
-                }.`,
-            )
-            .catch(noop);
+        await sendDamageMessage(
+            thread,
+            attackPower,
+            monster.name,
+            isCrit,
+            monsterDefended,
+            monster.defValue,
+        );
 
         if (bonusDamage > 0) {
             currentMonsterHp -= bonusDamage;
@@ -182,12 +185,11 @@ export async function playerAttack(
             attackPower = modifiersResult.attackPower;
             monsterState = modifiersResult.monsterState;
 
-            const critChance = stats.critChance || 0;
-            const critValue = stats.critValue || 1;
-            const isCrit = Math.random() * 100 < critChance;
-            if (isCrit) {
-                attackPower *= critValue;
-            }
+            const { isCrit, multiplier } = calculateCriticalHit(
+                stats.critChance || 0,
+                stats.critValue || 1,
+            );
+            attackPower *= multiplier;
 
             const defenseResult = await checkMonsterDefenses(
                 attackPower,
@@ -198,14 +200,12 @@ export async function playerAttack(
             );
             attackPower = defenseResult.attackPower;
             const attackMissed = defenseResult.attackMissed;
+            const monsterDefended = defenseResult.monsterDefended;
             monsterState = defenseResult.monsterState;
 
             if (attackMissed) {
                 return { currentMonsterHp, vigilanceUsed, monsterState };
             }
-
-            const monsterDefended = attackPower < stats.attackPower;
-            const monsterDefValue = monster.defValue || 0;
 
             if (hasVigilance && !vigilanceUsed) {
                 const vigilanceAttackPower = attackPower / 2;
@@ -223,19 +223,14 @@ export async function playerAttack(
 
             currentMonsterHp -= attackPower;
 
-            await thread
-                .send(
-                    `>>> \`⚔️\` You dealt \`${attackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name}${
-                        isCrit ? " 💢 (Critical Hit!)" : ""
-                    }${
-                        monsterDefended
-                            ? ` 🛡️ (Defended: -${monsterDefValue})`
-                            : ""
-                    }.`,
-                )
-                .catch(noop);
+            await sendDamageMessage(
+                thread,
+                attackPower,
+                monster.name,
+                isCrit,
+                monsterDefended,
+                monster.defValue,
+            );
 
             if (bonusDamage > 0) {
                 currentMonsterHp -= bonusDamage;
@@ -243,7 +238,7 @@ export async function playerAttack(
                     .send(
                         `>>> \`💔\` You dealt an additional \`${bonusDamage.toFixed(
                             2,
-                        )}\` bonus damage (Heartbroken)`,
+                        )}\` bonus damage (Heartbroken).`,
                     )
                     .catch(noop);
             }
@@ -276,20 +271,28 @@ export async function monsterAttack(
     monster: Monster,
     currentPlayerHp: number,
 ): Promise<number> {
-    let monsterDamage = getRandomValue(monster.minDamage, monster.maxDamage);
-
-    const critChance = monster.critChance || 0;
-    const critValue = monster.critValue || 1;
-    const isCrit = Math.random() * 100 < critChance;
-    if (isCrit) {
-        monsterDamage *= critValue;
+    const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
+    if (!monsterStats) {
+        throw new Error(`Stats not found for monster: ${monster.name}`);
     }
+
+    let monsterDamage = getRandomValue(
+        monsterStats.minDamage,
+        monsterStats.maxDamage,
+    );
+
+    const { isCrit, multiplier } = calculateCriticalHit(
+        monster.critChance || 0,
+        monster.critValue || 1,
+    );
+    monsterDamage *= multiplier;
 
     const defChance = stats.defChance || 0;
     const defValue = stats.defValue || 0;
     const defended = Math.random() * 100 < defChance;
+
     if (defended) {
-        monsterDamage = Math.max(monsterDamage - defValue, 0);
+        monsterDamage = Math.max(monsterDamage * (1 - defValue), 0);
     }
 
     if (monster.name.includes("Pyro")) {
@@ -323,7 +326,7 @@ export async function monsterAttack(
 
     const leechTriggered = Math.random() < 0.5;
     if (hasLeechSkill && leechTriggered) {
-        const healAmount = Math.ceil(monster.maxHp * 0.05);
+        const healAmount = Math.ceil(monsterStats.maxHp * 0.05);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
         await thread
             .send(
@@ -336,10 +339,12 @@ export async function monsterAttack(
 
     await thread
         .send(
-            `>>> \`⚔️\` The ${
-                monster.name
-            } dealt \`${monsterDamage}\` damage to you${
-                defended ? ` 🛡️ (Defended: -${defValue})` : ""
+            `>>> \`⚔️\` The ${monster.name} dealt \`${monsterDamage.toFixed(
+                2,
+            )}\` damage to you${
+                defended
+                    ? ` 🛡️ (Defended: -${(defValue * 100).toFixed(2)}%)`
+                    : ""
             }${isCrit ? " 💢 (Critical Hit!)" : ""}.`,
         )
         .catch(noop);
@@ -407,11 +412,15 @@ export async function handleHunt(
             monster.name,
             stats.location,
         );
+        const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
+        if (!monsterStats) {
+            throw new Error(`Stats not found for monster: ${monster.name}`);
+        }
         let currentMonsterHp = Math.floor(
-            getRandomValue(monster.minHp, monster.maxHp),
+            getRandomValue(monsterStats.minHp, monsterStats.maxHp),
         );
-        const initialMonsterHp = currentMonsterHp;
 
+        const initialMonsterHp = currentMonsterHp;
         const initialPlayerHp = currentPlayerHp;
 
         const createHealthBar = (
@@ -563,8 +572,6 @@ export async function handleHunt(
                 vigilanceUsed = result.vigilanceUsed;
                 monsterState = result.monsterState;
 
-                currentPlayerHp = stats.hp;
-
                 if (currentMonsterHp > 0) {
                     currentPlayerHp = await monsterAttack(
                         thread!,
@@ -657,9 +664,11 @@ export async function checkMonsterDefenses(
 ): Promise<{
     attackPower: number;
     attackMissed: boolean;
+    monsterDefended: boolean;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
 }> {
     let attackMissed = false;
+    let monsterDefended = false;
 
     if (monster.name.includes("Agent") && !monsterState.vanishedUsed) {
         attackMissed = true;
@@ -707,12 +716,43 @@ export async function checkMonsterDefenses(
             .catch(noop);
     }
 
-    const monsterDefChance = monster.defChance || 0;
+    const monsterDefChance = (monster.defChance || 0) * 100;
     const monsterDefValue = monster.defValue || 0;
-    const monsterDefended = Math.random() * 100 < monsterDefChance;
-    if (monsterDefended) {
-        attackPower = Math.max(attackPower - monsterDefValue, 0);
+
+    const monsterDefendedCheck = Math.random() * 100 < monsterDefChance;
+
+    if (monsterDefendedCheck) {
+        attackPower = Math.max(attackPower * (1 - monsterDefValue), 0);
+        monsterDefended = true;
     }
 
-    return { attackPower, attackMissed, monsterState };
+    return { attackPower, attackMissed, monsterDefended, monsterState };
+}
+
+function calculateCriticalHit(
+    critChance: number,
+    critValue: number,
+): { isCrit: boolean; multiplier: number } {
+    const isCrit = Math.random() * 100 < critChance;
+    return { isCrit, multiplier: isCrit ? critValue : 1 };
+}
+
+async function sendDamageMessage(
+    thread: ThreadChannel,
+    damage: number,
+    monsterName: string,
+    isCrit: boolean,
+    monsterDefended: boolean,
+    defValue?: number,
+) {
+    let message = `>>> \`⚔️\` You dealt \`${damage.toFixed(
+        2,
+    )}\` damage to the ${monsterName}`;
+    if (isCrit) {
+        message += " 💢 (Critical Hit!)";
+    }
+    if (monsterDefended && defValue !== undefined) {
+        message += ` 🛡️ (Defended: -${(defValue * 100).toFixed(2)}%)`;
+    }
+    await thread.send(message).catch(noop);
 }
