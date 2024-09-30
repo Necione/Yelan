@@ -89,7 +89,19 @@ export function calculateExp(minExp: number, maxExp: number): number {
     return getRandomValue(minExp, maxExp);
 }
 
-export async function getRandomMonster(worldLevel: number, location: string) {
+export async function getRandomMonster(
+    worldLevel: number,
+    location: string,
+    playerStats: {
+        currentHp: number;
+        attackPower: number;
+        critChance: number;
+        critValue: number;
+        defChance: number;
+        defValue: number;
+        maxHp: number;
+    },
+) {
     if (!monstersLoaded) {
         return null;
     }
@@ -126,7 +138,9 @@ export async function getRandomMonster(worldLevel: number, location: string) {
         return null;
     }
 
-    return JSON.parse(JSON.stringify(selectedMonster));
+    const monsterCopy = JSON.parse(JSON.stringify(selectedMonster));
+
+    return monsterCopy;
 }
 
 export function getEncounterDescription(monsterName: string, location: string) {

@@ -80,7 +80,7 @@ export const monster = buildCommand<SlashCommand>({
                 value: dropsList.length > 0 ? dropsList : "No drops available.",
                 inline: false,
             })
-            .setThumbnail(monster.image);
+            .setThumbnail(monster.image)
 
         await r.edit({
             embeds: [embed],
