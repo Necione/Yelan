@@ -17,8 +17,7 @@ import {
 } from "../../../utils/hunt";
 import { handleDefeat, handleVictory } from "./conditions";
 import {
-    handleAquaSimulacraAttack,
-    handleStaffOfHomaAttack,
+    handleStaffOfHomaAttack
 } from "./specialHunt";
 
 export async function playerAttack(
@@ -143,18 +142,6 @@ export async function playerAttack(
     } else {
         if (stats.equippedWeapon?.toLowerCase().includes("staff of homa")) {
             return handleStaffOfHomaAttack(
-                thread,
-                stats,
-                monster,
-                currentMonsterHp,
-                vigilanceUsed,
-                monsterState,
-                isFirstTurn,
-            );
-        } else if (
-            stats.equippedWeapon?.toLowerCase().includes("aqua simulacra")
-        ) {
-            return handleAquaSimulacraAttack(
                 thread,
                 stats,
                 monster,
