@@ -326,7 +326,7 @@ export async function monsterAttack(
 
     const leechTriggered = Math.random() < 0.5;
     if (hasLeechSkill && leechTriggered) {
-        const healAmount = Math.ceil(monsterStats.maxHp * 0.05);
+        const healAmount = Math.ceil(monsterStats.maxHp * 0.1);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
         await thread
             .send(
