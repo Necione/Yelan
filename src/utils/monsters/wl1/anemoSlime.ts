@@ -4,10 +4,6 @@ export default {
     group: "Slime",
     minExp: 3,
     maxExp: 6,
-    critChance: 5,
-    critValue: 1.5,
-    defChance: 5,
-    defValue: 1.0,
     minWorldLevel: 1,
     image: "https://lh.elara.workers.dev/rpg/monsters/anemo_slime.png",
     drops: [
