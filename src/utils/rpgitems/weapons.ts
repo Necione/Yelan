@@ -315,7 +315,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
 const prefixes: {
     [key: string]: (weaponData: WeaponData) => Partial<WeaponData>;
 } = {
-    "": (weaponData) => ({}),
+    "": (_weaponData) => ({}),
     Old: (weaponData) => ({
         attackPower: weaponData.attackPower * 0.75,
     }),

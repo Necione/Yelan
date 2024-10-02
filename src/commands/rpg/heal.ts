@@ -45,7 +45,7 @@ export const heal = buildCommand<SlashCommand>({
 
         const rebirthMultiplier = 1 + 0.2 * stats.rebirths;
 
-        const healCost = initialHealCost * rebirthMultiplier;
+        const healCost = Math.round(initialHealCost * rebirthMultiplier);
 
         if (userProfile.balance < healCost) {
             return r.edit(
