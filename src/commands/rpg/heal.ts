@@ -40,12 +40,17 @@ export const heal = buildCommand<SlashCommand>({
         }
 
         const baseHealCost = Math.floor(Math.random() * (50 - 40 + 1)) + 40;
-        const healCost = baseHealCost + stats.worldLevel * 1;
+        const worldLevelCost = stats.worldLevel * 1;
+        const initialHealCost = baseHealCost + worldLevelCost;
+
+        const rebirthMultiplier = 1 + 0.2 * stats.rebirths;
+
+        const healCost = initialHealCost * rebirthMultiplier;
 
         if (userProfile.balance < healCost) {
             return r.edit(
                 embedComment(
-                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal. You need at least \`${healCost}\` coins.`,
+                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal.\n-# You need at least \`${healCost}\` ${texts.c.u}.`,
                 ),
             );
         }
@@ -62,7 +67,7 @@ export const heal = buildCommand<SlashCommand>({
                 i.user.id,
                 healCost,
                 true,
-                `Paid ${healCost} coins to heal ${healAmount} HP`,
+                `Paid ${healCost} ${texts.c.u} to heal ${healAmount} HP`,
             ),
         ]);
 

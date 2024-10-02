@@ -312,26 +312,42 @@ const baseWeapons: { [key: string]: WeaponData } = {
     },
 };
 
-const prefixes: { [key: string]: number } = {
-    "": 1,
-    Old: 0.75,
-    Sharp: 1.25,
-    Godly: 1.5,
-    Perfect: 2,
-    Worthless: 0.5,
+const prefixes: {
+    [key: string]: (weaponData: WeaponData) => Partial<WeaponData>;
+} = {
+    "": (weaponData) => ({}),
+    Old: (weaponData) => ({
+        attackPower: weaponData.attackPower * 0.75,
+    }),
+    Sharp: (weaponData) => ({
+        attackPower: weaponData.attackPower * 1.25,
+    }),
+    Godly: (weaponData) => ({
+        attackPower: weaponData.attackPower * 1.5,
+    }),
+    Perfect: (weaponData) => ({
+        attackPower: weaponData.attackPower * 2,
+    }),
+    Worthless: (weaponData) => ({
+        attackPower: weaponData.attackPower * 0.5,
+        sellPrice: 0,
+    }),
+    Spicy: (weaponData) => ({
+        critValue: weaponData.critValue * 1.5,
+    }),
 };
 
 export const weapons: { [key: string]: WeaponData } = {};
 
 for (const weaponName in baseWeapons) {
-    const weaponData = baseWeapons[weaponName];
+    const baseWeaponData = baseWeapons[weaponName];
     for (const prefix in prefixes) {
-        const multiplier = prefixes[prefix];
+        const modifierFunction = prefixes[prefix];
         const newWeaponName = prefix ? `${prefix} ${weaponName}` : weaponName;
+        const modifiedStats = modifierFunction(baseWeaponData);
         weapons[newWeaponName] = {
-            ...weaponData,
-            attackPower: weaponData.attackPower * multiplier,
-            sellPrice: prefix === "Worthless" ? 0 : weaponData.sellPrice,
+            ...baseWeaponData,
+            ...modifiedStats,
         };
     }
 }
