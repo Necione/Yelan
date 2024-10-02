@@ -192,13 +192,21 @@ export async function monsterAttack(
 
     const defChance = stats.defChance || 0;
     const defValue = stats.defValue || 0;
-    const defended = Math.random() * 100 < defChance;
+    let defended = false;
 
-    if (defended) {
-        monsterDamage = Math.max(monsterDamage * (1 - defValue), 0);
+    if (monster.group !== "Machine") {
+        defended = Math.random() * 100 < defChance;
+
+        if (defended) {
+            monsterDamage = Math.max(monsterDamage * (1 - defValue), 0);
+        }
+    } else {
+        messages.push(
+            `\`⚙️\` The ${monster.name} ignores your defenses and deals **TRUE DAMAGE**.`,
+        );
     }
 
-    if (monster.name.includes("Pyro")) {
+    if (monster.name.includes("Pyro") || monster.name.includes("Flames")) {
         const burnDamage = Math.ceil(stats.maxHP * 0.03);
         currentPlayerHp -= burnDamage;
         messages.push(
@@ -206,7 +214,10 @@ export async function monsterAttack(
         );
     }
 
-    if (monster.name.includes("Cryo") && Math.random() < 0.5) {
+    if (
+        (monster.name.includes("Cryo") || monster.name.includes("Frost")) &&
+        Math.random() < 0.5
+    ) {
         const crippleDamage = Math.ceil(stats.maxHP * 0.05);
         currentPlayerHp -= crippleDamage;
         messages.push(

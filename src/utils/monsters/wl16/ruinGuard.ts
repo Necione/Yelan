@@ -1,29 +1,17 @@
 export default {
     currentHp: 0,
-    name: "Fathomless Flames",
-    group: "Abyss",
+    name: "Ruin Guard",
+    group: "Machine",
     minExp: 15,
     maxExp: 30,
-    minWorldLevel: 16,
-    image: "https://lh.elara.workers.dev/rpg/monsters/fathomless_flame.png",
+    minWorldLevel: 17,
+    image: "https://lh.elara.workers.dev/rpg/monsters/ruin_guard.png",
     drops: [
         {
-            item: "Dead Ley Line Branch",
-            minAmount: 1,
-            maxAmount: 2,
-            chance: 75,
-        },
-        {
-            item: "Dead Ley Line Leaves",
-            minAmount: 1,
-            maxAmount: 2,
-            chance: 25,
-        },
-        {
-            item: "Life Essence",
+            item: "Chaos Core",
             minAmount: 1,
             maxAmount: 1,
-            chance: 10,
+            chance: 50,
         },
     ],
     locations: [
@@ -37,10 +25,10 @@ export default {
         "Guili Plains",
         "Jueyun Karst",
     ],
-    critChance: 75,
-    critValue: 2.5,
-    defChance: 50,
-    defValue: 0.5,
+    critChance: 0,
+    critValue: 0,
+    defChance: 0,
+    defValue: 0,
     getStatsForWorldLevel(worldLevel: number) {
         const stats = [
             {
