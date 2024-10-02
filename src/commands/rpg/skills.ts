@@ -14,7 +14,7 @@ const availableSkills = [
     {
         name: "Leech",
         description:
-            "Gain 10% lifesteal from the enemy's Max HP 50% of the time",
+            "Gain 5% lifesteal from the enemy's Max HP 50% of the time",
         emoji: "💖",
     },
     {

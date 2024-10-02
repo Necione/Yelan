@@ -74,6 +74,13 @@ export const rebirth = buildCommand<SlashCommand>({
 
         let totalSellPrice = 0;
 
+        const rebirthMultiplier = 1 + Math.min(stats.rebirths, 3) * 0.25;
+        let appraiseBonus = 0;
+
+        const hasAppraiseSkill = stats.skills.some(
+            (skill) => skill.name === "Appraise",
+        );
+
         for (const item of stats.inventory) {
             const itemData =
                 drops[item.item as DropName] ||
@@ -81,7 +88,17 @@ export const rebirth = buildCommand<SlashCommand>({
                 artifacts[item.item as ArtifactName];
 
             if (itemData) {
-                totalSellPrice += itemData.sellPrice * item.amount;
+                const baseSellPrice = itemData.sellPrice * item.amount;
+
+                let itemSellPrice = baseSellPrice * rebirthMultiplier;
+
+                if (hasAppraiseSkill) {
+                    const itemAppraiseBonus = Math.round(itemSellPrice * 0.05);
+                    itemSellPrice += itemAppraiseBonus;
+                    appraiseBonus += itemAppraiseBonus;
+                }
+
+                totalSellPrice += Math.round(itemSellPrice);
             }
         }
 
@@ -105,9 +122,13 @@ export const rebirth = buildCommand<SlashCommand>({
         }
 
         if (confirmation.customId === "confirm_rebirth") {
-            await handleRebirth(i.user.id, stats);
+            await handleRebirth(i.user.id, stats, totalSellPrice);
+            const appraiseBonusText =
+                appraiseBonus > 0
+                    ? `\n🔍 (Appraisal Skill Bonus: +${appraiseBonus} ${texts.c.u})`
+                    : "";
             const successEmbed = embedComment(
-                `Rebirth complete! All stats and items have been reset.\nAll items have been sold for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\``,
+                `Rebirth complete! All stats and items have been reset.\nAll items have been sold for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\`${appraiseBonusText}`,
                 "Green",
             );
             await confirmation.update({
@@ -124,20 +145,11 @@ export const rebirth = buildCommand<SlashCommand>({
     },
 });
 
-async function handleRebirth(userId: string, stats: UserStats) {
-    let totalSellPrice = 0;
-
-    for (const item of stats.inventory) {
-        const itemData =
-            drops[item.item as DropName] ||
-            weapons[item.item as WeaponName] ||
-            artifacts[item.item as ArtifactName];
-
-        if (itemData) {
-            totalSellPrice += itemData.sellPrice * item.amount;
-        }
-    }
-
+async function handleRebirth(
+    userId: string,
+    stats: UserStats,
+    totalSellPrice: number,
+) {
     const defaultStats = {
         worldLevel: 1,
         exp: 0,

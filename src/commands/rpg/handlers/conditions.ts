@@ -11,6 +11,8 @@ import {
 import { cooldowns, texts } from "../../../utils";
 import { calculateDrop, calculateExp, type Monster } from "../../../utils/hunt";
 
+const maxWorldLevel = 20;
+
 export async function handleVictory(
     i: ChatInputCommandInteraction,
     thread: ThreadChannel,
@@ -43,10 +45,17 @@ export async function handleVictory(
     let newExp = stats.exp + totalExpGained;
     let expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
 
-    while (newExp >= expRequired) {
+    while (newExp >= expRequired && stats.worldLevel < maxWorldLevel) {
         newExp -= expRequired;
         stats.worldLevel += 1;
         expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
+    }
+
+    if (stats.worldLevel >= maxWorldLevel) {
+        newExp = 0;
+        finalEmbed.setDescription(
+            `You've hit the max world level for this patch (${maxWorldLevel}) and cannot progress any further.`,
+        );
     }
 
     await updateUserStats(i.user.id, {
