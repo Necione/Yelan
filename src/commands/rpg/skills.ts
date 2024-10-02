@@ -68,6 +68,16 @@ const availableSkills = [
         description: "Monsters deal less DMG early, but more later on",
         emoji: "🧊",
     },
+    {
+        name: "Sloth",
+        description: "Start each round with 125% your current HP",
+        emoji: "💤",
+    },
+    {
+        name: "Wrath",
+        description: "Deal 150% more DMG, start each round with 25% less HP",
+        emoji: "💢",
+    },
 ];
 
 const getSkillEmoji = (skillName: string) => {

@@ -21,7 +21,9 @@ type SkillName =
     | "Backstab"
     | "Heartbroken"
     | "Crystallize"
-    | "Kindle";
+    | "Kindle"
+    | "Sloth"
+    | "Wrath";
 
 const skillRequirements: Record<
     SkillName,
@@ -29,6 +31,7 @@ const skillRequirements: Record<
         worldLevel: number;
         coins: number;
         items: { item: string; amount: number }[];
+        rebirthsRequired?: number;
     }
 > = {
     Vigilance: {
@@ -97,6 +100,7 @@ const skillRequirements: Record<
             { item: "Golden Raven Insignia", amount: 2 },
             { item: "Sealed Scroll", amount: 1 },
         ],
+        rebirthsRequired: 1,
     },
     Crystallize: {
         worldLevel: 10,
@@ -106,6 +110,7 @@ const skillRequirements: Record<
             { item: "A Flower Yet to Bloom", amount: 5 },
             { item: "Slime Secretions", amount: 15 },
         ],
+        rebirthsRequired: 1,
     },
     Heartbroken: {
         worldLevel: 10,
@@ -114,11 +119,33 @@ const skillRequirements: Record<
             { item: "Mist Grass", amount: 2 },
             { item: "Agent's Sacrificial Knife", amount: 2 },
         ],
+        rebirthsRequired: 1,
     },
     Distraction: {
         worldLevel: 10,
         coins: 250,
         items: [{ item: "Dismal Prism", amount: 2 }],
+        rebirthsRequired: 1,
+    },
+    Sloth: {
+        worldLevel: 15,
+        coins: 500,
+        items: [
+            { item: "Mist Grass", amount: 10 },
+            { item: "Slime Concentrate", amount: 20 },
+            { item: "Life Essence", amount: 5 },
+        ],
+        rebirthsRequired: 2,
+    },
+    Wrath: {
+        worldLevel: 15,
+        coins: 500,
+        items: [
+            { item: "Crystal Prism", amount: 10 },
+            { item: "Slime Concentrate", amount: 20 },
+            { item: "Life Essence", amount: 5 },
+        ],
+        rebirthsRequired: 2,
     },
 };
 
@@ -144,6 +171,8 @@ export const learn = buildCommand<SlashCommand>({
                     { name: "Backstab", value: "Backstab" },
                     { name: "Heartbroken", value: "Heartbroken" },
                     { name: "Crystallize", value: "Crystallize" },
+                    { name: "Sloth", value: "Sloth" },
+                    { name: "Wrath", value: "Wrath" },
                 ),
         ),
     defer: { silent: false },

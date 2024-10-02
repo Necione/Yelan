@@ -19,18 +19,28 @@ import { handleDefeat, handleVictory } from "./conditions";
 export function playerAttack(
     stats: UserStats,
     monster: Monster,
+    currentPlayerHp: number,
     currentMonsterHp: number,
     hasVigilance: boolean,
     vigilanceUsed: boolean,
     monsterState: { displaced: boolean; vanishedUsed: boolean },
     isFirstTurn: boolean,
     messages: string[],
+    hasWrath: boolean,
 ): {
     currentMonsterHp: number;
+    currentPlayerHp: number;
     vigilanceUsed: boolean;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
 } {
     let attackPower = stats.attackPower;
+
+    if (hasWrath) {
+        attackPower *= 1.5;
+        messages.push(
+            `\`💢\` Wrath skill activated! You deal 150% more damage.`,
+        );
+    }
 
     const hasHeartbroken =
         stats.skills.some((skill) => skill.name === "Heartbroken") &&
@@ -38,7 +48,7 @@ export function playerAttack(
 
     let bonusDamage = 0;
     if (hasHeartbroken && isFirstTurn) {
-        bonusDamage = stats.hp / 4;
+        bonusDamage = currentPlayerHp / 4;
     }
 
     const modifiersResult = applyAttackModifiers(
@@ -70,7 +80,12 @@ export function playerAttack(
     monsterState = defenseResult.monsterState;
 
     if (attackMissed) {
-        return { currentMonsterHp, vigilanceUsed, monsterState };
+        return {
+            currentMonsterHp,
+            currentPlayerHp,
+            vigilanceUsed,
+            monsterState,
+        };
     }
 
     if (hasVigilance && !vigilanceUsed) {
@@ -120,7 +135,7 @@ export function playerAttack(
         );
     }
 
-    return { currentMonsterHp, vigilanceUsed, monsterState };
+    return { currentMonsterHp, currentPlayerHp, vigilanceUsed, monsterState };
 }
 
 export async function monsterAttack(
@@ -299,7 +314,7 @@ export async function handleHunt(
         );
 
         const initialMonsterHp = currentMonsterHp;
-        const initialPlayerHp = currentPlayerHp;
+        let initialPlayerHp = currentPlayerHp;
 
         const createHealthBar = (
             current: number,
@@ -395,6 +410,46 @@ export async function handleHunt(
 
         let turnNumber = 1;
 
+        const hasSloth =
+            stats.skills.some((skill) => skill.name === "Sloth") &&
+            stats.activeSkills.includes("Sloth");
+
+        const hasWrath =
+            stats.skills.some((skill) => skill.name === "Wrath") &&
+            stats.activeSkills.includes("Wrath");
+
+        if (hasSloth) {
+            currentPlayerHp = Math.floor(stats.hp * 1.25);
+        } else {
+            currentPlayerHp = stats.hp;
+        }
+
+        if (hasWrath) {
+            currentPlayerHp = Math.floor(currentPlayerHp * 0.75);
+        }
+
+        currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
+
+        initialPlayerHp = currentPlayerHp;
+
+        const startingMessages: string[] = [];
+        if (hasSloth) {
+            startingMessages.push(
+                `\`💤\` **SIN OF SLOTH** acivated. Your starting HP is increased by 25%.`,
+            );
+        }
+        if (hasWrath) {
+            startingMessages.push(
+                `\`💢\` **SIN OF WRATH** activated. Your starting HP is reduced by 25%.`,
+            );
+        }
+
+        if (startingMessages.length > 0) {
+            await thread
+                ?.send(">>> " + startingMessages.join("\n"))
+                .catch(noop);
+        }
+
         while (currentPlayerHp > 0 && currentMonsterHp > 0) {
             if (isPlayerTurn) {
                 const playerMessages: string[] = [];
@@ -402,15 +457,18 @@ export async function handleHunt(
                 const result = playerAttack(
                     stats,
                     monster,
+                    currentPlayerHp,
                     currentMonsterHp,
                     hasVigilance,
                     vigilanceUsed,
                     monsterState,
                     isFirstTurn,
                     playerMessages,
+                    hasWrath,
                 );
 
                 currentMonsterHp = result.currentMonsterHp;
+                currentPlayerHp = result.currentPlayerHp;
                 vigilanceUsed = result.vigilanceUsed;
                 monsterState = result.monsterState;
 
@@ -460,7 +518,6 @@ export async function handleHunt(
                     turnNumber,
                     hasCrystallize,
                 );
-                stats.hp = currentPlayerHp;
 
                 if (monsterMessages.length > 0) {
                     await thread
@@ -500,6 +557,9 @@ export async function handleHunt(
             }
 
             await new Promise((resolve) => setTimeout(resolve, get.secs(2)));
+
+            stats.hp = Math.min(currentPlayerHp, stats.maxHP);
+            await updateUserStats(stats.userId, { hp: stats.hp });
 
             if (isFirstTurn) {
                 isFirstTurn = false;
