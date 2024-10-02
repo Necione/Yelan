@@ -16,9 +16,6 @@ import {
     type Monster,
 } from "../../../utils/hunt";
 import { handleDefeat, handleVictory } from "./conditions";
-import {
-    handleStaffOfHomaAttack
-} from "./specialHunt";
 
 export async function playerAttack(
     thread: ThreadChannel,
@@ -34,8 +31,8 @@ export async function playerAttack(
     vigilanceUsed: boolean;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
 }> {
-    if (monster.group === "Chasm") {
-        let attackPower = stats.baseAttack;
+    {
+        let attackPower = stats.attackPower;
 
         const hasHeartbroken =
             stats.skills.some((skill) => skill.name === "Heartbroken") &&
@@ -43,14 +40,7 @@ export async function playerAttack(
 
         let bonusDamage = 0;
         if (hasHeartbroken && isFirstTurn) {
-            bonusDamage = stats.hp;
-            await thread
-                .send(
-                    `>>> \`💔\` You will deal an additional \`${bonusDamage.toFixed(
-                        2,
-                    )}\` bonus DMG (Heartbroken).`,
-                )
-                .catch(noop);
+            bonusDamage = stats.hp / 4;
         }
 
         const modifiersResult = await applyAttackModifiers(
@@ -116,7 +106,7 @@ export async function playerAttack(
                 .send(
                     `>>> \`💔\` You dealt an additional \`${bonusDamage.toFixed(
                         2,
-                    )}\` bonus damage with the Heartbroken skill!`,
+                    )}\` bonus damage (Heartbroken).`,
                 )
                 .catch(noop);
         }
@@ -139,116 +129,6 @@ export async function playerAttack(
         }
 
         return { currentMonsterHp, vigilanceUsed, monsterState };
-    } else {
-        if (stats.equippedWeapon?.toLowerCase().includes("staff of homa")) {
-            return handleStaffOfHomaAttack(
-                thread,
-                stats,
-                monster,
-                currentMonsterHp,
-                vigilanceUsed,
-                monsterState,
-                isFirstTurn,
-            );
-        } else {
-            let attackPower = stats.attackPower;
-
-            const hasHeartbroken =
-                stats.skills.some((skill) => skill.name === "Heartbroken") &&
-                stats.activeSkills.includes("Heartbroken");
-
-            let bonusDamage = 0;
-            if (hasHeartbroken && isFirstTurn) {
-                bonusDamage = stats.hp / 4;
-            }
-
-            const modifiersResult = await applyAttackModifiers(
-                attackPower,
-                stats,
-                monster,
-                thread,
-                monsterState,
-            );
-            attackPower = modifiersResult.attackPower;
-            monsterState = modifiersResult.monsterState;
-
-            const { isCrit, multiplier } = calculateCriticalHit(
-                stats.critChance || 0,
-                stats.critValue || 1,
-            );
-            attackPower *= multiplier;
-
-            const defenseResult = await checkMonsterDefenses(
-                attackPower,
-                stats,
-                monster,
-                thread,
-                monsterState,
-            );
-            attackPower = defenseResult.attackPower;
-            const attackMissed = defenseResult.attackMissed;
-            const monsterDefended = defenseResult.monsterDefended;
-            monsterState = defenseResult.monsterState;
-
-            if (attackMissed) {
-                return { currentMonsterHp, vigilanceUsed, monsterState };
-            }
-
-            if (hasVigilance && !vigilanceUsed) {
-                const vigilanceAttackPower = attackPower / 2;
-                currentMonsterHp -= vigilanceAttackPower;
-                vigilanceUsed = true;
-
-                await thread
-                    .send(
-                        `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                            2,
-                        )}\` damage to the ${monster.name} ✨ (Vigilance).`,
-                    )
-                    .catch(noop);
-            }
-
-            currentMonsterHp -= attackPower;
-
-            await sendDamageMessage(
-                thread,
-                attackPower,
-                monster.name,
-                isCrit,
-                monsterDefended,
-                monster.defValue,
-            );
-
-            if (bonusDamage > 0) {
-                currentMonsterHp -= bonusDamage;
-                await thread
-                    .send(
-                        `>>> \`💔\` You dealt an additional \`${bonusDamage.toFixed(
-                            2,
-                        )}\` bonus damage (Heartbroken).`,
-                    )
-                    .catch(noop);
-            }
-
-            const hasKindle =
-                stats.skills.some((skill) => skill.name === "Kindle") &&
-                stats.activeSkills.includes("Kindle");
-
-            if (hasKindle) {
-                const kindleBonusDamage = stats.maxHP * 0.1;
-                currentMonsterHp -= kindleBonusDamage;
-
-                await thread
-                    .send(
-                        `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
-                            2,
-                        )}\` bonus damage with the Kindle skill!`,
-                    )
-                    .catch(noop);
-            }
-
-            return { currentMonsterHp, vigilanceUsed, monsterState };
-        }
     }
 }
 

@@ -13,10 +13,7 @@ type LocationName =
     | "Tianqiu Valley"
     | "Luhua Pool"
     | "Guili Plains"
-    | "Jueyun Karst"
-    | "Cinnabar Cliff"
-    | "Glaze Peak"
-    | "Tiangong Gorge";
+    | "Jueyun Karst";
 
 type LocationXY = {
     x: number;
@@ -35,10 +32,6 @@ const locations: Record<LocationName, LocationXY> = {
     "Luhua Pool": { x: 13, y: 10 },
     "Guili Plains": { x: 15, y: 12 },
     "Jueyun Karst": { x: 7, y: 13 },
-
-    "Cinnabar Cliff": { x: 0, y: 0, requiredRebirths: 1 },
-    "Glaze Peak": { x: 0, y: 0, requiredRebirths: 2 },
-    "Tiangong Gorge": { x: 0, y: 0, requiredRebirths: 3 },
 };
 
 const locationEmojis: Record<LocationName, string> = {
@@ -52,10 +45,6 @@ const locationEmojis: Record<LocationName, string> = {
     "Luhua Pool": "🏖️",
     "Guili Plains": "🏞️",
     "Jueyun Karst": "🗻",
-
-    "Cinnabar Cliff": "⛔",
-    "Glaze Peak": "⛔",
-    "Tiangong Gorge": "⛔",
 };
 
 function calculateDistance(
@@ -130,28 +119,14 @@ export const travel = buildCommand<SlashCommand>({
             return r.edit(embedComment("Invalid location selected."));
         }
 
-        const requiredRebirths =
-            locations[selectedLocation].requiredRebirths || 0;
-        if (stats.rebirths < requiredRebirths) {
-            return r.edit(
-                embedComment(
-                    `You need at least ${requiredRebirths} rebirth${
-                        requiredRebirths > 1 ? "s" : ""
-                    } to travel to ${selectedLocation}.`,
-                ),
-            );
-        }
-
         const startCoords = locations[currentLocation];
         const endCoords = locations[selectedLocation];
 
-        let travelTime: number;
-        if (requiredRebirths > 0) {
-            travelTime = 300;
-        } else {
-            const distance = calculateDistance(startCoords, endCoords);
-            travelTime = distance * 5;
-        }
+        const distance = calculateDistance(startCoords, endCoords);
+        const travelTime = distance * 10;
+
+        const arrivalTimestamp =
+            Math.round(Date.now() / 1000) + Math.round(travelTime);
 
         await updateUserStats(i.user.id, { isTravelling: true });
 
@@ -159,9 +134,7 @@ export const travel = buildCommand<SlashCommand>({
 
         await r.edit(
             embedComment(
-                `You are travelling to ${emoji} **${selectedLocation}**.\n-# This will take approximately ${Math.round(
-                    travelTime,
-                )} seconds!`,
+                `You are travelling to ${emoji} **${selectedLocation}**.\n-# You will arrive <t:${arrivalTimestamp}:R>!`,
             ),
         );
 
@@ -174,7 +147,7 @@ export const travel = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You have arrived at ${emoji} **${selectedLocation}**!\n-# Maybe try using </hunt:1279824112566665296> now?`,
+                `You have arrived at ${emoji} **${selectedLocation}**!`,
             ),
         );
     },
