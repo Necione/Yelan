@@ -220,6 +220,17 @@ export const learn = buildCommand<SlashCommand>({
 
         const missingRequirements: string[] = [];
 
+        if (
+            skillData.rebirthsRequired &&
+            (stats.rebirths || 0) < skillData.rebirthsRequired
+        ) {
+            missingRequirements.push(
+                `**Rebirths**: You need to have at least **${
+                    skillData.rebirthsRequired
+                } Rebirth${skillData.rebirthsRequired > 1 ? "s" : ""}**.`,
+            );
+        }
+
         if (stats.worldLevel < skillData.worldLevel) {
             missingRequirements.push(
                 `**World Level**: You need to be at least **World Level ${skillData.worldLevel}**.`,
