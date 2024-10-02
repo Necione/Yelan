@@ -16,6 +16,7 @@ const skillChoices = [
     { name: "Distraction", value: "Distraction", emoji: "💫" },
     { name: "Energize", value: "Energize", emoji: "🔮" },
     { name: "Backstab", value: "Backstab", emoji: "🔪" },
+    { name: "Crystallize", value: "Crystallize", emoji: "🧊" },
     { name: "Heartbroken", value: "Heartbroken", emoji: "💔" },
 ];
 

@@ -63,6 +63,11 @@ const availableSkills = [
         description: "Deal 1/4 of your HP as bonus DMG on your first turn",
         emoji: "💔",
     },
+    {
+        name: "Crystallize",
+        description: "Monsters deal less DMG early, but more later on",
+        emoji: "🧊",
+    },
 ];
 
 const getSkillEmoji = (skillName: string) => {

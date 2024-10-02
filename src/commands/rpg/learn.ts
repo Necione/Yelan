@@ -20,6 +20,7 @@ type SkillName =
     | "Distraction"
     | "Backstab"
     | "Heartbroken"
+    | "Crystallize"
     | "Kindle";
 
 const skillRequirements: Record<
@@ -97,6 +98,15 @@ const skillRequirements: Record<
             { item: "Sealed Scroll", amount: 1 },
         ],
     },
+    Crystallize: {
+        worldLevel: 10,
+        coins: 200,
+        items: [
+            { item: "Recruit's Insignia", amount: 5 },
+            { item: "A Flower Yet to Bloom", amount: 5 },
+            { item: "Slime Secretions", amount: 15 },
+        ],
+    },
     Heartbroken: {
         worldLevel: 10,
         coins: 500,
@@ -133,6 +143,7 @@ export const learn = buildCommand<SlashCommand>({
                     { name: "Distraction", value: "Distraction" },
                     { name: "Backstab", value: "Backstab" },
                     { name: "Heartbroken", value: "Heartbroken" },
+                    { name: "Crystallize", value: "Crystallize" },
                 ),
         ),
     defer: { silent: false },

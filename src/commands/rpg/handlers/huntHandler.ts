@@ -128,6 +128,8 @@ export async function monsterAttack(
     monster: Monster,
     currentPlayerHp: number,
     messages: string[],
+    turnNumber: number,
+    hasCrystallize: boolean,
 ): Promise<number> {
     const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
     if (!monsterStats) {
@@ -144,6 +146,34 @@ export async function monsterAttack(
         monster.critValue || 1,
     );
     monsterDamage *= multiplier;
+
+    if (hasCrystallize) {
+        const segment = Math.ceil(turnNumber / 2);
+        let damageMultiplier: number;
+
+        if (segment <= 6) {
+            damageMultiplier = 0.4 + segment * 0.1;
+        } else {
+            damageMultiplier = 1.0 + (segment - 6) * 0.1;
+            damageMultiplier = Math.min(damageMultiplier, 2.0);
+        }
+
+        monsterDamage *= damageMultiplier;
+
+        let effectDescription = "";
+        if (segment <= 6) {
+            const reductionPercent = (1 - damageMultiplier) * 100;
+            effectDescription = `\`🧊\` Crystallize reduces the ${
+                monster.name
+            }'s damage by ${reductionPercent.toFixed(0)}%.`;
+        } else {
+            const increasePercent = (damageMultiplier - 1) * 100;
+            effectDescription = `\`🧊\` Crystallize increases the ${
+                monster.name
+            }'s damage by ${increasePercent.toFixed(0)}%.`;
+        }
+        messages.push(effectDescription);
+    }
 
     const defChance = stats.defChance || 0;
     const defValue = stats.defValue || 0;
@@ -359,6 +389,12 @@ export async function handleHunt(
 
         let isFirstTurn = true;
 
+        const hasCrystallize =
+            stats.skills.some((skill) => skill.name === "Crystallize") &&
+            stats.activeSkills.includes("Crystallize");
+
+        let turnNumber = 1;
+
         while (currentPlayerHp > 0 && currentMonsterHp > 0) {
             if (isPlayerTurn) {
                 const playerMessages: string[] = [];
@@ -421,6 +457,8 @@ export async function handleHunt(
                     monster,
                     currentPlayerHp,
                     monsterMessages,
+                    turnNumber,
+                    hasCrystallize,
                 );
                 stats.hp = currentPlayerHp;
 
@@ -466,6 +504,8 @@ export async function handleHunt(
             if (isFirstTurn) {
                 isFirstTurn = false;
             }
+
+            turnNumber++;
         }
 
         if (currentPlayerHp > 0) {
