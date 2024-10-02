@@ -45,41 +45,41 @@ export default {
         const stats = [
             {
                 worldLevel: 16,
-                minHp: 870, 
-                maxHp: 967, 
-                minDamage: 53, 
-                maxDamage: 68, 
+                minHp: 870,
+                maxHp: 967,
+                minDamage: 53,
+                maxDamage: 68,
             },
             {
                 worldLevel: 17,
-                minHp: 967, 
-                maxHp: 1065, 
-                minDamage: 68, 
-                maxDamage: 81, 
+                minHp: 967,
+                maxHp: 1065,
+                minDamage: 68,
+                maxDamage: 81,
             },
             {
                 worldLevel: 18,
-                minHp: 1065, 
-                maxHp: 1163, 
-                minDamage: 81, 
-                maxDamage: 98, 
+                minHp: 1065,
+                maxHp: 1163,
+                minDamage: 81,
+                maxDamage: 98,
             },
             {
                 worldLevel: 19,
-                minHp: 1163, 
-                maxHp: 1260, 
-                minDamage: 100, 
-                maxDamage: 131, 
+                minHp: 1163,
+                maxHp: 1260,
+                minDamage: 100,
+                maxDamage: 131,
             },
             {
                 worldLevel: 20,
-                minHp: 1320, 
-                maxHp: 1650, 
-                minDamage: 113, 
-                maxDamage: 156, 
+                minHp: 1320,
+                maxHp: 1650,
+                minDamage: 113,
+                maxDamage: 156,
             },
         ];
-    
+
         return stats.find((stat) => stat.worldLevel === worldLevel) || null;
-    }
+    },
 };

@@ -1,4 +1,4 @@
-import { get, noop, sleep } from "@elara-services/utils";
+import { get, noop } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction, ThreadChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
@@ -128,7 +128,8 @@ export async function handleVictory(
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
     await updateUserStats(i.user.id, { isHunting: false });
-    sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
+
+    await thread.edit({ archived: true, locked: true }).catch(noop);
 
     const hasInsomniaSkill =
         stats.skills.some((skill) => skill.name === "Insomnia") &&
@@ -182,5 +183,5 @@ export async function handleDefeat(
     const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
     await cooldowns.set(userWallet, "hunt", huntCooldown);
 
-    sleep(get.secs(30)).then(() => void thread.delete().catch(noop));
+    await thread.edit({ archived: true, locked: true }).catch(noop);
 }

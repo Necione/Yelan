@@ -4,7 +4,6 @@ import type {
     ChatInputCommandInteraction,
     Message,
     PublicThreadChannel,
-    ThreadChannel,
 } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { updateUserStats } from "../../../services";
@@ -17,8 +16,7 @@ import {
 } from "../../../utils/hunt";
 import { handleDefeat, handleVictory } from "./conditions";
 
-export async function playerAttack(
-    thread: ThreadChannel,
+export function playerAttack(
     stats: UserStats,
     monster: Monster,
     currentMonsterHp: number,
@@ -26,117 +24,110 @@ export async function playerAttack(
     vigilanceUsed: boolean,
     monsterState: { displaced: boolean; vanishedUsed: boolean },
     isFirstTurn: boolean,
-): Promise<{
+    messages: string[],
+): {
     currentMonsterHp: number;
     vigilanceUsed: boolean;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
-}> {
-    {
-        let attackPower = stats.attackPower;
+} {
+    let attackPower = stats.attackPower;
 
-        const hasHeartbroken =
-            stats.skills.some((skill) => skill.name === "Heartbroken") &&
-            stats.activeSkills.includes("Heartbroken");
+    const hasHeartbroken =
+        stats.skills.some((skill) => skill.name === "Heartbroken") &&
+        stats.activeSkills.includes("Heartbroken");
 
-        let bonusDamage = 0;
-        if (hasHeartbroken && isFirstTurn) {
-            bonusDamage = stats.hp / 4;
-        }
+    let bonusDamage = 0;
+    if (hasHeartbroken && isFirstTurn) {
+        bonusDamage = stats.hp / 4;
+    }
 
-        const modifiersResult = await applyAttackModifiers(
-            attackPower,
-            stats,
-            monster,
-            thread,
-            monsterState,
-        );
-        attackPower = modifiersResult.attackPower;
-        monsterState = modifiersResult.monsterState;
+    const modifiersResult = applyAttackModifiers(
+        attackPower,
+        stats,
+        monster,
+        monsterState,
+        messages,
+    );
+    attackPower = modifiersResult.attackPower;
+    monsterState = modifiersResult.monsterState;
 
-        const { isCrit, multiplier } = calculateCriticalHit(
-            stats.critChance || 0,
-            stats.critValue || 1,
-        );
-        attackPower *= multiplier;
+    const { isCrit, multiplier } = calculateCriticalHit(
+        stats.critChance || 0,
+        stats.critValue || 1,
+    );
+    attackPower *= multiplier;
 
-        const defenseResult = await checkMonsterDefenses(
-            attackPower,
-            stats,
-            monster,
-            thread,
-            monsterState,
-        );
-        attackPower = defenseResult.attackPower;
-        const attackMissed = defenseResult.attackMissed;
-        const monsterDefended = defenseResult.monsterDefended;
-        monsterState = defenseResult.monsterState;
+    const defenseResult = checkMonsterDefenses(
+        attackPower,
+        stats,
+        monster,
+        monsterState,
+        messages,
+    );
+    attackPower = defenseResult.attackPower;
+    const attackMissed = defenseResult.attackMissed;
+    const monsterDefended = defenseResult.monsterDefended;
+    monsterState = defenseResult.monsterState;
 
-        if (attackMissed) {
-            return { currentMonsterHp, vigilanceUsed, monsterState };
-        }
-
-        if (hasVigilance && !vigilanceUsed) {
-            const vigilanceAttackPower = attackPower / 2;
-            currentMonsterHp -= vigilanceAttackPower;
-            vigilanceUsed = true;
-
-            await thread
-                .send(
-                    `>>> \`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                        2,
-                    )}\` damage to the ${monster.name} ✨ (Vigilance).`,
-                )
-                .catch(noop);
-        }
-
-        currentMonsterHp -= attackPower;
-
-        await sendDamageMessage(
-            thread,
-            attackPower,
-            monster.name,
-            isCrit,
-            monsterDefended,
-            monster.defValue,
-        );
-
-        if (bonusDamage > 0) {
-            currentMonsterHp -= bonusDamage;
-            await thread
-                .send(
-                    `>>> \`💔\` You dealt an additional \`${bonusDamage.toFixed(
-                        2,
-                    )}\` bonus damage (Heartbroken).`,
-                )
-                .catch(noop);
-        }
-
-        const hasKindle =
-            stats.skills.some((skill) => skill.name === "Kindle") &&
-            stats.activeSkills.includes("Kindle");
-
-        if (hasKindle) {
-            const kindleBonusDamage = stats.maxHP * 0.1;
-            currentMonsterHp -= kindleBonusDamage;
-
-            await thread
-                .send(
-                    `>>> \`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
-                        2,
-                    )}\` bonus damage with the Kindle skill!`,
-                )
-                .catch(noop);
-        }
-
+    if (attackMissed) {
         return { currentMonsterHp, vigilanceUsed, monsterState };
     }
+
+    if (hasVigilance && !vigilanceUsed) {
+        const vigilanceAttackPower = attackPower / 2;
+        currentMonsterHp -= vigilanceAttackPower;
+        vigilanceUsed = true;
+
+        messages.push(
+            `\`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                2,
+            )}\` damage to the ${monster.name} ✨ (Vigilance).`,
+        );
+    }
+
+    currentMonsterHp -= attackPower;
+
+    sendDamageMessage(
+        attackPower,
+        monster.name,
+        isCrit,
+        monsterDefended,
+        monster.defValue,
+        messages,
+    );
+
+    if (bonusDamage > 0) {
+        currentMonsterHp -= bonusDamage;
+        messages.push(
+            `\`💔\` You dealt an additional \`${bonusDamage.toFixed(
+                2,
+            )}\` bonus damage (Heartbroken).`,
+        );
+    }
+
+    const hasKindle =
+        stats.skills.some((skill) => skill.name === "Kindle") &&
+        stats.activeSkills.includes("Kindle");
+
+    if (hasKindle) {
+        const kindleBonusDamage = stats.maxHP * 0.1;
+        currentMonsterHp -= kindleBonusDamage;
+
+        messages.push(
+            `\`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
+                2,
+            )}\` bonus damage with the Kindle skill!`,
+        );
+    }
+
+    return { currentMonsterHp, vigilanceUsed, monsterState };
 }
 
 export async function monsterAttack(
-    thread: ThreadChannel,
     stats: UserStats,
     monster: Monster,
     currentPlayerHp: number,
+    messages: string[],
 ): Promise<number> {
     const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
     if (!monsterStats) {
@@ -165,21 +156,17 @@ export async function monsterAttack(
     if (monster.name.includes("Pyro")) {
         const burnDamage = Math.ceil(stats.maxHP * 0.03);
         currentPlayerHp -= burnDamage;
-        await thread
-            .send(
-                `>>> \`🔥\` The ${monster.name} inflicted Burn! You took \`${burnDamage}\` Burn damage.`,
-            )
-            .catch(noop);
+        messages.push(
+            `\`🔥\` The ${monster.name} inflicted Burn! You took \`${burnDamage}\` Burn damage.`,
+        );
     }
 
     if (monster.name.includes("Cryo") && Math.random() < 0.5) {
         const crippleDamage = Math.ceil(stats.maxHP * 0.05);
         currentPlayerHp -= crippleDamage;
-        await thread
-            .send(
-                `>>> \`❄️\` The ${monster.name} inflicted Cripple! You took \`${crippleDamage}\` Cripple damage.`,
-            )
-            .catch(noop);
+        messages.push(
+            `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${crippleDamage}\` Cripple damage.`,
+        );
     }
 
     currentPlayerHp -= monsterDamage;
@@ -195,26 +182,20 @@ export async function monsterAttack(
     if (hasLeechSkill && leechTriggered) {
         const healAmount = Math.ceil(monsterStats.maxHp * 0.05);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
-        await thread
-            .send(
-                `>>> \`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}.`,
-            )
-            .catch(noop);
+        messages.push(
+            `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}.`,
+        );
     }
 
     await updateUserStats(stats.userId, { hp: currentPlayerHp });
 
-    await thread
-        .send(
-            `>>> \`⚔️\` The ${monster.name} dealt \`${monsterDamage.toFixed(
-                2,
-            )}\` damage to you${
-                defended
-                    ? ` 🛡️ (Defended: -${(defValue * 100).toFixed(2)}%)`
-                    : ""
-            }${isCrit ? " 💢 (Critical Hit!)" : ""}.`,
-        )
-        .catch(noop);
+    messages.push(
+        `\`⚔️\` The ${monster.name} dealt \`${monsterDamage.toFixed(
+            2,
+        )}\` damage to you${
+            defended ? ` 🛡️ (Defended: -${(defValue * 100).toFixed(2)}%)` : ""
+        }${isCrit ? " 💢 (Critical Hit!)" : ""}.`,
+    );
 
     return currentPlayerHp;
 }
@@ -369,6 +350,8 @@ export async function handleHunt(
             isMonsterFirst = Math.random() < 0.5;
         }
 
+        let isPlayerTurn = !isMonsterFirst;
+
         let monsterState = {
             displaced: false,
             vanishedUsed: false,
@@ -376,56 +359,11 @@ export async function handleHunt(
 
         let isFirstTurn = true;
 
-        const battleInterval = setInterval(async () => {
-            if (currentPlayerHp <= 0 || currentMonsterHp <= 0) {
-                clearInterval(battleInterval);
+        while (currentPlayerHp > 0 && currentMonsterHp > 0) {
+            if (isPlayerTurn) {
+                const playerMessages: string[] = [];
 
-                if (currentPlayerHp > 0) {
-                    if (currentMonsterIndex < monstersEncountered.length - 1) {
-                        currentMonsterIndex++;
-                        await handleMonsterBattle(thread);
-                    } else {
-                        if (thread) {
-                            await handleVictory(
-                                i,
-                                thread,
-                                stats,
-                                monstersEncountered,
-                                currentPlayerHp,
-                                userWallet,
-                            );
-                        }
-                    }
-                } else {
-                    if (thread) {
-                        await handleDefeat(
-                            i,
-                            thread,
-                            stats,
-                            monstersEncountered[currentMonsterIndex],
-                            currentPlayerHp,
-                            userWallet,
-                        );
-                    }
-                }
-
-                return;
-            }
-
-            if (isMonsterFirst && currentMonsterHp > 0) {
-                currentPlayerHp = await monsterAttack(
-                    thread!,
-                    stats,
-                    monster,
-                    currentPlayerHp,
-                );
-
-                stats.hp = currentPlayerHp;
-
-                isMonsterFirst = false;
-            } else {
-                const result = await playerAttack(
-                    thread!,
+                const result = playerAttack(
                     stats,
                     monster,
                     currentMonsterHp,
@@ -433,67 +371,146 @@ export async function handleHunt(
                     vigilanceUsed,
                     monsterState,
                     isFirstTurn,
+                    playerMessages,
                 );
 
                 currentMonsterHp = result.currentMonsterHp;
                 vigilanceUsed = result.vigilanceUsed;
                 monsterState = result.monsterState;
 
-                if (currentMonsterHp > 0) {
-                    currentPlayerHp = await monsterAttack(
-                        thread!,
-                        stats,
-                        monster,
-                        currentPlayerHp,
-                    );
+                if (playerMessages.length > 0) {
+                    await thread
+                        .send(">>> " + playerMessages.join("\n"))
+                        .catch(noop);
                 }
 
+                const playerHpBar = createHealthBar(
+                    currentPlayerHp,
+                    initialPlayerHp,
+                );
+                const monsterHpBar = createHealthBar(
+                    currentMonsterHp,
+                    initialMonsterHp,
+                );
+
+                battleEmbed.setFields([
+                    {
+                        name: "Your HP",
+                        value: playerHpBar,
+                        inline: true,
+                    },
+                    {
+                        name: "Monster HP",
+                        value: monsterHpBar,
+                        inline: true,
+                    },
+                ]);
+
+                await i.editReply({ embeds: [battleEmbed] }).catch(noop);
+
+                if (currentMonsterHp <= 0) {
+                    break;
+                }
+
+                isPlayerTurn = false;
+            } else {
+                const monsterMessages: string[] = [];
+
+                currentPlayerHp = await monsterAttack(
+                    stats,
+                    monster,
+                    currentPlayerHp,
+                    monsterMessages,
+                );
                 stats.hp = currentPlayerHp;
 
-                if (isFirstTurn) {
-                    isFirstTurn = false;
+                if (monsterMessages.length > 0) {
+                    await thread
+                        .send(">>> " + monsterMessages.join("\n"))
+                        .catch(noop);
                 }
+
+                const playerHpBar = createHealthBar(
+                    currentPlayerHp,
+                    initialPlayerHp,
+                );
+                const monsterHpBar = createHealthBar(
+                    currentMonsterHp,
+                    initialMonsterHp,
+                );
+
+                battleEmbed.setFields([
+                    {
+                        name: "Your HP",
+                        value: playerHpBar,
+                        inline: true,
+                    },
+                    {
+                        name: "Monster HP",
+                        value: monsterHpBar,
+                        inline: true,
+                    },
+                ]);
+
+                await i.editReply({ embeds: [battleEmbed] }).catch(noop);
+
+                if (currentPlayerHp <= 0) {
+                    break;
+                }
+
+                isPlayerTurn = true;
             }
 
-            const playerHpBar = createHealthBar(
-                currentPlayerHp,
-                initialPlayerHp,
-            );
-            const monsterHpBar = createHealthBar(
-                currentMonsterHp,
-                initialMonsterHp,
-            );
+            await new Promise((resolve) => setTimeout(resolve, get.secs(2)));
 
-            battleEmbed.setFields([
-                {
-                    name: "Your HP",
-                    value: playerHpBar,
-                    inline: true,
-                },
-                {
-                    name: "Monster HP",
-                    value: monsterHpBar,
-                    inline: true,
-                },
-            ]);
+            if (isFirstTurn) {
+                isFirstTurn = false;
+            }
+        }
 
-            await i.editReply({ embeds: [battleEmbed] }).catch(noop);
-        }, get.secs(4));
+        if (currentPlayerHp > 0) {
+            if (currentMonsterIndex < monstersEncountered.length - 1) {
+                currentMonsterIndex++;
+                await handleMonsterBattle(thread);
+            } else {
+                if (thread) {
+                    await handleVictory(
+                        i,
+                        thread,
+                        stats,
+                        monstersEncountered,
+                        currentPlayerHp,
+                        userWallet,
+                    );
+                }
+            }
+        } else {
+            if (thread) {
+                await handleDefeat(
+                    i,
+                    thread,
+                    stats,
+                    monstersEncountered[currentMonsterIndex],
+                    currentPlayerHp,
+                    userWallet,
+                );
+            }
+        }
     };
 
     await handleMonsterBattle();
 }
 
-export async function applyAttackModifiers(
+export function applyAttackModifiers(
     attackPower: number,
     stats: UserStats,
     monster: Monster,
-    thread: ThreadChannel,
     monsterState: { displaced: boolean; vanishedUsed: boolean },
-): Promise<{
+    messages: string[],
+): {
     attackPower: number;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
-}> {
+} {
     const hasBackstab =
         stats.skills.some((skill) => skill.name === "Backstab") &&
         stats.activeSkills.includes("Backstab");
@@ -502,49 +519,43 @@ export async function applyAttackModifiers(
 
     if (hasBackstab && isHumanOrFatui) {
         attackPower *= 1.5;
-        await thread
-            .send(
-                `>>> \`🗡️\` Backstab skill activated! You deal 150% more DMG!`,
-            )
-            .catch(noop);
+        messages.push(
+            `\`🗡️\` Backstab skill activated! You deal 150% more DMG!`,
+        );
     }
 
     if (monsterState.displaced) {
         attackPower *= 0.2;
         monsterState.displaced = false;
-        await thread
-            .send(
-                `>>> \`〽️\` You are displaced! Your attack power is reduced by 80%.`,
-            )
-            .catch(noop);
+        messages.push(
+            `\`〽️\` You are displaced! Your attack power is reduced by 80%.`,
+        );
     }
 
     return { attackPower, monsterState };
 }
 
-export async function checkMonsterDefenses(
+export function checkMonsterDefenses(
     attackPower: number,
     stats: UserStats,
     monster: Monster,
-    thread: ThreadChannel,
     monsterState: { displaced: boolean; vanishedUsed: boolean },
-): Promise<{
+    messages: string[],
+): {
     attackPower: number;
     attackMissed: boolean;
     monsterDefended: boolean;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
-}> {
+} {
     let attackMissed = false;
     let monsterDefended = false;
 
     if (monster.name.includes("Agent") && !monsterState.vanishedUsed) {
         attackMissed = true;
         monsterState.vanishedUsed = true;
-        await thread
-            .send(
-                `>>> \`👤\` The ${monster.name} has vanished, dodging your attack!`,
-            )
-            .catch(noop);
+        messages.push(
+            `\`👤\` The ${monster.name} has vanished, dodging your attack!`,
+        );
     }
 
     const isLawachurlOrElectro =
@@ -552,11 +563,9 @@ export async function checkMonsterDefenses(
     const stunChance = Math.random() < 0.25;
 
     if (isLawachurlOrElectro && stunChance) {
-        await thread
-            .send(
-                `>>> \`💫\` The ${monster.name} stunned you! You missed your attack.`,
-            )
-            .catch(noop);
+        messages.push(
+            `\`💫\` The ${monster.name} stunned you! You missed your attack.`,
+        );
         attackMissed = true;
     }
 
@@ -564,11 +573,9 @@ export async function checkMonsterDefenses(
     const dodgeChance = Math.random() < 0.25;
 
     if (isAnemo && dodgeChance) {
-        await thread
-            .send(
-                `>>> \`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
-            )
-            .catch(noop);
+        messages.push(
+            `\`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
+        );
         attackMissed = true;
     }
 
@@ -576,11 +583,9 @@ export async function checkMonsterDefenses(
     const displacementChance = Math.random() < 0.25;
     if (isFatui && displacementChance) {
         monsterState.displaced = true;
-        await thread
-            .send(
-                `>>> \`〽️\` The ${monster.name} displaced you! You will deal 80% less damage next turn.`,
-            )
-            .catch(noop);
+        messages.push(
+            `\`〽️\` The ${monster.name} displaced you! You will deal 80% less damage next turn.`,
+        );
     }
 
     const monsterDefChance = (monster.defChance || 0) * 100;
@@ -604,15 +609,15 @@ function calculateCriticalHit(
     return { isCrit, multiplier: isCrit ? critValue : 1 };
 }
 
-async function sendDamageMessage(
-    thread: ThreadChannel,
+function sendDamageMessage(
     damage: number,
     monsterName: string,
     isCrit: boolean,
     monsterDefended: boolean,
-    defValue?: number,
+    defValue: number | undefined,
+    messages: string[],
 ) {
-    let message = `>>> \`⚔️\` You dealt \`${damage.toFixed(
+    let message = `\`⚔️\` You dealt \`${damage.toFixed(
         2,
     )}\` damage to the ${monsterName}`;
     if (isCrit) {
@@ -621,5 +626,5 @@ async function sendDamageMessage(
     if (monsterDefended && defValue !== undefined) {
         message += ` 🛡️ (Defended: -${(defValue * 100).toFixed(2)}%)`;
     }
-    await thread.send(message).catch(noop);
+    messages.push(message);
 }
