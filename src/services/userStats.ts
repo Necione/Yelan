@@ -133,8 +133,9 @@ export async function syncStats(userId: string) {
         calculatedDefValue = 0;
     }
 
-    const finalMaxHP =
-        calculatedMaxHP + additionalArtifactStats.maxHP + additionalWeaponHP;
+    const finalMaxHP = Math.floor(
+        calculatedMaxHP + additionalArtifactStats.maxHP + additionalWeaponHP,
+    );
 
     let needsUpdate = false;
     if (stats.baseAttack !== finalBaseAttack) {
