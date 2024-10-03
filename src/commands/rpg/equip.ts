@@ -98,7 +98,7 @@ export const equip = buildCommand<SlashCommand>({
             }
             if (additionalCritChance !== 0) {
                 updatedStats.push(
-                    `🎯 Crit Chance: ${formatChange(
+                    `🎯 Crit Rate: ${formatChange(
                         additionalCritChance,
                     )}% (Total: ${formatChange(
                         stats.critChance + additionalCritChance,
@@ -193,7 +193,7 @@ export const equip = buildCommand<SlashCommand>({
             }
             if (additionalCritChance !== 0) {
                 updatedStats.push(
-                    `🎯 Crit Chance: ${formatChange(
+                    `🎯 Crit Rate: ${formatChange(
                         additionalCritChance,
                     )}% (Total: ${formatChange(
                         stats.critChance + additionalCritChance,

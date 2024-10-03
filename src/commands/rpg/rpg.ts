@@ -72,7 +72,7 @@ export const rpg = buildCommand<SlashCommand>({
                     2,
                 )} (${formatChange(stats.attackPower - stats.baseAttack)})\`${
                     stats.critChance > 0 || stats.critValue > 0
-                        ? `\n🎯 Crit Chance: \`${
+                        ? `\n🎯 Crit Rate: \`${
                               stats.critChance
                           }%\` | 💥 Crit Value: \`${stats.critValue.toFixed(
                               2,
