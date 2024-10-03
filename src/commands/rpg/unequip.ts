@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, getKeys, is, noop } from "@elara-services/utils";
+import { embedComment, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import {
@@ -25,24 +25,54 @@ export const unequip = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
     async autocomplete(i) {
-        const list = [...getKeys(weapons), ...getKeys(artifacts)].map((c) => ({
-            name: String(c),
-            value: c,
-        }));
-        const item = i.options.getString("item", false) ?? "";
-        if (!item) {
-            return i.respond(list.slice(0, 25)).catch(noop);
-        }
-        const items = list.filter((c) =>
-            c.name.toLowerCase().includes(item.toLowerCase()),
-        );
-        if (!is.array(items)) {
+        const stats = await getUserStats(i.user.id);
+
+        if (!stats) {
             return i
-                .respond([{ name: "No match found for that.", value: "n/a" }])
+                .respond([{ name: "No stats found.", value: "n/a" }])
                 .catch(noop);
         }
+
+        const equippedItems: { name: string; value: string }[] = [];
+
+        if (stats.equippedWeapon) {
+            equippedItems.push({
+                name: stats.equippedWeapon,
+                value: stats.equippedWeapon,
+            });
+        }
+
+        const artifactTypes = ["Flower", "Plume", "Sands", "Goblet", "Circlet"];
+
+        for (const type of artifactTypes) {
+            const field = `equipped${type}` as keyof typeof stats;
+            const itemName = stats[field];
+            if (itemName && typeof itemName === "string") {
+                equippedItems.push({
+                    name: itemName,
+                    value: itemName,
+                });
+            }
+        }
+
+        const input = i.options.getString("item", false) ?? "";
+
+        let items = equippedItems;
+        if (input) {
+            items = items.filter((c) =>
+                c.name.toLowerCase().includes(input.toLowerCase()),
+            );
+        }
+
+        if (!is.array(items) || items.length === 0) {
+            return i
+                .respond([{ name: "No match found.", value: "n/a" }])
+                .catch(noop);
+        }
+
         return i.respond(items.slice(0, 25)).catch(noop);
     },
+
     async execute(i, r) {
         const itemName = i.options.getString("item", true);
         const stats = await getUserStats(i.user.id);
@@ -92,41 +122,34 @@ export const unequip = buildCommand<SlashCommand>({
             );
         }
 
-        if (artifactType) {
-            const equippedField =
-                `equipped${artifactType}` as keyof typeof stats;
+        const equippedField = `equipped${artifactType}` as keyof typeof stats;
 
-            if (stats[equippedField]) {
-                const artifactStats = artifacts[itemName as ArtifactName];
+        if (stats[equippedField] === itemName) {
+            const artifactStats = artifacts[itemName as ArtifactName];
 
-                await updateUserStats(i.user.id, {
-                    [equippedField]: { set: null },
-                    attackPower: stats.attackPower - artifactStats.attackPower,
-                    critChance:
-                        stats.critChance - (artifactStats.critChance || 0),
-                    critValue: stats.critValue - (artifactStats.critValue || 0),
-                    maxHP: stats.maxHP - (artifactStats.maxHP || 0),
-                    defChance: stats.defChance - (artifactStats.defChance || 0),
-                    defValue: stats.defValue - (artifactStats.defValue || 0),
-                });
+            await updateUserStats(i.user.id, {
+                [equippedField]: { set: null },
+                attackPower:
+                    stats.attackPower - (artifactStats.attackPower || 0),
+                critChance: stats.critChance - (artifactStats.critChance || 0),
+                critValue: stats.critValue - (artifactStats.critValue || 0),
+                maxHP: stats.maxHP - (artifactStats.maxHP || 0),
+                defChance: stats.defChance - (artifactStats.defChance || 0),
+                defValue: stats.defValue - (artifactStats.defValue || 0),
+            });
 
-                return r.edit(
-                    embedComment(
-                        `You have unequipped your artifact: **${itemName}**.`,
-                        "Green",
-                    ),
-                );
-            } else {
-                return r.edit(
-                    embedComment(
-                        `You don't have the artifact "${itemName}" equipped.`,
-                    ),
-                );
-            }
+            return r.edit(
+                embedComment(
+                    `You have unequipped your artifact: **${itemName}**.`,
+                    "Green",
+                ),
+            );
+        } else {
+            return r.edit(
+                embedComment(
+                    `You don't have the artifact "${itemName}" equipped.`,
+                ),
+            );
         }
-
-        return r.edit(
-            embedComment(`The item "${itemName}" is not currently equipped.`),
-        );
     },
 });
