@@ -72,6 +72,10 @@ const craftingMap: Record<string, { source: DropName; target: DropName }> = {
         source: "Hunter's Sacrificial Knife",
         target: "Agent's Sacrificial Knife",
     },
+    CrystalPrism: {
+        source: "Dismal Prism",
+        target: "Crystal Prism",
+    },
 };
 
 export const craft = buildCommand<SlashCommand>({
