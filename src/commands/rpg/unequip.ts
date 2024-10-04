@@ -35,6 +35,11 @@ export const unequip = buildCommand<SlashCommand>({
 
         const equippedItems: { name: string; value: string }[] = [];
 
+        equippedItems.push({
+            name: "All",
+            value: "All",
+        });
+
         if (stats.equippedWeapon) {
             equippedItems.push({
                 name: stats.equippedWeapon,
@@ -87,6 +92,73 @@ export const unequip = buildCommand<SlashCommand>({
 
         if (stats.isHunting) {
             return r.edit(embedComment("You cannot unequip while hunting!"));
+        }
+
+        if (itemName === "All") {
+            const equippedItems: string[] = [];
+            let totalAttackPower = stats.attackPower;
+            let totalCritChance = stats.critChance;
+            let totalCritValue = stats.critValue;
+            let totalMaxHP = stats.maxHP;
+            let totalDefChance = stats.defChance;
+            let totalDefValue = stats.defValue;
+
+            if (stats.equippedWeapon) {
+                const weaponStats = weapons[stats.equippedWeapon as WeaponName];
+                totalAttackPower -= weaponStats.attackPower;
+                totalCritChance -= weaponStats.critChance || 0;
+                totalCritValue -= weaponStats.critValue || 0;
+                totalMaxHP -= weaponStats.additionalHP || 0;
+                equippedItems.push(stats.equippedWeapon);
+            }
+
+            const artifactTypes = [
+                "Flower",
+                "Plume",
+                "Sands",
+                "Goblet",
+                "Circlet",
+            ];
+            const updates: any = {};
+
+            for (const type of artifactTypes) {
+                const field = `equipped${type}` as keyof typeof stats;
+                const artifactName = stats[field];
+
+                if (artifactName && typeof artifactName === "string") {
+                    const artifactStats =
+                        artifacts[artifactName as ArtifactName];
+                    totalAttackPower -= artifactStats.attackPower || 0;
+                    totalCritChance -= artifactStats.critChance || 0;
+                    totalCritValue -= artifactStats.critValue || 0;
+                    totalMaxHP -= artifactStats.maxHP || 0;
+                    totalDefChance -= artifactStats.defChance || 0;
+                    totalDefValue -= artifactStats.defValue || 0;
+                    updates[field] = { set: null };
+                    equippedItems.push(artifactName);
+                }
+            }
+
+            await updateUserStats(i.user.id, {
+                equippedWeapon: { set: null },
+                attackPower: totalAttackPower,
+                critChance: totalCritChance,
+                critValue: totalCritValue,
+                maxHP: totalMaxHP,
+                defChance: totalDefChance,
+                defValue: totalDefValue,
+                ...updates,
+            });
+
+            if (equippedItems.length === 0) {
+                return r.edit(
+                    embedComment(`You have no items equipped to unequip.`),
+                );
+            }
+
+            return r.edit(
+                embedComment(`You have unequipped all items`, "Green"),
+            );
         }
 
         if (itemName === stats.equippedWeapon) {
