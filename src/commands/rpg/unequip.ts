@@ -47,7 +47,13 @@ export const unequip = buildCommand<SlashCommand>({
             });
         }
 
-        const artifactTypes = ["Flower", "Plume", "Sands", "Goblet", "Circlet"];
+        const artifactTypes = [
+            "Flower",
+            "Plume",
+            "Sands",
+            "Goblet",
+            "Circlet",
+        ] as const;
 
         for (const type of artifactTypes) {
             const field = `equipped${type}` as keyof typeof stats;
@@ -118,11 +124,15 @@ export const unequip = buildCommand<SlashCommand>({
                 "Sands",
                 "Goblet",
                 "Circlet",
-            ];
-            const updates: any = {};
+            ] as const;
+
+            type ArtifactType = (typeof artifactTypes)[number];
+            type EquippedField = `equipped${ArtifactType}`;
+
+            const updates: Partial<Record<EquippedField, { set: null }>> = {};
 
             for (const type of artifactTypes) {
-                const field = `equipped${type}` as keyof typeof stats;
+                const field = `equipped${type}` as EquippedField;
                 const artifactName = stats[field];
 
                 if (artifactName && typeof artifactName === "string") {

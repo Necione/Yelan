@@ -19,8 +19,7 @@ const availableSkills = [
     },
     {
         name: "Vampirism",
-        description:
-            "Gain 20% lifesteal from each enemy's Max HP on victory",
+        description: "Gain 20% lifesteal from each enemy's Max HP on victory",
         emoji: "🦇",
     },
     {
