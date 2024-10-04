@@ -327,6 +327,10 @@ export async function handleHunt(
         const initialMonsterHp = currentMonsterHp;
         let initialPlayerHp = currentPlayerHp;
 
+        const hasVampirism =
+            stats.skills.some((skill) => skill.name === "Vampirism") &&
+            stats.activeSkills.includes("Vampirism");
+
         const createHealthBar = (
             current: number,
             max: number,
@@ -514,6 +518,19 @@ export async function handleHunt(
                 await i.editReply({ embeds: [battleEmbed] }).catch(noop);
 
                 if (currentMonsterHp <= 0) {
+                    if (hasVampirism) {
+                        const healAmount = stats.maxHP * 0.2;
+                        currentPlayerHp = Math.min(
+                            currentPlayerHp + healAmount,
+                            stats.maxHP,
+                        );
+                        const vampirismMessage = `\`🦇\` Vampirism skill activated! You healed \`${healAmount.toFixed(
+                            2,
+                        )}\` HP.`;
+                        await thread
+                            ?.send(">>> " + vampirismMessage)
+                            .catch(noop);
+                    }
                     break;
                 }
 

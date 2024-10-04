@@ -20,6 +20,7 @@ type SkillName =
     | "Distraction"
     | "Backstab"
     | "Heartbroken"
+    | "Vampirism"
     | "Crystallize"
     | "Kindle"
     | "Sloth"
@@ -93,6 +94,12 @@ const skillRequirements: Record<
             { item: "Silver Raven Insignia", amount: 3 },
         ],
     },
+    Vampirism: {
+        worldLevel: 3,
+        coins: 150,
+        items: [{ item: "Slime Concentrate", amount: 10 }],
+        rebirthsRequired: 1,
+    },
     Backstab: {
         worldLevel: 5,
         coins: 100,
@@ -161,6 +168,7 @@ export const learn = buildCommand<SlashCommand>({
                 .addChoices(
                     { name: "Vigilance", value: "Vigilance" },
                     { name: "Leech", value: "Leech" },
+                    { name: "Vampirism", value: "Vampirism" },
                     { name: "Appraise", value: "Appraise" },
                     { name: "Totem", value: "Totem" },
                     { name: "Insomnia", value: "Insomnia" },

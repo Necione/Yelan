@@ -8,6 +8,7 @@ const MAX_ACTIVE_SKILLS = 5;
 const skillChoices = [
     { name: "Vigilance", value: "Vigilance", emoji: "✨" },
     { name: "Leech", value: "Leech", emoji: "💖" },
+    { name: "Vampirism", value: "Vampirism", emoji: "🦇" },
     { name: "Appraise", value: "Appraise", emoji: "🔍" },
     { name: "Totem", value: "Totem", emoji: "⭐" },
     { name: "Insomnia", value: "Insomnia", emoji: "🌙" },

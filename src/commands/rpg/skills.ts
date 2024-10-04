@@ -14,8 +14,14 @@ const availableSkills = [
     {
         name: "Leech",
         description:
-            "Gain 5% lifesteal from the enemy's Max HP 50% of the time",
+            "Gain 5% lifesteal from each enemy's Max HP 50% of the time",
         emoji: "💖",
+    },
+    {
+        name: "Vampirism",
+        description:
+            "Gain 20% lifesteal from each enemy's Max HP on victory",
+        emoji: "🦇",
     },
     {
         name: "Appraise",
@@ -146,7 +152,7 @@ export const skills = buildCommand<SlashCommand>({
             .setTitle(`${i.user.username}'s Skills`)
             .addFields(
                 {
-                    name: `Active Skills (${activeSkills.length}/5`,
+                    name: `Active Skills (${activeSkills.length}/5)`,
                     value: activeList,
                     inline: true,
                 },
