@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -7,12 +8,17 @@ import {
     ComponentType,
     SlashCommandBuilder,
 } from "discord.js";
-import { getUserStats, updateUserStats } from "../../services";
+import {
+    getProfileByUserId,
+    getUserStats,
+    removeBalance,
+    updateUserStats,
+} from "../../services";
 
 export const downgrade = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("downgrade")
-        .setDescription("[RPG] Downgrade your world level by up to 3 levels.")
+        .setDescription("[RPG] Downgrade your world level by up to 2 levels.")
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
@@ -31,6 +37,16 @@ export const downgrade = buildCommand<SlashCommand>({
             });
         }
 
+        const userProfile = await getProfileByUserId(i.user.id);
+
+        if (!userProfile) {
+            return r.edit(
+                embedComment(
+                    "No profile found for your user. Please set up your profile.",
+                ),
+            );
+        }
+
         if (stats.worldLevel <= 1) {
             const embed = embedComment(
                 `You are already at the lowest world level (1)! You cannot downgrade further.`,
@@ -45,18 +61,26 @@ export const downgrade = buildCommand<SlashCommand>({
             await updateUserStats(i.user.id, {
                 highestWL: stats.worldLevel,
             });
+            stats.highestWL = stats.worldLevel;
         }
 
-        const highestAllowedDowngrade = Math.max(stats.highestWL - 3, 1);
-        const minDowngradeLevel = Math.max(1, stats.worldLevel - 3);
-        const allowedDowngradeLevels = Math.max(
-            minDowngradeLevel,
-            highestAllowedDowngrade,
-        );
-
-        if (allowedDowngradeLevels >= stats.worldLevel) {
+        if (userProfile.balance < 250) {
             const embed = embedComment(
-                `You cannot downgrade lower than the limit of 3 levels below your highest world level (${stats.highestWL}).`,
+                `You need **${customEmoji.a.z_coins} 250 ${texts.c.u}** to downgrade your world level.`,
+                "Red",
+            );
+            return r.edit({
+                embeds: embed.embeds,
+                components: embed.components,
+            });
+        }
+
+        const minDowngradeLevel = Math.max(stats.highestWL - 2, 1);
+
+        if (stats.worldLevel <= minDowngradeLevel) {
+            const embed = embedComment(
+                `You cannot downgrade lower than 2 levels below your highest world level (${stats.highestWL}).`,
+                "Red",
             );
             return r.edit({
                 embeds: embed.embeds,
@@ -67,7 +91,7 @@ export const downgrade = buildCommand<SlashCommand>({
         const downgradeLevels = [];
         for (
             let level = stats.worldLevel - 1;
-            level >= allowedDowngradeLevels;
+            level >= minDowngradeLevel;
             level--
         ) {
             downgradeLevels.push(level);
@@ -85,7 +109,7 @@ export const downgrade = buildCommand<SlashCommand>({
         );
 
         const confirmationEmbed = embedComment(
-            `Select the world level you want to downgrade to.\nYour current world level is ${stats.worldLevel}.\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
+            `Select the world level you want to downgrade to. Downgrading costs **${customEmoji.a.z_coins} 250 ${texts.c.u}**.\nYour current world level is ${stats.worldLevel}.\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
             "Yellow",
         );
 
@@ -115,13 +139,20 @@ export const downgrade = buildCommand<SlashCommand>({
 
         const selectedLevel = parseInt(confirmation.customId.split("_")[1], 10);
 
+        await removeBalance(
+            i.user.id,
+            250,
+            true,
+            `Paid 250 ${texts.c.u} to downgrade world level from ${stats.worldLevel} to ${selectedLevel}`,
+        );
+
         await updateUserStats(i.user.id, {
             worldLevel: selectedLevel,
             exp: 0,
         });
 
         const successEmbed = embedComment(
-            `Your world level has been downgraded to ${selectedLevel} and your EXP has been reset to 0.`,
+            `Your world level has been downgraded to ${selectedLevel}, your EXP has been reset to 0, and **${customEmoji.a.z_coins} 250 ${texts.c.u}** have been deducted from your wallet.`,
             "Green",
         );
 
