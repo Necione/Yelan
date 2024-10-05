@@ -28,6 +28,16 @@ export const bag = buildCommand<SlashCommand>({
                     { name: "Food", value: "Food" },
                 ),
         )
+        .addStringOption((option) =>
+            option
+                .setName("sort")
+                .setDescription("How to sort the items.")
+                .setRequired(false)
+                .addChoices(
+                    { name: "Alphabetical", value: "Alphabetical" },
+                    { name: "Quantity", value: "Quantity" },
+                ),
+        )
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
@@ -64,6 +74,7 @@ export const bag = buildCommand<SlashCommand>({
         }
 
         const category = i.options.getString("category");
+        const sortOption = i.options.getString("sort") || "Alphabetical";
 
         let filteredItems = items;
 
@@ -97,13 +108,21 @@ export const bag = buildCommand<SlashCommand>({
             );
         }
 
+        if (sortOption === "Alphabetical") {
+            filteredItems.sort((a, b) => a.item.localeCompare(b.item));
+        } else if (sortOption === "Quantity") {
+            filteredItems.sort((a, b) => b.amount - a.amount);
+        }
+
         const chunks = chunk(filteredItems, 10);
         const pager = getPaginatedMessage();
 
         for (const c of chunks) {
             const embed = new EmbedBuilder()
                 .setColor("Aqua")
-                .setTitle(`${i.user.username}'s Inventory - ${category}`)
+                .setTitle(
+                    `${i.user.username}'s Inventory - ${category} (${sortOption})`,
+                )
                 .setDescription(
                     c
                         .map((item) => `\`${item.amount}x\` ${item.item}`)
