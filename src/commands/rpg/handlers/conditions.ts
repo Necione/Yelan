@@ -1,4 +1,5 @@
 import { get, noop } from "@elara-services/utils";
+import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction, ThreadChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
@@ -161,10 +162,17 @@ export async function handleDefeat(
         .setColor("Red")
         .setTitle(`Defeat...`)
         .setDescription(
-            `Oh no :( You were defeated by the ${monster.name}...\n-# Use </downgrade:1282035993242767450> if this WL is too hard`,
+            `Oh no :( You were defeated by the **${monster.name}**...\n-# Use </downgrade:1282035993242767450> if this WL is too hard.`,
         );
 
-    const amountToDeduct = Math.min(25, userWallet.balance);
+    const rebirths = typeof stats.rebirths === "number" ? stats.rebirths : 0;
+
+    const baseDeduction = 25;
+    const additionalDeduction = 25 * rebirths;
+    const totalDeduction = baseDeduction + additionalDeduction;
+
+    const amountToDeduct = Math.min(totalDeduction, userWallet.balance);
+
     if (amountToDeduct > 0) {
         await removeBalance(
             i.user.id,
@@ -175,7 +183,7 @@ export async function handleDefeat(
 
         finalEmbed.addFields({
             name: "Loss",
-            value: `You lost \`${amountToDeduct}\` coins due to your defeat.`,
+            value: `You lost ${customEmoji.a.z_coins} \`${amountToDeduct}\` ${texts.c.u} due to your defeat.`,
         });
     }
 
