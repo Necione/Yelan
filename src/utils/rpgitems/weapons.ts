@@ -260,6 +260,16 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Chain_Breaker:1284617740899844176>",
     },
+    "Cinnabar Spindle": {
+        sellPrice: 45,
+        attackPower: 20,
+        critChance: 0,
+        critValue: 2,
+        additionalHP: 0,
+        minWorldLevel: 10,
+        chestChance: 5,
+        emoji: "<:Weapon_Cinnabar_Spindle:1292283663329005621>",
+    },
     Deathmatch: {
         sellPrice: 45,
         attackPower: 12,
