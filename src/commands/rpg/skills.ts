@@ -73,7 +73,7 @@ const availableSkills = [
     },
     {
         name: "Growth",
-        description: "Earn 200% more EXP at the end of each battle",
+        description: "Earn 150% more EXP at the end of each battle",
         emoji: "🌱",
     },
     {

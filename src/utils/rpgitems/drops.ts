@@ -244,6 +244,13 @@ export const drops = {
         minWorldLevel: 1,
         chestChance: 0,
     },
+    "Domain Key": {
+        sellPrice: 5,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 1,
+        chestChance: 2,
+    },
 };
 
 export type DropName = keyof typeof drops;

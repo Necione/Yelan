@@ -49,8 +49,8 @@ export async function handleVictory(
         stats.activeSkills.includes("Growth");
 
     if (hasGrowthSkill) {
-        totalExpGained = Math.round(totalExpGained * 2);
-        skillsActivated += `\`🌱\` Growth skill activated! You earned 2x EXP.\n`;
+        totalExpGained = Math.round(totalExpGained * 1.5);
+        skillsActivated += `\`🌱\` Growth skill activated! You earned 1.5x EXP.\n`;
     }
 
     let newExp = stats.exp + totalExpGained;

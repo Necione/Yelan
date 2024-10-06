@@ -189,6 +189,7 @@ export const learn = buildCommand<SlashCommand>({
                     { name: "Backstab", value: "Backstab" },
                     { name: "Heartbroken", value: "Heartbroken" },
                     { name: "Crystallize", value: "Crystallize" },
+                    { name: "Growth", value: "Growth" },
                     { name: "Sloth", value: "Sloth" },
                     { name: "Wrath", value: "Wrath" },
                 ),
