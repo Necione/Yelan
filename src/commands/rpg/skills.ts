@@ -3,11 +3,11 @@ import { embedComment, noop } from "@elara-services/utils";
 import {
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonInteraction,
+    type ButtonInteraction,
     ButtonStyle,
     ComponentType,
     EmbedBuilder,
-    Message,
+    type Message,
     SlashCommandBuilder,
 } from "discord.js";
 import { getUserStats } from "../../services";
@@ -198,7 +198,9 @@ export const skills = buildCommand<SlashCommand>({
                 embeds: [allSkillsEmbed],
                 ephemeral: true,
             });
-        } catch (noop) {}
+        } catch (error) {
+            noop();
+        }
 
         viewAllSkillsButton.setDisabled(true);
         const disabledActionRow =

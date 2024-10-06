@@ -344,7 +344,7 @@ export async function handleHunt(
         );
 
         const initialMonsterHp = currentMonsterHp;
-        let initialPlayerHp = currentPlayerHp;
+        const initialPlayerHp = currentPlayerHp;
 
         const hasVampirism =
             stats.skills.some((skill) => skill.name === "Vampirism") &&
