@@ -23,6 +23,7 @@ type SkillName =
     | "Vampirism"
     | "Crystallize"
     | "Kindle"
+    | "Growth"
     | "Sloth"
     | "Wrath";
 
@@ -133,6 +134,15 @@ const skillRequirements: Record<
         coins: 250,
         items: [{ item: "Dismal Prism", amount: 2 }],
         rebirthsRequired: 1,
+    },
+    Growth: {
+        worldLevel: 10,
+        coins: 500,
+        items: [
+            { item: "Black Bronze Horn", amount: 5 },
+            { item: "Dead Ley Line Leaves", amount: 10 },
+        ],
+        rebirthsRequired: 2,
     },
     Sloth: {
         worldLevel: 15,

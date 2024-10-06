@@ -1,7 +1,15 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
-import { texts } from "@liyueharbor/econ";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { embedComment, noop } from "@elara-services/utils";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonInteraction,
+    ButtonStyle,
+    ComponentType,
+    EmbedBuilder,
+    Message,
+    SlashCommandBuilder,
+} from "discord.js";
 import { getUserStats } from "../../services";
 
 const availableSkills = [
@@ -44,7 +52,7 @@ const availableSkills = [
     },
     {
         name: "Scrounge",
-        description: `In addition to drops, earn ${texts.c.u} per hunt`,
+        description: `In addition to drops, earn coins per hunt`,
         emoji: "💸",
     },
     {
@@ -62,6 +70,11 @@ const availableSkills = [
         name: "Backstab",
         description: "Deal 150% more DMG to humans",
         emoji: "🔪",
+    },
+    {
+        name: "Growth",
+        description: "Earn 200% more EXP at the end of each battle",
+        emoji: "🌱",
     },
     {
         name: "Heartbroken",
@@ -94,7 +107,7 @@ export const skills = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("skills")
         .setDescription(
-            "[RPG] Displays a list of your learned skills and available skills.",
+            "[RPG] Displays a list of your active and learned skills.",
         )
         .setDMPermission(false),
     defer: { silent: false },
@@ -129,26 +142,13 @@ export const skills = buildCommand<SlashCommand>({
                   .join("\n")
             : "You haven't learned any skills yet.";
 
-        const filteredAvailableSkills = availableSkills.filter(
-            (skill) =>
-                !learnedSkills.some((learned) => learned.name === skill.name),
-        );
-
-        const availableSkillsList = filteredAvailableSkills.length
-            ? filteredAvailableSkills
-                  .map(
-                      (skill) =>
-                          `${skill.emoji} **${skill.name}**: ${skill.description}`,
-                  )
-                  .join("\n")
-            : "You have learned all available skills.";
-
         const embed = new EmbedBuilder()
             .setColor("Aqua")
-            .setDescription(
-                `- Use </learn:1282044626408308736> command to get new skills\n- Use </activate:1284399993897353292> to enable/disable a skill`,
-            )
             .setTitle(`${i.user.username}'s Skills`)
+            .setThumbnail(i.user.displayAvatarURL())
+            .setDescription(
+                `- Use </learn:1282044626408308736> to learn new skills.\n- Use </activate:1284399993897353292> to enable/disable a skill.`,
+            )
             .addFields(
                 {
                     name: `Active Skills (${activeSkills.length}/5)`,
@@ -156,9 +156,55 @@ export const skills = buildCommand<SlashCommand>({
                     inline: true,
                 },
                 { name: "Learned Skills", value: skillsList, inline: true },
-                { name: "Learnable Skills", value: availableSkillsList },
             );
 
-        await r.edit({ embeds: [embed] });
+        const viewAllSkillsButton = new ButtonBuilder()
+            .setCustomId("view_all_skills")
+            .setLabel("View All Skills")
+            .setStyle(ButtonStyle.Primary);
+
+        const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            viewAllSkillsButton,
+        );
+
+        await i.editReply({ embeds: [embed], components: [actionRow] });
+
+        const message = (await i.fetchReply()) as Message;
+
+        const filter = (interaction: ButtonInteraction) =>
+            interaction.customId === "view_all_skills" &&
+            interaction.user.id === i.user.id;
+
+        try {
+            const buttonInteraction = await message.awaitMessageComponent({
+                filter,
+                componentType: ComponentType.Button,
+                time: 60000,
+            });
+
+            const allSkillsList = availableSkills
+                .map(
+                    (skill) =>
+                        `${skill.emoji} **${skill.name}**: ${skill.description}`,
+                )
+                .join("\n");
+
+            const allSkillsEmbed = new EmbedBuilder()
+                .setColor("Aqua")
+                .setTitle("All Skills")
+                .setDescription(allSkillsList);
+
+            await buttonInteraction.reply({
+                embeds: [allSkillsEmbed],
+                ephemeral: true,
+            });
+        } catch (noop) {}
+
+        viewAllSkillsButton.setDisabled(true);
+        const disabledActionRow =
+            new ActionRowBuilder<ButtonBuilder>().addComponents(
+                viewAllSkillsButton,
+            );
+        await message.edit({ components: [disabledActionRow] }).catch(noop);
     },
 });

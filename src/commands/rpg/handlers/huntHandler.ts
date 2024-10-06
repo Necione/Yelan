@@ -272,7 +272,26 @@ export async function handleHunt(
               : 1;
 
     const monstersEncountered: Monster[] = [];
+
     let currentPlayerHp = stats.hp;
+
+    const hasSloth =
+        stats.skills.some((skill) => skill.name === "Sloth") &&
+        stats.activeSkills.includes("Sloth");
+
+    const hasWrath =
+        stats.skills.some((skill) => skill.name === "Wrath") &&
+        stats.activeSkills.includes("Wrath");
+
+    if (hasSloth) {
+        currentPlayerHp = Math.floor(currentPlayerHp * 1.25);
+    }
+
+    if (hasWrath) {
+        currentPlayerHp = Math.floor(currentPlayerHp * 0.75);
+    }
+
+    currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
 
     for (let encounter = 0; encounter < numberOfMonsters; encounter++) {
         const monster = await getRandomMonster(
@@ -425,32 +444,10 @@ export async function handleHunt(
 
         let turnNumber = 1;
 
-        const hasSloth =
-            stats.skills.some((skill) => skill.name === "Sloth") &&
-            stats.activeSkills.includes("Sloth");
-
-        const hasWrath =
-            stats.skills.some((skill) => skill.name === "Wrath") &&
-            stats.activeSkills.includes("Wrath");
-
-        if (hasSloth) {
-            currentPlayerHp = Math.floor(stats.hp * 1.25);
-        } else {
-            currentPlayerHp = stats.hp;
-        }
-
-        if (hasWrath) {
-            currentPlayerHp = Math.floor(currentPlayerHp * 0.75);
-        }
-
-        currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
-
-        initialPlayerHp = currentPlayerHp;
-
         const startingMessages: string[] = [];
         if (hasSloth) {
             startingMessages.push(
-                `\`💤\` **SIN OF SLOTH** acivated. Your starting HP is increased by 25%.`,
+                `\`💤\` **SIN OF SLOTH** activated. Your starting HP is increased by 25%.`,
             );
         }
         if (hasWrath) {

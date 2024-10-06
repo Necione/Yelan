@@ -40,7 +40,17 @@ export async function handleVictory(
 
     const numberOfMonsters = monstersEncountered.length;
     const xpReductionFactor = Math.max(0, 1 - (numberOfMonsters - 1) * 0.25);
+
     totalExpGained = Math.round(totalExpGained * xpReductionFactor);
+
+    const hasGrowthSkill =
+        stats.skills.some((skill) => skill.name === "Growth") &&
+        stats.activeSkills.includes("Growth");
+
+    if (hasGrowthSkill) {
+        totalExpGained = Math.round(totalExpGained * 2);
+        skillsActivated += `\`🌱\` Growth skill activated! You earned 2x EXP.\n`;
+    }
 
     let newExp = stats.exp + totalExpGained;
     let expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
