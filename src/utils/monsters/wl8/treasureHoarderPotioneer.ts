@@ -18,7 +18,7 @@ export default {
             item: "Silver Raven Insignia",
             minAmount: 1,
             maxAmount: 3,
-            chance: 100,
+            chance: 90,
         },
         {
             item: "Golden Raven Insignia",

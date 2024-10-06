@@ -1,15 +1,15 @@
 export default {
     currentHp: 0,
-    name: "Nobushi: Jintouban",
+    name: "Nobushi: Kikouban",
     group: "Human",
     minExp: 10,
     maxExp: 20,
     minWorldLevel: 16,
-    image: "https://lh.elara.workers.dev/rpg/monsters/jintouban.png",
+    image: "https://lh.elara.workers.dev/rpg/monsters/kikouban.png",
     critChance: 25,
-    critValue: 7.5,
-    defChance: 50,
-    defValue: 0.5,
+    critValue: 5,
+    defchance: 90,
+    defValue: 0.25,
     drops: [
         {
             item: "Old Handguard",
@@ -19,11 +19,11 @@ export default {
         },
     ],
     locations: [
-        "Qingxu Pool",
-        "Lingju Pass",
-        "Lumberpick Valley",
-        "Dunyu Ruins",
         "Nantianmen",
+        "Tianqiu Valley",
+        "Luhua Pool",
+        "Guili Plains",
+        "Jueyun Karst",
     ],
     getStatsForWorldLevel(worldLevel: number) {
         const stats = [

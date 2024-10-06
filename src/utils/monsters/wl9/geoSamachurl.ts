@@ -7,12 +7,12 @@ export default {
     minWorldLevel: 9,
     image: "https://lh.elara.workers.dev/rpg/monsters/geo_samachurl.png",
     drops: [
-        { item: "Divining Scroll", minAmount: 1, maxAmount: 3, chance: 100 },
-        { item: "Sealed Scroll", minAmount: 1, maxAmount: 2, chance: 75 },
+        { item: "Divining Scroll", minAmount: 1, maxAmount: 2, chance: 90 },
+        { item: "Sealed Scroll", minAmount: 1, maxAmount: 1, chance: 75 },
         {
             item: "Forbidden Curse Scroll",
             minAmount: 1,
-            maxAmount: 2,
+            maxAmount: 1,
             chance: 50,
         },
         {

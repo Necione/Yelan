@@ -11,7 +11,7 @@ export default {
             item: "Slime Secretions",
             minAmount: 2,
             maxAmount: 4,
-            chance: 100,
+            chance: 90,
         },
         {
             item: "Slime Concentrate",

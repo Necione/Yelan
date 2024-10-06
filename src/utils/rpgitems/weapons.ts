@@ -223,7 +223,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     "The Widsith": {
         sellPrice: 45,
         attackPower: -10,
-        critChance: 100,
+        critchance: 90,
         critValue: 0,
         additionalHP: 5,
         minWorldLevel: 8,

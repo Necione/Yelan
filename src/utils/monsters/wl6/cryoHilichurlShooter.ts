@@ -15,7 +15,7 @@ export default {
             item: "Firm Arrowhead",
             minAmount: 1,
             maxAmount: 3,
-            chance: 100,
+            chance: 90,
         },
         {
             item: "Sharp Arrowhead",

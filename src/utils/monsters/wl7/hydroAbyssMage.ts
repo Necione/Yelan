@@ -16,7 +16,7 @@ export default {
         {
             item: "Dead Ley Line Leaves",
             minAmount: 1,
-            maxAmount: 2,
+            maxAmount: 1,
             chance: 25,
         },
         {

@@ -11,7 +11,7 @@ export default {
             item: "Slime Secretions",
             minAmount: 1,
             maxAmount: 3,
-            chance: 100,
+            chance: 90,
         },
         {
             item: "Slime Concentrate",
@@ -40,7 +40,7 @@ export default {
 
     critChance: 10,
     critValue: 1.5,
-    defChance: 100,
+    defchance: 90,
     defValue: 0.5,
     getStatsForWorldLevel(worldLevel: number) {
         const stats = [

@@ -207,7 +207,9 @@ export async function monsterAttack(
     }
 
     if (monster.name.includes("Pyro") || monster.name.includes("Flames")) {
-        const burnDamage = Math.ceil(stats.maxHP * 0.03);
+        const burnDamage = Math.ceil(
+            stats.maxHP * (0.03 + 0.01 * Math.floor(stats.worldLevel / 2)),
+        );
         currentPlayerHp -= burnDamage;
         messages.push(
             `\`🔥\` The ${monster.name} inflicted Burn! You took \`${burnDamage}\` Burn damage.`,
@@ -218,7 +220,9 @@ export async function monsterAttack(
         (monster.name.includes("Cryo") || monster.name.includes("Frost")) &&
         Math.random() < 0.5
     ) {
-        const crippleDamage = Math.ceil(stats.maxHP * 0.05);
+        const crippleDamage = Math.ceil(
+            stats.maxHP * (0.05 + 0.01 * Math.floor(stats.worldLevel / 2)),
+        );
         currentPlayerHp -= crippleDamage;
         messages.push(
             `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${crippleDamage}\` Cripple damage.`,
@@ -344,7 +348,7 @@ export async function handleHunt(
         );
 
         const initialMonsterHp = currentMonsterHp;
-        const initialPlayerHp = currentPlayerHp;
+        let initialPlayerHp = currentPlayerHp;
 
         const hasVampirism =
             stats.skills.some((skill) => skill.name === "Vampirism") &&

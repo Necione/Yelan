@@ -7,7 +7,7 @@ export default {
     minWorldLevel: 1,
     image: "https://lh.elara.workers.dev/rpg/monsters/hilichurl.png",
     drops: [
-        { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 100 },
+        { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 90 },
         { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 50 },
         {
             item: "Life Essence",
