@@ -113,12 +113,6 @@ export const misc = {
         maxAmount: 2,
         dropChance: 7,
     },
-    "Raw Meat": {
-        sellPrice: 3,
-        minAmount: 1,
-        maxAmount: 2,
-        dropChance: 7,
-    },
 };
 
 export type MiscName = keyof typeof misc;

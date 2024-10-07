@@ -378,7 +378,6 @@ const prefixes: {
     "": (() => ({})) as (weaponData: WeaponData) => Partial<WeaponData>,
     Old: (weaponData) => ({
         attackPower: weaponData.attackPower * 0.75,
-        sellPrice: 0.5,
     }),
     Sharp: (weaponData) => ({
         attackPower: weaponData.attackPower * 1.25,
