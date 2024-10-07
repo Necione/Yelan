@@ -86,6 +86,8 @@ export const equip = buildCommand<SlashCommand>({
             const additionalCritChance = weapons[weaponName].critChance || 0;
             const additionalCritValue = weapons[weaponName].critValue || 0;
             const additionalHP = weapons[weaponName].additionalHP || 0;
+            const additionalDefChance = weapons[weaponName].defChance || 0;
+            const additionalDefValue = weapons[weaponName].defValue || 0;
 
             if (additionalAttackPower !== 0) {
                 updatedStats.push(
@@ -121,6 +123,24 @@ export const equip = buildCommand<SlashCommand>({
                     )} (Total: ${formatChange(stats.maxHP + additionalHP)})`,
                 );
             }
+            if (additionalDefChance !== 0) {
+                updatedStats.push(
+                    `🛡️ Def Chance: ${formatChange(
+                        additionalDefChance,
+                    )}% (Total: ${formatChange(
+                        stats.defChance + additionalDefChance,
+                    )}%)`,
+                );
+            }
+            if (additionalDefValue !== 0) {
+                updatedStats.push(
+                    `🛡️ Def Value: ${formatChange(
+                        additionalDefValue * 100,
+                    )}% (Total: ${formatChange(
+                        (stats.defValue + additionalDefValue) * 100,
+                    )}%)`,
+                );
+            }
 
             await updateUserStats(i.user.id, {
                 equippedWeapon: weaponName,
@@ -128,6 +148,8 @@ export const equip = buildCommand<SlashCommand>({
                 critChance: stats.critChance + additionalCritChance,
                 critValue: stats.critValue + additionalCritValue,
                 maxHP: stats.maxHP + additionalHP,
+                defChance: stats.defChance + additionalDefChance,
+                defValue: stats.defValue + additionalDefValue,
             });
 
             return r.edit(

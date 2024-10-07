@@ -17,25 +17,24 @@ export async function syncStats(userId: string) {
     const calculatedMaxHP =
         100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
 
-    const additionalWeaponAttackPower =
-        stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
-            ? weapons[stats.equippedWeapon as WeaponName].attackPower || 0
-            : 0;
+    const additionalWeaponStats = {
+        attackPower: 0,
+        critChance: 0,
+        critValue: 0,
+        additionalHP: 0,
+        defChance: 0,
+        defValue: 0,
+    };
 
-    const additionalWeaponCritChance =
-        stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
-            ? weapons[stats.equippedWeapon as WeaponName].critChance || 0
-            : 0;
-
-    const additionalWeaponCritValue =
-        stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
-            ? weapons[stats.equippedWeapon as WeaponName].critValue || 0
-            : 0;
-
-    const additionalWeaponHP =
-        stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]
-            ? weapons[stats.equippedWeapon as WeaponName].additionalHP || 0
-            : 0;
+    if (stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]) {
+        const weapon = weapons[stats.equippedWeapon as WeaponName];
+        additionalWeaponStats.attackPower = weapon.attackPower || 0;
+        additionalWeaponStats.critChance = weapon.critChance || 0;
+        additionalWeaponStats.critValue = weapon.critValue || 0;
+        additionalWeaponStats.additionalHP = weapon.additionalHP || 0;
+        additionalWeaponStats.defChance = weapon.defChance || 0;
+        additionalWeaponStats.defValue = weapon.defValue || 0;
+    }
 
     const additionalArtifactStats = {
         attackPower: 0,
@@ -46,68 +45,30 @@ export async function syncStats(userId: string) {
         maxHP: 0,
     };
 
-    if (
-        stats.equippedFlower &&
-        artifacts[stats.equippedFlower as ArtifactName]
-    ) {
-        const flower = artifacts[stats.equippedFlower as ArtifactName];
-        additionalArtifactStats.attackPower += flower.attackPower || 0;
-        additionalArtifactStats.critChance += flower.critChance || 0;
-        additionalArtifactStats.critValue += flower.critValue || 0;
-        additionalArtifactStats.defChance += flower.defChance || 0;
-        additionalArtifactStats.defValue += flower.defValue || 0;
-        additionalArtifactStats.maxHP += flower.maxHP || 0;
-    }
+    const artifactTypes = [
+        "Flower",
+        "Plume",
+        "Sands",
+        "Goblet",
+        "Circlet",
+    ] as const;
 
-    if (stats.equippedPlume && artifacts[stats.equippedPlume as ArtifactName]) {
-        const plume = artifacts[stats.equippedPlume as ArtifactName];
-        additionalArtifactStats.attackPower += plume.attackPower || 0;
-        additionalArtifactStats.critChance += plume.critChance || 0;
-        additionalArtifactStats.critValue += plume.critValue || 0;
-        additionalArtifactStats.defChance += plume.defChance || 0;
-        additionalArtifactStats.defValue += plume.defValue || 0;
-        additionalArtifactStats.maxHP += plume.maxHP || 0;
-    }
-
-    if (stats.equippedSands && artifacts[stats.equippedSands as ArtifactName]) {
-        const sands = artifacts[stats.equippedSands as ArtifactName];
-        additionalArtifactStats.attackPower += sands.attackPower || 0;
-        additionalArtifactStats.critChance += sands.critChance || 0;
-        additionalArtifactStats.critValue += sands.critValue || 0;
-        additionalArtifactStats.defChance += sands.defChance || 0;
-        additionalArtifactStats.defValue += sands.defValue || 0;
-        additionalArtifactStats.maxHP += sands.maxHP || 0;
-    }
-
-    if (
-        stats.equippedGoblet &&
-        artifacts[stats.equippedGoblet as ArtifactName]
-    ) {
-        const goblet = artifacts[stats.equippedGoblet as ArtifactName];
-        additionalArtifactStats.attackPower += goblet.attackPower || 0;
-        additionalArtifactStats.critChance += goblet.critChance || 0;
-        additionalArtifactStats.critValue += goblet.critValue || 0;
-        additionalArtifactStats.defChance += goblet.defChance || 0;
-        additionalArtifactStats.defValue += goblet.defValue || 0;
-        additionalArtifactStats.maxHP += goblet.maxHP || 0;
-    }
-
-    if (
-        stats.equippedCirclet &&
-        artifacts[stats.equippedCirclet as ArtifactName]
-    ) {
-        const circlet = artifacts[stats.equippedCirclet as ArtifactName];
-        additionalArtifactStats.attackPower += circlet.attackPower || 0;
-        additionalArtifactStats.critChance += circlet.critChance || 0;
-        additionalArtifactStats.critValue += circlet.critValue || 0;
-        additionalArtifactStats.defChance += circlet.defChance || 0;
-        additionalArtifactStats.defValue += circlet.defValue || 0;
-        additionalArtifactStats.maxHP += circlet.maxHP || 0;
+    for (const type of artifactTypes) {
+        const field = `equipped${type}` as keyof typeof stats;
+        if (stats[field] && artifacts[stats[field] as ArtifactName]) {
+            const artifact = artifacts[stats[field] as ArtifactName];
+            additionalArtifactStats.attackPower += artifact.attackPower || 0;
+            additionalArtifactStats.critChance += artifact.critChance || 0;
+            additionalArtifactStats.critValue += artifact.critValue || 0;
+            additionalArtifactStats.defChance += artifact.defChance || 0;
+            additionalArtifactStats.defValue += artifact.defValue || 0;
+            additionalArtifactStats.maxHP += artifact.maxHP || 0;
+        }
     }
 
     let calculatedAttackPower =
         finalBaseAttack +
-        additionalWeaponAttackPower +
+        additionalWeaponStats.attackPower +
         additionalArtifactStats.attackPower;
 
     if (calculatedAttackPower < 0) {
@@ -115,26 +76,32 @@ export async function syncStats(userId: string) {
     }
 
     let calculatedCritChance =
-        1 + additionalWeaponCritChance + additionalArtifactStats.critChance;
+        1 +
+        additionalWeaponStats.critChance +
+        additionalArtifactStats.critChance;
     if (calculatedCritChance < 0) {
         calculatedCritChance = 0;
     }
 
     const calculatedCritValue =
-        1 + additionalWeaponCritValue + additionalArtifactStats.critValue;
+        1 + additionalWeaponStats.critValue + additionalArtifactStats.critValue;
 
-    let calculatedDefChance = additionalArtifactStats.defChance;
+    let calculatedDefChance =
+        additionalWeaponStats.defChance + additionalArtifactStats.defChance;
     if (calculatedDefChance < 0) {
         calculatedDefChance = 0;
     }
 
-    let calculatedDefValue = additionalArtifactStats.defValue;
+    let calculatedDefValue =
+        additionalWeaponStats.defValue + additionalArtifactStats.defValue;
     if (calculatedDefValue < 0) {
         calculatedDefValue = 0;
     }
 
     const finalMaxHP = Math.floor(
-        calculatedMaxHP + additionalArtifactStats.maxHP + additionalWeaponHP,
+        calculatedMaxHP +
+            additionalArtifactStats.maxHP +
+            additionalWeaponStats.additionalHP,
     );
 
     let needsUpdate = false;

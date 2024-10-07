@@ -115,6 +115,8 @@ export const unequip = buildCommand<SlashCommand>({
                 totalCritChance -= weaponStats.critChance || 0;
                 totalCritValue -= weaponStats.critValue || 0;
                 totalMaxHP -= weaponStats.additionalHP || 0;
+                totalDefChance -= weaponStats.defChance || 0;
+                totalDefValue -= weaponStats.defValue || 0;
                 equippedItems.push(stats.equippedWeapon);
             }
 
@@ -184,6 +186,10 @@ export const unequip = buildCommand<SlashCommand>({
                 critValue:
                     stats.critValue - (unequippedWeaponStats.critValue || 0),
                 maxHP: stats.maxHP - (unequippedWeaponStats.additionalHP || 0),
+                defChance:
+                    stats.defChance - (unequippedWeaponStats.defChance || 0),
+                defValue:
+                    stats.defValue - (unequippedWeaponStats.defValue || 0),
             });
 
             return r.edit(
