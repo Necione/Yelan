@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Hilichurl",
-    group: "Hilichurl",
+    group: MonsterGroup.Hilichurl,
     minExp: 3,
     maxExp: 6,
     minWorldLevel: 1,
@@ -16,7 +18,6 @@ export default {
             chance: 10,
         },
     ],
-    locations: ["Qingxu Pool", "Lingju Pass", "Tianqiu Valley"],
     getStatsForWorldLevel(worldLevel: number) {
         const stats = [
             { worldLevel: 1, minHp: 17, maxHp: 26, minDamage: 3, maxDamage: 5 },

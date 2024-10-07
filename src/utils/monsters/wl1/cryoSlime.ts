@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Cryo Slime",
-    group: "Silme",
+    group: MonsterGroup.Slime,
     minExp: 3,
     maxExp: 6,
     minWorldLevel: 1,
@@ -25,17 +27,6 @@ export default {
             maxAmount: 1,
             chance: 10,
         },
-    ],
-    locations: [
-        "Qingxu Pool",
-        "Lingju Pass",
-        "Lumberpick Valley",
-        "Dunyu Ruins",
-        "Nantianmen",
-        "Tianqiu Valley",
-        "Luhua Pool",
-        "Guili Plains",
-        "Jueyun Karst",
     ],
     getStatsForWorldLevel(worldLevel: number) {
         const stats = [

@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Violet Lightning",
-    group: "Abyss",
+    group: MonsterGroup.Abyss,
     minExp: 10,
     maxExp: 25,
     minWorldLevel: 16,
@@ -26,17 +28,7 @@ export default {
             chance: 10,
         },
     ],
-    locations: [
-        "Qingxu Pool",
-        "Lingju Pass",
-        "Lumberpick Valley",
-        "Dunyu Ruins",
-        "Nantianmen",
-        "Tianqiu Valley",
-        "Luhua Pool",
-        "Guili Plains",
-        "Jueyun Karst",
-    ],
+
     critChance: 40,
     critValue: 3,
     defChance: 85,

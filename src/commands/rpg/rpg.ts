@@ -55,7 +55,7 @@ export const rpg = buildCommand<SlashCommand>({
             .setColor("Aqua")
             .setTitle(`${i.user.username}'s RPG Stats`)
             .setDescription(
-                `Use the </bag:1282456807100387411> command to see your inventory`,
+                `- Use the </bag:1282456807100387411> command to see your inventory\n- Use the </travel:1281778318160691301> command to find new enemies`,
             )
             .setThumbnail(i.user.displayAvatarURL())
             .addFields({
@@ -68,6 +68,8 @@ export const rpg = buildCommand<SlashCommand>({
                     0,
                 )}\`\n<:Achievement_Domains_and_Spiral_A:1287247461399662622> Abyss Floor: \`${
                     stats.abyssFloor
+                }\`\n📍 Location: \`${
+                    stats.location
                 }\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
                     2,
                 )} (${formatChange(stats.attackPower - stats.baseAttack)})\`${
@@ -87,9 +89,9 @@ export const rpg = buildCommand<SlashCommand>({
                           ).toFixed(2)}%\``
                         : ""
                 }`,
-
                 inline: false,
             });
+
         if (stats.rebirths > 0) {
             embed.setFooter({
                 text: getRebirthString(stats.rebirths),

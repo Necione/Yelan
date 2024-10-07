@@ -26,13 +26,13 @@ export const misc = {
     Wheat: {
         sellPrice: 1,
         minAmount: 1,
-        maxAmount: 6,
+        maxAmount: 2,
         dropChance: 18,
     },
     Mushroom: {
         sellPrice: 1,
         minAmount: 1,
-        maxAmount: 6,
+        maxAmount: 2,
         dropChance: 18,
     },
     Radish: {
@@ -108,6 +108,12 @@ export const misc = {
         dropChance: 9,
     },
     Almond: {
+        sellPrice: 3,
+        minAmount: 1,
+        maxAmount: 2,
+        dropChance: 7,
+    },
+    "Raw Meat": {
         sellPrice: 3,
         minAmount: 1,
         maxAmount: 2,

@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Mirror Maiden",
-    group: "Fatui",
+    group: MonsterGroup.Fatui,
     minExp: 10,
     maxExp: 15,
     minWorldLevel: 11,
@@ -15,17 +17,6 @@ export default {
             maxAmount: 1,
             chance: 10,
         },
-    ],
-    locations: [
-        "Qingxu Pool",
-        "Lingju Pass",
-        "Lumberpick Valley",
-        "Dunyu Ruins",
-        "Nantianmen",
-        "Tianqiu Valley",
-        "Luhua Pool",
-        "Guili Plains",
-        "Jueyun Karst",
     ],
 
     critChance: 50,

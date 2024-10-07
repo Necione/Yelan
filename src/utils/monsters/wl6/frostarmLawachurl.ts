@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Frostarm Lawachurl",
-    group: "Hilichurl",
+    group: MonsterGroup.Hilichurl,
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 6,
@@ -22,7 +24,6 @@ export default {
             chance: 10,
         },
     ],
-    locations: ["Tianqiu Valley", "Qingxu Pool", "Lumberpick Valley"],
     getStatsForWorldLevel(worldLevel: number) {
         const stats = [
             {

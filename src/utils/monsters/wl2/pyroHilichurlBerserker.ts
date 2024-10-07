@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Pyro Hilichurl Berserker",
-    group: "Hilichurl",
+    group: MonsterGroup.Hilichurl,
     minExp: 4,
     maxExp: 8,
     minWorldLevel: 2,
@@ -17,7 +19,6 @@ export default {
             chance: 10,
         },
     ],
-    locations: ["Lingju Pass", "Jueyun Karst", "Luhua Pool"],
 
     critChance: 10,
     critValue: 1.5,

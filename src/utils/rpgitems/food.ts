@@ -1,10 +1,10 @@
 export const food = {
     "Chicken-Mushroom Skewer": {
-        sellAmount: 5,
+        sellAmount: 3,
         healAmount: 10,
     },
     "Sweet Madame": {
-        sellAmount: 10,
+        sellAmount: 3,
         healAmount: 30,
     },
     "Teyvat Fried Egg": {
@@ -16,35 +16,35 @@ export const food = {
         healAmount: 20,
     },
     "Mondstadt Hash Brown": {
-        sellAmount: 15,
+        sellAmount: 5,
         healAmount: 40,
     },
     "Barbatos Ratatouille": {
-        sellAmount: 10,
+        sellAmount: 5,
         healAmount: 30,
     },
     "Jade Parcels": {
-        sellAmount: 20,
+        sellAmount: 5,
         healAmount: 100,
     },
     "Almond Tofu": {
-        sellAmount: 12,
+        sellAmount: 5,
         healAmount: 75,
     },
     "Jewelry Soup": {
-        sellAmount: 10,
+        sellAmount: 5,
         healAmount: 75,
     },
     "Matsutake Meat Rolls": {
-        sellAmount: 12,
+        sellAmount: 5,
         healAmount: 32,
     },
     "Golden Crab": {
-        sellAmount: 15,
+        sellAmount: 5,
         healAmount: 50,
     },
     "Fish and Chips": {
-        sellAmount: 15,
+        sellAmount: 5,
         healAmount: 30,
     },
 };
