@@ -1,8 +1,6 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     name: "Treasure Hoarder Potioneer",
-    group: MonsterGroup.Human,
+    group: "Human",
     minHp: 150,
     maxHp: 250,
     minDamage: 25,
@@ -35,7 +33,13 @@ export default {
             chance: 10,
         },
     ],
-
+    locations: [
+        "Nantianmen",
+        "Luhua Pool",
+        "Dunyu Ruins",
+        "Jueyun Karst",
+        "Lumberpick Valley",
+    ],
     getStatsForWorldLevel(worldLevel: number) {
         const stats = [
             {

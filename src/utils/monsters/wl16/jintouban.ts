@@ -1,9 +1,7 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     currentHp: 0,
     name: "Nobushi: Jintouban",
-    group: MonsterGroup.Human,
+    group: "Human",
     minExp: 10,
     maxExp: 20,
     minWorldLevel: 16,
@@ -20,7 +18,13 @@ export default {
             chance: 50,
         },
     ],
-
+    locations: [
+        "Qingxu Pool",
+        "Lingju Pass",
+        "Lumberpick Valley",
+        "Dunyu Ruins",
+        "Nantianmen",
+    ],
     getStatsForWorldLevel(worldLevel: number) {
         const stats = [
             {

@@ -1,9 +1,7 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     currentHp: 0,
     name: "Pyro Slime",
-    group: MonsterGroup.Slime,
+    group: "Slime",
     minExp: 4,
     maxExp: 8,
     minWorldLevel: 2,
@@ -28,6 +26,18 @@ export default {
             chance: 10,
         },
     ],
+    locations: [
+        "Qingxu Pool",
+        "Lingju Pass",
+        "Lumberpick Valley",
+        "Dunyu Ruins",
+        "Nantianmen",
+        "Tianqiu Valley",
+        "Luhua Pool",
+        "Guili Plains",
+        "Jueyun Karst",
+    ],
+
     critChance: 10,
     critValue: 1.5,
     defChance: 20,

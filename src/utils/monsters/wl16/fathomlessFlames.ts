@@ -1,9 +1,7 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     currentHp: 0,
     name: "Fathomless Flames",
-    group: MonsterGroup.Abyss,
+    group: "Abyss",
     minExp: 15,
     maxExp: 30,
     minWorldLevel: 16,
@@ -28,7 +26,17 @@ export default {
             chance: 10,
         },
     ],
-
+    locations: [
+        "Qingxu Pool",
+        "Lingju Pass",
+        "Lumberpick Valley",
+        "Dunyu Ruins",
+        "Nantianmen",
+        "Tianqiu Valley",
+        "Luhua Pool",
+        "Guili Plains",
+        "Jueyun Karst",
+    ],
     critChance: 75,
     critValue: 2.5,
     defChance: 50,

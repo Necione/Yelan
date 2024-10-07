@@ -367,8 +367,10 @@ export async function handleHunt(
             return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
         };
 
+        const embedColor = monster.group === "Chasm" ? "Orange" : "Aqua";
+
         const battleEmbed = new EmbedBuilder()
-            .setColor("Aqua")
+            .setColor(embedColor)
             .setTitle(`You encountered a ${monster.name}!`)
             .setDescription(selectedDescription)
             .setThumbnail(monster.image)

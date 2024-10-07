@@ -1,9 +1,7 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     currentHp: 0,
     name: "Dendro Samachurl",
-    group: MonsterGroup.Hilichurl,
+    group: "Hilichurl",
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 9,
@@ -24,6 +22,7 @@ export default {
             chance: 10,
         },
     ],
+    locations: ["Nantianmen", "Luhua Pool", "Guili Plains"],
 
     critChance: 0,
     critValue: 0,

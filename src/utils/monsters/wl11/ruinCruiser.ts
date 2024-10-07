@@ -1,9 +1,7 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     currentHp: 0,
     name: "Ruin Cruiser",
-    group: MonsterGroup.Machine,
+    group: "Machine",
     minExp: 10,
     maxExp: 20,
     minWorldLevel: 11,
@@ -16,7 +14,17 @@ export default {
             chance: 50,
         },
     ],
-
+    locations: [
+        "Qingxu Pool",
+        "Lingju Pass",
+        "Lumberpick Valley",
+        "Dunyu Ruins",
+        "Nantianmen",
+        "Tianqiu Valley",
+        "Luhua Pool",
+        "Guili Plains",
+        "Jueyun Karst",
+    ],
     critChance: 5,
     critValue: 5,
     defChance: 50,

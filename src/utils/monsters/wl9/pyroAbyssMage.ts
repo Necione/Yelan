@@ -1,9 +1,7 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     currentHp: 0,
     name: "Pyro Abyss Mage",
-    group: MonsterGroup.Abyss,
+    group: "Abyss",
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 9,
@@ -27,6 +25,13 @@ export default {
             maxAmount: 1,
             chance: 10,
         },
+    ],
+    locations: [
+        "Lumberpick Valley",
+        "Jueyun Karst",
+        "Guili Plains",
+        "Luhua Pool",
+        "Qingxu Pool",
     ],
 
     critChance: 10,

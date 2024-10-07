@@ -1,9 +1,7 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     currentHp: 0,
     name: "Geo Slime",
-    group: MonsterGroup.Slime,
+    group: "Slime",
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 5,
@@ -33,6 +31,17 @@ export default {
             maxAmount: 1,
             chance: 10,
         },
+    ],
+    locations: [
+        "Qingxu Pool",
+        "Lingju Pass",
+        "Lumberpick Valley",
+        "Dunyu Ruins",
+        "Nantianmen",
+        "Tianqiu Valley",
+        "Luhua Pool",
+        "Guili Plains",
+        "Jueyun Karst",
     ],
 
     critChance: 10,

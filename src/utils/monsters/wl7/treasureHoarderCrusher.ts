@@ -1,9 +1,7 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     currentHp: 0,
     name: "Treasure Hoarder Crusher",
-    group: MonsterGroup.Human,
+    group: "Human",
     minExp: 7,
     maxExp: 13,
     minWorldLevel: 7,
@@ -32,7 +30,13 @@ export default {
             chance: 10,
         },
     ],
-
+    locations: [
+        "Tianqiu Valley",
+        "Guili Plains",
+        "Qingxu Pool",
+        "Lumberpick Valley",
+        "Nantianmen",
+    ],
     getStatsForWorldLevel(worldLevel: number) {
         const stats = [
             {

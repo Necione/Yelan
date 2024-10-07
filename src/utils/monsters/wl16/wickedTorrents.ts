@@ -1,9 +1,7 @@
-import { MonsterGroup } from "../../groups";
-
 export default {
     currentHp: 0,
     name: "Wicked Torrents",
-    group: MonsterGroup.Abyss,
+    group: "Abyss",
     minExp: 10,
     maxExp: 25,
     minWorldLevel: 16,
@@ -27,6 +25,17 @@ export default {
             maxAmount: 1,
             chance: 10,
         },
+    ],
+    locations: [
+        "Qingxu Pool",
+        "Lingju Pass",
+        "Lumberpick Valley",
+        "Dunyu Ruins",
+        "Nantianmen",
+        "Tianqiu Valley",
+        "Luhua Pool",
+        "Guili Plains",
+        "Jueyun Karst",
     ],
 
     critChance: 50,
