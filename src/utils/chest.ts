@@ -178,9 +178,11 @@ type RandomDrop = {
 
 export function getRandomDrop(): RandomDrop {
     const dropNames = Object.keys(drops) as DropName[];
-    const randomDropName = dropNames[randomNumber({ min: 0, max: dropNames.length - 1, integer: true })];
+    const randomDropName =
+        dropNames[
+            randomNumber({ min: 0, max: dropNames.length - 1, integer: true })
+        ];
 
-    const drop = drops[randomDropName];
     const quantity = randomNumber({ min: 1, max: 4, integer: true });
 
     return {

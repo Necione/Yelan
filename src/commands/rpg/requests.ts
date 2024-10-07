@@ -153,7 +153,8 @@ export const requests = buildCommand<SlashCommand>({
                     updateUserStats(userId, {
                         inventory: { set: stats.inventory },
                         requests: { set: updatedRequests },
-                        lifetimeRequestsCompleted: stats.lifetimeRequestsCompleted,
+                        lifetimeRequestsCompleted:
+                            stats.lifetimeRequestsCompleted,
                     }),
                     addBalance(
                         userId,
@@ -198,7 +199,9 @@ function generateRandomRequests(
         do {
             drop = getRandomDrop();
             attempts++;
-            if (attempts > 10) break;
+            if (attempts > 10) {
+                break;
+            }
         } while (usedItems.has(drop.name) && attempts < 10);
 
         usedItems.add(drop.name);
@@ -245,7 +248,9 @@ function getRandomDropWithReward(existingRequests: UserRequest[]): {
     do {
         drop = getRandomDrop();
         attempts++;
-        if (attempts > 10) break;
+        if (attempts > 10) {
+            break;
+        }
     } while (usedItems.has(drop.name) && attempts < 10);
 
     const reward = randomNumber({
