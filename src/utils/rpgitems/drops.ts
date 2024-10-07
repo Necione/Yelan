@@ -109,7 +109,7 @@ export const drops = {
         minAmount: 1,
         maxAmount: 2,
         minWorldLevel: 7,
-        chestChance: 5,
+        chestChance: 0,
     },
     "Silver Raven Insignia": {
         sellPrice: 10,
@@ -130,14 +130,14 @@ export const drops = {
         minAmount: 1,
         maxAmount: 2,
         minWorldLevel: 7,
-        chestChance: 5,
+        chestChance: 0,
     },
     "Dead Ley Line Leaves": {
         sellPrice: 10,
         minAmount: 1,
         maxAmount: 2,
         minWorldLevel: 7,
-        chestChance: 2,
+        chestChance: 0,
     },
     "Ley Line Sprout": {
         sellPrice: 15,
@@ -165,7 +165,7 @@ export const drops = {
         minAmount: 1,
         maxAmount: 2,
         minWorldLevel: 11,
-        chestChance: 5,
+        chestChance: 0,
     },
     "Crystal Prism": {
         sellPrice: 25,
