@@ -229,7 +229,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Halberd:1291432656986312766>",
     },
     "Ferrous Shadow": {
-        sellPrice: 20,
+        sellPrice: 30,
         attackPower: 12,
         critChance: 5,
         critValue: 0.5,
@@ -241,7 +241,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Ferrous_Shadow:1282456147210535013>",
     },
     "Fillet Blade": {
-        sellPrice: 20,
+        sellPrice: 30,
         attackPower: 15,
         critChance: 5,
         critValue: 0.8,
@@ -253,7 +253,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Fillet_Blade:1282456217150558258>",
     },
     "Sacrificial Sword": {
-        sellPrice: 20,
+        sellPrice: 30,
         attackPower: -5,
         critChance: 0,
         critValue: 0.5,
@@ -265,7 +265,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Sacrificial_Sword:1282504118518284338>",
     },
     "The Widsith": {
-        sellPrice: 20,
+        sellPrice: 30,
         attackPower: -10,
         critChance: 90,
         critValue: 0,
@@ -277,7 +277,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Widsith:1291432715622547478>",
     },
     "The Flute": {
-        sellPrice: 20,
+        sellPrice: 30,
         attackPower: 5,
         critChance: 50,
         critValue: 0.5,
@@ -289,7 +289,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Flute:1282504448538837013>",
     },
     "Blackcliff Agate": {
-        sellPrice: 20,
+        sellPrice: 30,
         attackPower: 15,
         critChance: 20,
         critValue: 1,
@@ -301,7 +301,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Blackcliff_Agate:1284390885836066847>",
     },
     "Chain Breaker": {
-        sellPrice: 20,
+        sellPrice: 30,
         attackPower: 20,
         critChance: 20,
         critValue: 1,
@@ -313,7 +313,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Chain_Breaker:1284617740899844176>",
     },
     "Cinnabar Spindle": {
-        sellPrice: 20,
+        sellPrice: 30,
         attackPower: 20,
         critChance: 0,
         critValue: 2,
@@ -325,7 +325,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Cinnabar_Spindle:1292283663329005621>",
     },
     Deathmatch: {
-        sellPrice: 20,
+        sellPrice: 30,
         attackPower: 12,
         critChance: -50,
         critValue: 3,
@@ -337,7 +337,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Deathmatch:1284617953509245082>",
     },
     "The Stringless": {
-        sellPrice: 20,
+        sellPrice: 40,
         attackPower: 20,
         critChance: 5,
         critValue: 0.25,
@@ -349,7 +349,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Stringless:1291432822808117338>",
     },
     "The Alley Flash": {
-        sellPrice: 20,
+        sellPrice: 40,
         attackPower: 25,
         critChance: -10,
         critValue: 3,
@@ -361,7 +361,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Alley_Flash:1289482689778548736>",
     },
     "Pro­to­type Ar­cha­ic": {
-        sellPrice: 20,
+        sellPrice: 40,
         attackPower: 30,
         critChance: -10,
         critValue: -2,
@@ -373,7 +373,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Prototype_Archaic:1289482979793698896>",
     },
     "Black­cliff War­bow": {
-        sellPrice: 20,
+        sellPrice: 40,
         attackPower: 25,
         critChance: -10,
         critValue: 2.5,
@@ -385,7 +385,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Blackcliff_Warbow:1289483143304314940>",
     },
     Rainslasher: {
-        sellPrice: 20,
+        sellPrice: 50,
         attackPower: 30,
         critChance: 0,
         critValue: 2.5,
@@ -397,7 +397,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Rainslasher:1292670965121159250>",
     },
     "Roy­al Gri­moire": {
-        sellPrice: 20,
+        sellPrice: 50,
         attackPower: 50,
         critChance: 0,
         critValue: 2,
@@ -409,7 +409,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Royal_Grimoire:1289486411061395517>",
     },
     "Eye of Perception": {
-        sellPrice: 20,
+        sellPrice: 50,
         attackPower: 50,
         critChance: 20,
         critValue: 1.5,
@@ -421,7 +421,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Eye_of_Perception:1291133932711972955>",
     },
     "Kagotsurube Isshin": {
-        sellPrice: 20,
+        sellPrice: 50,
         attackPower: 30,
         critChance: 10,
         critValue: 3,
@@ -467,15 +467,15 @@ const prefixes: {
     }),
     Sharp: (weaponData) => ({
         attackPower: weaponData.attackPower * 1.25,
-        sellPrice: 1.25,
+        sellPrice: Math.round(weaponData.sellPrice * 1.25),
     }),
     Godly: (weaponData) => ({
         attackPower: weaponData.attackPower * 1.5,
-        sellPrice: 1.5,
+        sellPrice: Math.round(weaponData.sellPrice * 1.5),
     }),
     Perfect: (weaponData) => ({
         attackPower: weaponData.attackPower * 2,
-        sellPrice: 2,
+        sellPrice: Math.round(weaponData.sellPrice * 2),
     }),
     Worthless: (weaponData) => ({
         attackPower: weaponData.attackPower * 0.5,
