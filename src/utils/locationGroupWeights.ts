@@ -10,6 +10,7 @@ export const locationGroupWeights: {
         [MonsterGroup.Human]: 1,
         [MonsterGroup.Fatui]: 1,
         [MonsterGroup.Machine]: 1,
+        [MonsterGroup.Eremite]: 1,
     },
     "Qingxu Pool": {
         [MonsterGroup.Slime]: 4,
@@ -18,14 +19,16 @@ export const locationGroupWeights: {
         [MonsterGroup.Human]: 1,
         [MonsterGroup.Fatui]: 1,
         [MonsterGroup.Machine]: 3,
+        [MonsterGroup.Eremite]: 1,
     },
     "Lingju Pass": {
         [MonsterGroup.Slime]: 2,
-        [MonsterGroup.Hilichurl]: 4,
+        [MonsterGroup.Hilichurl]: 2,
         [MonsterGroup.Abyss]: 2,
         [MonsterGroup.Human]: 1,
         [MonsterGroup.Fatui]: 2,
         [MonsterGroup.Machine]: 1,
+        [MonsterGroup.Eremite]: 5,
     },
     "Lumberpick Valley": {
         [MonsterGroup.Slime]: 3,
@@ -34,14 +37,16 @@ export const locationGroupWeights: {
         [MonsterGroup.Human]: 2,
         [MonsterGroup.Fatui]: 1,
         [MonsterGroup.Machine]: 1,
+        [MonsterGroup.Eremite]: 3,
     },
     "Dunyu Ruins": {
         [MonsterGroup.Slime]: 2,
         [MonsterGroup.Hilichurl]: 2,
-        [MonsterGroup.Abyss]: 4,
+        [MonsterGroup.Abyss]: 3,
         [MonsterGroup.Human]: 1,
         [MonsterGroup.Fatui]: 3,
         [MonsterGroup.Machine]: 1,
+        [MonsterGroup.Eremite]: 4,
     },
     Nantianmen: {
         [MonsterGroup.Slime]: 1,
@@ -50,6 +55,7 @@ export const locationGroupWeights: {
         [MonsterGroup.Human]: 5,
         [MonsterGroup.Fatui]: 2,
         [MonsterGroup.Machine]: 1,
+        [MonsterGroup.Eremite]: 1,
     },
     "Tianqiu Valley": {
         [MonsterGroup.Slime]: 1,
@@ -58,6 +64,7 @@ export const locationGroupWeights: {
         [MonsterGroup.Human]: 2,
         [MonsterGroup.Fatui]: 4,
         [MonsterGroup.Machine]: 1,
+        [MonsterGroup.Eremite]: 1,
     },
     "Luhua Pool": {
         [MonsterGroup.Slime]: 4,
@@ -66,6 +73,7 @@ export const locationGroupWeights: {
         [MonsterGroup.Human]: 1,
         [MonsterGroup.Fatui]: 1,
         [MonsterGroup.Machine]: 1,
+        [MonsterGroup.Eremite]: 1,
     },
     "Guili Plains": {
         [MonsterGroup.Slime]: 3,
@@ -74,6 +82,7 @@ export const locationGroupWeights: {
         [MonsterGroup.Human]: 1,
         [MonsterGroup.Fatui]: 2,
         [MonsterGroup.Machine]: 4,
+        [MonsterGroup.Eremite]: 1,
     },
     "Jueyun Karst": {
         [MonsterGroup.Slime]: 2,
@@ -82,6 +91,7 @@ export const locationGroupWeights: {
         [MonsterGroup.Human]: 1,
         [MonsterGroup.Fatui]: 1,
         [MonsterGroup.Machine]: 3,
+        [MonsterGroup.Eremite]: 1,
     },
     Default: {
         [MonsterGroup.Slime]: 2,
@@ -90,5 +100,6 @@ export const locationGroupWeights: {
         [MonsterGroup.Human]: 2,
         [MonsterGroup.Fatui]: 2,
         [MonsterGroup.Machine]: 2,
+        [MonsterGroup.Eremite]: 2,
     },
 };

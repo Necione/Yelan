@@ -209,11 +209,18 @@ export const drops = {
         minWorldLevel: 11,
         chestChance: 0,
     },
-    "Metal Scrap": {
+    "Faded Red Satin": {
         sellPrice: 5,
         minAmount: 0,
         maxAmount: 0,
-        minWorldLevel: 1,
+        minWorldLevel: 13,
+        chestChance: 0,
+    },
+    "Chaos Core": {
+        sellPrice: 5,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 11,
         chestChance: 0,
     },
     "Chaos Gear": {
