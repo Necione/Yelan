@@ -183,7 +183,7 @@ export function getRandomDrop(): RandomDrop {
             randomNumber({ min: 0, max: dropNames.length - 1, integer: true })
         ];
 
-    const quantity = randomNumber({ min: 1, max: 4, integer: true });
+    const quantity = randomNumber({ min: 2, max: 7, integer: true });
 
     return {
         name: randomDropName,

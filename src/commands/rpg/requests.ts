@@ -207,7 +207,7 @@ function generateRandomRequests(
         usedItems.add(drop.name);
 
         const reward = randomNumber({
-            min: 50,
+            min: 25,
             max: 200,
             integer: true,
         });
@@ -254,7 +254,7 @@ function getRandomDropWithReward(existingRequests: UserRequest[]): {
     } while (usedItems.has(drop.name) && attempts < 10);
 
     const reward = randomNumber({
-        min: 50,
+        min: 25,
         max: 200,
         integer: true,
     });
