@@ -67,6 +67,11 @@ export function playerAttack(
     );
     attackPower *= multiplier;
 
+    if (currentPlayerHp > stats.maxHP) {
+        attackPower *= 0.5;
+        messages.push(`\`💜\` You are poisoned due to **OVERHEAL**, and your damage has been halved.`);
+    }
+
     const defenseResult = checkMonsterDefenses(
         attackPower,
         stats,
