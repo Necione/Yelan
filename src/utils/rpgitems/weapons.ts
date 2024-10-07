@@ -467,12 +467,15 @@ const prefixes: {
     }),
     Sharp: (weaponData) => ({
         attackPower: weaponData.attackPower * 1.25,
+        sellPrice: 1.25,
     }),
     Godly: (weaponData) => ({
         attackPower: weaponData.attackPower * 1.5,
+        sellPrice: 1.5,
     }),
     Perfect: (weaponData) => ({
         attackPower: weaponData.attackPower * 2,
+        sellPrice: 2,
     }),
     Worthless: (weaponData) => ({
         attackPower: weaponData.attackPower * 0.5,
