@@ -1,11 +1,13 @@
 import { log } from "@elara-services/utils";
 import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
+import { type MonsterGroup } from "./groups";
+import { locationGroupWeights } from "./locationGroupWeights";
 
 export interface Monster {
     currentHp: number;
     name: string;
-    group: string;
+    group: MonsterGroup;
     minExp: number;
     maxExp: number;
     critChance: number;
@@ -20,7 +22,6 @@ export interface Monster {
         maxAmount: number;
         chance: number;
     }[];
-    locations: string[];
     getStatsForWorldLevel: (worldLevel: number) => {
         minHp: number;
         maxHp: number;
@@ -116,9 +117,7 @@ export async function getRandomMonster(
     }
 
     const availableMonsters = monsters.filter(
-        (monster) =>
-            worldLevel >= monster.minWorldLevel &&
-            monster.locations.includes(location),
+        (monster) => worldLevel >= monster.minWorldLevel,
     );
 
     if (availableMonsters.length === 0) {
@@ -127,39 +126,107 @@ export async function getRandomMonster(
 
     const uniqueGroups = [
         ...new Set(availableMonsters.map((monster) => monster.group)),
-    ];
+    ] as MonsterGroup[];
 
-    const randomGroup =
-        uniqueGroups[Math.floor(Math.random() * uniqueGroups.length)];
+    log(`Unique Groups Available: ${uniqueGroups.join(", ")}`);
+
+    const groupWeightsForLocation =
+        locationGroupWeights[location] || locationGroupWeights["Default"] || {};
+
+    log(`Group Weights for Location "${location}":`, groupWeightsForLocation);
+
+    const groupWeights: { group: MonsterGroup; weight: number }[] =
+        uniqueGroups.map((group) => ({
+            group,
+            weight:
+                groupWeightsForLocation[group] ||
+                locationGroupWeights["Default"][group] ||
+                1,
+        }));
+
+    log(`Group Weights:`, groupWeights);
+
+    const totalGroupWeight = groupWeights.reduce(
+        (acc, gw) => acc + gw.weight,
+        0,
+    );
+
+    log(`Total Group Weight: ${totalGroupWeight}`);
+
+    let randomGroupWeight = Math.random() * totalGroupWeight;
+    let selectedGroup: MonsterGroup | null = null;
+
+    for (const gw of groupWeights) {
+        randomGroupWeight -= gw.weight;
+        if (randomGroupWeight <= 0) {
+            selectedGroup = gw.group;
+            break;
+        }
+    }
+
+    log(`Selected Group: ${selectedGroup}`);
+
+    if (!selectedGroup) {
+        return null;
+    }
 
     const monstersInGroup = availableMonsters.filter(
-        (monster) => monster.group === randomGroup,
+        (monster) => monster.group === selectedGroup,
     );
 
     if (monstersInGroup.length === 0) {
         return null;
     }
 
-    const totalWeight = monstersInGroup.reduce(
+    log(
+        `Monsters in Selected Group "${selectedGroup}":`,
+        monstersInGroup.map((m) => m.name),
+    );
+
+    const totalMonsterWeight = monstersInGroup.reduce(
         (acc, monster) => acc + monster.minWorldLevel,
         0,
     );
-    let randomWeight = Math.random() * totalWeight;
+
+    log(
+        `Total Monster Weight in Group "${selectedGroup}": ${totalMonsterWeight}`,
+    );
+
+    let randomMonsterWeight = Math.random() * totalMonsterWeight;
     let selectedMonster: Monster | null = null;
 
     for (const monster of monstersInGroup) {
-        randomWeight -= monster.minWorldLevel;
-        if (randomWeight <= 0) {
-            selectedMonster = monster; // Directly assign the monster object
+        randomMonsterWeight -= monster.minWorldLevel;
+        if (randomMonsterWeight <= 0) {
+            selectedMonster = monster;
             break;
         }
     }
+
+    log(`Selected Monster: ${selectedMonster ? selectedMonster.name : "None"}`);
 
     if (!selectedMonster) {
         return null;
     }
 
-    // Check if getStatsForWorldLevel exists on the selectedMonster
+    if (selectedMonster.name === "Mirror Maiden") {
+        const monsterInstance: MonsterInstance = {
+            ...selectedMonster,
+            currentHp: playerStats.currentHp,
+            minDamage: playerStats.attackPower,
+            maxDamage: playerStats.attackPower,
+            critChance: playerStats.critChance,
+            critValue: playerStats.critValue,
+            defChance: playerStats.defChance,
+            defValue: playerStats.defValue,
+            minHp: playerStats.maxHp,
+            maxHp: playerStats.maxHp,
+        };
+
+        log(`Created MonsterInstance for Mirror Maiden.`);
+        return monsterInstance;
+    }
+
     if (typeof selectedMonster.getStatsForWorldLevel !== "function") {
         console.error(
             `getStatsForWorldLevel is not a function for monster: ${selectedMonster.name}`,
@@ -167,39 +234,21 @@ export async function getRandomMonster(
         return null;
     }
 
-    // Retrieve stats for the current world level using the helper method
-    const stats = selectedMonster.getStatsForWorldLevel(worldLevel);
+    const stats = selectedMonster.getStatsForWorldLevel
+        ? selectedMonster.getStatsForWorldLevel(worldLevel)
+        : null;
 
     if (stats) {
-        // Create a MonsterInstance with the selected stats
         const monsterInstance: MonsterInstance = {
-            ...selectedMonster, // Shallow copy to include original methods
+            ...selectedMonster,
             minHp: stats.minHp,
             maxHp: stats.maxHp,
             minDamage: stats.minDamage,
             maxDamage: stats.maxDamage,
-            currentHp: stats.minHp, // Initialize currentHp to minHp or as needed
+            currentHp: stats.minHp,
         };
 
-        if (monsterInstance.name === "Mirror Maiden") {
-            monsterInstance.currentHp = playerStats.currentHp;
-            monsterInstance.minDamage = playerStats.attackPower;
-            monsterInstance.maxDamage = playerStats.attackPower;
-            monsterInstance.critChance = playerStats.critChance;
-            monsterInstance.critValue = playerStats.critValue;
-            monsterInstance.defChance = playerStats.defChance;
-            monsterInstance.defValue = playerStats.defValue;
-            monsterInstance.minHp = playerStats.maxHp;
-            monsterInstance.maxHp = playerStats.maxHp;
-        } else if (worldLevel >= 16 && monsterInstance.minWorldLevel >= 16) {
-            const levelDifference = worldLevel - monsterInstance.minWorldLevel;
-            if (levelDifference > 0) {
-                monsterInstance.currentHp += 50 * levelDifference;
-                monsterInstance.minDamage += 10 * levelDifference;
-                monsterInstance.maxDamage += 10 * levelDifference;
-            }
-        }
-
+        log(`Created MonsterInstance for ${selectedMonster.name}.`);
         return monsterInstance;
     } else {
         console.error(

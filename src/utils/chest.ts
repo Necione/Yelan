@@ -144,7 +144,7 @@ const materialLoot: MaterialItem[] = [
 ];
 
 export function generateRawMaterials() {
-    const uniqueMaterialsCount = getRandomValue(2, 5);
+    const uniqueMaterialsCount = getRandomValue(2, 3);
     const materials: { item: MiscName; amount: number }[] = [];
 
     const availableLoot = [...materialLoot];

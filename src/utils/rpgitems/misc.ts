@@ -26,13 +26,13 @@ export const misc = {
     Wheat: {
         sellPrice: 1,
         minAmount: 1,
-        maxAmount: 6,
+        maxAmount: 2,
         dropChance: 18,
     },
     Mushroom: {
         sellPrice: 1,
         minAmount: 1,
-        maxAmount: 6,
+        maxAmount: 2,
         dropChance: 18,
     },
     Radish: {

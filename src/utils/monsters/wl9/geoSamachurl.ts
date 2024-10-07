@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Geo Samachurl",
-    group: "Hilichurl",
+    group: MonsterGroup.Hilichurl,
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 9,
@@ -22,7 +24,6 @@ export default {
             chance: 10,
         },
     ],
-    locations: ["Luhua Pool", "Jueyun Karst", "Lumberpick Valley"],
 
     critChance: 10,
     critValue: 1.5,

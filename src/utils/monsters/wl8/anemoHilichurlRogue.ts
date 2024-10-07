@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Anemo Hilichurl Rogue",
-    group: "Hilichurl",
+    group: MonsterGroup.Hilichurl,
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 8,
@@ -20,13 +22,7 @@ export default {
             chance: 10,
         },
     ],
-    locations: [
-        "Qingxu Pool",
-        "Tianqiu Valley",
-        "Jueyun Karst",
-        "Guili Plains",
-        "Lingju Pass",
-    ],
+
     critChance: 10,
     critValue: 2,
     defChance: 75,

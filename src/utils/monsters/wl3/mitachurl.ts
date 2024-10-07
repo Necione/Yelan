@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Mitachurl",
-    group: "Hilichurl",
+    group: MonsterGroup.Hilichurl,
     minExp: 5,
     maxExp: 7,
     minWorldLevel: 3,
@@ -16,7 +18,6 @@ export default {
             chance: 10,
         },
     ],
-    locations: ["Dunyu Ruins", "Luhua Pool", "Guili Plains"],
 
     critChance: 15,
     critValue: 2,

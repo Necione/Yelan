@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Electro Hilichurl Shooter",
-    group: "Hilichurl",
+    group: MonsterGroup.Hilichurl,
     minHp: 20,
     maxHp: 25,
     minDamage: 4,
@@ -30,7 +32,6 @@ export default {
             chance: 10,
         },
     ],
-    locations: ["Tianqiu Valley", "Lumberpick Valley", "Dunyu Ruins"],
 
     critChance: 10,
     critValue: 1.5,

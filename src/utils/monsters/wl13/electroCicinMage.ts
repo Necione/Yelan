@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Electro Cicin Mage",
-    group: "Fatui",
+    group: MonsterGroup.Fatui,
     minExp: 10,
     maxExp: 25,
     minWorldLevel: 13,
@@ -19,17 +21,6 @@ export default {
             maxAmount: 2,
             chance: 25,
         },
-    ],
-    locations: [
-        "Qingxu Pool",
-        "Lingju Pass",
-        "Lumberpick Valley",
-        "Dunyu Ruins",
-        "Nantianmen",
-        "Tianqiu Valley",
-        "Luhua Pool",
-        "Guili Plains",
-        "Jueyun Karst",
     ],
 
     critChance: 50,

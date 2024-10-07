@@ -1,7 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { MonsterGroup } from "../../utils/groups";
 import { initializeMonsters, monsters, monstersLoaded } from "../../utils/hunt";
+import { getCommonLocationsForGroup } from "../../utils/locationUtils";
 
 export const monster = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -60,6 +62,16 @@ export const monster = buildCommand<SlashCommand>({
             );
         }
 
+        const group =
+            MonsterGroup[monster.group as keyof typeof MonsterGroup] ||
+            MonsterGroup.Human;
+
+        let commonLocations = getCommonLocationsForGroup(group, 3);
+
+        commonLocations = commonLocations.filter(
+            (location) => location !== "Default",
+        );
+
         const dropsList = monster.drops
             .map(
                 (drop) =>
@@ -70,21 +82,30 @@ export const monster = buildCommand<SlashCommand>({
         const embed = new EmbedBuilder()
             .setColor("Orange")
             .setTitle(`${monster.name}`)
-            .setDescription(
-                `**Min World Level**: ${
-                    monster.minWorldLevel
-                }\n**Locations**: ${monster.locations.join(", ")}`,
+            .addFields(
+                {
+                    name: "Min World Level",
+                    value: `${monster.minWorldLevel}`,
+                    inline: true,
+                },
+                {
+                    name: "Commonly Found:",
+                    value:
+                        commonLocations.length > 0
+                            ? commonLocations.join(", ")
+                            : "Unknown",
+                    inline: true,
+                },
+                {
+                    name: "Drops",
+                    value:
+                        dropsList.length > 0
+                            ? dropsList
+                            : "No drops available.",
+                    inline: false,
+                },
             )
-            .addFields({
-                name: "Drops",
-                value: dropsList.length > 0 ? dropsList : "No drops available.",
-                inline: false,
-            })
-            .setThumbnail(monster.image)
-            .setFooter({
-                text: `Requested by ${i.user.username}`,
-                iconURL: i.user.displayAvatarURL(),
-            });
+            .setThumbnail(monster.image);
 
         await r.edit({
             embeds: [embed],

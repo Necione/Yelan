@@ -1,7 +1,9 @@
+import { MonsterGroup } from "../../groups";
+
 export default {
     currentHp: 0,
     name: "Hydro Hilichurl Rogue",
-    group: "Hilichurl",
+    group: MonsterGroup.Hilichurl,
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 8,
@@ -19,13 +21,6 @@ export default {
             maxAmount: 1,
             chance: 10,
         },
-    ],
-    locations: [
-        "Lumberpick Valley",
-        "Jueyun Karst",
-        "Guili Plains",
-        "Luhua Pool",
-        "Qingxu Pool",
     ],
 
     critChance: 10,
