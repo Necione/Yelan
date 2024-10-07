@@ -34,7 +34,7 @@ const locations: Record<LocationName, LocationXY> = {
     "Jueyun Karst": { x: 7, y: 13 },
 };
 
-export const locationEmojis: Record<LocationName, string> = {
+const locationEmojis: Record<LocationName, string> = {
     "Liyue Harbor": "⛵",
     "Qingxu Pool": "🏞️",
     "Lingju Pass": "🌉",
