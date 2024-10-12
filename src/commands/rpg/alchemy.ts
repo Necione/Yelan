@@ -14,7 +14,7 @@ const alchemyRankEmojis = {
     Gold: "🟨",
     Platinum: "🟦",
     Sapphire: "🔷",
-    Diamond: "🔶",
+    Diamond: "💠",
     Emerald: "🟩",
     Ruby: "🟥",
 };
