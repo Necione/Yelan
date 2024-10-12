@@ -8,7 +8,7 @@ import { logs } from "../../utils";
 
 export const payment = buildCommand<SlashCommand>({
     locked: {
-        roles: [...roles.main, ...roles.management.econ],
+        roles: [...roles.main, roles.management.econ, roles.payroll],
     },
     command: new SlashCommandBuilder()
         .setName(`payment`)
