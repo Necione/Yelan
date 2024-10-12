@@ -360,6 +360,18 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_The_Alley_Flash:1289482689778548736>",
     },
+    "Lithic Blade": {
+        sellPrice: 30,
+        attackPower: 35,
+        critChance: -5,
+        critValue: 1.5,
+        defValue: 0,
+        defChance: 0,
+        additionalHP: 150,
+        minWorldLevel: 15,
+        chestChance: 5,
+        emoji: "<:Weapon_Lithic_Blade:1294565079554981898>",
+    },
     "Pro­to­type Ar­cha­ic": {
         sellPrice: 30,
         attackPower: 30,
@@ -432,6 +444,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Kagotsurube_Isshin:1291134317984092262>",
     },
+    // Reworking
     "Aqua Simulacra": {
         sellPrice: 25,
         attackPower: 0,
@@ -441,7 +454,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         defChance: 0,
         additionalHP: 0,
         minWorldLevel: 5,
-        chestChance: 1,
+        chestChance: 0,
         emoji: "<:Weapon_Aqua_Simulacra:1283303723082190902>",
     },
     "Staff of Homa": {
@@ -453,8 +466,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         defChance: 0,
         additionalHP: 0,
         minWorldLevel: 10,
-        chestChance: 1,
+        chestChance: 0,
         emoji: "<:Weapon_Staff_of_Homa:1283341597425008640>",
+    },
+    // Special Weapons
+    "Englufing Lightning": {
+        sellPrice: 25,
+        attackPower: 50,
+        critChance: 30,
+        critValue: 2.5,
+        defValue: 5,
+        defChance: 0.2,
+        additionalHP: 100,
+        minWorldLevel: 15,
+        chestChance: 0,
+        emoji: "<:Weapon_Engulfing_Lightning:1294565987710009344>",
     },
 };
 
