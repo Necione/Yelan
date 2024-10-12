@@ -1,7 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { getProfileByUserId, getUserStats } from "../../services";
+import { getProfileByUserId, syncStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { handleChest, handleMaterials } from "./handlers/exploreHandler";
 
@@ -53,7 +53,8 @@ export const explore = buildCommand<SlashCommand>({
             return r.edit(embedComment(cc.message));
         }
 
-        const stats = await getUserStats(i.user.id);
+        const stats = await syncStats(i.user.id);
+
         if (!stats) {
             locked.del(i.user.id);
             return r.edit(
