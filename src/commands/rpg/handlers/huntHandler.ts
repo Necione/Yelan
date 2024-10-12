@@ -163,6 +163,10 @@ export async function monsterAttack(
         monsterStats.maxDamage,
     );
 
+    if (monster.isMutated) {
+        monsterDamage *= 1.5;
+    }
+
     const { isCrit, multiplier } = calculateCriticalHit(
         monster.critChance || 0,
         monster.critValue || 1,
@@ -320,19 +324,12 @@ export async function handleHunt(
         );
 
         if (!monster) {
-            await i
-                .editReply(
-                    embedComment(
-                        `This area (${stats.location}) has no monsters to encounter.\nTry to </travel:1281778318160691301> to another location!`,
-                    ),
-                )
-                .catch(noop);
-
-            await updateUserStats(i.user.id, {
-                isHunting: false,
-            });
-
             return;
+        }
+
+        if (stats.rebirths >= 2 && Math.random() < 0.1) {
+            monster.name = `Mutated ${monster.name}`;
+            monster.isMutated = true;
         }
 
         monstersEncountered.push(monster);
@@ -353,6 +350,10 @@ export async function handleHunt(
         let currentMonsterHp = Math.floor(
             getRandomValue(monsterStats.minHp, monsterStats.maxHp),
         );
+
+        if (monster.isMutated) {
+            currentMonsterHp *= 1.5;
+        }
 
         const initialMonsterHp = currentMonsterHp;
         const initialPlayerHp = currentPlayerHp;
@@ -375,7 +376,7 @@ export async function handleHunt(
         };
 
         const battleEmbed = new EmbedBuilder()
-            .setColor("Aqua")
+            .setColor(monster.isMutated ? "#658e4d" : "Aqua")
             .setTitle(`You encountered a ${monster.name}!`)
             .setDescription(selectedDescription)
             .setThumbnail(monster.image)

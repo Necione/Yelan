@@ -67,12 +67,16 @@ function selectChestRarity(): ChestRarity {
     return rarities[0];
 }
 
+function isWeapon(name: string): boolean {
+    return name in weapons;
+}
+
 export function generateChestLoot(worldLevel: number) {
     const selectedRarity = selectChestRarity();
 
     const maxUniqueItems = Math.min(
-        2 + rarities.findIndex((r) => r.rarity === selectedRarity.rarity),
-        5,
+        1 + rarities.findIndex((r) => r.rarity === selectedRarity.rarity),
+        4,
     );
 
     const loot: {
@@ -81,17 +85,17 @@ export function generateChestLoot(worldLevel: number) {
     }[] = [];
 
     let totalUniqueItems = 0;
+    let hasWeapon = false;
 
     const eligibleLoot = chestLoot.filter(
         (lootItem) => worldLevel >= lootItem.minWorldLevel,
     );
 
-    const totalWeight = eligibleLoot.reduce(
-        (acc, lootItem) => acc + lootItem.minWorldLevel,
-        0,
-    );
-
     while (totalUniqueItems < maxUniqueItems && eligibleLoot.length > 0) {
+        const totalWeight = eligibleLoot.reduce(
+            (acc, lootItem) => acc + lootItem.minWorldLevel,
+            0,
+        );
         let randomWeight = Math.random() * totalWeight;
 
         for (const lootItem of eligibleLoot) {
@@ -104,16 +108,34 @@ export function generateChestLoot(worldLevel: number) {
                     );
 
                     if (amount > 0) {
-                        loot.push({
-                            item: lootItem.name,
-                            amount: Math.floor(amount),
-                        });
-                        totalUniqueItems++;
+                        const isWeaponItem = isWeapon(lootItem.name as string);
+                        if (isWeaponItem && hasWeapon) {
+                            eligibleLoot.splice(
+                                eligibleLoot.indexOf(lootItem),
+                                1,
+                            );
+                            break;
+                        } else {
+                            if (isWeaponItem) {
+                                hasWeapon = true;
+                            }
+                            loot.push({
+                                item: lootItem.name,
+                                amount: Math.floor(amount),
+                            });
+                            totalUniqueItems++;
 
-                        eligibleLoot.splice(eligibleLoot.indexOf(lootItem), 1);
+                            eligibleLoot.splice(
+                                eligibleLoot.indexOf(lootItem),
+                                1,
+                            );
+                            break;
+                        }
                     }
+                } else {
+                    eligibleLoot.splice(eligibleLoot.indexOf(lootItem), 1);
+                    break;
                 }
-                break;
             }
             randomWeight -= lootItem.minWorldLevel;
         }

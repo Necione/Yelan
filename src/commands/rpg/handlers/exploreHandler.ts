@@ -1,7 +1,17 @@
 import { embedComment, get, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
-import type { ChatInputCommandInteraction } from "discord.js";
+import type {
+    ButtonInteraction,
+    ChatInputCommandInteraction,
+} from "discord.js";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ComponentType,
+    EmbedBuilder,
+} from "discord.js";
 import {
     addBalance,
     addItemToInventory,
@@ -23,36 +33,141 @@ export async function handleChest(
         return;
     }
 
-    const { rarity, loot, coins } = generateChestLoot(stats.worldLevel);
-
-    await addBalance(
-        i.user.id,
-        coins,
-        false,
-        `Found a ${rarity} Treasure Chest`,
-    );
-
-    if (loot.length > 0) {
-        await addItemToInventory(i.user.id, loot);
+    const chestPromises = [];
+    for (let j = 0; j < 3; j++) {
+        chestPromises.push(generateChestLoot(stats.worldLevel));
     }
 
-    const lootDescription =
-        loot.length > 0
-            ? loot.map((item) => `\`${item.amount}x\` ${item.item}`).join(", ")
-            : "";
+    const chestLoots = await Promise.all(chestPromises);
 
-    const message = lootDescription
-        ? `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins}\` and the following items:\n${lootDescription}`
-        : `You stumbled upon a ${rarity} Treasure Chest!\nIt contained ${customEmoji.a.z_coins} \`${coins}\`.`;
+    const rarity = chestLoots[0].rarity;
+    for (let j = 1; j < chestLoots.length; j++) {
+        chestLoots[j].rarity = rarity;
+    }
 
-    await i.editReply(embedComment(message, "Green")).catch(noop);
+    const chestDescriptions = chestLoots.map((chest, index) => {
+        const lootDescription =
+            chest.loot.length > 0
+                ? chest.loot
+                      .map((item) => `\`${item.amount}x\` ${item.item}`)
+                      .join(", ")
+                : "No items";
+        return `**Chest ${index + 1}:**\n${customEmoji.a.z_coins} \`${
+            chest.coins
+        }\`${lootDescription ? `\nItems: ${lootDescription}` : ""}`;
+    });
 
-    const hasEnergizeSkill =
-        stats.skills.some((skill) => skill.name === "Energize") &&
-        stats.activeSkills.includes("Energize");
+    const embed = new EmbedBuilder()
+        .setTitle(`You stumbled upon some ${rarity} Treasure Chests!`)
+        .setDescription(
+            `Select one of the chests below to claim its contents. You have **10 seconds** to choose!\n\n${chestDescriptions.join(
+                "\n\n",
+            )}`,
+        )
+        .setColor("Green");
 
-    const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
-    await cooldowns.set(userWallet, "explore", exploreCooldown);
+    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+            .setCustomId("chest_1")
+            .setLabel("Chest 1")
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId("chest_2")
+            .setLabel("Chest 2")
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId("chest_3")
+            .setLabel("Chest 3")
+            .setStyle(ButtonStyle.Primary),
+    );
+
+    const message = await i
+        .editReply({
+            embeds: [embed],
+            components: [buttons],
+        })
+        .catch(noop);
+
+    if (!message) {
+        return;
+    }
+
+    const filter = (interaction: ButtonInteraction) =>
+        interaction.user.id === i.user.id;
+
+    const collector = message.createMessageComponentCollector({
+        filter,
+        componentType: ComponentType.Button,
+        time: 10_000,
+        max: 1,
+    });
+
+    let collected = false;
+
+    collector.on("collect", async (interaction: ButtonInteraction) => {
+        collected = true;
+        await interaction.deferUpdate().catch(noop);
+
+        const selectedChestIndex =
+            parseInt(interaction.customId.split("_")[1]) - 1;
+        const selectedChest = chestLoots[selectedChestIndex];
+
+        await addBalance(
+            i.user.id,
+            selectedChest.coins,
+            false,
+            `Found a ${rarity} Treasure Chest`,
+        );
+
+        if (selectedChest.loot.length > 0) {
+            await addItemToInventory(i.user.id, selectedChest.loot);
+        }
+
+        const lootDescription =
+            selectedChest.loot.length > 0
+                ? selectedChest.loot
+                      .map((item) => `\`${item.amount}x\` ${item.item}`)
+                      .join(", ")
+                : "";
+
+        const resultMessage = lootDescription
+            ? `You chose **Chest ${selectedChestIndex + 1}**!\nIt contained ${
+                  customEmoji.a.z_coins
+              } \`${
+                  selectedChest.coins
+              }\` and the following items:\n${lootDescription}`
+            : `You chose **Chest ${selectedChestIndex + 1}**!\nIt contained ${
+                  customEmoji.a.z_coins
+              } \`${selectedChest.coins}\`.`;
+
+        embed.setDescription(resultMessage);
+        await i.editReply({ embeds: [embed], components: [] }).catch(noop);
+
+        const hasEnergizeSkill =
+            stats.skills.some((skill) => skill.name === "Energize") &&
+            stats.activeSkills.includes("Energize");
+
+        const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
+        await cooldowns.set(userWallet, "explore", exploreCooldown);
+    });
+
+    collector.on("end", async () => {
+        if (!collected) {
+            embed.setDescription(
+                `You got distracted and lost the opportunity to claim a chest.`,
+            );
+            await i.editReply({ embeds: [embed], components: [] }).catch(noop);
+
+            const hasEnergizeSkill =
+                stats.skills.some((skill) => skill.name === "Energize") &&
+                stats.activeSkills.includes("Energize");
+
+            const exploreCooldown = hasEnergizeSkill
+                ? get.mins(15)
+                : get.mins(20);
+            await cooldowns.set(userWallet, "explore", exploreCooldown);
+        }
+    });
 }
 
 export async function handleMaterials(

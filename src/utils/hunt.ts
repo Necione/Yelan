@@ -16,6 +16,7 @@ export interface Monster {
     defValue: number;
     minWorldLevel: number;
     image: string;
+    isMutated?: boolean;
     drops: {
         item: string;
         minAmount: number;
