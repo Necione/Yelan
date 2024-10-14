@@ -199,7 +199,7 @@ export const artifacts = {
 
     "Exile's Flower": {
         type: "Flower",
-        artifactSet: "Exile",
+        artifactSet: "The Exile",
         sellPrice: 10,
         attackPower: 0,
         critChance: 5,
@@ -212,7 +212,7 @@ export const artifacts = {
     },
     "Exile's Feather": {
         type: "Plume",
-        artifactSet: "Exile",
+        artifactSet: "The Exile",
         sellPrice: 10,
         attackPower: 6,
         critChance: 9,
@@ -225,7 +225,7 @@ export const artifacts = {
     },
     "Exile's Pocket Watch": {
         type: "Sands",
-        artifactSet: "Exile",
+        artifactSet: "The Exile",
         sellPrice: 10,
         attackPower: 4,
         critChance: 8,
@@ -238,7 +238,7 @@ export const artifacts = {
     },
     "Exile's Goblet": {
         type: "Goblet",
-        artifactSet: "Exile",
+        artifactSet: "The Exile",
         sellPrice: 10,
         attackPower: 3,
         critChance: 9,
@@ -251,7 +251,7 @@ export const artifacts = {
     },
     "Exile's Circlet": {
         type: "Circlet",
-        artifactSet: "Exile",
+        artifactSet: "The Exile",
         sellPrice: 10,
         attackPower: 2,
         critChance: 13,
