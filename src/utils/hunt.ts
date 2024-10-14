@@ -118,7 +118,8 @@ export async function getRandomMonster(
     }
 
     const availableMonsters = monsters.filter(
-        (monster) => worldLevel >= monster.minWorldLevel,
+        (monster) =>
+            worldLevel >= monster.minWorldLevel && monster.group !== "Boss",
     );
 
     if (availableMonsters.length === 0) {
