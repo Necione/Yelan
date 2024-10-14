@@ -97,7 +97,7 @@ export const explore = buildCommand<SlashCommand>({
         if (exploreType === "chest") {
             await handleChest(i, stats);
         } else if (exploreType === "materials") {
-            await handleMaterials(i, stats, userWallet);
+            await handleMaterials(i, stats);
         } else {
             await i.editReply(embedComment("Invalid exploration type."));
         }
