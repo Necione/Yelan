@@ -144,7 +144,7 @@ export const roles = {
     mafia: "1132216942158155827",
     moderator: "1103906017340821624", // Set to @Council
     management: {
-        econ:"1188120160402407544",
+        econ: "1188120160402407544",
         corners: "1188119808353509436",
     },
     payroll1: "1293222541116182528",

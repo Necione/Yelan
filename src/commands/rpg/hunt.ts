@@ -1,11 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import {
-    getProfileByUserId,
-    syncStats,
-    updateUserStats
-} from "../../services";
+import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { handleHunt } from "./handlers/huntHandler";
 
