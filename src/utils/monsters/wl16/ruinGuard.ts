@@ -58,6 +58,41 @@ export default {
                 minDamage: 107,
                 maxDamage: 148,
             },
+            {
+                worldLevel: 21,
+                minHp: 1380,
+                maxHp: 1750,
+                minDamage: 110,
+                maxDamage: 155,
+            },
+            {
+                worldLevel: 22,
+                minHp: 1440,
+                maxHp: 1800,
+                minDamage: 115,
+                maxDamage: 160,
+            },
+            {
+                worldLevel: 23,
+                minHp: 1500,
+                maxHp: 1850,
+                minDamage: 120,
+                maxDamage: 165,
+            },
+            {
+                worldLevel: 24,
+                minHp: 1560,
+                maxHp: 1900,
+                minDamage: 125,
+                maxDamage: 170,
+            },
+            {
+                worldLevel: 25,
+                minHp: 1620,
+                maxHp: 1950,
+                minDamage: 130,
+                maxDamage: 175,
+            },
         ];
 
         return stats.find((stat) => stat.worldLevel === worldLevel) || null;

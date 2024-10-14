@@ -12,7 +12,7 @@ import {
 import { cooldowns, texts } from "../../../utils";
 import { calculateDrop, calculateExp, type Monster } from "../../../utils/hunt";
 
-const maxWorldLevel = 20;
+const maxWorldLevel = 25;
 
 export async function handleVictory(
     i: ChatInputCommandInteraction,
