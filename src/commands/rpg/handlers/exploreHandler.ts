@@ -1,6 +1,6 @@
 import { embedComment, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
-import type { UserStats, UserWallet } from "@prisma/client";
+import type { UserStats } from "@prisma/client";
 import type {
     ButtonInteraction,
     ChatInputCommandInteraction,
@@ -23,12 +23,11 @@ import { generateChestLoot, generateRawMaterials } from "../../../utils/chest";
 export async function handleChest(
     i: ChatInputCommandInteraction,
     stats: UserStats,
-    userWallet: UserWallet,
 ) {
     const chance = Math.random();
 
     if (chance < 0.05) {
-        await handleTrap(i, stats, userWallet);
+        await handleTrap(i, stats);
         return;
     }
 
@@ -156,12 +155,11 @@ export async function handleChest(
 export async function handleMaterials(
     i: ChatInputCommandInteraction,
     stats: UserStats,
-    userWallet: UserWallet,
 ) {
     const chance = Math.random();
 
     if (chance < 0.05) {
-        await handleTrap(i, stats, userWallet);
+        await handleTrap(i, stats);
         return;
     }
 
@@ -191,11 +189,7 @@ export async function handleMaterials(
     }
 }
 
-async function handleTrap(
-    i: ChatInputCommandInteraction,
-    stats: UserStats,
-    userWallet: UserWallet,
-) {
+async function handleTrap(i: ChatInputCommandInteraction, stats: UserStats) {
     const trapDamage = 20;
     const coinLoss = 50;
 

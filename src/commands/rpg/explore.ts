@@ -95,7 +95,7 @@ export const explore = buildCommand<SlashCommand>({
         await cooldowns.set(userWallet, "explore", exploreCooldown);
 
         if (exploreType === "chest") {
-            await handleChest(i, stats, userWallet);
+            await handleChest(i, stats);
         } else if (exploreType === "materials") {
             await handleMaterials(i, stats, userWallet);
         } else {
