@@ -6,8 +6,8 @@ import {
     calculateStatChanges,
     getSetBonusMessages,
 } from "../../utils/artifactHelper";
+import type { ArtifactType } from "../../utils/rpgitems/artifacts";
 import {
-    ArtifactType,
     getArtifactType,
     type ArtifactName,
 } from "../../utils/rpgitems/artifacts";

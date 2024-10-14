@@ -1,7 +1,15 @@
 import { formatChange } from "./hunt";
-import { ArtifactName, artifacts, ArtifactSetName, artifactSets, ArtifactType } from "./rpgitems/artifacts";
+import type {
+    ArtifactName,
+    ArtifactSetName,
+    ArtifactType,
+} from "./rpgitems/artifacts";
+import { artifacts, artifactSets } from "./rpgitems/artifacts";
 
-export function calculateStatChanges(beforeStats: any, afterStats: any): string[] {
+export function calculateStatChanges(
+    beforeStats: any,
+    afterStats: any,
+): string[] {
     const updatedStats: string[] = [];
 
     const statsToCheck = [

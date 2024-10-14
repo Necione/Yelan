@@ -1,11 +1,13 @@
 import { is, noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
+import type {
+    ArtifactSetName,
+    ArtifactType,
+} from "../utils/rpgitems/artifacts";
 import {
     artifacts,
-    ArtifactSetName,
     artifactSets,
-    ArtifactType,
     getArtifactSetBonuses,
     type ArtifactName,
 } from "../utils/rpgitems/artifacts";
@@ -22,13 +24,14 @@ export async function syncStats(userId: string) {
     const alchemyBaseAttack = stats.alchemyProgress * 0.25;
     const finalBaseAttack = calculatedBaseAttack + alchemyBaseAttack;
 
-    const calculatedMaxHP = 100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
+    const calculatedMaxHP =
+        100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
 
     // Initialize total stats
-    let totalStats = {
+    const totalStats = {
         attackPower: finalBaseAttack,
         critChance: 1, // Base crit chance
-        critValue: 1,  // Base crit damage multiplier
+        critValue: 1, // Base crit damage multiplier
         defChance: 0,
         defValue: 0,
         maxHP: calculatedMaxHP,
@@ -48,7 +51,13 @@ export async function syncStats(userId: string) {
     }
 
     // Collect equipped artifacts
-    const artifactTypes: ArtifactType[] = ["Flower", "Plume", "Sands", "Goblet", "Circlet"];
+    const artifactTypes: ArtifactType[] = [
+        "Flower",
+        "Plume",
+        "Sands",
+        "Goblet",
+        "Circlet",
+    ];
     const equippedArtifacts: { [slot in ArtifactType]?: ArtifactName } = {};
 
     for (const type of artifactTypes) {
@@ -187,7 +196,8 @@ function applySetBonuses(
                 totalStats.defValue += totalStats.defValue * value;
                 break;
             case "healEffectiveness":
-                totalStats.healEffectiveness += totalStats.healEffectiveness * value;
+                totalStats.healEffectiveness +=
+                    totalStats.healEffectiveness * value;
                 break;
             default:
                 break;

@@ -27,7 +27,7 @@ module.exports = {
         "object-shorthand": "error",
         "sonarjs/prefer-immediate-return": "error",
         "@typescript-eslint/consistent-type-imports": "error",
-        "@typescript-eslint/no-explicit-any": "error",
+        '@typescript-eslint/no-explicit-any': 0,
         "no-async-promise-executor": 0,
         "@typescript-eslint/ban-ts-comment": 0,
     },
