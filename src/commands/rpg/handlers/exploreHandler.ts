@@ -1,4 +1,4 @@
-import { embedComment, get, noop } from "@elara-services/utils";
+import { embedComment, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type {
@@ -18,7 +18,6 @@ import {
     removeBalance,
     updateUserStats,
 } from "../../../services";
-import { cooldowns } from "../../../utils";
 import { generateChestLoot, generateRawMaterials } from "../../../utils/chest";
 
 export async function handleChest(
@@ -142,13 +141,6 @@ export async function handleChest(
 
         embed.setDescription(resultMessage);
         await i.editReply({ embeds: [embed], components: [] }).catch(noop);
-
-        const hasEnergizeSkill =
-            stats.skills.some((skill) => skill.name === "Energize") &&
-            stats.activeSkills.includes("Energize");
-
-        const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
-        await cooldowns.set(userWallet, "explore", exploreCooldown);
     });
 
     collector.on("end", async () => {
@@ -157,15 +149,6 @@ export async function handleChest(
                 `You got distracted and lost the opportunity to claim a chest.`,
             );
             await i.editReply({ embeds: [embed], components: [] }).catch(noop);
-
-            const hasEnergizeSkill =
-                stats.skills.some((skill) => skill.name === "Energize") &&
-                stats.activeSkills.includes("Energize");
-
-            const exploreCooldown = hasEnergizeSkill
-                ? get.mins(15)
-                : get.mins(20);
-            await cooldowns.set(userWallet, "explore", exploreCooldown);
         }
     });
 }
@@ -206,13 +189,6 @@ export async function handleMaterials(
             )
             .catch(noop);
     }
-
-    const hasEnergizeSkill =
-        stats.skills.some((skill) => skill.name === "Energize") &&
-        stats.activeSkills.includes("Energize");
-
-    const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
-    await cooldowns.set(userWallet, "explore", exploreCooldown);
 }
 
 async function handleTrap(
@@ -241,11 +217,4 @@ async function handleTrap(
             ),
         )
         .catch(noop);
-
-    const hasEnergizeSkill =
-        stats.skills.some((skill) => skill.name === "Energize") &&
-        stats.activeSkills.includes("Energize");
-
-    const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
-    await cooldowns.set(userWallet, "explore", exploreCooldown);
 }

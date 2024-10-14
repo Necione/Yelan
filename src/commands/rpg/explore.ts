@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import { embedComment, get, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
@@ -86,6 +86,13 @@ export const explore = buildCommand<SlashCommand>({
         }
 
         const exploreType = i.options.getString("type", true);
+
+        const hasEnergizeSkill =
+            stats.skills.some((skill) => skill.name === "Energize") &&
+            stats.activeSkills.includes("Energize");
+
+        const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
+        await cooldowns.set(userWallet, "explore", exploreCooldown);
 
         if (exploreType === "chest") {
             await handleChest(i, stats, userWallet);
