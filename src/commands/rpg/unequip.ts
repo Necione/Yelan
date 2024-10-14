@@ -1,13 +1,16 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { getUserStats, updateUserStats } from "../../services";
+import { getUserStats, syncStats, updateUserStats } from "../../services";
 import {
-    artifacts,
+    calculateStatChanges,
+    getSetBonusMessages,
+} from "../../utils/artifactHelper";
+import {
+    ArtifactType,
     getArtifactType,
     type ArtifactName,
 } from "../../utils/rpgitems/artifacts";
-import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 export const unequip = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -47,13 +50,13 @@ export const unequip = buildCommand<SlashCommand>({
             });
         }
 
-        const artifactTypes = [
+        const artifactTypes: ArtifactType[] = [
             "Flower",
             "Plume",
             "Sands",
             "Goblet",
             "Circlet",
-        ] as const;
+        ];
 
         for (const type of artifactTypes) {
             const field = `equipped${type}` as keyof typeof stats;
@@ -86,7 +89,7 @@ export const unequip = buildCommand<SlashCommand>({
 
     async execute(i, r) {
         const itemName = i.options.getString("item", true);
-        const stats = await getUserStats(i.user.id);
+        let stats = await getUserStats(i.user.id);
 
         if (!stats) {
             return r.edit(
@@ -100,101 +103,80 @@ export const unequip = buildCommand<SlashCommand>({
             return r.edit(embedComment("You cannot unequip while hunting!"));
         }
 
+        const updatedStats: string[] = [];
+        const beforeStats = { ...stats };
+
         if (itemName === "All") {
-            const equippedItems: string[] = [];
-            let totalAttackPower = stats.attackPower;
-            let totalCritChance = stats.critChance;
-            let totalCritValue = stats.critValue;
-            let totalMaxHP = stats.maxHP;
-            let totalDefChance = stats.defChance;
-            let totalDefValue = stats.defValue;
+            const updates: any = {};
 
             if (stats.equippedWeapon) {
-                const weaponStats = weapons[stats.equippedWeapon as WeaponName];
-                totalAttackPower -= weaponStats.attackPower;
-                totalCritChance -= weaponStats.critChance || 0;
-                totalCritValue -= weaponStats.critValue || 0;
-                totalMaxHP -= weaponStats.additionalHP || 0;
-                totalDefChance -= weaponStats.defChance || 0;
-                totalDefValue -= weaponStats.defValue || 0;
-                equippedItems.push(stats.equippedWeapon);
+                updates.equippedWeapon = { set: null };
             }
 
-            const artifactTypes = [
+            const artifactTypes: ArtifactType[] = [
                 "Flower",
                 "Plume",
                 "Sands",
                 "Goblet",
                 "Circlet",
-            ] as const;
-
-            type ArtifactType = (typeof artifactTypes)[number];
-            type EquippedField = `equipped${ArtifactType}`;
-
-            const updates: Partial<Record<EquippedField, { set: null }>> = {};
+            ];
 
             for (const type of artifactTypes) {
-                const field = `equipped${type}` as EquippedField;
-                const artifactName = stats[field];
-
-                if (artifactName && typeof artifactName === "string") {
-                    const artifactStats =
-                        artifacts[artifactName as ArtifactName];
-                    totalAttackPower -= artifactStats.attackPower || 0;
-                    totalCritChance -= artifactStats.critChance || 0;
-                    totalCritValue -= artifactStats.critValue || 0;
-                    totalMaxHP -= artifactStats.maxHP || 0;
-                    totalDefChance -= artifactStats.defChance || 0;
-                    totalDefValue -= artifactStats.defValue || 0;
+                const field = `equipped${type}` as keyof typeof stats;
+                if (stats[field]) {
                     updates[field] = { set: null };
-                    equippedItems.push(artifactName);
                 }
             }
 
-            await updateUserStats(i.user.id, {
-                equippedWeapon: { set: null },
-                attackPower: totalAttackPower,
-                critChance: totalCritChance,
-                critValue: totalCritValue,
-                maxHP: totalMaxHP,
-                defChance: totalDefChance,
-                defValue: totalDefValue,
-                ...updates,
-            });
-
-            if (equippedItems.length === 0) {
+            if (Object.keys(updates).length === 0) {
                 return r.edit(
                     embedComment(`You have no items equipped to unequip.`),
                 );
             }
 
+            await updateUserStats(i.user.id, updates);
+
+            stats = await syncStats(i.user.id);
+
+            const afterStats = { ...stats };
+
+            const statChanges = calculateStatChanges(beforeStats, afterStats);
+            updatedStats.push(...statChanges);
+
+            const setBonusMessages = getSetBonusMessages(
+                beforeStats,
+                afterStats,
+                "deactivated",
+            );
+            updatedStats.push(...setBonusMessages);
+
             return r.edit(
-                embedComment(`You have unequipped all items`, "Green"),
+                embedComment(
+                    `You have unequipped all items.\n${updatedStats.join(
+                        "\n",
+                    )}`,
+                    "Green",
+                ),
             );
         }
 
         if (itemName === stats.equippedWeapon) {
-            const unequippedWeaponStats =
-                weapons[stats.equippedWeapon as WeaponName];
-
             await updateUserStats(i.user.id, {
                 equippedWeapon: { set: null },
-                attackPower:
-                    stats.attackPower - unequippedWeaponStats.attackPower,
-                critChance:
-                    stats.critChance - (unequippedWeaponStats.critChance || 0),
-                critValue:
-                    stats.critValue - (unequippedWeaponStats.critValue || 0),
-                maxHP: stats.maxHP - (unequippedWeaponStats.additionalHP || 0),
-                defChance:
-                    stats.defChance - (unequippedWeaponStats.defChance || 0),
-                defValue:
-                    stats.defValue - (unequippedWeaponStats.defValue || 0),
             });
+
+            stats = await syncStats(i.user.id);
+
+            const afterStats = { ...stats };
+
+            const statChanges = calculateStatChanges(beforeStats, afterStats);
+            updatedStats.push(...statChanges);
 
             return r.edit(
                 embedComment(
-                    `You have unequipped your weapon: **${stats.equippedWeapon}**.`,
+                    `You have unequipped your weapon: **${itemName}**.\n${updatedStats.join(
+                        "\n",
+                    )}`,
                     "Green",
                 ),
             );
@@ -213,22 +195,29 @@ export const unequip = buildCommand<SlashCommand>({
         const equippedField = `equipped${artifactType}` as keyof typeof stats;
 
         if (stats[equippedField] === itemName) {
-            const artifactStats = artifacts[itemName as ArtifactName];
-
             await updateUserStats(i.user.id, {
                 [equippedField]: { set: null },
-                attackPower:
-                    stats.attackPower - (artifactStats.attackPower || 0),
-                critChance: stats.critChance - (artifactStats.critChance || 0),
-                critValue: stats.critValue - (artifactStats.critValue || 0),
-                maxHP: stats.maxHP - (artifactStats.maxHP || 0),
-                defChance: stats.defChance - (artifactStats.defChance || 0),
-                defValue: stats.defValue - (artifactStats.defValue || 0),
             });
+
+            stats = await syncStats(i.user.id);
+
+            const afterStats = { ...stats };
+
+            const statChanges = calculateStatChanges(beforeStats, afterStats);
+            updatedStats.push(...statChanges);
+
+            const setBonusMessages = getSetBonusMessages(
+                beforeStats,
+                afterStats,
+                "deactivated",
+            );
+            updatedStats.push(...setBonusMessages);
 
             return r.edit(
                 embedComment(
-                    `You have unequipped your artifact: **${itemName}**.`,
+                    `You have unequipped your artifact: **${itemName}**.\n${updatedStats.join(
+                        "\n",
+                    )}`,
                     "Green",
                 ),
             );

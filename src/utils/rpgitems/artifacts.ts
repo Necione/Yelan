@@ -1,6 +1,7 @@
 export const artifacts = {
     "Adventurer's Flower": {
         type: "Flower",
+        artifactSet: "Adventurer",
         sellPrice: 5,
         attackPower: 0,
         critChance: 0,
@@ -13,6 +14,7 @@ export const artifacts = {
     },
     "Adventurer's Tail Feather": {
         type: "Plume",
+        artifactSet: "Adventurer",
         sellPrice: 5,
         attackPower: 1.5,
         critChance: 0,
@@ -25,6 +27,7 @@ export const artifacts = {
     },
     "Adventurer's Pocket Watch": {
         type: "Sands",
+        artifactSet: "Adventurer",
         sellPrice: 5,
         attackPower: 1,
         critChance: 3,
@@ -37,6 +40,7 @@ export const artifacts = {
     },
     "Adventurer's Golden Goblet": {
         type: "Goblet",
+        artifactSet: "Adventurer",
         sellPrice: 5,
         attackPower: 0,
         critChance: 0,
@@ -49,6 +53,7 @@ export const artifacts = {
     },
     "Adventurer's Bandana": {
         type: "Circlet",
+        artifactSet: "Adventurer",
         sellPrice: 5,
         attackPower: 0,
         critChance: 10,
@@ -59,8 +64,10 @@ export const artifacts = {
         minWorldLevel: 2,
         chestChance: 10,
     },
+
     "Travelling Doctor's Silver Lotus": {
         type: "Flower",
+        artifactSet: "Travelling Doctor",
         sellPrice: 6,
         attackPower: -2,
         critChance: 0,
@@ -73,6 +80,7 @@ export const artifacts = {
     },
     "Travelling Doctor's Owl Feather": {
         type: "Plume",
+        artifactSet: "Travelling Doctor",
         sellPrice: 6,
         attackPower: 2,
         critChance: 0,
@@ -85,6 +93,7 @@ export const artifacts = {
     },
     "Travelling Doctor's Pocket Watch": {
         type: "Sands",
+        artifactSet: "Travelling Doctor",
         sellPrice: 6,
         attackPower: 2,
         critChance: 3,
@@ -97,6 +106,7 @@ export const artifacts = {
     },
     "Travelling Doctor's Medicine Pot": {
         type: "Goblet",
+        artifactSet: "Travelling Doctor",
         sellPrice: 6,
         attackPower: 0,
         critChance: 0,
@@ -109,6 +119,7 @@ export const artifacts = {
     },
     "Travelling Doctor's Handkerchief": {
         type: "Circlet",
+        artifactSet: "Travelling Doctor",
         sellPrice: 6,
         attackPower: 0,
         critChance: 7,
@@ -119,8 +130,10 @@ export const artifacts = {
         minWorldLevel: 2,
         chestChance: 10,
     },
+
     "Berserker's Rose": {
         type: "Flower",
+        artifactSet: "Berserker",
         sellPrice: 8,
         attackPower: 5,
         critChance: 10,
@@ -133,6 +146,7 @@ export const artifacts = {
     },
     "Berserker's Indigo Feather": {
         type: "Plume",
+        artifactSet: "Berserker",
         sellPrice: 8,
         attackPower: 5,
         critChance: 5,
@@ -145,6 +159,7 @@ export const artifacts = {
     },
     "Berserker's Timepiece": {
         type: "Sands",
+        artifactSet: "Berserker",
         sellPrice: 8,
         attackPower: 5,
         critChance: 10,
@@ -157,6 +172,7 @@ export const artifacts = {
     },
     "Berserker's Bone Goblet": {
         type: "Goblet",
+        artifactSet: "Berserker",
         sellPrice: 8,
         attackPower: 4,
         critChance: 10,
@@ -169,6 +185,7 @@ export const artifacts = {
     },
     "Berserker's Battle Mask": {
         type: "Circlet",
+        artifactSet: "Berserker",
         sellPrice: 8,
         attackPower: 4,
         critChance: 0,
@@ -179,8 +196,10 @@ export const artifacts = {
         minWorldLevel: 4,
         chestChance: 10,
     },
+
     "Exile's Flower": {
         type: "Flower",
+        artifactSet: "Exile",
         sellPrice: 10,
         attackPower: 0,
         critChance: 5,
@@ -193,6 +212,7 @@ export const artifacts = {
     },
     "Exile's Feather": {
         type: "Plume",
+        artifactSet: "Exile",
         sellPrice: 10,
         attackPower: 6,
         critChance: 9,
@@ -205,6 +225,7 @@ export const artifacts = {
     },
     "Exile's Pocket Watch": {
         type: "Sands",
+        artifactSet: "Exile",
         sellPrice: 10,
         attackPower: 4,
         critChance: 8,
@@ -217,6 +238,7 @@ export const artifacts = {
     },
     "Exile's Goblet": {
         type: "Goblet",
+        artifactSet: "Exile",
         sellPrice: 10,
         attackPower: 3,
         critChance: 9,
@@ -229,6 +251,7 @@ export const artifacts = {
     },
     "Exile's Circlet": {
         type: "Circlet",
+        artifactSet: "Exile",
         sellPrice: 10,
         attackPower: 2,
         critChance: 13,
@@ -239,8 +262,10 @@ export const artifacts = {
         minWorldLevel: 5,
         chestChance: 10,
     },
+
     "Troupe's Dawnlight": {
         type: "Flower",
+        artifactSet: "Wanderer's Troupe",
         sellPrice: 15,
         attackPower: 2,
         critChance: 4,
@@ -253,6 +278,7 @@ export const artifacts = {
     },
     "Bard's Arrow Feather": {
         type: "Plume",
+        artifactSet: "Wanderer's Troupe",
         sellPrice: 15,
         attackPower: 6,
         critChance: 9,
@@ -265,6 +291,7 @@ export const artifacts = {
     },
     "Concert's Final Hour": {
         type: "Sands",
+        artifactSet: "Wanderer's Troupe",
         sellPrice: 15,
         attackPower: 4,
         critChance: 5,
@@ -277,6 +304,7 @@ export const artifacts = {
     },
     "Wanderer's String-Kettle": {
         type: "Goblet",
+        artifactSet: "Wanderer's Troupe",
         sellPrice: 15,
         attackPower: -5,
         critChance: 12,
@@ -289,6 +317,7 @@ export const artifacts = {
     },
     "Conductor's Top Hat": {
         type: "Circlet",
+        artifactSet: "Wanderer's Troupe",
         sellPrice: 25,
         attackPower: 5,
         critChance: 10,
@@ -299,8 +328,10 @@ export const artifacts = {
         minWorldLevel: 5,
         chestChance: 10,
     },
+
     "Guardian's Flower": {
         type: "Flower",
+        artifactSet: "Defender's Will",
         sellPrice: 12,
         attackPower: -3,
         critChance: 0,
@@ -313,6 +344,7 @@ export const artifacts = {
     },
     "Guardian's Sigil": {
         type: "Plume",
+        artifactSet: "Defender's Will",
         sellPrice: 12,
         attackPower: 2,
         critChance: 0,
@@ -325,6 +357,7 @@ export const artifacts = {
     },
     "Guardian's Clock": {
         type: "Sands",
+        artifactSet: "Defender's Will",
         sellPrice: 12,
         attackPower: 1,
         critChance: 5,
@@ -337,6 +370,7 @@ export const artifacts = {
     },
     "Guardian's Vessel": {
         type: "Goblet",
+        artifactSet: "Defender's Will",
         sellPrice: 12,
         attackPower: 0,
         critChance: 0,
@@ -349,6 +383,7 @@ export const artifacts = {
     },
     "Guardian's Band": {
         type: "Circlet",
+        artifactSet: "Defender's Will",
         sellPrice: 12,
         attackPower: -5,
         critChance: 0,
@@ -359,8 +394,10 @@ export const artifacts = {
         minWorldLevel: 6,
         chestChance: 8,
     },
+
     "Maiden's Distant Love": {
         type: "Flower",
+        artifactSet: "Maiden Beloved",
         sellPrice: 25,
         attackPower: 0,
         critChance: -50,
@@ -373,6 +410,7 @@ export const artifacts = {
     },
     "Maiden's Heart-Stricken Infatuation": {
         type: "Plume",
+        artifactSet: "Maiden Beloved",
         sellPrice: 25,
         attackPower: 0,
         critChance: 0,
@@ -385,6 +423,7 @@ export const artifacts = {
     },
     "Maiden's Passing Youth": {
         type: "Sands",
+        artifactSet: "Maiden Beloved",
         sellPrice: 25,
         attackPower: 0,
         critChance: 0,
@@ -397,6 +436,7 @@ export const artifacts = {
     },
     "Maiden's Fleeting Leisure": {
         type: "Goblet",
+        artifactSet: "Maiden Beloved",
         sellPrice: 25,
         attackPower: -25,
         critChance: 0,
@@ -409,6 +449,7 @@ export const artifacts = {
     },
     "Maiden's Fading Beauty": {
         type: "Circlet",
+        artifactSet: "Maiden Beloved",
         sellPrice: 25,
         attackPower: 0,
         critChance: 0,
@@ -419,8 +460,10 @@ export const artifacts = {
         minWorldLevel: 6,
         chestChance: 3,
     },
+
     "Gladiator's Nostalgia": {
         type: "Flower",
+        artifactSet: "Gladiator's Finale",
         sellPrice: 25,
         attackPower: 5,
         critChance: 8,
@@ -433,6 +476,7 @@ export const artifacts = {
     },
     "Gladiator's Destiny": {
         type: "Plume",
+        artifactSet: "Gladiator's Finale",
         sellPrice: 25,
         attackPower: 4,
         critChance: 0,
@@ -445,6 +489,7 @@ export const artifacts = {
     },
     "Gladiator's Longing": {
         type: "Sands",
+        artifactSet: "Gladiator's Finale",
         sellPrice: 25,
         attackPower: 10,
         critChance: 0,
@@ -457,6 +502,7 @@ export const artifacts = {
     },
     "Gladiator's Intoxication": {
         type: "Goblet",
+        artifactSet: "Gladiator's Finale",
         sellPrice: 25,
         attackPower: 0,
         critChance: -10,
@@ -469,6 +515,7 @@ export const artifacts = {
     },
     "Gladiator's Triumphus": {
         type: "Circlet",
+        artifactSet: "Gladiator's Finale",
         sellPrice: 25,
         attackPower: 4,
         critChance: 8,
@@ -479,8 +526,10 @@ export const artifacts = {
         minWorldLevel: 10,
         chestChance: 3,
     },
+
     "Thundersoother's Heart": {
         type: "Flower",
+        artifactSet: "Thundersoother",
         sellPrice: 25,
         attackPower: 3,
         critChance: 5,
@@ -493,6 +542,7 @@ export const artifacts = {
     },
     "Thundersoother's Plume": {
         type: "Plume",
+        artifactSet: "Thundersoother",
         sellPrice: 25,
         attackPower: 2,
         critChance: 0,
@@ -505,6 +555,7 @@ export const artifacts = {
     },
     "Hour of Soothing Thunder": {
         type: "Sands",
+        artifactSet: "Thundersoother",
         sellPrice: 25,
         attackPower: -5,
         critChance: 10,
@@ -517,6 +568,7 @@ export const artifacts = {
     },
     "Thundersoother's Goblet": {
         type: "Goblet",
+        artifactSet: "Thundersoother",
         sellPrice: 25,
         attackPower: -5,
         critChance: -5,
@@ -529,6 +581,7 @@ export const artifacts = {
     },
     "Thundersoother's Diadem": {
         type: "Circlet",
+        artifactSet: "Thundersoother",
         sellPrice: 25,
         attackPower: 0,
         critChance: 0,
@@ -539,8 +592,10 @@ export const artifacts = {
         minWorldLevel: 13,
         chestChance: 3,
     },
+
     "Thunderbird's Mercy": {
         type: "Flower",
+        artifactSet: "Thundering Fury",
         sellPrice: 15,
         attackPower: 10,
         critChance: 5,
@@ -553,6 +608,7 @@ export const artifacts = {
     },
     "Survivor of Catastrophe": {
         type: "Plume",
+        artifactSet: "Thundering Fury",
         sellPrice: 15,
         attackPower: 20,
         critChance: 0,
@@ -565,6 +621,7 @@ export const artifacts = {
     },
     "Hourglass of Thunder": {
         type: "Sands",
+        artifactSet: "Thundering Fury",
         sellPrice: 15,
         attackPower: 4,
         critChance: 5,
@@ -577,6 +634,7 @@ export const artifacts = {
     },
     "Omen of Thunderstorm": {
         type: "Goblet",
+        artifactSet: "Thundering Fury",
         sellPrice: 15,
         attackPower: 0,
         critChance: 0,
@@ -589,6 +647,7 @@ export const artifacts = {
     },
     "Thunder Summoner's Crown": {
         type: "Circlet",
+        artifactSet: "Thundering Fury",
         sellPrice: 25,
         attackPower: 10,
         critChance: 15,
@@ -599,8 +658,10 @@ export const artifacts = {
         minWorldLevel: 13,
         chestChance: 3,
     },
+
     "Royal Flora": {
         type: "Flower",
+        artifactSet: "Noblesse Oblige",
         sellPrice: 15,
         attackPower: 15,
         critChance: 5,
@@ -613,6 +674,7 @@ export const artifacts = {
     },
     "Royal Plume": {
         type: "Plume",
+        artifactSet: "Noblesse Oblige",
         sellPrice: 15,
         attackPower: 20,
         critChance: 0,
@@ -625,6 +687,7 @@ export const artifacts = {
     },
     "Royal Pocket Watch": {
         type: "Sands",
+        artifactSet: "Noblesse Oblige",
         sellPrice: 15,
         attackPower: 10,
         critChance: 10,
@@ -637,6 +700,7 @@ export const artifacts = {
     },
     "Royal Silver Urn": {
         type: "Goblet",
+        artifactSet: "Noblesse Oblige",
         sellPrice: 15,
         attackPower: 15,
         critChance: 0,
@@ -649,6 +713,7 @@ export const artifacts = {
     },
     "Royal Masque": {
         type: "Circlet",
+        artifactSet: "Noblesse Oblige",
         sellPrice: 25,
         attackPower: 15,
         critChance: 20,
@@ -659,8 +724,10 @@ export const artifacts = {
         minWorldLevel: 15,
         chestChance: 3,
     },
+
     "Witch's Flower of Blaze": {
         type: "Flower",
+        artifactSet: "Crimson Witch of Flames",
         sellPrice: 100,
         attackPower: 20,
         critChance: 10,
@@ -673,6 +740,7 @@ export const artifacts = {
     },
     "Witch's Ever-Burning Plume": {
         type: "Plume",
+        artifactSet: "Crimson Witch of Flames",
         sellPrice: 100,
         attackPower: 25,
         critChance: 10,
@@ -685,6 +753,7 @@ export const artifacts = {
     },
     "Witch's End Time": {
         type: "Sands",
+        artifactSet: "Crimson Witch of Flames",
         sellPrice: 100,
         attackPower: 30,
         critChance: 15,
@@ -697,6 +766,7 @@ export const artifacts = {
     },
     "Witch's Heart Flames": {
         type: "Goblet",
+        artifactSet: "Crimson Witch of Flames",
         sellPrice: 100,
         attackPower: 40,
         critChance: 10,
@@ -709,6 +779,7 @@ export const artifacts = {
     },
     "Witch's Scorching Hat": {
         type: "Circlet",
+        artifactSet: "Crimson Witch of Flames",
         sellPrice: 100,
         attackPower: 50,
         critChance: 20,
@@ -721,12 +792,128 @@ export const artifacts = {
     },
 };
 
+export const artifactSets = {
+    Adventurer: {
+        "2pc": {
+            maxHPPercentage: 0.1,
+        },
+        "4pc": {
+            maxHPPercentage: 0.1,
+            attackPowerPercentage: 0.05,
+        },
+    },
+    "Travelling Doctor": {
+        "2pc": {
+            healEffectiveness: 0.15,
+        },
+        "4pc": {
+            healEffectiveness: 0.15,
+            defValuePercentage: 0.05,
+        },
+    },
+    Berserker: {
+        "2pc": {
+            critChance: 10,
+        },
+        "4pc": {
+            critChance: 10,
+            attackPowerPercentage: 0.1,
+        },
+    },
+    "The Exile": {
+        "2pc": {
+            attackPowerPercentage: 0.1,
+        },
+        "4pc": {
+            attackPowerPercentage: 0.1,
+            critValuePercentage: 0.15,
+        },
+    },
+    "Wanderer's Troupe": {
+        "2pc": {
+            critValuePercentage: 0.15,
+        },
+        "4pc": {
+            critValuePercentage: 0.15,
+            attackPowerPercentage: 0.05,
+        },
+    },
+    "Defender's Will": {
+        "2pc": {
+            defValuePercentage: 0.15,
+        },
+        "4pc": {
+            defValuePercentage: 0.15,
+            maxHPPercentage: 0.1,
+        },
+    },
+    "Maiden Beloved": {
+        "2pc": {
+            healEffectiveness: 0.2,
+        },
+        "4pc": {
+            healEffectiveness: 0.2,
+            maxHPPercentage: 0.15,
+        },
+    },
+    "Gladiator's Finale": {
+        "2pc": {
+            attackPowerPercentage: 0.18,
+        },
+        "4pc": {
+            attackPowerPercentage: 0.18,
+            critChance: 10,
+        },
+    },
+    Thundersoother: {
+        "2pc": {
+            defChance: 10,
+        },
+        "4pc": {
+            defChance: 10,
+            defValuePercentage: 0.1,
+        },
+    },
+    "Thundering Fury": {
+        "2pc": {
+            critValuePercentage: 0.15,
+        },
+        "4pc": {
+            critValuePercentage: 0.15,
+            attackPowerPercentage: 0.1,
+        },
+    },
+    "Noblesse Oblige": {
+        "2pc": {
+            attackPowerPercentage: 0.2,
+        },
+        "4pc": {
+            attackPowerPercentage: 0.2,
+            critChance: 15,
+        },
+    },
+    "Crimson Witch of Flames": {
+        "2pc": {
+            attackPowerPercentage: 0.15,
+        },
+        "4pc": {
+            attackPowerPercentage: 0.15,
+            critValuePercentage: 0.2,
+        },
+    },
+};
+
 export type ArtifactName = keyof typeof artifacts;
 export type ArtifactType = "Flower" | "Plume" | "Sands" | "Goblet" | "Circlet";
+export type ArtifactSetName = keyof typeof artifactSets;
 
 export function getArtifactType(artifact: ArtifactName): ArtifactType | null {
     if (!artifacts[artifact]) {
         return null;
     }
     return artifacts[artifact].type as ArtifactType;
+}
+
+export function getArtifactSetBonuses(setName: ArtifactSetName) {
+    return artifactSets[setName] || null;
 }

@@ -1,7 +1,14 @@
 import { is, noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
-import { artifacts, type ArtifactName } from "../utils/rpgitems/artifacts";
+import {
+    artifacts,
+    ArtifactSetName,
+    artifactSets,
+    ArtifactType,
+    getArtifactSetBonuses,
+    type ArtifactName,
+} from "../utils/rpgitems/artifacts";
 import { weapons, type WeaponName } from "../utils/rpgitems/weapons";
 
 export async function syncStats(userId: string) {
@@ -10,143 +17,182 @@ export async function syncStats(userId: string) {
         return null;
     }
 
+    // Base stats calculations
     const calculatedBaseAttack = 5 + (stats.worldLevel - 1) * 0.5;
     const alchemyBaseAttack = stats.alchemyProgress * 0.25;
     const finalBaseAttack = calculatedBaseAttack + alchemyBaseAttack;
 
-    const calculatedMaxHP =
-        100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
+    const calculatedMaxHP = 100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
 
-    const additionalWeaponStats = {
-        attackPower: 0,
-        critChance: 0,
-        critValue: 0,
-        additionalHP: 0,
+    // Initialize total stats
+    let totalStats = {
+        attackPower: finalBaseAttack,
+        critChance: 1, // Base crit chance
+        critValue: 1,  // Base crit damage multiplier
         defChance: 0,
         defValue: 0,
+        maxHP: calculatedMaxHP,
+        healEffectiveness: 0,
     };
 
+    // Add weapon stats
     if (stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]) {
         const weapon = weapons[stats.equippedWeapon as WeaponName];
-        additionalWeaponStats.attackPower = weapon.attackPower || 0;
-        additionalWeaponStats.critChance = weapon.critChance || 0;
-        additionalWeaponStats.critValue = weapon.critValue || 0;
-        additionalWeaponStats.additionalHP = weapon.additionalHP || 0;
-        additionalWeaponStats.defChance = weapon.defChance || 0;
-        additionalWeaponStats.defValue = weapon.defValue || 0;
+        totalStats.attackPower += weapon.attackPower || 0;
+        totalStats.critChance += weapon.critChance || 0;
+        totalStats.critValue += weapon.critValue || 0;
+        totalStats.defChance += weapon.defChance || 0;
+        totalStats.defValue += weapon.defValue || 0;
+        totalStats.maxHP += weapon.additionalHP || 0;
+        totalStats.healEffectiveness || 0; // Include if weapons can have healEffectiveness
     }
 
-    const additionalArtifactStats = {
-        attackPower: 0,
-        critChance: 0,
-        critValue: 0,
-        defChance: 0,
-        defValue: 0,
-        maxHP: 0,
-    };
-
-    const artifactTypes = [
-        "Flower",
-        "Plume",
-        "Sands",
-        "Goblet",
-        "Circlet",
-    ] as const;
+    // Collect equipped artifacts
+    const artifactTypes: ArtifactType[] = ["Flower", "Plume", "Sands", "Goblet", "Circlet"];
+    const equippedArtifacts: { [slot in ArtifactType]?: ArtifactName } = {};
 
     for (const type of artifactTypes) {
         const field = `equipped${type}` as keyof typeof stats;
         if (stats[field] && artifacts[stats[field] as ArtifactName]) {
-            const artifact = artifacts[stats[field] as ArtifactName];
-            additionalArtifactStats.attackPower += artifact.attackPower || 0;
-            additionalArtifactStats.critChance += artifact.critChance || 0;
-            additionalArtifactStats.critValue += artifact.critValue || 0;
-            additionalArtifactStats.defChance += artifact.defChance || 0;
-            additionalArtifactStats.defValue += artifact.defValue || 0;
-            additionalArtifactStats.maxHP += artifact.maxHP || 0;
+            const artifactName = stats[field] as ArtifactName;
+            equippedArtifacts[type] = artifactName;
+
+            const artifact = artifacts[artifactName];
+            totalStats.attackPower += artifact.attackPower || 0;
+            totalStats.critChance += artifact.critChance || 0;
+            totalStats.critValue += artifact.critValue || 0;
+            totalStats.defChance += artifact.defChance || 0;
+            totalStats.defValue += artifact.defValue || 0;
+            totalStats.maxHP += artifact.maxHP || 0;
+            totalStats.healEffectiveness || 0;
         }
     }
 
-    let calculatedAttackPower =
-        finalBaseAttack +
-        additionalWeaponStats.attackPower +
-        additionalArtifactStats.attackPower;
+    // Calculate and apply set bonuses
+    const setCounts: { [setName: string]: number } = {};
 
-    if (calculatedAttackPower < 0) {
-        calculatedAttackPower = 0;
+    for (const artifactName of Object.values(equippedArtifacts)) {
+        const artifact = artifacts[artifactName];
+        const setName = artifact.artifactSet;
+        setCounts[setName] = (setCounts[setName] || 0) + 1;
     }
 
-    let calculatedCritChance =
-        1 +
-        additionalWeaponStats.critChance +
-        additionalArtifactStats.critChance;
-    if (calculatedCritChance < 0) {
-        calculatedCritChance = 0;
+    for (const [setName, count] of Object.entries(setCounts)) {
+        const setBonuses = artifactSets[setName as ArtifactSetName];
+        if (setBonuses) {
+            // Apply 2-piece bonus
+            if (count >= 2) {
+                const bonus2pc = setBonuses["2pc"];
+                applySetBonuses(totalStats, bonus2pc);
+            }
+            // Apply 4-piece bonus
+            if (count >= 4) {
+                const bonus4pc = setBonuses["4pc"];
+                applySetBonuses(totalStats, bonus4pc);
+            }
+        }
     }
 
-    const calculatedCritValue =
-        1 + additionalWeaponStats.critValue + additionalArtifactStats.critValue;
+    // Ensure stats are within acceptable ranges
+    totalStats.attackPower = Math.max(0, totalStats.attackPower);
+    totalStats.critChance = Math.max(0, totalStats.critChance);
+    totalStats.critValue = Math.max(0, totalStats.critValue);
+    totalStats.defChance = Math.max(0, totalStats.defChance);
+    totalStats.defValue = Math.max(0, totalStats.defValue);
+    totalStats.maxHP = Math.floor(totalStats.maxHP);
+    totalStats.healEffectiveness = Math.max(0, totalStats.healEffectiveness);
 
-    let calculatedDefChance =
-        additionalWeaponStats.defChance + additionalArtifactStats.defChance;
-    if (calculatedDefChance < 0) {
-        calculatedDefChance = 0;
-    }
-
-    let calculatedDefValue =
-        additionalWeaponStats.defValue + additionalArtifactStats.defValue;
-    if (calculatedDefValue < 0) {
-        calculatedDefValue = 0;
-    }
-
-    const finalMaxHP = Math.floor(
-        calculatedMaxHP +
-            additionalArtifactStats.maxHP +
-            additionalWeaponStats.additionalHP,
-    );
-
+    // Check if stats have changed
     let needsUpdate = false;
+
     if (stats.baseAttack !== finalBaseAttack) {
         stats.baseAttack = finalBaseAttack;
         needsUpdate = true;
     }
-    if (stats.attackPower !== calculatedAttackPower) {
-        stats.attackPower = calculatedAttackPower;
+    if (stats.attackPower !== totalStats.attackPower) {
+        stats.attackPower = totalStats.attackPower;
         needsUpdate = true;
     }
-    if (stats.maxHP !== finalMaxHP) {
-        stats.maxHP = finalMaxHP;
+    if (stats.maxHP !== totalStats.maxHP) {
+        stats.maxHP = totalStats.maxHP;
         needsUpdate = true;
     }
-    if (stats.critChance !== calculatedCritChance) {
-        stats.critChance = calculatedCritChance;
+    if (stats.critChance !== totalStats.critChance) {
+        stats.critChance = totalStats.critChance;
         needsUpdate = true;
     }
-    if (stats.critValue !== calculatedCritValue) {
-        stats.critValue = calculatedCritValue;
+    if (stats.critValue !== totalStats.critValue) {
+        stats.critValue = totalStats.critValue;
         needsUpdate = true;
     }
-    if (stats.defChance !== calculatedDefChance) {
-        stats.defChance = calculatedDefChance;
+    if (stats.defChance !== totalStats.defChance) {
+        stats.defChance = totalStats.defChance;
         needsUpdate = true;
     }
-    if (stats.defValue !== calculatedDefValue) {
-        stats.defValue = calculatedDefValue;
+    if (stats.defValue !== totalStats.defValue) {
+        stats.defValue = totalStats.defValue;
+        needsUpdate = true;
+    }
+    if (stats.healEffectiveness !== totalStats.healEffectiveness) {
+        stats.healEffectiveness = totalStats.healEffectiveness;
         needsUpdate = true;
     }
 
     if (needsUpdate) {
         return await updateUserStats(userId, {
             baseAttack: { set: finalBaseAttack },
-            attackPower: { set: calculatedAttackPower },
-            maxHP: { set: finalMaxHP },
-            critChance: { set: calculatedCritChance },
-            critValue: { set: calculatedCritValue },
-            defChance: { set: calculatedDefChance },
-            defValue: { set: calculatedDefValue },
+            attackPower: { set: totalStats.attackPower },
+            maxHP: { set: totalStats.maxHP },
+            critChance: { set: totalStats.critChance },
+            critValue: { set: totalStats.critValue },
+            defChance: { set: totalStats.defChance },
+            defValue: { set: totalStats.defValue },
+            healEffectiveness: { set: totalStats.healEffectiveness },
         });
     }
 
     return stats;
+}
+
+function applySetBonuses(
+    totalStats: {
+        attackPower: number;
+        critChance: number;
+        critValue: number;
+        defChance: number;
+        defValue: number;
+        maxHP: number;
+        healEffectiveness: number;
+    },
+    bonuses: { [key: string]: number },
+) {
+    for (const [key, value] of Object.entries(bonuses)) {
+        switch (key) {
+            case "attackPowerPercentage":
+                totalStats.attackPower += totalStats.attackPower * value;
+                break;
+            case "critChance":
+                totalStats.critChance += value;
+                break;
+            case "critValuePercentage":
+                totalStats.critValue += totalStats.critValue * value;
+                break;
+            case "maxHPPercentage":
+                totalStats.maxHP += totalStats.maxHP * value;
+                break;
+            case "defChance":
+                totalStats.defChance += value;
+                break;
+            case "defValuePercentage":
+                totalStats.defValue += totalStats.defValue * value;
+                break;
+            case "healEffectiveness":
+                totalStats.healEffectiveness += totalStats.healEffectiveness * value;
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 export const getUserStats = async (userId: string) => {
@@ -163,6 +209,7 @@ export const getUserStats = async (userId: string) => {
                 inventory: [],
                 exp: 0,
                 worldLevel: 1,
+                healEffectiveness: 0,
             },
             update: {},
         })
@@ -238,3 +285,57 @@ export const removeItemFromInventory = async (
         },
     });
 };
+
+export function calculateSetBonuses(equippedArtifacts: {
+    [slot in ArtifactType]?: ArtifactName;
+}): {
+    attackPowerPercentage: number;
+    critChance: number;
+    critValuePercentage: number;
+    maxHPPercentage: number;
+    defChance: number;
+    defValuePercentage: number;
+    healEffectiveness: number;
+} {
+    const bonuses = {
+        attackPowerPercentage: 0,
+        critChance: 0,
+        critValuePercentage: 0,
+        maxHPPercentage: 0,
+        defChance: 0,
+        defValuePercentage: 0,
+        healEffectiveness: 0,
+    };
+
+    const setCounts: { [setName: string]: number } = {};
+
+    // Count how many artifacts of each set are equipped
+    for (const artifactName of Object.values(equippedArtifacts)) {
+        const artifact = artifacts[artifactName];
+        if (artifact) {
+            const setName = artifact.artifactSet;
+            setCounts[setName] = (setCounts[setName] || 0) + 1;
+        }
+    }
+
+    // Apply set bonuses based on counts
+    for (const [setName, count] of Object.entries(setCounts)) {
+        const setBonuses = getArtifactSetBonuses(setName as ArtifactSetName);
+        if (setBonuses) {
+            if (count >= 2) {
+                const bonus2pc = setBonuses["2pc"];
+                for (const [key, value] of Object.entries(bonus2pc)) {
+                    bonuses[key as keyof typeof bonuses] += value as number;
+                }
+            }
+            if (count >= 4) {
+                const bonus4pc = setBonuses["4pc"];
+                for (const [key, value] of Object.entries(bonus4pc)) {
+                    bonuses[key as keyof typeof bonuses] += value as number;
+                }
+            }
+        }
+    }
+
+    return bonuses;
+}

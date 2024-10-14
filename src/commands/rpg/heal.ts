@@ -6,6 +6,7 @@ import {
     getProfileByUserId,
     getUserStats,
     removeBalance,
+    syncStats,
     updateUserStats,
 } from "../../services";
 
@@ -25,18 +26,28 @@ export const heal = buildCommand<SlashCommand>({
             );
         }
 
-        const stats = await getUserStats(i.user.id);
+        let stats = await getUserStats(i.user.id);
 
         if (!stats) {
             return r.edit(
                 embedComment(
-                    `No stats found for you, please setup your profile.`,
+                    `No stats found for you, please set up your profile.`,
                 ),
             );
         }
 
         if (stats.isHunting) {
             return r.edit(embedComment("You cannot heal while hunting!"));
+        }
+
+        stats = await syncStats(i.user.id);
+
+        if (!stats) {
+            return r.edit(
+                embedComment(
+                    `Failed to sync your stats. Please try again later.`,
+                ),
+            );
         }
 
         const baseHealCost = Math.floor(Math.random() * (50 - 40 + 1)) + 40;
@@ -50,15 +61,19 @@ export const heal = buildCommand<SlashCommand>({
         if (userProfile.balance < healCost) {
             return r.edit(
                 embedComment(
-                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal.\n-# You need at least \`${healCost}\` ${texts.c.u}.`,
+                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal.\n- You need at least \`${healCost}\` ${texts.c.u}.`,
                 ),
             );
         }
 
         const maxHP = stats.maxHP;
-        const healAmount = Math.floor(
-            Math.random() * (0.75 - 0.25 + 0.01) * maxHP + 0.25 * maxHP,
-        );
+        const baseHealPercentage = Math.random() * (0.75 - 0.25) + 0.25;
+        let healAmount = Math.floor(baseHealPercentage * maxHP);
+
+        healAmount += healAmount * stats.healEffectiveness;
+
+        healAmount = Math.max(1, Math.floor(healAmount));
+
         const newHp = Math.min(stats.hp + healAmount, maxHP);
 
         await Promise.all([

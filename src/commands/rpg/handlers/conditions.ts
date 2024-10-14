@@ -171,7 +171,7 @@ export async function handleDefeat(
     const additionalDeduction = 25 * rebirths;
     const totalDeduction = baseDeduction + additionalDeduction;
 
-    const amountToDeduct = Math.min(totalDeduction, userWallet.balance);
+    const amountToDeduct = Math.min(totalDeduction);
 
     if (amountToDeduct > 0) {
         await removeBalance(
