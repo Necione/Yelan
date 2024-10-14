@@ -1,9 +1,9 @@
 import { addButtonRow, formatNumber, get } from "@elara-services/utils";
-import { ButtonStyle, Colors, EmbedBuilder } from "discord.js";
 import { customEmoji, texts } from "@liyueharbor/econ";
+import { ButtonStyle, Colors, EmbedBuilder } from "discord.js";
 import { boosterExpiryDuration } from "../../services/booster";
 
-export const duration = get.hrs(1); // 1h
+export const duration = get.hrs(1);
 export const boosterPrices: {
     name: string;
     price: number;

@@ -211,6 +211,7 @@ model UserStats {
   isHunting                       Boolean        @default(false)
   alchemyProgress                 Int            @default(0)
   lifetimeRequestsCompleted       Int            @default(0)
+  beatenBosses                    String[]       @default([])
 }
 
 type UserRequest {

@@ -392,3 +392,50 @@ export async function getDropsForAbyssFloor(
 }
 
 export { abyssMonsters, abyssMonstersLoaded };
+
+export async function getMonsterByName(
+    name: string,
+): Promise<MonsterInstance | null> {
+    if (!monstersLoaded) {
+        await initializeMonsters();
+    }
+
+    const monster = monsters.find((monster) => monster.name === name);
+
+    if (!monster) {
+        log(`Monster with name "${name}" not found.`);
+        return null;
+    }
+
+    if (typeof monster.getStatsForWorldLevel !== "function") {
+        console.error(
+            `getStatsForWorldLevel is not a function for monster: ${monster.name}`,
+        );
+        return null;
+    }
+
+    const worldLevel = monster.minWorldLevel;
+
+    const stats = monster.getStatsForWorldLevel(worldLevel);
+
+    if (stats) {
+        const monsterInstance: MonsterInstance = {
+            ...monster,
+            minHp: stats.minHp,
+            maxHp: stats.maxHp,
+            minDamage: stats.minDamage,
+            maxDamage: stats.maxDamage,
+            currentHp: stats.minHp,
+        };
+
+        log(
+            `Created MonsterInstance for ${monster.name} at world level ${worldLevel}.`,
+        );
+        return monsterInstance;
+    } else {
+        console.error(
+            `Stats for world level ${worldLevel} not found for monster: ${monster.name}`,
+        );
+        return null;
+    }
+}
