@@ -5,6 +5,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 1,
         chestChance: 25,
+        rarity: 1,
     },
     "Stained Mask": {
         sellPrice: 10,
@@ -12,6 +13,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 2,
         chestChance: 15,
+        rarity: 2,
     },
     "Ominous Mask": {
         sellPrice: 20,
@@ -19,6 +21,7 @@ export const drops = {
         maxAmount: 1,
         minWorldLevel: 3,
         chestChance: 5,
+        rarity: 3,
     },
     "Slime Condensate": {
         sellPrice: 3,
@@ -26,6 +29,7 @@ export const drops = {
         maxAmount: 3,
         minWorldLevel: 1,
         chestChance: 25,
+        rarity: 1,
     },
     "Slime Secretions": {
         sellPrice: 6,
@@ -33,6 +37,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 2,
         chestChance: 15,
+        rarity: 2,
     },
     "Slime Concentrate": {
         sellPrice: 9,
@@ -40,6 +45,7 @@ export const drops = {
         maxAmount: 1,
         minWorldLevel: 3,
         chestChance: 5,
+        rarity: 3,
     },
     "Firm Arrowhead": {
         sellPrice: 5,
@@ -47,6 +53,7 @@ export const drops = {
         maxAmount: 3,
         minWorldLevel: 1,
         chestChance: 25,
+        rarity: 1,
     },
     "Sharp Arrowhead": {
         sellPrice: 10,
@@ -54,6 +61,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 2,
         chestChance: 15,
+        rarity: 2,
     },
     "Weathered Arrowhead": {
         sellPrice: 15,
@@ -61,6 +69,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 2,
         chestChance: 15,
+        rarity: 3,
     },
     "Divining Scroll": {
         sellPrice: 5,
@@ -68,6 +77,7 @@ export const drops = {
         maxAmount: 3,
         minWorldLevel: 1,
         chestChance: 5,
+        rarity: 1,
     },
     "Sealed Scroll": {
         sellPrice: 10,
@@ -75,6 +85,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 3,
         chestChance: 5,
+        rarity: 2,
     },
     "Forbidden Curse Scroll": {
         sellPrice: 15,
@@ -82,6 +93,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 3,
         chestChance: 5,
+        rarity: 3,
     },
     "Heavy Horn": {
         sellPrice: 5,
@@ -89,6 +101,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 6,
         chestChance: 5,
+        rarity: 1,
     },
     "Black Bronze Horn": {
         sellPrice: 10,
@@ -96,6 +109,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 6,
         chestChance: 0,
+        rarity: 2,
     },
     "Black Crystal Horn": {
         sellPrice: 15,
@@ -103,6 +117,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 6,
         chestChance: 0,
+        rarity: 3,
     },
     "Treasure Hoarder Insignia": {
         sellPrice: 5,
@@ -110,6 +125,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 7,
         chestChance: 0,
+        rarity: 1,
     },
     "Silver Raven Insignia": {
         sellPrice: 10,
@@ -117,6 +133,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 7,
         chestChance: 0,
+        rarity: 2,
     },
     "Golden Raven Insignia": {
         sellPrice: 15,
@@ -124,6 +141,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 7,
         chestChance: 0,
+        rarity: 3,
     },
     "Dead Ley Line Branch": {
         sellPrice: 5,
@@ -131,6 +149,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 7,
         chestChance: 0,
+        rarity: 1,
     },
     "Dead Ley Line Leaves": {
         sellPrice: 10,
@@ -138,6 +157,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 7,
         chestChance: 0,
+        rarity: 2,
     },
     "Ley Line Sprout": {
         sellPrice: 15,
@@ -145,6 +165,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 7,
         chestChance: 0,
+        rarity: 3,
     },
     "Recruit's Insignia": {
         sellPrice: 20,
@@ -152,6 +173,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 5,
+        rarity: 1,
     },
     "Sergeant's Insignia": {
         sellPrice: 25,
@@ -159,6 +181,15 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 0,
+        rarity: 2,
+    },
+    "Lieutenant's Insignia": {
+        sellPrice: 30,
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 11,
+        chestChance: 0,
+        rarity: 3,
     },
     "Dismal Prism": {
         sellPrice: 20,
@@ -166,6 +197,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 0,
+        rarity: 1,
     },
     "Crystal Prism": {
         sellPrice: 25,
@@ -173,6 +205,15 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 0,
+        rarity: 2,
+    },
+    "Polarizing Prism": {
+        sellPrice: 30,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 11,
+        chestChance: 0,
+        rarity: 3,
     },
     "Mist Grass Pollen": {
         sellPrice: 20,
@@ -180,6 +221,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 5,
+        rarity: 1,
     },
     "Mist Grass": {
         sellPrice: 25,
@@ -187,6 +229,15 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 0,
+        rarity: 2,
+    },
+    "Mist Grass Wick": {
+        sellPrice: 30,
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 11,
+        chestChance: 0,
+        rarity: 3,
     },
     "Hunter's Sacrificial Knife": {
         sellPrice: 20,
@@ -194,6 +245,7 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 5,
+        rarity: 1,
     },
     "Agent's Sacrificial Knife": {
         sellPrice: 25,
@@ -201,13 +253,39 @@ export const drops = {
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 0,
+        rarity: 2,
+    },
+    "Inspector's Sacrificial Knife": {
+        sellPrice: 25,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 11,
+        chestChance: 0,
+        rarity: 3,
     },
     "A Flower Yet to Bloom": {
+        sellPrice: 15,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 11,
+        chestChance: 0,
+        rarity: 1,
+    },
+    "Treasured Flower": {
         sellPrice: 20,
         minAmount: 1,
         maxAmount: 2,
         minWorldLevel: 11,
         chestChance: 0,
+        rarity: 2,
+    },
+    "Wanderer's Blooming Flower": {
+        sellPrice: 25,
+        minAmount: 1,
+        maxAmount: 2,
+        minWorldLevel: 11,
+        chestChance: 0,
+        rarity: 3,
     },
     "Faded Red Satin": {
         sellPrice: 5,
@@ -215,6 +293,39 @@ export const drops = {
         maxAmount: 0,
         minWorldLevel: 13,
         chestChance: 0,
+        rarity: 1,
+    },
+    "Trimmed Red Silk": {
+        sellPrice: 10,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 13,
+        chestChance: 0,
+        rarity: 2,
+    },
+    "Rich Red Brocade": {
+        sellPrice: 15,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 13,
+        chestChance: 0,
+        rarity: 3,
+    },
+    "Chaos Device": {
+        sellPrice: 5,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 11,
+        chestChance: 0,
+        rarity: 1,
+    },
+    "Chaos Circuit": {
+        sellPrice: 5,
+        minAmount: 0,
+        maxAmount: 0,
+        minWorldLevel: 11,
+        chestChance: 0,
+        rarity: 2,
     },
     "Chaos Core": {
         sellPrice: 5,
@@ -222,6 +333,7 @@ export const drops = {
         maxAmount: 0,
         minWorldLevel: 11,
         chestChance: 0,
+        rarity: 3,
     },
     "Chaos Gear": {
         sellPrice: 25,
@@ -229,6 +341,7 @@ export const drops = {
         maxAmount: 0,
         minWorldLevel: 1,
         chestChance: 0,
+        rarity: 1,
     },
     "Chaos Axis": {
         sellPrice: 30,
@@ -236,20 +349,15 @@ export const drops = {
         maxAmount: 0,
         minWorldLevel: 1,
         chestChance: 0,
+        rarity: 2,
     },
-    "Chaos Device": {
-        sellPrice: 25,
-        minAmount: 0,
-        maxAmount: 0,
-        minWorldLevel: 1,
-        chestChance: 0,
-    },
-    "Chaos Circuit": {
+    "Chaos Oculus": {
         sellPrice: 30,
         minAmount: 0,
         maxAmount: 0,
         minWorldLevel: 1,
         chestChance: 0,
+        rarity: 3,
     },
     "Domain Key": {
         sellPrice: 5,
@@ -257,6 +365,7 @@ export const drops = {
         maxAmount: 0,
         minWorldLevel: 1,
         chestChance: 2,
+        rarity: 1,
     },
 };
 
