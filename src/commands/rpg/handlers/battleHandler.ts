@@ -47,10 +47,19 @@ export function playerAttack(
     attackPower = modifiersResult.attackPower;
     monsterState = modifiersResult.monsterState;
 
-    const { isCrit, multiplier } = calculateCriticalHit(
-        stats.critChance || 0,
-        stats.critValue || 1,
-    );
+    let critChance = stats.critChance || 0;
+    const critValue = stats.critValue || 1;
+
+    const isNobushi = ["Nobushi"].includes(monster.group);
+
+    if (isNobushi) {
+        critChance = 0;
+        messages.push(
+            `\`👹\` The Ninja's Code prevents you from landing a critical hit.`,
+        );
+    }
+
+    const { isCrit, multiplier } = calculateCriticalHit(critChance, critValue);
     attackPower *= multiplier;
 
     if (currentPlayerHp > stats.maxHP) {
@@ -271,7 +280,9 @@ export function applyAttackModifiers(
         stats.skills.some((skill) => skill.name === "Backstab") &&
         stats.activeSkills.includes("Backstab");
 
-    const isHumanOrFatui = ["Human", "Fatui"].includes(monster.group);
+    const isHumanOrFatui = ["Human", "Fatui", "Nobushi"].includes(
+        monster.group,
+    );
 
     if (hasBackstab && isHumanOrFatui) {
         attackPower *= 1.5;

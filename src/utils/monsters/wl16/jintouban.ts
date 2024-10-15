@@ -3,7 +3,7 @@ import { MonsterGroup } from "../../groups";
 export default {
     currentHp: 0,
     name: "Nobushi: Jintouban",
-    group: MonsterGroup.Human,
+    group: MonsterGroup.Nobushi,
     minExp: 10,
     maxExp: 20,
     minWorldLevel: 16,
