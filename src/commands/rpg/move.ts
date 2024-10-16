@@ -117,6 +117,13 @@ export const move = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.hp <= 0) {
+            locked.del(i.user.id);
+            return r.edit(
+                embedComment("You're dead... Go back up to the surface and recover."),
+            );
+        }
+
         let currentX = stats.abyssCoordX;
         let currentY = stats.abyssCoordY;
 

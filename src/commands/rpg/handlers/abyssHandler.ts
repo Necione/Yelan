@@ -14,7 +14,7 @@ import {
     type Monster,
 } from "../../../utils/hunt";
 import { monsterAttack, playerAttack } from "./battleHandler";
-import { handleAbyssVictory, handleDefeat } from "./conditions";
+import { handleAbyssDefeat, handleAbyssVictory } from "./conditions";
 
 export async function handleAbyssBattle(
     i: ChatInputCommandInteraction,
@@ -335,13 +335,11 @@ export async function handleAbyssBattle(
             }
         } else {
             if (thread) {
-                await handleDefeat(
+                await handleAbyssDefeat(
                     i,
                     thread,
-                    stats,
                     monstersEncountered[currentMonsterIndex],
                     currentPlayerHp,
-                    userWallet,
                 );
             }
         }

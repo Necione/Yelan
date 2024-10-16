@@ -256,3 +256,26 @@ export async function handleDefeat(
 
     await thread.edit({ archived: true, locked: true }).catch(noop);
 }
+
+export async function handleAbyssDefeat(
+    i: ChatInputCommandInteraction,
+    thread: ThreadChannel,
+    monster: Monster,
+    currentPlayerHp: number,
+) {
+    const finalEmbed = new EmbedBuilder()
+        .setColor("Red")
+        .setTitle(`Defeat...`)
+        .setDescription(
+            `Oh no :( You were defeated by the **${monster.name}**...\n`,
+        );
+
+    await updateUserStats(i.user.id, {
+        hp: Math.max(currentPlayerHp, 0),
+        isHunting: false,
+    });
+
+    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+    await thread.edit({ archived: true, locked: true }).catch(noop);
+
+}
