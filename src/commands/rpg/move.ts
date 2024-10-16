@@ -252,7 +252,7 @@ export const move = buildCommand<SlashCommand>({
                 );
             }
 
-            if (Math.random() < 0.25) {
+            if (Math.random() < 0.5) {
                 locked.set(i.user);
 
                 if (!i.deferred) {

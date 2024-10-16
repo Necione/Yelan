@@ -141,7 +141,7 @@ export const abyss = buildCommand<SlashCommand>({
                     embeds: [
                         {
                             description:
-                                "You have entered the Abyss. This is your private channel to run movement commands in, please utilize this channel for </move:1295986595383611412>.",
+                                "You have entered the Abyss. This is your private channel to run movement commands in, please utilize this channel for </move:1295986595383611412>. You can also use </whereami:1295986595383611414> to see your current location.",
                         },
                     ],
                 });
