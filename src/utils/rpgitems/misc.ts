@@ -114,7 +114,7 @@ export const misc = {
         dropChance: 7,
     },
     Geode: {
-        sellPrice: 50,
+        sellPrice: 125,
         minAmount: 1,
         maxAmount: 1,
         dropChance: 0,
