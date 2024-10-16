@@ -102,11 +102,11 @@ export const sellall = buildCommand<SlashCommand>({
         }
 
         let totalSellPrice = 0;
-        let messages = [];
+        const messages = [];
         const rebirthMultiplier = 1 + Math.min(stats.rebirths, 3) * 0.2;
         let totalRebirthBonus = 0;
         let totalAppraiseBonus = 0;
-        let itemsSold = [];
+        const itemsSold = [];
 
         const hasAppraiseSkill = stats.skills.some(
             (skill) => skill.name === "Appraise",

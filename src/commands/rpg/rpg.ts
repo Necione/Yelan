@@ -66,11 +66,7 @@ export const rpg = buildCommand<SlashCommand>({
                     stats.worldLevel
                 }\` | <:Item_Adventure_EXP:1287247325135114356> EXP: \`${
                     stats.exp
-                }/${expRequired.toFixed(
-                    0,
-                )}\`\n<:Achievement_Domains_and_Spiral_A:1287247461399662622> Abyss Floor: \`${
-                    stats.abyssFloor
-                }\`\n📍 Location: \`${
+                }/${expRequired.toFixed(0)}\`\n📍 Location: \`${
                     stats.location
                 }\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
                     2,
