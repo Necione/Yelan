@@ -103,7 +103,7 @@ export async function handleHunt(
             return;
         }
 
-        if (stats.rebirths >= 2 && Math.random() < 0.1) {
+        if (stats.rebirths >= 2 && Math.random() < 0.05) {
             monster.name = `Mutated ${monster.name}`;
             monster.isMutated = true;
         }
