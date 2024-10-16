@@ -33,7 +33,6 @@ export async function handleAbyssBattle(
         "Dendro Samachurl",
         "Ruin Scout",
         "Cryo Abyss Mage",
-        "Pyro Abyss Mage",
         "Hydro Abyss Mage",
     ];
     let monstersEncountered: Monster[] = [];
