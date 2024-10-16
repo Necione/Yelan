@@ -153,8 +153,7 @@ export async function handleAbyssBattle(
 
         let vigilanceUsed = false;
 
-        const isMonsterFirst = true;
-        let isPlayerTurn = !isMonsterFirst;
+        let isPlayerTurn = false;
 
         let monsterState = {
             displaced: false,
@@ -211,7 +210,7 @@ export async function handleAbyssBattle(
 
                 if (playerMessages.length > 0) {
                     await thread
-                        .send(">>> " + playerMessages.join("\n"))
+                        ?.send(">>> " + playerMessages.join("\n"))
                         .catch(noop);
                 }
 
@@ -256,11 +255,11 @@ export async function handleAbyssBattle(
                     break;
                 }
 
-                isPlayerTurn = false;
+                isPlayerTurn = false; 
             } else {
                 const monsterMessages: string[] = [];
 
-                currentPlayerHp = await monsterAttack(
+                const updatedPlayerHp = await monsterAttack(
                     stats,
                     monster,
                     currentPlayerHp,
@@ -268,6 +267,10 @@ export async function handleAbyssBattle(
                     turnNumber,
                     hasCrystallize,
                 );
+
+                if (updatedPlayerHp !== undefined) {
+                    currentPlayerHp = updatedPlayerHp;
+                }
 
                 if (monsterMessages.length > 0) {
                     await thread
@@ -303,7 +306,7 @@ export async function handleAbyssBattle(
                     break;
                 }
 
-                isPlayerTurn = true;
+                isPlayerTurn = true; 
             }
 
             await new Promise((resolve) => setTimeout(resolve, get.secs(2)));
