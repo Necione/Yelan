@@ -1,12 +1,16 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, get } from "@elara-services/utils";
 import {
     ChannelType,
     PermissionFlagsBits,
     SlashCommandBuilder,
 } from "discord.js";
-import { getUserStats, updateUserStats } from "../../services";
-import { locked } from "../../utils";
+import {
+    getProfileByUserId,
+    getUserStats,
+    updateUserStats,
+} from "../../services";
+import { cooldowns, locked } from "../../utils";
 
 export const abyss = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -21,6 +25,14 @@ export const abyss = buildCommand<SlashCommand>({
         if (!i.deferred) {
             locked.del(i.user.id);
             return;
+        }
+
+        const userWallet = await getProfileByUserId(i.user.id);
+        if (!userWallet) {
+            locked.del(i.user.id);
+            return r.edit(
+                embedComment("Unable to find/create your user profile."),
+            );
         }
 
         const stats = await getUserStats(i.user.id);
@@ -50,6 +62,18 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         const newAbyssMode = !stats.abyssMode;
+
+        if (newAbyssMode) {
+            const cooldownKey = "abyss";
+            const cc = cooldowns.get(userWallet, cooldownKey);
+            if (!cc.status) {
+                locked.del(i.user.id);
+                return r.edit(embedComment(cc.message));
+            }
+
+            const abyssCooldown = get.hrs(1);
+            await cooldowns.set(userWallet, cooldownKey, abyssCooldown);
+        }
 
         await updateUserStats(i.user.id, {
             abyssMode: newAbyssMode,
@@ -98,16 +122,6 @@ export const abyss = buildCommand<SlashCommand>({
 
                 responseMessage += `\nA private channel has been created for you: ${channel}`;
 
-                await channel.send({
-                    content: `${i.user}`,
-                    embeds: [
-                        {
-                            description:
-                                "You have entered the Abyss. This is your private channel to run abyss-related commands in, please utilize this instead of the normal channels.",
-                        },
-                    ],
-                });
-
                 const extraChannel = guild.channels.cache.get(extraChannelId);
                 if (
                     extraChannel &&
@@ -121,6 +135,16 @@ export const abyss = buildCommand<SlashCommand>({
                         "Extra channel does not exist or is not a text channel.",
                     );
                 }
+
+                await channel.send({
+                    content: `${i.user}`,
+                    embeds: [
+                        {
+                            description:
+                                "You have entered the Abyss. This is your private channel to run movement commands in, please utilize this channel for </move:1295986595383611412>.",
+                        },
+                    ],
+                });
 
                 await r.edit(embedComment(responseMessage, "Green"));
             } catch (error) {

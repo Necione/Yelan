@@ -29,6 +29,17 @@ export async function handleAbyssChest(
 
     const chestLoot = await generateChestLoot(stats.worldLevel);
 
+    if (Math.random() < 0.01) {
+        chestLoot.loot.push({ item: "Engulfing Lightning", amount: 1 });
+    }
+
+    const geodeAmount = Math.random() < 0.75 ? 1 : 2;
+    chestLoot.loot.push({ item: "Geode", amount: geodeAmount });
+
+    if (Math.random() < 0.5) {
+        chestLoot.loot.push({ item: "Chaos Oculus", amount: 1 });
+    }
+
     await addBalance(
         i.user.id,
         chestLoot.coins,
