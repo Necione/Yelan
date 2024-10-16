@@ -34,6 +34,7 @@ export async function handleAbyssBattle(
         "Ruin Scout",
         "Cryo Abyss Mage",
         "Hydro Abyss Mage",
+        "Pyro Abyss Mage",
     ];
     let monstersEncountered: Monster[] = [];
 

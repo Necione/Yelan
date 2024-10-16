@@ -54,6 +54,15 @@ export const abyss = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.worldLevel < 10) {
+            return r.edit(
+                embedComment(
+                    `You need to be at least World Level 10 to enter the Abyss.`,
+                    "Red",
+                ),
+            );
+        }
+
         if (stats.isHunting) {
             locked.del(i.user.id);
             return r.edit(
