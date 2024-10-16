@@ -34,7 +34,7 @@ export async function handleAbyssBattle(
         "Ruin Scout",
         "Cryo Abyss Mage",
         "Pyro Abyss Mage",
-        "Hydro Abyss Mage"
+        "Hydro Abyss Mage",
     ];
     let monstersEncountered: Monster[] = [];
 
@@ -153,8 +153,7 @@ export async function handleAbyssBattle(
 
         let vigilanceUsed = false;
 
-        let isMonsterFirst = true
-
+        const isMonsterFirst = true;
         let isPlayerTurn = !isMonsterFirst;
 
         let monsterState = {
