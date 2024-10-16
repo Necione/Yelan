@@ -1,10 +1,16 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
-import { SlashCommandBuilder } from "discord.js";
-import { getUserStats, updateUserStats } from "../../services";
+import { embedComment, noop } from "@elara-services/utils";
+import { Message, SlashCommandBuilder } from "discord.js";
+import {
+    getProfileByUserId,
+    getUserStats,
+    syncStats,
+    updateUserStats,
+} from "../../services";
 import { locked } from "../../utils";
 import { handleAbyssChest } from "./abyssHelpers/abyssChest";
 import { floor1Map } from "./abyssHelpers/floor1map";
+import { handleAbyssBattle } from "./handlers/abyssHandler";
 
 const directions = {
     up: { dx: 0, dy: 1 },
@@ -191,9 +197,7 @@ export const move = buildCommand<SlashCommand>({
         } else if (cell === "d" && !stats.hasKey) {
             locked.del(i.user.id);
             return i.editReply(
-                embedComment(
-                    "You stumbled across a massive metal door. It doesn't open no matter how hard you try...",
-                ),
+                embedComment("You need a key to open this door."),
             );
         } else {
             await updateUserStats(i.user.id, {
@@ -217,7 +221,7 @@ export const move = buildCommand<SlashCommand>({
                     await updateUserStats(i.user.id, { hasKey: true });
                     message += "\nYou found an old, rusted key.";
                 } else {
-                    message += "\nYou've already collected this key!";
+                    message += "\nYou've already collected this key.";
                 }
             }
 
@@ -238,9 +242,77 @@ export const move = buildCommand<SlashCommand>({
             }
 
             await i.editReply(embedComment(message, "Green"));
-        }
 
-        locked.del(i.user.id);
+            const reply = await i.fetchReply();
+
+            if (!reply || !(reply instanceof Message)) {
+                locked.del(i.user.id);
+                return i.editReply(
+                    embedComment("Unable to fetch the reply message."),
+                );
+            }
+
+            if (Math.random() < 0.25) {
+                locked.set(i.user);
+
+                if (!i.deferred) {
+                    return;
+                }
+
+                const message = await i.fetchReply().catch(noop);
+                if (!message) {
+                    locked.del(i.user.id);
+                    return r.edit(
+                        embedComment("Unable to fetch the original message."),
+                    );
+                }
+
+                const userWallet = await getProfileByUserId(i.user.id);
+                if (!userWallet) {
+                    locked.del(i.user.id);
+                    return r.edit(
+                        embedComment(
+                            "Unable to find/create your user profile.",
+                        ),
+                    );
+                }
+
+                const syncedStats = await syncStats(i.user.id);
+                if (!syncedStats) {
+                    locked.del(i.user.id);
+                    return r.edit(
+                        embedComment(
+                            "No stats found for you, please set up your profile.",
+                        ),
+                    );
+                }
+
+                if (syncedStats.isTravelling) {
+                    locked.del(i.user.id);
+                    return r.edit(
+                        embedComment(
+                            "You cannot go on a hunt while you are travelling!",
+                        ),
+                    );
+                }
+
+                if (syncedStats.hp <= 0) {
+                    locked.del(i.user.id);
+                    return r.edit(
+                        embedComment(
+                            "You don't have enough HP to go on a hunt :(",
+                        ),
+                    );
+                }
+
+                await updateUserStats(i.user.id, { isHunting: true });
+                await handleAbyssBattle(i, message, syncedStats, userWallet);
+
+                locked.del(i.user.id);
+            } else {
+                locked.del(i.user.id);
+            }
+        }
     },
 });
 
