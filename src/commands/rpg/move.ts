@@ -120,7 +120,9 @@ export const move = buildCommand<SlashCommand>({
         if (stats.hp <= 0) {
             locked.del(i.user.id);
             return r.edit(
-                embedComment("You're dead... Go back up to the surface and recover."),
+                embedComment(
+                    "You're dead... Go back up to the surface and recover.",
+                ),
             );
         }
 
@@ -313,7 +315,7 @@ export const move = buildCommand<SlashCommand>({
                 }
 
                 await updateUserStats(i.user.id, { isHunting: true });
-                await handleAbyssBattle(i, message, syncedStats, userWallet);
+                await handleAbyssBattle(i, message, syncedStats);
 
                 locked.del(i.user.id);
             } else {

@@ -277,5 +277,4 @@ export async function handleAbyssDefeat(
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
     await thread.edit({ archived: true, locked: true }).catch(noop);
-
 }

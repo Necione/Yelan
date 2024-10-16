@@ -1,5 +1,5 @@
 import { embedComment, get, noop } from "@elara-services/utils";
-import type { UserStats, UserWallet } from "@prisma/client";
+import type { UserStats } from "@prisma/client";
 import type {
     ChatInputCommandInteraction,
     Message,
@@ -20,7 +20,6 @@ export async function handleAbyssBattle(
     i: ChatInputCommandInteraction,
     r: Message<boolean>,
     stats: UserStats,
-    userWallet: UserWallet,
 ) {
     await initializeMonsters();
 
@@ -255,7 +254,7 @@ export async function handleAbyssBattle(
                     break;
                 }
 
-                isPlayerTurn = false; 
+                isPlayerTurn = false;
             } else {
                 const monsterMessages: string[] = [];
 
@@ -306,7 +305,7 @@ export async function handleAbyssBattle(
                     break;
                 }
 
-                isPlayerTurn = true; 
+                isPlayerTurn = true;
             }
 
             await new Promise((resolve) => setTimeout(resolve, get.secs(2)));
