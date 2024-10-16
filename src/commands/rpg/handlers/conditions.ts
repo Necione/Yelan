@@ -150,6 +150,59 @@ export async function handleVictory(
     await cooldowns.set(userWallet, "hunt", huntCooldown);
 }
 
+export async function handleAbyssVictory(
+    i: ChatInputCommandInteraction,
+    thread: ThreadChannel,
+    stats: UserStats,
+    monstersEncountered: Monster[],
+    currentPlayerHp: number,
+) {
+    const finalEmbed = new EmbedBuilder();
+
+    let skillsActivated = "";
+
+    const monstersFought = monstersEncountered
+        .map((monster) => monster.name)
+        .join(", ");
+
+    finalEmbed
+        .setColor("#b84df1")
+        .setTitle(`Victory in The Abyss!`)
+        .setDescription(
+            `You defeated the following monsters:\n\`${monstersFought}\`!`,
+        )
+        .setThumbnail(
+            monstersEncountered[monstersEncountered.length - 1].image,
+        );
+
+    const hasTotemSkill =
+        stats.skills.some((skill) => skill.name === "Totem") &&
+        stats.activeSkills.includes("Totem");
+
+    if (hasTotemSkill) {
+        const healAmount = Math.ceil(stats.maxHP * 0.05);
+        currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
+
+        skillsActivated += `\`💖\` Healed \`${healAmount}\` HP due to the Totem skill.\n`;
+
+        await updateUserStats(i.user.id, {
+            hp: currentPlayerHp,
+        });
+    }
+
+    if (skillsActivated) {
+        finalEmbed.addFields({
+            name: "Skills Activated",
+            value: skillsActivated,
+        });
+    }
+
+    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+    await updateUserStats(i.user.id, { isHunting: false });
+
+    await thread.edit({ archived: true, locked: true }).catch(noop);
+}
+
 export async function handleDefeat(
     i: ChatInputCommandInteraction,
     thread: ThreadChannel,

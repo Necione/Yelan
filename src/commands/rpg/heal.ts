@@ -36,8 +36,8 @@ export const heal = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.isHunting) {
-            return r.edit(embedComment("You cannot heal while hunting!"));
+        if (stats.isHunting || stats.abyssMode) {
+            return r.edit(embedComment("You cannot heal right now!"));
         }
 
         stats = await syncStats(i.user.id);

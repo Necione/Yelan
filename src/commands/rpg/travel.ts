@@ -88,12 +88,8 @@ export const travel = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.isHunting) {
-            return r.edit(
-                embedComment(
-                    "You cannot travel while you are hunting! Please finish your hunt first.",
-                ),
-            );
+        if (stats.isHunting || stats.abyssMode) {
+            return r.edit(embedComment("You cannot travel right now!"));
         }
 
         if (stats.isTravelling) {

@@ -73,9 +73,9 @@ export const explore = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.isHunting) {
+        if (stats.isHunting || stats.abyssMode) {
             locked.del(i.user.id);
-            return r.edit(embedComment("You cannot explore while hunting!"));
+            return r.edit(embedComment("You cannot explore right now!"));
         }
 
         if (stats.hp <= 0) {

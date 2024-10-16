@@ -51,8 +51,10 @@ export const rpg = buildCommand<SlashCommand>({
                   ? `🧡 \`${stats.hp}/${stats.maxHP}\` **LOW HP**`
                   : `❤️ \`${stats.hp}/${stats.maxHP}\``;
 
+        const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
+
         const embed = new EmbedBuilder()
-            .setColor("Aqua")
+            .setColor(embedColor)
             .setTitle(`${i.user.username}'s RPG Stats`)
             .setDescription(
                 `- Use the </bag:1282456807100387411> command to see your inventory\n- Use the </travel:1281778318160691301> command to find new enemies`,

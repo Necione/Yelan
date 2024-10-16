@@ -142,8 +142,10 @@ export const skills = buildCommand<SlashCommand>({
                   .join("\n")
             : "You haven't learned any skills yet.";
 
+        const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
+
         const embed = new EmbedBuilder()
-            .setColor("Aqua")
+            .setColor(embedColor)
             .setTitle(`${i.user.username}'s Skills`)
             .setThumbnail(i.user.displayAvatarURL())
             .setDescription(

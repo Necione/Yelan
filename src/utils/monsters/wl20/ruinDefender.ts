@@ -6,7 +6,7 @@ export default {
     group: MonsterGroup.Machine,
     minExp: 10,
     maxExp: 25,
-    minWorldLevel: 19,
+    minWorldLevel: 20,
     image: "https://lh.elara.workers.dev/rpg/monsters/ruin_defender.png",
     drops: [
         {

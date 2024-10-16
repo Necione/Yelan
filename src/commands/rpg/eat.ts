@@ -78,8 +78,8 @@ export const eat = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.isHunting) {
-            return r.edit(embedComment("You cannot eat while hunting!"));
+        if (stats.isHunting || stats.abyssMode) {
+            return r.edit(embedComment("You cannot eat right now!"));
         }
 
         const inventoryItem = stats.inventory.find(

@@ -65,6 +65,15 @@ export const hunt = buildCommand<SlashCommand>({
             return r.edit(embedComment("You are already hunting!"));
         }
 
+        if (stats.abyssMode) {
+            locked.del(i.user.id);
+            return r.edit(
+                embedComment(
+                    "You cannot start a hunt while in The Spiral Abyss!",
+                ),
+            );
+        }
+
         if (stats.hp <= 0) {
             locked.del(i.user.id);
             return r.edit(

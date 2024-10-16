@@ -46,8 +46,8 @@ export const cook = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.isHunting) {
-            return r.edit(embedComment("You cannot cook while hunting!"));
+        if (stats.isHunting || stats.abyssMode) {
+            return r.edit(embedComment("You cannot cook right now!"));
         }
 
         const currentTime = new Date();

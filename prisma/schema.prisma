@@ -213,6 +213,11 @@ model UserStats {
   alchemyProgress                 Int            @default(0)
   lifetimeRequestsCompleted       Int            @default(0)
   beatenBosses                    String[]       @default([])
+  abyssMode                       Boolean        @default(false) 
+  abyssCoordX                     Int?
+  abyssCoordY                     Int?
+  collectedChests                 String[]       @default([])
+  hasKey                          Boolean        @default(false)
 }
 
 type UserRequest {

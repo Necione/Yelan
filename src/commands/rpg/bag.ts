@@ -116,10 +116,11 @@ export const bag = buildCommand<SlashCommand>({
 
         const chunks = chunk(filteredItems, 10);
         const pager = getPaginatedMessage();
+        const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
 
         for (const c of chunks) {
             const embed = new EmbedBuilder()
-                .setColor("Aqua")
+                .setColor(embedColor)
                 .setTitle(
                     `${i.user.username}'s Inventory - ${category} (${sortOption})`,
                 )
