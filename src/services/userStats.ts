@@ -19,7 +19,6 @@ export async function syncStats(userId: string) {
         return null;
     }
 
-    // Base stats calculations
     const calculatedBaseAttack = 5 + (stats.worldLevel - 1) * 0.5;
     const alchemyBaseAttack = stats.alchemyProgress * 0.25;
     const finalBaseAttack = calculatedBaseAttack + alchemyBaseAttack;
@@ -27,18 +26,16 @@ export async function syncStats(userId: string) {
     const calculatedMaxHP =
         100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
 
-    // Initialize total stats
     const totalStats = {
         attackPower: finalBaseAttack,
-        critChance: 1, // Base crit chance
-        critValue: 1, // Base crit damage multiplier
+        critChance: 1,
+        critValue: 1,
         defChance: 0,
         defValue: 0,
         maxHP: calculatedMaxHP,
         healEffectiveness: 0,
     };
 
-    // Add weapon stats
     if (stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]) {
         const weapon = weapons[stats.equippedWeapon as WeaponName];
         totalStats.attackPower += weapon.attackPower || 0;
@@ -47,10 +44,9 @@ export async function syncStats(userId: string) {
         totalStats.defChance += weapon.defChance || 0;
         totalStats.defValue += weapon.defValue || 0;
         totalStats.maxHP += weapon.additionalHP || 0;
-        totalStats.healEffectiveness || 0; // Include if weapons can have healEffectiveness
+        totalStats.healEffectiveness || 0;
     }
 
-    // Collect equipped artifacts
     const artifactTypes: ArtifactType[] = [
         "Flower",
         "Plume",
@@ -77,7 +73,6 @@ export async function syncStats(userId: string) {
         }
     }
 
-    // Calculate and apply set bonuses
     const setCounts: { [setName: string]: number } = {};
 
     for (const artifactName of Object.values(equippedArtifacts)) {
@@ -89,12 +84,11 @@ export async function syncStats(userId: string) {
     for (const [setName, count] of Object.entries(setCounts)) {
         const setBonuses = artifactSets[setName as ArtifactSetName];
         if (setBonuses) {
-            // Apply 2-piece bonus
             if (count >= 2) {
                 const bonus2pc = setBonuses["2pc"];
                 applySetBonuses(totalStats, bonus2pc);
             }
-            // Apply 4-piece bonus
+
             if (count >= 4) {
                 const bonus4pc = setBonuses["4pc"];
                 applySetBonuses(totalStats, bonus4pc);
@@ -102,16 +96,14 @@ export async function syncStats(userId: string) {
         }
     }
 
-    // Ensure stats are within acceptable ranges
     totalStats.attackPower = Math.max(0, totalStats.attackPower);
     totalStats.critChance = Math.max(0, totalStats.critChance);
     totalStats.critValue = Math.max(0, totalStats.critValue);
     totalStats.defChance = Math.max(0, totalStats.defChance);
-    totalStats.defValue = Math.max(0, totalStats.defValue);
+    totalStats.defValue = Math.min(Math.max(0, totalStats.defValue), 0.9);
     totalStats.maxHP = Math.floor(totalStats.maxHP);
     totalStats.healEffectiveness = Math.max(0, totalStats.healEffectiveness);
 
-    // Check if stats have changed
     let needsUpdate = false;
 
     if (stats.baseAttack !== finalBaseAttack) {
@@ -319,7 +311,6 @@ export function calculateSetBonuses(equippedArtifacts: {
 
     const setCounts: { [setName: string]: number } = {};
 
-    // Count how many artifacts of each set are equipped
     for (const artifactName of Object.values(equippedArtifacts)) {
         const artifact = artifacts[artifactName];
         if (artifact) {
@@ -328,7 +319,6 @@ export function calculateSetBonuses(equippedArtifacts: {
         }
     }
 
-    // Apply set bonuses based on counts
     for (const [setName, count] of Object.entries(setCounts)) {
         const setBonuses = getArtifactSetBonuses(setName as ArtifactSetName);
         if (setBonuses) {

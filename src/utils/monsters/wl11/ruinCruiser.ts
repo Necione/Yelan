@@ -10,7 +10,7 @@ export default {
     image: "https://lh.elara.workers.dev/rpg/monsters/ruin_cruiser.png",
     drops: [
         {
-            item: "Chaos Core",
+            item: "Chaos Device",
             minAmount: 1,
             maxAmount: 1,
             chance: 50,

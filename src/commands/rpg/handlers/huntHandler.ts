@@ -47,11 +47,15 @@ export async function handleHunt(
 
     const numberOfMonsters = isBossEncounter
         ? 1
-        : stats.worldLevel >= 10
-          ? Math.floor(Math.random() * 2) + 2
-          : stats.worldLevel >= 5
-            ? Math.floor(Math.random() * 2) + 1
-            : 1;
+        : stats.worldLevel >= 20
+          ? Math.floor(Math.random() * 2) + 3
+          : stats.worldLevel === 15
+            ? 3
+            : stats.worldLevel >= 10
+              ? Math.floor(Math.random() * 2) + 2
+              : stats.worldLevel >= 5
+                ? Math.floor(Math.random() * 2) + 1
+                : 1;
 
     const monstersEncountered: Monster[] = [];
 

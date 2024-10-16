@@ -56,32 +56,32 @@ export function getSetBonusMessages(
     const beforeSets = getActivatedSets(beforeStats);
     const afterSets = getActivatedSets(afterStats);
 
-    const differenceSets =
-        action === "activated"
-            ? afterSets.filter((set) => !beforeSets.includes(set))
-            : beforeSets.filter((set) => !afterSets.includes(set));
+    const allSetNames = new Set([
+        ...Object.keys(beforeSets),
+        ...Object.keys(afterSets),
+    ]);
 
-    for (const setName of differenceSets) {
-        const setBonuses = artifactSets[setName as ArtifactSetName];
-        if (setBonuses) {
-            const pieceCounts = action === "activated" ? [2, 4] : [4, 2];
-            for (const count of pieceCounts) {
-                const hadBonus = hasSetPieces(beforeStats, setName, count);
-                const hasBonus = hasSetPieces(afterStats, setName, count);
+    for (const setName of allSetNames) {
+        const beforeCount = beforeSets[setName] || 0;
+        const afterCount = afterSets[setName] || 0;
 
-                if (
-                    (action === "activated" && hasBonus && !hadBonus) ||
-                    (action === "deactivated" && !hasBonus && hadBonus)
-                ) {
-                    const bonusType = `${count}pc` as "2pc" | "4pc";
-                    const verb =
-                        action === "activated" ? "Activated" : "Deactivated";
-                    messages.push(
-                        `\n${verb} ${count}-piece set bonus: **${setName}**`,
-                    );
-                    if (action === "activated") {
-                        messages.push(describeSetBonus(setName, bonusType));
-                    }
+        const thresholds = [2, 4];
+        for (const threshold of thresholds) {
+            const hadBonus = beforeCount >= threshold;
+            const hasBonus = afterCount >= threshold;
+
+            if (
+                (action === "activated" && hasBonus && !hadBonus) ||
+                (action === "deactivated" && !hasBonus && hadBonus)
+            ) {
+                const bonusType = `${threshold}pc` as "2pc" | "4pc";
+                const verb =
+                    action === "activated" ? "Activated" : "Deactivated";
+                messages.push(
+                    `\n${verb} ${threshold}-piece set bonus: **${setName}**`,
+                );
+                if (action === "activated") {
+                    messages.push(describeSetBonus(setName, bonusType));
                 }
             }
         }
@@ -90,7 +90,7 @@ export function getSetBonusMessages(
     return messages;
 }
 
-function getActivatedSets(stats: any): string[] {
+function getActivatedSets(stats: any): { [setName: string]: number } {
     const artifactTypes: ArtifactType[] = [
         "Flower",
         "Plume",
@@ -110,29 +110,7 @@ function getActivatedSets(stats: any): string[] {
         }
     }
 
-    return Object.keys(setCounts).filter((setName) => setCounts[setName] >= 2);
-}
-
-function hasSetPieces(stats: any, setName: string, pieces: number): boolean {
-    const artifactTypes: ArtifactType[] = [
-        "Flower",
-        "Plume",
-        "Sands",
-        "Goblet",
-        "Circlet",
-    ];
-    let count = 0;
-    for (const type of artifactTypes) {
-        const field = `equipped${type}` as keyof typeof stats;
-        const artifactName = stats[field];
-        if (artifactName && artifacts[artifactName as ArtifactName]) {
-            const artifact = artifacts[artifactName as ArtifactName];
-            if (artifact.artifactSet === setName) {
-                count++;
-            }
-        }
-    }
-    return count >= pieces;
+    return setCounts;
 }
 
 function describeSetBonus(setName: string, bonusType: "2pc" | "4pc"): string {
