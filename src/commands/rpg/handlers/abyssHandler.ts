@@ -151,18 +151,9 @@ export async function handleAbyssBattle(
             stats.skills.some((skill) => skill.name === "Vigilance") &&
             stats.activeSkills.includes("Vigilance");
 
-        const hasDistraction =
-            stats.skills.some((skill) => skill.name === "Distraction") &&
-            stats.activeSkills.includes("Distraction");
-
         let vigilanceUsed = false;
 
-        let isMonsterFirst: boolean;
-        if (hasDistraction) {
-            isMonsterFirst = Math.random() >= 0.75;
-        } else {
-            isMonsterFirst = Math.random() < 0.5;
-        }
+        let isMonsterFirst = true
 
         let isPlayerTurn = !isMonsterFirst;
 
