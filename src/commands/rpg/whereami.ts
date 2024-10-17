@@ -101,8 +101,8 @@ export const whereami = buildCommand<SlashCommand>({
                 );
             }
 
-            let currentFloor = stats.currentAbyssFloor || 1;
-            let currentMap = getCurrentMap(currentFloor);
+            const currentFloor = stats.currentAbyssFloor || 1;
+            const currentMap = getCurrentMap(currentFloor);
 
             if (!currentMap) {
                 locked.del(i.user.id);
@@ -160,6 +160,8 @@ export const whereami = buildCommand<SlashCommand>({
             } else {
                 message += `\nThere are no available directions to move from here.`;
             }
+
+            await i.editReply(embedComment(message, "Blue"));
 
             locked.del(i.user.id);
         } catch (error) {

@@ -35,7 +35,7 @@ export async function handleAbyssBattle(
         "Hydro Abyss Mage",
         "Pyro Abyss Mage",
     ];
-    
+
     let monstersEncountered: Monster[] = [];
 
     const selectedMonsterName =

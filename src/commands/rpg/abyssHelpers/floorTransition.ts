@@ -1,5 +1,5 @@
 import { embedComment } from "@elara-services/utils";
-import { ChatInputCommandInteraction } from "discord.js";
+import { type ChatInputCommandInteraction } from "discord.js";
 import { updateUserStats } from "../../../services";
 
 type TransitionDirection = "ascend" | "descend";
@@ -15,29 +15,34 @@ export async function handleFloorTransition(
         map: string[][],
         target: string,
         x?: number,
-        y?: number
-    ) => { x: number; y: number } | null
-): Promise<{ newX: number; newY: number, transitionMessage: string } | null> {
+        y?: number,
+    ) => { x: number; y: number } | null,
+): Promise<{ newX: number; newY: number; transitionMessage: string } | null> {
     const newMap = floorMaps[newFloor];
     if (!newMap) {
         await i.editReply(
             embedComment(
                 `Floor **${newFloor}** does not exist. You cannot ${direction} further.`,
-                "Red"
-            )
+                "Red",
+            ),
         );
         return null;
     }
 
     const targetCell = direction === "descend" ? "s" : "f";
-    const startingPosition = findPositionInMap(newMap, targetCell, currentX, currentY);
+    const startingPosition = findPositionInMap(
+        newMap,
+        targetCell,
+        currentX,
+        currentY,
+    );
 
     if (!startingPosition) {
         await i.editReply(
             embedComment(
                 `Starting position (${targetCell}) not found on Floor **${newFloor}**.`,
-                "Red"
-            )
+                "Red",
+            ),
         );
         return null;
     }
@@ -57,4 +62,3 @@ export async function handleFloorTransition(
 
     return { newX, newY, transitionMessage };
 }
-
