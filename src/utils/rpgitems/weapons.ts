@@ -470,7 +470,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Staff_of_Homa:1283341597425008640>",
     },
     // Special Weapons
-    "Englufing Lightning": {
+    "Engulfing Lightning": {
         sellPrice: 25,
         attackPower: 50,
         critChance: 30,

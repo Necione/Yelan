@@ -3,57 +3,10 @@ import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { locked } from "../../utils";
-import { floor1Map } from "./abyssHelpers/floor1map";
-import { floor2Map } from "./abyssHelpers/floor2map";
-
-const floorMaps: { [key: number]: string[][] } = {
-    1: floor1Map,
-    2: floor2Map,
-};
-
-const directions = {
-    up: { dx: 0, dy: 1 },
-    down: { dx: 0, dy: -1 },
-    left: { dx: -1, dy: 0 },
-    right: { dx: 1, dy: 0 },
-};
-
-function getAvailableDirections(
-    x: number,
-    y: number,
-    map: string[][],
-): string[] {
-    const available: string[] = [];
-
-    for (const [direction, delta] of Object.entries(directions)) {
-        const potentialX = x + delta.dx;
-        const potentialY = y + delta.dy;
-
-        if (
-            potentialX < 0 ||
-            potentialX >= map[0].length ||
-            potentialY < 0 ||
-            potentialY >= map.length
-        ) {
-            continue;
-        }
-
-        const rowIndex = map.length - 1 - potentialY;
-        const cell = map[rowIndex][potentialX].toLowerCase();
-
-        if (cell !== "w") {
-            available.push(
-                direction.charAt(0).toUpperCase() + direction.slice(1),
-            );
-        }
-    }
-
-    return available;
-}
-
-function getCurrentMap(floor: number): string[][] | null {
-    return floorMaps[floor] || null;
-}
+import {
+    getAvailableDirections,
+    getCurrentMap,
+} from "./abyssHelpers/directionHelper";
 
 export const whereami = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

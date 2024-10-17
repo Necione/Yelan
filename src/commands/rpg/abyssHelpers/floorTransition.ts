@@ -1,6 +1,8 @@
 import { embedComment } from "@elara-services/utils";
+import { UserStats } from "@prisma/client";
 import { type ChatInputCommandInteraction } from "discord.js";
 import { updateUserStats } from "../../../services";
+import { floorRequirements } from "./floorReq";
 
 type TransitionDirection = "ascend" | "descend";
 
@@ -17,6 +19,7 @@ export async function handleFloorTransition(
         x?: number,
         y?: number,
     ) => { x: number; y: number } | null,
+    stats: UserStats,
 ): Promise<{ newX: number; newY: number; transitionMessage: string } | null> {
     const newMap = floorMaps[newFloor];
     if (!newMap) {
@@ -27,6 +30,19 @@ export async function handleFloorTransition(
             ),
         );
         return null;
+    }
+
+    if (direction === "ascend" && newFloor > 1) {
+        const requiredLevel = floorRequirements[newFloor] || 0;
+        if (stats.worldLevel < requiredLevel) {
+            await i.editReply(
+                embedComment(
+                    `You need to be at least **World Level ${requiredLevel}** to ${direction} to Floor **${newFloor}**.`,
+                    "Red",
+                ),
+            );
+            return null;
+        }
     }
 
     const targetCell = direction === "descend" ? "s" : "f";

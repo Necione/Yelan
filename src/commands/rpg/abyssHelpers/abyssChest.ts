@@ -1,8 +1,6 @@
-import { embedComment, noop } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
-import { EmbedBuilder } from "discord.js";
 import {
     addBalance,
     addItemToInventory,
@@ -16,7 +14,7 @@ export async function handleAbyssChest(
     currentFloor: number,
     currentX: number,
     currentY: number,
-) {
+): Promise<string> {
     const fullKey = `${currentFloor},${currentX},${currentY}`;
     const legacyKey = currentFloor === 1 ? `${currentX},${currentY}` : null;
 
@@ -44,15 +42,7 @@ export async function handleAbyssChest(
     }
 
     if (chestAlreadyCollected) {
-        await i.editReply(
-            embedComment(
-                currentFloor === 1
-                    ? `You have already collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`.`
-                    : `You have already collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`.`,
-                "Yellow",
-            ),
-        );
-        return;
+        return `You have already collected the chest here!`;
     }
 
     const chestLoot = await generateChestLoot(stats.worldLevel);
@@ -94,15 +84,7 @@ export async function handleAbyssChest(
             ? `You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!\nIt contained ${customEmoji.a.z_coins} \`${chestLoot.coins}\``
             : `You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!`;
 
-    const finalMessage =
-        chestLoot.loot.length > 0
-            ? `${resultMessage} and the following items:\n${lootDescription}`
-            : `${resultMessage}.`;
-
-    const embed = new EmbedBuilder()
-        .setTitle("You Collected a Treasure Chest!")
-        .setDescription(finalMessage)
-        .setColor("Green");
-
-    await i.editReply({ embeds: [embed] }).catch(noop);
+    return chestLoot.loot.length > 0
+        ? `${resultMessage} and the following items:\n${lootDescription}`
+        : `${resultMessage}.`;
 }

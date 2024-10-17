@@ -9,12 +9,14 @@ import {
 } from "../../services";
 import { locked } from "../../utils";
 import { handleAbyssChest } from "./abyssHelpers/abyssChest";
+import { handleTrap } from "./abyssHelpers/abyssTrap";
+import { findPositionInMap } from "./abyssHelpers/directionHelper";
 import { floor1Map } from "./abyssHelpers/floor1map";
 import { floor2Map } from "./abyssHelpers/floor2map";
 import { handleFloorTransition } from "./abyssHelpers/floorTransition";
 import { handleAbyssBattle } from "./handlers/abyssHandler";
 
-const tileWithoutMonsters = ["f", "s"];
+const tileWithoutMonsters = ["f", "s", "c"];
 
 const floorMaps: { [key: number]: string[][] } = {
     1: floor1Map,
@@ -120,6 +122,7 @@ export const move = buildCommand<SlashCommand>({
                 return r.edit(
                     embedComment(
                         "No stats found for you, please set up your profile.",
+                        "Red",
                     ),
                 );
             }
@@ -129,6 +132,7 @@ export const move = buildCommand<SlashCommand>({
                 return r.edit(
                     embedComment(
                         "You are not in Abyss Mode. Use `/abyss` to enter the Abyss.",
+                        "Red",
                     ),
                 );
             }
@@ -138,6 +142,7 @@ export const move = buildCommand<SlashCommand>({
                 return r.edit(
                     embedComment(
                         "You're dead... go back up to the surface and recover.",
+                        "Red",
                     ),
                 );
             }
@@ -150,6 +155,7 @@ export const move = buildCommand<SlashCommand>({
                 return r.edit(
                     embedComment(
                         `Current floor (${currentFloor}) map is not defined.`,
+                        "Red",
                     ),
                 );
             }
@@ -167,7 +173,10 @@ export const move = buildCommand<SlashCommand>({
                 if (!startingPosition) {
                     locked.del(i.user.id);
                     return r.edit(
-                        embedComment("Starting position not found in the map."),
+                        embedComment(
+                            "Starting position not found in the map.",
+                            "Red",
+                        ),
                     );
                 }
                 currentX = startingPosition.x;
@@ -205,7 +214,9 @@ export const move = buildCommand<SlashCommand>({
                     break;
                 default:
                     locked.del(i.user.id);
-                    return i.editReply(embedComment("Invalid direction."));
+                    return i.editReply(
+                        embedComment("Invalid direction.", "Red"),
+                    );
             }
 
             console.log(
@@ -220,7 +231,7 @@ export const move = buildCommand<SlashCommand>({
             ) {
                 locked.del(i.user.id);
                 return i.editReply(
-                    embedComment("You cannot move outside the map!"),
+                    embedComment("You cannot move outside the map!", "Red"),
                 );
             }
 
@@ -236,6 +247,7 @@ export const move = buildCommand<SlashCommand>({
                 return i.editReply(
                     embedComment(
                         "You hit a wall and cannot move in that direction.",
+                        "Red",
                     ),
                 );
             }
@@ -245,17 +257,32 @@ export const move = buildCommand<SlashCommand>({
                 return i.editReply(
                     embedComment(
                         "There's a massive metal door in front of you... It's locked.",
+                        "Red",
                     ),
                 );
             }
 
+            await i.editReply(
+                embedComment(
+                    "Travelling <a:loading:1184700865303552031>",
+                    "Blue",
+                ),
+            );
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
             let message = `Moved **${direction}** to position \`[${newX}, ${newY}]\` on Floor **${currentFloor}**.`;
 
+            let chestMessage = "";
+
             if (cell === "c") {
-                message += "\nOoohh shiny! You found treasure.";
-                await handleAbyssChest(i, stats, currentFloor, newX, newY);
-                locked.del(i.user.id);
-                return;
+                chestMessage = await handleAbyssChest(
+                    i,
+                    stats,
+                    currentFloor,
+                    newX,
+                    newY,
+                );
             } else if (cell === "k") {
                 if (!stats.hasKey) {
                     await updateUserStats(i.user.id, { hasKey: true });
@@ -264,6 +291,12 @@ export const move = buildCommand<SlashCommand>({
                     message += "\nYou've already collected this key.";
                 }
             }
+
+            await updateUserStats(i.user.id, {
+                abyssCoordX: newX,
+                abyssCoordY: newY,
+                currentAbyssFloor: currentFloor,
+            });
 
             if (cell === "f") {
                 const nextFloor = currentFloor + 1;
@@ -275,6 +308,7 @@ export const move = buildCommand<SlashCommand>({
                     newY,
                     floorMaps,
                     findPositionInMap,
+                    stats,
                 );
 
                 if (!floorTransitionResult) {
@@ -307,6 +341,7 @@ export const move = buildCommand<SlashCommand>({
                     newY,
                     floorMaps,
                     findPositionInMap,
+                    stats,
                 );
 
                 if (!floorTransitionResult) {
@@ -323,8 +358,15 @@ export const move = buildCommand<SlashCommand>({
                 message += `\n${floorTransitionResult.transitionMessage}`;
             }
 
-            const ambienceMessage = getRandomAmbience();
-            message += `\n\n*${ambienceMessage}*`;
+            if (chestMessage) {
+                message += `\n${chestMessage}`;
+            }
+
+            const ambienceMessageChance = Math.random();
+            if (ambienceMessageChance < 0.5) {
+                const ambienceMessage = getRandomAmbience();
+                message += `\n\n*${ambienceMessage}*`;
+            }
 
             if (currentMap) {
                 const availableDirections = getAvailableDirections(
@@ -352,7 +394,7 @@ export const move = buildCommand<SlashCommand>({
             if (!reply || !(reply instanceof Message)) {
                 locked.del(i.user.id);
                 return i.editReply(
-                    embedComment("Unable to fetch the reply message."),
+                    embedComment("Unable to fetch the reply message.", "Red"),
                 );
             }
 
@@ -371,7 +413,10 @@ export const move = buildCommand<SlashCommand>({
                 if (!battleMessage) {
                     locked.del(i.user.id);
                     return r.edit(
-                        embedComment("Unable to fetch the original message."),
+                        embedComment(
+                            "Unable to fetch the original message.",
+                            "Red",
+                        ),
                     );
                 }
 
@@ -381,6 +426,7 @@ export const move = buildCommand<SlashCommand>({
                     return r.edit(
                         embedComment(
                             "Unable to find/create your user profile.",
+                            "Red",
                         ),
                     );
                 }
@@ -391,6 +437,7 @@ export const move = buildCommand<SlashCommand>({
                     return r.edit(
                         embedComment(
                             "No stats found for you, please set up your profile.",
+                            "Red",
                         ),
                     );
                 }
@@ -400,6 +447,7 @@ export const move = buildCommand<SlashCommand>({
                     return r.edit(
                         embedComment(
                             "You cannot go on a hunt while you are travelling!",
+                            "Red",
                         ),
                     );
                 }
@@ -409,6 +457,7 @@ export const move = buildCommand<SlashCommand>({
                     return r.edit(
                         embedComment(
                             "You don't have enough HP to go on a hunt :(",
+                            "Red",
                         ),
                     );
                 }
@@ -419,6 +468,13 @@ export const move = buildCommand<SlashCommand>({
 
                 locked.del(i.user.id);
             } else {
+                if (
+                    !tileWithoutMonsters.includes(cell.toLowerCase()) &&
+                    Math.random() < 0.2
+                ) {
+                    await handleTrap(i, stats);
+                }
+
                 locked.del(i.user.id);
             }
         } catch (error) {
@@ -435,26 +491,3 @@ export const move = buildCommand<SlashCommand>({
         }
     },
 });
-
-function findPositionInMap(
-    map: string[][],
-    target: string,
-    x?: number,
-    y?: number,
-): { x: number; y: number } | null {
-    for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
-        const row = map[rowIndex];
-        for (let col = 0; col < row.length; col++) {
-            if (row[col].toLowerCase() === target.toLowerCase()) {
-                const calculatedY = map.length - 1 - rowIndex;
-                if (
-                    (x === undefined || col === x) &&
-                    (y === undefined || calculatedY === y)
-                ) {
-                    return { x: col, y: calculatedY };
-                }
-            }
-        }
-    }
-    return null;
-}

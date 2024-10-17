@@ -11,6 +11,10 @@ import {
 } from "../../../services";
 import { cooldowns, texts } from "../../../utils";
 import { calculateDrop, calculateExp, type Monster } from "../../../utils/hunt";
+import {
+    getAvailableDirections,
+    getCurrentMap,
+} from "../abyssHelpers/directionHelper";
 
 const maxWorldLevel = 25;
 
@@ -197,12 +201,54 @@ export async function handleAbyssVictory(
         });
     }
 
+    const currentX = stats.abyssCoordX;
+    const currentY = stats.abyssCoordY;
+    const currentFloor = stats.currentAbyssFloor;
+
+    const currentMap = getCurrentMap(currentFloor);
+
+    let availableDirections: string[] = [];
+
+    if (currentMap) {
+        if (currentX !== null && currentY !== null) {
+            availableDirections = getAvailableDirections(
+                currentX,
+                currentY,
+                currentMap,
+            );
+            const directionsList =
+                availableDirections.length > 0
+                    ? availableDirections.join(", ")
+                    : "No available moves from here.";
+
+            finalEmbed.addFields(
+                {
+                    name: "Current Location",
+                    value: `\`[${currentX}, ${currentY}]\` on Floor **${currentFloor}**`,
+                },
+                {
+                    name: "Available Moves",
+                    value: directionsList,
+                },
+            );
+        } else {
+            finalEmbed.addFields({
+                name: "Error",
+                value: "Current coordinates are not set.",
+            });
+        }
+    } else {
+        finalEmbed.addFields({
+            name: "Error",
+            value: "Could not retrieve the current map for available moves.",
+        });
+    }
+
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
     await updateUserStats(i.user.id, { isHunting: false });
 
     await thread.edit({ archived: true, locked: true }).catch(noop);
 }
-
 export async function handleDefeat(
     i: ChatInputCommandInteraction,
     thread: ThreadChannel,
