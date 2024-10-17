@@ -35,6 +35,7 @@ export async function handleAbyssBattle(
         "Hydro Abyss Mage",
         "Pyro Abyss Mage",
     ];
+    
     let monstersEncountered: Monster[] = [];
 
     const selectedMonsterName =
@@ -72,7 +73,10 @@ export async function handleAbyssBattle(
     const handleMonsterBattle = async (thread?: PublicThreadChannel<false>) => {
         const monster = monstersEncountered[currentMonsterIndex];
 
-        const monsterStats = monster.getStatsForWorldLevel(10);
+        const monsterStats = monster.getStatsForWorldLevel(
+            stats.currentAbyssFloor === 2 ? 15 : 10,
+        );
+
         if (!monsterStats) {
             throw new Error(`Stats not found for monster: ${monster.name}`);
         }

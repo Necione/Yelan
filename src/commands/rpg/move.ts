@@ -10,7 +10,16 @@ import {
 import { locked } from "../../utils";
 import { handleAbyssChest } from "./abyssHelpers/abyssChest";
 import { floor1Map } from "./abyssHelpers/floor1map";
+import { floor2Map } from "./abyssHelpers/floor2map";
+import { handleFloorTransition } from "./abyssHelpers/floorTransition";
 import { handleAbyssBattle } from "./handlers/abyssHandler";
+
+const tileWithoutMonsters = ["f", "s"];
+
+const floorMaps: { [key: number]: string[][] } = {
+    1: floor1Map,
+    2: floor2Map,
+};
 
 const directions = {
     up: { dx: 0, dy: 1 },
@@ -70,6 +79,10 @@ function getAvailableDirections(
     return available;
 }
 
+function getCurrentMap(floor: number): string[][] | null {
+    return floorMaps[floor] || null;
+}
+
 export const move = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("move")
@@ -91,140 +104,158 @@ export const move = buildCommand<SlashCommand>({
     async execute(i, r) {
         locked.set(i.user);
 
-        if (!i.deferred) {
-            locked.del(i.user.id);
-            return;
-        }
+        try {
+            if (!i.deferred) {
+                locked.del(i.user.id);
+                return;
+            }
 
-        const direction = i.options.getString("direction", true).toLowerCase();
+            const direction = i.options
+                .getString("direction", true)
+                .toLowerCase();
 
-        const stats = await getUserStats(i.user.id);
-        if (!stats) {
-            locked.del(i.user.id);
-            return r.edit(
-                embedComment(
-                    "No stats found for you, please set up your profile.",
-                ),
-            );
-        }
-
-        if (!stats.abyssMode) {
-            locked.del(i.user.id);
-            return r.edit(
-                embedComment(
-                    "You are not in Abyss Mode. Use `/abyss` to enter the Abyss.",
-                ),
-            );
-        }
-
-        if (stats.hp <= 0) {
-            locked.del(i.user.id);
-            return r.edit(
-                embedComment(
-                    "You're dead... Go back up to the surface and recover.",
-                ),
-            );
-        }
-
-        let currentX = stats.abyssCoordX;
-        let currentY = stats.abyssCoordY;
-
-        if (
-            currentX === null ||
-            currentX === undefined ||
-            currentY === null ||
-            currentY === undefined
-        ) {
-            const startingPosition = findPositionInMap(floor1Map, "s");
-            if (!startingPosition) {
+            const stats = await getUserStats(i.user.id);
+            if (!stats) {
                 locked.del(i.user.id);
                 return r.edit(
-                    embedComment("Starting position not found in the map."),
+                    embedComment(
+                        "No stats found for you, please set up your profile.",
+                    ),
                 );
             }
-            currentX = startingPosition.x;
-            currentY = startingPosition.y;
 
-            await updateUserStats(i.user.id, {
-                abyssCoordX: currentX,
-                abyssCoordY: currentY,
-            });
-            console.log(`Starting Position Set to: (${currentX}, ${currentY})`);
-        }
-
-        let newX = currentX;
-        let newY = currentY;
-
-        console.log(`Current Position: (${currentX}, ${currentY})`);
-
-        switch (direction) {
-            case "up":
-                newY += 1;
-                break;
-            case "down":
-                newY -= 1;
-                break;
-            case "left":
-                newX -= 1;
-                break;
-            case "right":
-                newX += 1;
-                break;
-            default:
+            if (!stats.abyssMode) {
                 locked.del(i.user.id);
-                return i.editReply(embedComment("Invalid direction."));
-        }
+                return r.edit(
+                    embedComment(
+                        "You are not in Abyss Mode. Use `/abyss` to enter the Abyss.",
+                    ),
+                );
+            }
 
-        console.log(`Attempting to move ${direction} to: (${newX}, ${newY})`);
+            if (stats.hp <= 0) {
+                locked.del(i.user.id);
+                return r.edit(
+                    embedComment(
+                        "You're dead... go back up to the surface and recover.",
+                    ),
+                );
+            }
 
-        if (
-            newX < 0 ||
-            newX >= floor1Map[0].length ||
-            newY < 0 ||
-            newY >= floor1Map.length
-        ) {
-            locked.del(i.user.id);
-            return i.editReply(
-                embedComment("You cannot move outside the map!"),
+            let currentFloor = stats.currentAbyssFloor || 1;
+            let currentMap = getCurrentMap(currentFloor);
+
+            if (!currentMap) {
+                locked.del(i.user.id);
+                return r.edit(
+                    embedComment(
+                        `Current floor (${currentFloor}) map is not defined.`,
+                    ),
+                );
+            }
+
+            let currentX = stats.abyssCoordX;
+            let currentY = stats.abyssCoordY;
+
+            if (
+                currentX === null ||
+                currentX === undefined ||
+                currentY === null ||
+                currentY === undefined
+            ) {
+                const startingPosition = findPositionInMap(currentMap, "s");
+                if (!startingPosition) {
+                    locked.del(i.user.id);
+                    return r.edit(
+                        embedComment("Starting position not found in the map."),
+                    );
+                }
+                currentX = startingPosition.x;
+                currentY = startingPosition.y;
+
+                await updateUserStats(i.user.id, {
+                    abyssCoordX: currentX,
+                    abyssCoordY: currentY,
+                    currentAbyssFloor: currentFloor,
+                });
+                console.log(
+                    `Starting Position Set to: (${currentX}, ${currentY})`,
+                );
+            }
+
+            let newX = currentX;
+            let newY = currentY;
+
+            console.log(
+                `Current Position on Floor ${currentFloor}: (${currentX}, ${currentY})`,
             );
-        }
 
-        const rowIndex = floor1Map.length - 1 - newY;
-        const cell = floor1Map[rowIndex][newX].toLowerCase();
+            switch (direction) {
+                case "up":
+                    newY += 1;
+                    break;
+                case "down":
+                    newY -= 1;
+                    break;
+                case "left":
+                    newX -= 1;
+                    break;
+                case "right":
+                    newX += 1;
+                    break;
+                default:
+                    locked.del(i.user.id);
+                    return i.editReply(embedComment("Invalid direction."));
+            }
 
-        console.log(
-            `Accessing Map Cell at rowIndex: ${rowIndex}, x: ${newX} with cell: '${cell}'`,
-        );
-
-        if (cell === "w") {
-            locked.del(i.user.id);
-            return i.editReply(
-                embedComment(
-                    "You hit a wall and cannot move in that direction.",
-                ),
+            console.log(
+                `Attempting to move ${direction} to: (${newX}, ${newY}) on Floor ${currentFloor}`,
             );
-        } else if (cell === "d" && !stats.hasKey) {
-            locked.del(i.user.id);
-            return i.editReply(
-                embedComment("You need a key to open this door."),
-            );
-        } else {
-            await updateUserStats(i.user.id, {
-                abyssCoordX: newX,
-                abyssCoordY: newY,
-            });
 
-            let message = `Moved **${direction}** to position \`[${newX}, ${newY}]\``;
+            if (
+                newX < 0 ||
+                newX >= currentMap[0].length ||
+                newY < 0 ||
+                newY >= currentMap.length
+            ) {
+                locked.del(i.user.id);
+                return i.editReply(
+                    embedComment("You cannot move outside the map!"),
+                );
+            }
+
+            const rowIndex = currentMap.length - 1 - newY;
+            const cell = currentMap[rowIndex][newX].toLowerCase();
+
+            console.log(
+                `Accessing Map Cell at rowIndex: ${rowIndex}, x: ${newX} with cell: '${cell}'`,
+            );
+
+            if (cell === "w") {
+                locked.del(i.user.id);
+                return i.editReply(
+                    embedComment(
+                        "You hit a wall and cannot move in that direction.",
+                    ),
+                );
+            }
+
+            if (cell === "d" && !stats.hasKey) {
+                locked.del(i.user.id);
+                return i.editReply(
+                    embedComment(
+                        "There's a massive metal door in front of you... It's locked.",
+                    ),
+                );
+            }
+
+            let message = `Moved **${direction}** to position \`[${newX}, ${newY}]\` on Floor **${currentFloor}**.`;
 
             if (cell === "c") {
                 message += "\nOoohh shiny! You found treasure.";
-                await handleAbyssChest(i, stats, newX, newY);
+                await handleAbyssChest(i, stats, currentFloor, newX, newY);
                 locked.del(i.user.id);
                 return;
-            } else if (cell === "f") {
-                message +=
-                    "\nThere's a massive stairway that goes down to the Second Floor. However, you're unable to go there yet :(";
-                locked.del(i.user.id);
             } else if (cell === "k") {
                 if (!stats.hasKey) {
                     await updateUserStats(i.user.id, { hasKey: true });
@@ -234,23 +265,87 @@ export const move = buildCommand<SlashCommand>({
                 }
             }
 
+            if (cell === "f") {
+                const nextFloor = currentFloor + 1;
+                const floorTransitionResult = await handleFloorTransition(
+                    i,
+                    "descend",
+                    nextFloor,
+                    newX,
+                    newY,
+                    floorMaps,
+                    findPositionInMap,
+                );
+
+                if (!floorTransitionResult) {
+                    locked.del(i.user.id);
+                    return;
+                }
+
+                newX = floorTransitionResult.newX;
+                newY = floorTransitionResult.newY;
+                currentFloor = nextFloor;
+
+                currentMap = getCurrentMap(currentFloor);
+
+                message += `\n${floorTransitionResult.transitionMessage}`;
+            } else if (cell === "s") {
+                const previousFloor = currentFloor - 1;
+                if (previousFloor < 1) {
+                    message +=
+                        "\nYou're already on the surface floor. You cannot ascend further.";
+                    await i.editReply(embedComment(message, "Green"));
+                    locked.del(i.user.id);
+                    return;
+                }
+
+                const floorTransitionResult = await handleFloorTransition(
+                    i,
+                    "ascend",
+                    previousFloor,
+                    newX,
+                    newY,
+                    floorMaps,
+                    findPositionInMap,
+                );
+
+                if (!floorTransitionResult) {
+                    locked.del(i.user.id);
+                    return;
+                }
+
+                newX = floorTransitionResult.newX;
+                newY = floorTransitionResult.newY;
+                currentFloor = previousFloor;
+
+                currentMap = getCurrentMap(currentFloor);
+
+                message += `\n${floorTransitionResult.transitionMessage}`;
+            }
+
             const ambienceMessage = getRandomAmbience();
             message += `\n\n*${ambienceMessage}*`;
 
-            const availableDirections = getAvailableDirections(
-                newX,
-                newY,
-                floor1Map,
-            );
-            if (availableDirections.length > 0) {
-                const directionsList = availableDirections.join(", ");
-                message += `\n**Available Moves:** ${directionsList}.`;
+            if (currentMap) {
+                const availableDirections = getAvailableDirections(
+                    newX,
+                    newY,
+                    currentMap,
+                );
+                if (availableDirections.length > 0) {
+                    const directionsList = availableDirections.join(", ");
+                    message += `\n**Available Moves:** ${directionsList}.`;
+                } else {
+                    message +=
+                        "\nThere are no available directions to move from here.";
+                }
             } else {
                 message +=
-                    "\nThere are no available directions to move from here.";
+                    "\nError: Could not retrieve the map for the current floor.";
             }
 
             await i.editReply(embedComment(message, "Green"));
+            locked.del(i.user.id);
 
             const reply = await i.fetchReply();
 
@@ -261,15 +356,19 @@ export const move = buildCommand<SlashCommand>({
                 );
             }
 
-            if (Math.random() < 0.5) {
+            if (
+                !tileWithoutMonsters.includes(cell.toLowerCase()) &&
+                Math.random() < 0.5
+            ) {
                 locked.set(i.user);
 
                 if (!i.deferred) {
+                    locked.del(i.user.id);
                     return;
                 }
 
-                const message = await i.fetchReply().catch(noop);
-                if (!message) {
+                const battleMessage = await i.fetchReply().catch(noop);
+                if (!battleMessage) {
                     locked.del(i.user.id);
                     return r.edit(
                         embedComment("Unable to fetch the original message."),
@@ -315,12 +414,24 @@ export const move = buildCommand<SlashCommand>({
                 }
 
                 await updateUserStats(i.user.id, { isHunting: true });
-                await handleAbyssBattle(i, message, syncedStats);
+
+                await handleAbyssBattle(i, battleMessage, syncedStats);
 
                 locked.del(i.user.id);
             } else {
                 locked.del(i.user.id);
             }
+        } catch (error) {
+            console.error("Error in /move command:", error);
+            locked.del(i.user.id);
+            await i
+                .editReply(
+                    embedComment(
+                        "An unexpected error occurred. Please try again later.",
+                        "Red",
+                    ),
+                )
+                .catch(noop);
         }
     },
 });
@@ -328,13 +439,20 @@ export const move = buildCommand<SlashCommand>({
 function findPositionInMap(
     map: string[][],
     target: string,
+    x?: number,
+    y?: number,
 ): { x: number; y: number } | null {
     for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
         const row = map[rowIndex];
-        for (let x = 0; x < row.length; x++) {
-            if (row[x].toLowerCase() === target.toLowerCase()) {
-                const y = map.length - 1 - rowIndex;
-                return { x, y };
+        for (let col = 0; col < row.length; col++) {
+            if (row[col].toLowerCase() === target.toLowerCase()) {
+                const calculatedY = map.length - 1 - rowIndex;
+                if (
+                    (x === undefined || col === x) &&
+                    (y === undefined || calculatedY === y)
+                ) {
+                    return { x: col, y: calculatedY };
+                }
             }
         }
     }

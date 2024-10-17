@@ -200,6 +200,7 @@ model UserStats {
   exp                             Int            @default(0)
   worldLevel                      Int            @default(1)
   highestWL                       Int            @default(1)
+  currentAbyssFloor               Int            @default(1)
   abyssFloor                      Int            @default(0)
   equippedWeapon                  String?
   equippedFlower                  String?
