@@ -4,8 +4,8 @@ export default {
     currentHp: 0,
     name: "Wicked Torrents",
     group: MonsterGroup.Abyss,
-    minExp: 10,
-    maxExp: 25,
+    minExp: 20,
+    maxExp: 30,
     minWorldLevel: 16,
     image: "https://lh.elara.workers.dev/rpg/monsters/wicked_torrents.png",
     drops: [

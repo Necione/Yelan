@@ -54,7 +54,7 @@ export const heal = buildCommand<SlashCommand>({
         const worldLevelCost = stats.worldLevel * 1;
         const initialHealCost = baseHealCost + worldLevelCost;
 
-        const rebirthMultiplier = 1 + 0.25 * stats.rebirths;
+        const rebirthMultiplier = 1 + 0.2 * stats.rebirths;
 
         const healCost = Math.round(initialHealCost * rebirthMultiplier);
 

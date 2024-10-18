@@ -4,8 +4,8 @@ export default {
     currentHp: 0,
     name: "Frost Fall",
     group: MonsterGroup.Abyss,
-    minExp: 12,
-    maxExp: 28,
+    minExp: 20,
+    maxExp: 30,
     minWorldLevel: 16,
     image: "https://lh.elara.workers.dev/rpg/monsters/frost_fall.png",
     drops: [

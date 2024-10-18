@@ -1,5 +1,5 @@
 import { embedComment } from "@elara-services/utils";
-import { UserStats } from "@prisma/client";
+import { type UserStats } from "@prisma/client";
 import { type ChatInputCommandInteraction } from "discord.js";
 import { updateUserStats } from "../../../services";
 import { floorRequirements } from "./floorReq";
@@ -25,19 +25,19 @@ export async function handleFloorTransition(
     if (!newMap) {
         await i.editReply(
             embedComment(
-                `Floor **${newFloor}** does not exist. You cannot ${direction} further.`,
+                `You come across a massive stairwell with guards next to it. They say that floor **${newFloor}** is not open yet. You cannot ${direction} further.`,
                 "Red",
             ),
         );
         return null;
     }
 
-    if (direction === "ascend" && newFloor > 1) {
+    if (direction === "descend" && newFloor > 1) {
         const requiredLevel = floorRequirements[newFloor] || 0;
         if (stats.worldLevel < requiredLevel) {
             await i.editReply(
                 embedComment(
-                    `You need to be at least **World Level ${requiredLevel}** to ${direction} to Floor **${newFloor}**.`,
+                    `You come across a massive stairwell with guards next to it. They say that you need to be at least **World Level ${requiredLevel}** to ${direction} to Floor **${newFloor}**.`,
                     "Red",
                 ),
             );

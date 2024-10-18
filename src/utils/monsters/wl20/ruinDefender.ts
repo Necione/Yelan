@@ -4,8 +4,8 @@ export default {
     currentHp: 0,
     name: "Ruin Defender",
     group: MonsterGroup.Machine,
-    minExp: 10,
-    maxExp: 25,
+    minExp: 25,
+    maxExp: 40,
     minWorldLevel: 20,
     image: "https://lh.elara.workers.dev/rpg/monsters/ruin_defender.png",
     drops: [
