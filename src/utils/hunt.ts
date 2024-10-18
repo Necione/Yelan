@@ -4,8 +4,6 @@ import { join, resolve } from "path";
 import { type MonsterGroup } from "./groups";
 import { locationGroupWeights } from "./locationGroupWeights";
 
-export type MonsterModifier = "Mutated" | "Bloodthirsty" | undefined;
-
 export interface Monster {
     currentHp: number;
     name: string;
@@ -18,7 +16,7 @@ export interface Monster {
     defValue: number;
     minWorldLevel: number;
     image: string;
-    modifier?: MonsterModifier;
+    isMutated?: boolean;
     drops: {
         item: string;
         minAmount: number;

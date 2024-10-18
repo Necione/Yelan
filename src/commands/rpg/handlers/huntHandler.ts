@@ -104,14 +104,8 @@ export async function handleHunt(
         }
 
         if (stats.rebirths >= 2 && Math.random() < 0.05) {
-            const modifierType = Math.random() < 0 ? "Mutated" : "Bloodthirsty";
-            monster.modifier = modifierType;
-
-            if (modifierType === "Mutated") {
-                monster.currentHp = Math.floor(monster.currentHp * 1.5);
-            } else if (modifierType === "Bloodthirsty") {
-                monster.currentHp = Math.floor(monster.currentHp * 0.75);
-            }
+            monster.name = `Mutated ${monster.name}`;
+            monster.isMutated = true;
         }
 
         monstersEncountered.push(monster);
@@ -133,15 +127,12 @@ export async function handleHunt(
         if (!monsterStats) {
             throw new Error(`Stats not found for monster: ${monster.name}`);
         }
-
         let currentMonsterHp = Math.floor(
             getRandomValue(monsterStats.minHp, monsterStats.maxHp),
         );
 
-        if (monster.modifier === "Mutated") {
-            currentMonsterHp = Math.floor(currentMonsterHp * 1.5);
-        } else if (monster.modifier === "Bloodthirsty") {
-            currentMonsterHp = Math.floor(currentMonsterHp * 0.75);
+        if (monster.isMutated) {
+            currentMonsterHp *= 1.5;
         }
 
         const initialMonsterHp = currentMonsterHp;
@@ -165,14 +156,8 @@ export async function handleHunt(
         };
 
         const battleEmbed = new EmbedBuilder()
-            .setColor(
-                monster.modifier === "Bloodthirsty"
-                    ? "#b20303"
-                    : monster.modifier === "Mutated"
-                      ? "#658e4d"
-                      : "Aqua",
-            )
-            .setTitle(`You encountered a ${monster.modifier} ${monster.name}!`)
+            .setColor(monster.isMutated ? "#658e4d" : "Aqua")
+            .setTitle(`You encountered a ${monster.name}!`)
             .setDescription(selectedDescription)
             .setThumbnail(monster.image)
             .addFields(
@@ -271,9 +256,6 @@ export async function handleHunt(
             if (isPlayerTurn) {
                 const playerMessages: string[] = [];
 
-                const modifier = monster.modifier;
-
-                // Pass modifier to playerAttack if needed
                 const result = playerAttack(
                     stats,
                     monster,
@@ -285,7 +267,6 @@ export async function handleHunt(
                     isFirstTurn,
                     playerMessages,
                     hasWrath,
-                    modifier, // New parameter
                 );
 
                 currentMonsterHp = result.currentMonsterHp;

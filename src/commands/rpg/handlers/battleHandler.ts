@@ -1,6 +1,5 @@
 import type { UserStats } from "@prisma/client";
 import { updateUserStats } from "../../../services";
-import type { MonsterModifier } from "../../../utils/hunt";
 import { getRandomValue, type Monster } from "../../../utils/hunt";
 
 export function playerAttack(
@@ -14,7 +13,6 @@ export function playerAttack(
     isFirstTurn: boolean,
     messages: string[],
     hasWrath: boolean,
-    modifier?: MonsterModifier,
 ): {
     currentMonsterHp: number;
     currentPlayerHp: number;
@@ -160,10 +158,8 @@ export async function monsterAttack(
         monsterStats.maxDamage,
     );
 
-    if (monster.modifier === "Mutated") {
+    if (monster.isMutated) {
         monsterDamage *= 1.5;
-    } else if (monster.modifier === "Bloodthirsty") {
-        monsterDamage *= 2;
     }
 
     const { isCrit, multiplier } = calculateCriticalHit(
@@ -200,19 +196,12 @@ export async function monsterAttack(
         messages.push(effectDescription);
     }
 
-    let defChance = stats.defChance || 0;
+    const defChance = stats.defChance || 0;
     const defValue = stats.defValue || 0;
     let defended = false;
 
     if (monster.group !== "Machine") {
         defended = Math.random() * 100 < defChance;
-
-        if (monster.modifier === "Bloodthirsty") {
-            defChance = defChance * 0.5;
-            messages.push(
-                `\`🩸\` The Bloodthirsty ${monster.name} makes you scared. Your DEF Chance is reduced by 50%`,
-            );
-        }
 
         if (defended) {
             monsterDamage = Math.max(monsterDamage * (1 - defValue), 0);
