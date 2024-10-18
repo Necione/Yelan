@@ -4,6 +4,7 @@ import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { handleChest, handleMaterials } from "./handlers/exploreHandler";
+import { skills } from "../../plugins/other/utils";
 
 export const explore = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -87,9 +88,7 @@ export const explore = buildCommand<SlashCommand>({
 
         const exploreType = i.options.getString("type", true);
 
-        const hasEnergizeSkill =
-            stats.skills.some((skill) => skill.name === "Energize") &&
-            stats.activeSkills.includes("Energize");
+        const hasEnergizeSkill = skills.has(stats, "Energize");
 
         const exploreCooldown = hasEnergizeSkill ? get.mins(15) : get.mins(20);
         await cooldowns.set(userWallet, "explore", exploreCooldown);

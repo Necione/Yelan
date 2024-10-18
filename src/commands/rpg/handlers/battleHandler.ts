@@ -1,4 +1,5 @@
 import type { UserStats } from "@prisma/client";
+import { skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
 import { getRandomValue, type Monster } from "../../../utils/hunt";
 
@@ -28,9 +29,7 @@ export function playerAttack(
         );
     }
 
-    const hasHeartbroken =
-        stats.skills.some((skill) => skill.name === "Heartbroken") &&
-        stats.activeSkills.includes("Heartbroken");
+    const hasHeartbroken = skills.has(stats, "Heartbroken");
 
     let bonusDamage = 0;
     if (hasHeartbroken && isFirstTurn) {
@@ -122,9 +121,7 @@ export function playerAttack(
         );
     }
 
-    const hasKindle =
-        stats.skills.some((skill) => skill.name === "Kindle") &&
-        stats.activeSkills.includes("Kindle");
+    const hasKindle = skills.has(stats, "Kindle");
 
     if (hasKindle) {
         const kindleBonusDamage = stats.maxHP * 0.1;
@@ -240,9 +237,7 @@ export async function monsterAttack(
         currentPlayerHp = 0;
     }
 
-    const hasLeechSkill =
-        stats.skills.some((skill) => skill.name === "Leech") &&
-        stats.activeSkills.includes("Leech");
+    const hasLeechSkill = skills.has(stats, "Leech");
 
     const leechTriggered = Math.random() < 0.5;
     if (hasLeechSkill && leechTriggered) {
@@ -276,9 +271,7 @@ export function applyAttackModifiers(
     attackPower: number;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
 } {
-    const hasBackstab =
-        stats.skills.some((skill) => skill.name === "Backstab") &&
-        stats.activeSkills.includes("Backstab");
+    const hasBackstab = skills.has(stats, "Backstab");
 
     const isHumanOrFatui = ["Human", "Fatui", "Nobushi"].includes(
         monster.group,

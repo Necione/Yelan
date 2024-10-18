@@ -2,6 +2,7 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, getKeys, is, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
+import { skills } from "../../plugins/other/utils";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
@@ -111,9 +112,7 @@ export const sellall = buildCommand<SlashCommand>({
         let totalAppraiseBonus = 0;
         const itemsSold = [];
 
-        const hasAppraiseSkill = stats.skills.some(
-            (skill) => skill.name === "Appraise",
-        );
+        const hasAppraiseSkill = skills.has(stats, "Appraise", false);
 
         for (const itemName of itemNames) {
             const itemData =

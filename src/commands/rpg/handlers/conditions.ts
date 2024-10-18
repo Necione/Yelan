@@ -15,6 +15,7 @@ import {
     getAvailableDirections,
     getCurrentMap,
 } from "../abyssHelpers/directionHelper";
+import { skills } from "../../../plugins/other/utils";
 
 const maxWorldLevel = 25;
 
@@ -48,9 +49,7 @@ export async function handleVictory(
 
     totalExpGained = Math.round(totalExpGained * xpReductionFactor);
 
-    const hasGrowthSkill =
-        stats.skills.some((skill) => skill.name === "Growth") &&
-        stats.activeSkills.includes("Growth");
+    const hasGrowthSkill = skills.has(stats, "Growth");
 
     if (hasGrowthSkill) {
         totalExpGained = Math.round(totalExpGained * 1.5);
@@ -92,9 +91,7 @@ export async function handleVictory(
             monstersEncountered[monstersEncountered.length - 1].image,
         );
 
-    const hasTotemSkill =
-        stats.skills.some((skill) => skill.name === "Totem") &&
-        stats.activeSkills.includes("Totem");
+    const hasTotemSkill = skills.has(stats, "Totem");
 
     if (hasTotemSkill) {
         const healAmount = Math.ceil(stats.maxHP * 0.05);
@@ -107,9 +104,7 @@ export async function handleVictory(
         });
     }
 
-    const hasScroungeSkill =
-        stats.skills.some((skill) => skill.name === "Scrounge") &&
-        stats.activeSkills.includes("Scrounge");
+    const hasScroungeSkill = skills.has(stats, "Scrounge");
 
     if (hasScroungeSkill) {
         const coinsEarned = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
@@ -146,9 +141,7 @@ export async function handleVictory(
 
     await thread.edit({ archived: true, locked: true }).catch(noop);
 
-    const hasInsomniaSkill =
-        stats.skills.some((skill) => skill.name === "Insomnia") &&
-        stats.activeSkills.includes("Insomnia");
+    const hasInsomniaSkill = skills.has(stats, "Insomnia");
 
     const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
     await cooldowns.set(userWallet, "hunt", huntCooldown);
@@ -179,9 +172,7 @@ export async function handleAbyssVictory(
             monstersEncountered[monstersEncountered.length - 1].image,
         );
 
-    const hasTotemSkill =
-        stats.skills.some((skill) => skill.name === "Totem") &&
-        stats.activeSkills.includes("Totem");
+    const hasTotemSkill = skills.has(stats, "Totem");
 
     if (hasTotemSkill) {
         const healAmount = Math.ceil(stats.maxHP * 0.05);
@@ -293,9 +284,7 @@ export async function handleDefeat(
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
 
-    const hasInsomniaSkill =
-        stats.skills.some((skill) => skill.name === "Insomnia") &&
-        stats.activeSkills.includes("Insomnia");
+    const hasInsomniaSkill = skills.has(stats, "Insomnia");
 
     const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
     await cooldowns.set(userWallet, "hunt", huntCooldown);

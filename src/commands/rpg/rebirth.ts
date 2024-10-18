@@ -10,6 +10,7 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
 } from "discord.js";
+import { skills } from "../../plugins/other/utils";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
@@ -79,10 +80,7 @@ export const rebirth = buildCommand<SlashCommand>({
             Math.min(stats.rebirths, 3) * 0.2 +
             Math.max(0, stats.rebirths - 3) * 0.1;
         let appraiseBonus = 0;
-
-        const hasAppraiseSkill = stats.skills.some(
-            (skill) => skill.name === "Appraise",
-        );
+        const hasAppraiseSkill = skills.has(stats, "Appraise", false);
 
         for (const item of stats.inventory) {
             const itemData =

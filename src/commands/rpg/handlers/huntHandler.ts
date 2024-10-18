@@ -1,4 +1,4 @@
-import { embedComment, get, noop } from "@elara-services/utils";
+import { embedComment, get, make, noop, sleep } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type {
     ChatInputCommandInteraction,
@@ -6,6 +6,7 @@ import type {
     PublicThreadChannel,
 } from "discord.js";
 import { EmbedBuilder } from "discord.js";
+import { sendToChannel, skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
 import {
     getEncounterDescription,
@@ -61,13 +62,9 @@ export async function handleHunt(
 
     let currentPlayerHp = stats.hp;
 
-    const hasSloth =
-        stats.skills.some((skill) => skill.name === "Sloth") &&
-        stats.activeSkills.includes("Sloth");
+    const hasSloth = skills.has(stats, "Sloth");
 
-    const hasWrath =
-        stats.skills.some((skill) => skill.name === "Wrath") &&
-        stats.activeSkills.includes("Wrath");
+    const hasWrath = skills.has(stats, "Wrath");
 
     if (hasSloth) {
         currentPlayerHp = Math.floor(currentPlayerHp * 1.25);
@@ -138,9 +135,7 @@ export async function handleHunt(
         const initialMonsterHp = currentMonsterHp;
         const initialPlayerHp = currentPlayerHp;
 
-        const hasVampirism =
-            stats.skills.some((skill) => skill.name === "Vampirism") &&
-            stats.activeSkills.includes("Vampirism");
+        const hasVampirism = skills.has(stats, "Vampirism");
 
         const createHealthBar = (
             current: number,
@@ -195,20 +190,14 @@ export async function handleHunt(
                 return;
             }
         } else {
-            await thread
-                .send(
-                    `Another monster has appeared! You are now facing ${monster.name}.`,
-                )
-                .catch(noop);
+            await sendToChannel(thread.id, {
+                content: `Another monster has appeared! You are now facing ${monster.name}.`,
+            });
         }
 
-        const hasVigilance =
-            stats.skills.some((skill) => skill.name === "Vigilance") &&
-            stats.activeSkills.includes("Vigilance");
+        const hasVigilance = skills.has(stats, "Vigilance");
 
-        const hasDistraction =
-            stats.skills.some((skill) => skill.name === "Distraction") &&
-            stats.activeSkills.includes("Distraction");
+        const hasDistraction = skills.has(stats, "Distraction");
 
         let vigilanceUsed = false;
 
@@ -228,13 +217,11 @@ export async function handleHunt(
 
         let isFirstTurn = true;
 
-        const hasCrystallize =
-            stats.skills.some((skill) => skill.name === "Crystallize") &&
-            stats.activeSkills.includes("Crystallize");
+        const hasCrystallize = skills.has(stats, "Crystallize");
 
         let turnNumber = 1;
 
-        const startingMessages: string[] = [];
+        const startingMessages = make.array<string>();
         if (hasSloth) {
             startingMessages.push(
                 `\`💤\` **SIN OF SLOTH** activated. Your starting HP is increased by 25%.`,
@@ -247,9 +234,11 @@ export async function handleHunt(
         }
 
         if (startingMessages.length > 0) {
-            await thread
-                ?.send(">>> " + startingMessages.join("\n"))
-                .catch(noop);
+            if (thread) {
+                await sendToChannel(thread.id, {
+                    content: `>>> ${startingMessages.join("\n")}`,
+                });
+            }
         }
 
         while (currentPlayerHp > 0 && currentMonsterHp > 0) {
@@ -275,9 +264,11 @@ export async function handleHunt(
                 monsterState = result.monsterState;
 
                 if (playerMessages.length > 0) {
-                    await thread
-                        .send(">>> " + playerMessages.join("\n"))
-                        .catch(noop);
+                    if (thread) {
+                        await sendToChannel(thread.id, {
+                            content: `>>> ${playerMessages.join("\n")}`,
+                        });
+                    }
                 }
 
                 const playerHpBar = createHealthBar(
@@ -314,9 +305,11 @@ export async function handleHunt(
                         const vampirismMessage = `\`🦇\` Vampirism skill activated! You healed \`${healAmount.toFixed(
                             2,
                         )}\` HP.`;
-                        await thread
-                            ?.send(">>> " + vampirismMessage)
-                            .catch(noop);
+                        if (thread) {
+                            await sendToChannel(thread.id, {
+                                content: `>>> ${vampirismMessage}`,
+                            });
+                        }
                     }
                     break;
                 }
@@ -335,9 +328,11 @@ export async function handleHunt(
                 );
 
                 if (monsterMessages.length > 0) {
-                    await thread
-                        .send(">>> " + monsterMessages.join("\n"))
-                        .catch(noop);
+                    if (thread) {
+                        await sendToChannel(thread.id, {
+                            content: `>>> ${monsterMessages.join("\n")}`,
+                        });
+                    }
                 }
 
                 const playerHpBar = createHealthBar(
@@ -370,8 +365,7 @@ export async function handleHunt(
 
                 isPlayerTurn = true;
             }
-
-            await new Promise((resolve) => setTimeout(resolve, get.secs(2)));
+            await sleep(get.secs(2));
 
             stats.hp = Math.min(currentPlayerHp, stats.maxHP);
             await updateUserStats(stats.userId, { hp: stats.hp });

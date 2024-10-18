@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, make } from "@elara-services/utils";
 import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import {
@@ -237,7 +237,7 @@ export const learn = buildCommand<SlashCommand>({
             );
         }
 
-        const missingRequirements: string[] = [];
+        const missingRequirements = make.array<string>();
 
         if (
             skillData.rebirthsRequired &&

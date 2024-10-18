@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get } from "@elara-services/utils";
+import { embedComment, get, noop } from "@elara-services/utils";
 import {
     ChannelType,
     PermissionFlagsBits,
@@ -98,14 +98,12 @@ export const abyss = buildCommand<SlashCommand>({
                 embedComment("This command can only be used in a server."),
             );
         }
-
-        const guild = i.guild;
         const categoryId = "1290188539828633600";
         const channelName = `abysspriv-${i.user.username}`;
         const extraChannelId = "1295945026253226044";
 
         if (newAbyssMode) {
-            const category = guild.channels.cache.get(categoryId);
+            const category = i.guild.channels.resolve(categoryId);
             if (!category || category.type !== ChannelType.GuildCategory) {
                 locked.del(i.user.id);
                 return r.edit(
@@ -113,14 +111,14 @@ export const abyss = buildCommand<SlashCommand>({
                 );
             }
 
-            try {
-                const channel = await guild.channels.create({
+            const channel = await i.guild.channels
+                .create({
                     name: channelName,
                     type: ChannelType.GuildText,
                     parent: categoryId,
                     permissionOverwrites: [
                         {
-                            id: guild.roles.everyone.id,
+                            id: i.guild.roles.everyone.id,
                             deny: [PermissionFlagsBits.ViewChannel],
                         },
                         {
@@ -128,43 +126,39 @@ export const abyss = buildCommand<SlashCommand>({
                             allow: [PermissionFlagsBits.ViewChannel],
                         },
                     ],
-                });
+                })
+                .catch((e) => new Error(e));
+            if (channel instanceof Error) {
+                responseMessage += `\nFailed to create the private channel.`;
+                return r.edit(embedComment(responseMessage));
+            }
 
-                responseMessage += `\nA private channel has been created for you: ${channel}`;
+            responseMessage += `\nA private channel has been created for you: ${channel}`;
 
-                const extraChannel = guild.channels.cache.get(extraChannelId);
-                if (
-                    extraChannel &&
-                    extraChannel.type === ChannelType.GuildText
-                ) {
-                    await extraChannel.permissionOverwrites.edit(i.user.id, {
+            const extraChannel = i.guild.channels.resolve(extraChannelId);
+            if (extraChannel && extraChannel.type === ChannelType.GuildText) {
+                await extraChannel.permissionOverwrites
+                    .edit(i.user.id, {
                         ViewChannel: true,
-                    });
-                } else {
-                    console.error(
-                        "Extra channel does not exist or is not a text channel.",
-                    );
-                }
+                    })
+                    .catch(noop);
+            }
 
-                await channel.send({
-                    content: `${i.user}`,
+            await channel
+                .send({
+                    content: i.user.toString(),
                     embeds: [
                         {
                             description:
                                 "You have entered the Abyss. This is your private channel to run movement commands in, please utilize this channel for </move:1295986595383611412>. You can also use </whereami:1295986595383611414> to see your current location.",
                         },
                     ],
-                });
+                })
+                .catch(noop);
 
-                await r.edit(embedComment(responseMessage, "Green"));
-            } catch (error) {
-                console.error("Error creating channel:", error);
-                responseMessage += `\nFailed to create the private channel.`;
-
-                await r.edit(embedComment(responseMessage, "Red"));
-            }
+            await r.edit(embedComment(responseMessage, "Green"));
         } else {
-            const abyssChannel = guild.channels.cache.find(
+            const abyssChannel = i.guild.channels.cache.find(
                 (c) =>
                     c.name === channelName &&
                     c.type === ChannelType.GuildText &&
@@ -177,7 +171,7 @@ export const abyss = buildCommand<SlashCommand>({
                 responseMessage += `\nNo Abyss channel found to delete.`;
             }
 
-            const extraChannel = guild.channels.cache.get(extraChannelId);
+            const extraChannel = i.guild.channels.resolve(extraChannelId);
             if (extraChannel && extraChannel.type === ChannelType.GuildText) {
                 await extraChannel.permissionOverwrites
                     .delete(i.user.id)
@@ -187,10 +181,6 @@ export const abyss = buildCommand<SlashCommand>({
                             error,
                         );
                     });
-            } else {
-                console.error(
-                    "Extra channel does not exist or is not a text channel.",
-                );
             }
 
             await r.edit({
@@ -202,11 +192,7 @@ export const abyss = buildCommand<SlashCommand>({
             });
 
             if (abyssChannel) {
-                try {
-                    await abyssChannel.delete();
-                } catch (error) {
-                    console.error("Error deleting channel:", error);
-                }
+                await abyssChannel.delete().catch(noop);
             }
         }
 
