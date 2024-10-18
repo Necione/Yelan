@@ -1,12 +1,12 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, getKeys, is, noop } from "@elara-services/utils";
+import { embedComment, getKeys, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
     getUserStats,
     updateUserStats,
 } from "../../services";
-import { cooldowns, locked } from "../../utils";
+import { locked } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
@@ -14,7 +14,7 @@ import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 export const diffuse = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("diffuse")
-        .setDescription("[RPG] Trade an item in your bag for HP")
+        .setDescription("[RPG] Trade an item in your bag for benefits")
         .setDMPermission(false)
         .addStringOption((option) =>
             option
@@ -52,7 +52,7 @@ export const diffuse = buildCommand<SlashCommand>({
     },
     async execute(i, r) {
         const itemName = i.options.getString("item", true);
-        const amountTodiffuse = i.options.getInteger("amount", true);
+        const amountToDiffuse = i.options.getInteger("amount", true);
 
         if (itemName === "n/a") {
             return r.edit(embedComment(`You didn't select a valid item.`));
@@ -63,25 +63,6 @@ export const diffuse = buildCommand<SlashCommand>({
             locked.del(i.user.id);
             return r.edit(
                 embedComment("Unable to find/create your user profile."),
-            );
-        }
-
-        const cc = cooldowns.get(userWallet, "diffuse");
-        if (!cc.status) {
-            locked.del(i.user.id);
-            return r.edit(embedComment(cc.message));
-        }
-
-        const itemData =
-            drops[itemName as DropName] ||
-            weapons[itemName as WeaponName] ||
-            artifacts[itemName as ArtifactName];
-
-        if (!itemData) {
-            return r.edit(
-                embedComment(
-                    `The item "${itemName}" doesn't exist. Make sure you typed it correctly.`,
-                ),
             );
         }
 
@@ -98,28 +79,51 @@ export const diffuse = buildCommand<SlashCommand>({
             return r.edit(embedComment("You cannot diffuse while hunting!"));
         }
 
-        if (
-            weapons[itemName as WeaponName] &&
-            stats.equippedWeapon === itemName
-        ) {
+        // Handle Life Essence separately to add alchemy progress
+        if (itemName === "Life Essence") {
+            const item = stats.inventory.find((c) => c.item === itemName);
+            if (!item || item.amount < amountToDiffuse) {
+                return r.edit(
+                    embedComment(
+                        `You don't have enough "Life Essence" to diffuse.`,
+                    ),
+                );
+            }
+
+            // Increase alchemy progress
+            const alchemyIncrease = amountToDiffuse;
+            const newAlchemyProgress = stats.alchemyProgress + alchemyIncrease;
+
+            item.amount -= amountToDiffuse;
+            if (item.amount <= 0) {
+                stats.inventory = stats.inventory.filter(
+                    (c) => c.item !== item.item,
+                );
+            }
+
+            await updateUserStats(i.user.id, {
+                inventory: { set: stats.inventory },
+                alchemyProgress: newAlchemyProgress,
+            });
+
             return r.edit(
                 embedComment(
-                    `You cannot diffuse "${itemName}" because it is currently equipped!`,
+                    `You diffused \`${amountToDiffuse}x\` **Life Essence** and gained \`${alchemyIncrease}\` Alchemy Point!`,
+                    "Green",
                 ),
             );
         }
 
-        if (
-            artifacts[itemName as ArtifactName] &&
-            (stats.equippedFlower === itemName ||
-                stats.equippedPlume === itemName ||
-                stats.equippedSands === itemName ||
-                stats.equippedGoblet === itemName ||
-                stats.equippedCirclet === itemName)
-        ) {
+        // Handle other items (weapons, artifacts) as before
+        const itemData =
+            drops[itemName as DropName] ||
+            weapons[itemName as WeaponName] ||
+            artifacts[itemName as ArtifactName];
+
+        if (!itemData) {
             return r.edit(
                 embedComment(
-                    `You cannot diffuse "${itemName}" because it is currently equipped!`,
+                    `The item "${itemName}" doesn't exist. Make sure you typed it correctly.`,
                 ),
             );
         }
@@ -132,7 +136,7 @@ export const diffuse = buildCommand<SlashCommand>({
                 ),
             );
         }
-        if (item.amount < amountTodiffuse) {
+        if (item.amount < amountToDiffuse) {
             return r.edit(
                 embedComment(
                     `You don't have enough of "${itemName}" to diffuse.\n-# Check your inventory with </rpg:1279824112566665297>`,
@@ -140,12 +144,12 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
-        const totaldiffusePrice = itemData.sellPrice * amountTodiffuse;
-        const totalHeal = Math.round(totaldiffusePrice * 1.5);
+        const totalDiffusePrice = itemData.sellPrice * amountToDiffuse;
+        const totalHeal = Math.round(totalDiffusePrice * 1.5);
         const maxHP = stats.maxHP;
         const newHp = Math.min(stats.hp + totalHeal, maxHP);
 
-        item.amount -= amountTodiffuse;
+        item.amount -= amountToDiffuse;
         if (item.amount <= 0) {
             stats.inventory = stats.inventory.filter(
                 (c) => c.item !== item.item,
@@ -161,11 +165,9 @@ export const diffuse = buildCommand<SlashCommand>({
             }),
         ]);
 
-        await cooldowns.set(userWallet, "diffuse", get.mins(30));
-
         return r.edit(
             embedComment(
-                `You diffused \`${amountTodiffuse}x\` **${itemName}** for 💗 \`${totalHeal} HP\`!`,
+                `You diffused \`${amountToDiffuse}x\` **${itemName}** for 💗 \`${totalHeal} HP\`!`,
                 "Green",
             ),
         );

@@ -359,13 +359,21 @@ export const drops = {
         chestChance: 0,
         rarity: 3,
     },
-    "Domain Key": {
-        sellPrice: 5,
+    "Life Essence": {
+        sellPrice: 1,
         minAmount: 0,
         maxAmount: 0,
         minWorldLevel: 1,
-        chestChance: 2,
-        rarity: 1,
+        chestChance: 0,
+        rarity: 3,
+    },
+    Geode: {
+        sellPrice: 125,
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 10,
+        chestChance: 0,
+        rarity: 3,
     },
 };
 

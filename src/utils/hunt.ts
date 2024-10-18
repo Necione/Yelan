@@ -396,6 +396,7 @@ export { abyssMonsters, abyssMonstersLoaded };
 
 export async function getMonsterByName(
     name: string,
+    worldLevel?: number,
 ): Promise<MonsterInstance | null> {
     if (!monstersLoaded) {
         await initializeMonsters();
@@ -415,9 +416,9 @@ export async function getMonsterByName(
         return null;
     }
 
-    const worldLevel = monster.minWorldLevel;
+    const selectedWorldLevel = worldLevel ?? monster.minWorldLevel;
 
-    const stats = monster.getStatsForWorldLevel(worldLevel);
+    const stats = monster.getStatsForWorldLevel(selectedWorldLevel);
 
     if (stats) {
         const monsterInstance: MonsterInstance = {
@@ -430,12 +431,12 @@ export async function getMonsterByName(
         };
 
         log(
-            `Created MonsterInstance for ${monster.name} at world level ${worldLevel}.`,
+            `Created MonsterInstance for ${monster.name} at world level ${selectedWorldLevel}.`,
         );
         return monsterInstance;
     } else {
         console.error(
-            `Stats for world level ${worldLevel} not found for monster: ${monster.name}`,
+            `Stats for world level ${selectedWorldLevel} not found for monster: ${monster.name}`,
         );
         return null;
     }

@@ -56,7 +56,9 @@ export async function handleChest(
     });
 
     const embed = new EmbedBuilder()
-        .setTitle(`You stumbled upon some ${rarity} Treasure Chests!`)
+        .setTitle(
+            `<a:z_reward:1091219256395452517> You stumbled upon some ${rarity} Treasure Chests!`,
+        )
         .setDescription(
             `Select one of the chests below to claim its contents. You have **10 seconds** to choose!\n\n${chestDescriptions.join(
                 "\n\n",
@@ -129,9 +131,9 @@ export async function handleChest(
                 : "";
 
         const resultMessage = lootDescription
-            ? `You chose **Chest ${selectedChestIndex + 1}**!\nIt contained ${
-                  customEmoji.a.z_coins
-              } \`${
+            ? `<a:z_reward:1091219256395452517> You chose **Chest ${
+                  selectedChestIndex + 1
+              }**!\nIt contained ${customEmoji.a.z_coins} \`${
                   selectedChest.coins
               }\` and the following items:\n${lootDescription}`
             : `You chose **Chest ${selectedChestIndex + 1}**!\nIt contained ${

@@ -444,6 +444,18 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Kagotsurube_Isshin:1291134317984092262>",
     },
+    "Amenoma Kageuchi": {
+        sellPrice: 40,
+        attackPower: 20,
+        critChance: 10,
+        critValue: 2,
+        defValue: 0,
+        defChance: 0,
+        additionalHP: 200,
+        minWorldLevel: 20,
+        chestChance: 3,
+        emoji: "<:Weapon_Amenoma_Kageuchi:1296678201065603112>",
+    },
     // Reworking
     "Aqua Simulacra": {
         sellPrice: 25,
@@ -470,7 +482,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Staff_of_Homa:1283341597425008640>",
     },
     // Special Weapons
-    "Englufing Lightning": {
+    "Engulfing Lightning": {
         sellPrice: 25,
         attackPower: 50,
         critChance: 30,
@@ -510,6 +522,9 @@ const prefixes: {
     }),
     Spicy: (weaponData) => ({
         critValue: weaponData.critValue * 1.5,
+    }),
+    Hearty: (weaponData) => ({
+        additionalHP: weaponData.additionalHP * 2,
     }),
 };
 

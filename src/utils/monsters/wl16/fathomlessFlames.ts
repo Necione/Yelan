@@ -4,7 +4,7 @@ export default {
     currentHp: 0,
     name: "Fathomless Flames",
     group: MonsterGroup.Abyss,
-    minExp: 15,
+    minExp: 20,
     maxExp: 30,
     minWorldLevel: 16,
     image: "https://lh.elara.workers.dev/rpg/monsters/fathomless_flame.png",

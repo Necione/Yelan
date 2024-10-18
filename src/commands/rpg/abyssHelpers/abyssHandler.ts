@@ -13,8 +13,9 @@ import {
     initializeMonsters,
     type Monster,
 } from "../../../utils/hunt";
-import { monsterAttack, playerAttack } from "./battleHandler";
-import { handleAbyssDefeat, handleAbyssVictory } from "./conditions";
+import { monsterAttack, playerAttack } from "../handlers/battleHandler";
+import { handleAbyssDefeat, handleAbyssVictory } from "../handlers/conditions";
+import { floor1Monsters, floor2Monsters } from "./monsterSets";
 
 export async function handleAbyssBattle(
     i: ChatInputCommandInteraction,
@@ -23,24 +24,32 @@ export async function handleAbyssBattle(
 ) {
     await initializeMonsters();
 
-    const possibleMonsters = [
-        "Large Pyro Slime",
-        "Large Cryo Slime",
-        "Large Geo Slime",
-        "Hilichurl",
-        "Mitachurl",
-        "Dendro Samachurl",
-        "Ruin Scout",
-        "Cryo Abyss Mage",
-        "Hydro Abyss Mage",
-        "Pyro Abyss Mage",
-    ];
+    let possibleMonsters: string[] = [];
+
+    switch (stats.currentAbyssFloor) {
+        case 1:
+            possibleMonsters = floor1Monsters;
+            break;
+        case 2:
+            possibleMonsters = floor2Monsters;
+            break;
+        default:
+            possibleMonsters = floor1Monsters;
+            break;
+    }
+
     let monstersEncountered: Monster[] = [];
 
     const selectedMonsterName =
         possibleMonsters[Math.floor(Math.random() * possibleMonsters.length)];
 
-    const selectedMonster = await getMonsterByName(selectedMonsterName);
+    const abyssWorldLevel = stats.currentAbyssFloor === 2 ? 15 : 10;
+
+    const selectedMonster = await getMonsterByName(
+        selectedMonsterName,
+        abyssWorldLevel,
+    );
+
     if (!selectedMonster) {
         throw new Error(`Monster not found: ${selectedMonsterName}`);
     }
@@ -72,7 +81,9 @@ export async function handleAbyssBattle(
     const handleMonsterBattle = async (thread?: PublicThreadChannel<false>) => {
         const monster = monstersEncountered[currentMonsterIndex];
 
-        const monsterStats = monster.getStatsForWorldLevel(10);
+        const abyssWorldLevel = stats.currentAbyssFloor === 2 ? 15 : 10;
+        const monsterStats = monster.getStatsForWorldLevel(abyssWorldLevel);
+
         if (!monsterStats) {
             throw new Error(`Stats not found for monster: ${monster.name}`);
         }

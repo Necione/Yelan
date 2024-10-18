@@ -125,7 +125,10 @@ export const sell = buildCommand<SlashCommand>({
             );
         }
 
-        const rebirthMultiplier = 1 + Math.min(stats.rebirths, 3) * 0.2;
+        const rebirthMultiplier =
+            1 +
+            Math.min(stats.rebirths, 3) * 0.2 +
+            Math.max(0, stats.rebirths - 3) * 0.1;
         const rebirthBonus =
             (rebirthMultiplier - 1) * itemData.sellPrice * amountToSell;
 

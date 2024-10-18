@@ -113,12 +113,6 @@ export const misc = {
         maxAmount: 2,
         dropChance: 7,
     },
-    Geode: {
-        sellPrice: 125,
-        minAmount: 1,
-        maxAmount: 1,
-        dropChance: 0,
-    },
 };
 
 export type MiscName = keyof typeof misc;

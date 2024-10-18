@@ -80,7 +80,7 @@ export const rpg = buildCommand<SlashCommand>({
                         : ""
                 }${
                     stats.defChance > 0 || stats.defValue > 0
-                        ? `\n🛡️ DEF Chance: \`${
+                        ? `\n🛡️ DEF Rate: \`${
                               stats.defChance
                           }%\` | 🛡️ DEF Value: \`${(
                               stats.defValue * 100

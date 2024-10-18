@@ -4,8 +4,8 @@ export default {
     currentHp: 0,
     name: "Electro Cicin",
     group: MonsterGroup.Abyss,
-    minExp: 10,
-    maxExp: 25,
+    minExp: 20,
+    maxExp: 35,
     minWorldLevel: 19,
     image: "https://lh.elara.workers.dev/rpg/monsters/electro_cicin.png",
     drops: [

@@ -4,7 +4,7 @@ export default {
     currentHp: 0,
     name: "Ruin Guard",
     group: MonsterGroup.Machine,
-    minExp: 15,
+    minExp: 20,
     maxExp: 30,
     minWorldLevel: 16,
     image: "https://lh.elara.workers.dev/rpg/monsters/ruin_guard.png",

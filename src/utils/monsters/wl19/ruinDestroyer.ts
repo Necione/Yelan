@@ -4,8 +4,8 @@ export default {
     currentHp: 0,
     name: "Ruin Destroyer",
     group: MonsterGroup.Machine,
-    minExp: 10,
-    maxExp: 25,
+    minExp: 20,
+    maxExp: 35,
     minWorldLevel: 19,
     image: "https://lh.elara.workers.dev/rpg/monsters/ruin_destroyer.png",
     drops: [
