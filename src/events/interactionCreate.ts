@@ -13,12 +13,18 @@ import { handleInviteInteraction, isInviteInt } from "../plugins/other/invites";
 import { handleInteractions } from "../plugins/pets";
 import { onInteraction } from "../plugins/profile";
 import { isInActiveTrade, locked } from "../utils";
+import { onInventoryInteraction } from "../plugins/other/inventory";
 
 export const interactionCreate = createEvent({
     name: Events.InteractionCreate,
     async execute(i: Interaction) {
         if (i.isAutocomplete()) {
             return handleAutocompleteCommand(i, getFilesList(Commands));
+        }
+        if (i.isStringSelectMenu()) {
+            if (i.customId.startsWith("inventory_select")) {
+                return onInventoryInteraction(i);
+            }
         }
         handlePostInteraction(i);
         if ("customId" in i) {
