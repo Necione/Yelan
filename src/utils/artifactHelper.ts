@@ -15,10 +15,10 @@ export function calculateStatChanges(
     const statsToCheck = [
         { key: "attackPower", label: "⚔️ Attack Power" },
         { key: "critChance", label: "🎯 Crit Rate", isPercentage: true },
-        { key: "critValue", label: "💥 Crit Damage", isMultiplier: true },
+        { key: "critValue", label: "💥 Crit Value", isMultiplier: true },
         { key: "maxHP", label: "❤️ Max HP" },
-        { key: "defChance", label: "🛡️ Def Chance", isPercentage: true },
-        { key: "defValue", label: "🛡️ Def Value", isPercentage: true },
+        { key: "defChance", label: "🛡️ DEF Rate", isPercentage: true },
+        { key: "defValue", label: "🛡️ DEF Value", isPercentage: true },
     ];
 
     for (const stat of statsToCheck) {
@@ -132,7 +132,7 @@ function describeSetBonus(setName: string, bonusType: "2pc" | "4pc"): string {
                 break;
             case "critValuePercentage":
                 descriptions.push(
-                    `💥 Crit Damage increased by ${(value * 100).toFixed(2)}%`,
+                    `💥 Crit Value increased by ${(value * 100).toFixed(2)}%`,
                 );
                 break;
             case "maxHPPercentage":
@@ -141,7 +141,7 @@ function describeSetBonus(setName: string, bonusType: "2pc" | "4pc"): string {
                 );
                 break;
             case "defChance":
-                descriptions.push(`🛡️ DEF Chance increased by ${value}%`);
+                descriptions.push(`🛡️ DEF Rate increased by ${value}%`);
                 break;
             case "defValuePercentage":
                 descriptions.push(

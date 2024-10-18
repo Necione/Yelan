@@ -103,7 +103,10 @@ export const sellall = buildCommand<SlashCommand>({
 
         let totalSellPrice = 0;
         const messages = [];
-        const rebirthMultiplier = 1 + Math.min(stats.rebirths, 3) * 0.2 + Math.max(0, stats.rebirths - 3) * 0.1;
+        const rebirthMultiplier =
+            1 +
+            Math.min(stats.rebirths, 3) * 0.2 +
+            Math.max(0, stats.rebirths - 3) * 0.1;
         let totalRebirthBonus = 0;
         let totalAppraiseBonus = 0;
         const itemsSold = [];

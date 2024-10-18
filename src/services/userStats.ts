@@ -19,20 +19,31 @@ export async function syncStats(userId: string) {
         return null;
     }
 
+    if (stats.totalAssigned > stats.alchemyProgress) {
+        stats.totalAssigned = stats.alchemyProgress;
+    }
+
     const calculatedBaseAttack = 5 + (stats.worldLevel - 1) * 0.5;
-    const alchemyBaseAttack = stats.alchemyProgress * 0.25;
-    const finalBaseAttack = calculatedBaseAttack + alchemyBaseAttack;
+
+    const assignedAttackBonus = (stats.assignedAtk || 0) * 0.25;
+    const alchemyBaseAttack = calculatedBaseAttack + assignedAttackBonus;
 
     const calculatedMaxHP =
         100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
 
+    const assignedHpBonus = (stats.assignedHp || 0) * 5;
+    const finalMaxHP = calculatedMaxHP + assignedHpBonus;
+
+    const assignedCritValueBonus = (stats.assignedCritValue || 0) * 0.01;
+    const assignedDefValueBonus = (stats.assignedDefValue || 0) * 0.01;
+
     const totalStats = {
-        attackPower: finalBaseAttack,
         critChance: 1,
-        critValue: 1,
         defChance: 0,
-        defValue: 0,
-        maxHP: calculatedMaxHP,
+        attackPower: alchemyBaseAttack,
+        critValue: 1 + assignedCritValueBonus,
+        defValue: assignedDefValueBonus,
+        maxHP: finalMaxHP,
         healEffectiveness: 0,
     };
 
@@ -106,8 +117,8 @@ export async function syncStats(userId: string) {
 
     let needsUpdate = false;
 
-    if (stats.baseAttack !== finalBaseAttack) {
-        stats.baseAttack = finalBaseAttack;
+    if (stats.baseAttack !== alchemyBaseAttack) {
+        stats.baseAttack = alchemyBaseAttack;
         needsUpdate = true;
     }
     if (stats.attackPower !== totalStats.attackPower) {
@@ -141,7 +152,7 @@ export async function syncStats(userId: string) {
 
     if (needsUpdate) {
         return await updateUserStats(userId, {
-            baseAttack: { set: finalBaseAttack },
+            baseAttack: { set: alchemyBaseAttack },
             attackPower: { set: totalStats.attackPower },
             maxHP: { set: totalStats.maxHP },
             critChance: { set: totalStats.critChance },

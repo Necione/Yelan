@@ -1,12 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import {
-    getProfileByUserId,
-    getUserStats,
-    updateUserStats,
-} from "../../services";
-import { locked } from "../../utils";
+import { getUserStats, updateUserStats } from "../../services";
 
 const alchemyRankEmojis = {
     Bronze: "🟫",
@@ -79,116 +74,228 @@ const createAlchemyBar = (
 export const alchemy = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("alchemy")
-        .setDescription("[RPG] Not sure what this does exactly")
+        .setDescription(
+            "[RPG] View your alchemy profile or assign/deallocate points to stats.",
+        )
         .setDMPermission(false)
         .addStringOption((option) =>
             option
-                .setName("item")
-                .setDescription("The item that you want to use")
+                .setName("action")
+                .setDescription(
+                    "Choose whether to allocate or deallocate points.",
+                )
                 .setRequired(false)
-                .addChoices({ name: "Life Essence", value: "Life Essence" }),
+                .addChoices(
+                    { name: "Allocate", value: "allocate" },
+                    { name: "Deallocate", value: "deallocate" },
+                ),
+        )
+        .addStringOption((option) =>
+            option
+                .setName("stat")
+                .setDescription(
+                    "The stat to assign or deallocate points to/from.",
+                )
+                .setRequired(false)
+                .addChoices(
+                    { name: "ATK", value: "ATK" },
+                    { name: "HP", value: "HP" },
+                    { name: "Crit Value", value: "Crit Value" },
+                    { name: "DEF Value", value: "DEF Value" },
+                ),
         )
         .addIntegerOption((option) =>
             option
-                .setName("amount")
-                .setDescription("The amount to use")
+                .setName("points")
+                .setDescription(
+                    "The number of points to allocate or deallocate.",
+                )
                 .setRequired(false),
         ),
     defer: { silent: false },
 
     async execute(i, r) {
-        const itemName = i.options.getString("item", false);
-        const amountToUse = i.options.getInteger("amount", false) ?? 1;
-
-        const userWallet = await getProfileByUserId(i.user.id);
-        if (!userWallet) {
-            locked.del(i.user.id);
-            return r.edit(
-                embedComment("Unable to find/create your user profile."),
-            );
-        }
+        const action = i.options.getString("action", false);
+        const stat = i.options.getString("stat", false);
+        const pointsToAssign = i.options.getInteger("points", false);
 
         const stats = await getUserStats(i.user.id);
         if (!stats) {
             return r.edit(
                 embedComment(
-                    `No stats found for you, please set up your profile.`,
+                    "No stats found for you, please set up your profile.",
                 ),
             );
         }
 
-        if (stats.isHunting) {
-            return r.edit(
-                embedComment("You cannot perform alchemy while hunting!"),
-            );
-        }
-
-        if (!itemName || !amountToUse) {
+        if (!action || !stat || !pointsToAssign) {
             const alchemyProgress = stats.alchemyProgress;
             const alchemyMax = 360;
             const alchemyBar = createAlchemyBar(alchemyProgress, alchemyMax);
             const alchemyRankWithEmoji =
                 getAlchemyRankWithEmoji(alchemyProgress);
-            const alchemyAttackIncrease = alchemyProgress * 0.25;
+
+            const assignedAtkBonus = stats.assignedAtk * 0.25;
+            const assignedHpBonus = stats.assignedHp * 5;
+            const assignedCritValueBonus = (
+                stats.assignedCritValue * 0.01
+            ).toFixed(2);
+            const assignedDefValueBonus = (
+                stats.assignedDefValue * 0.01
+            ).toFixed(2);
 
             return r.edit({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle("Your Alchemy Progress")
+                        .setTitle("Your Alchemy Profile")
                         .setDescription(
-                            `Alchemy Rank: ${alchemyRankWithEmoji}\n` +
-                                `🍃 Essence: ${alchemyBar}\n\n` +
-                                `Base ATK: \`+${alchemyAttackIncrease} ATK\``,
+                            `Alchemist Rank: ${alchemyRankWithEmoji}\n` +
+                                `🍃 Essence: ${alchemyBar}`,
                         )
-                        .setColor(0x4b52bb),
+                        .setColor(0x4b52bb)
+                        .addFields(
+                            {
+                                name: "Assigned Bonuses",
+                                value:
+                                    `⚔️ ATK: \`+${assignedAtkBonus}\` (${stats.assignedAtk} Points)\n` +
+                                    `❤️ HP: \`+${assignedHpBonus}\` (${stats.assignedHp} Points)\n` +
+                                    `💥 Crit Value: \`+${assignedCritValueBonus}\` (${stats.assignedCritValue} Points)\n` +
+                                    `🛡️ DEF Value: \`+${assignedDefValueBonus}\` (${stats.assignedDefValue} Points)`,
+                                inline: false,
+                            },
+                            {
+                                name: "Total Assigned Points",
+                                value: `\`${stats.totalAssigned}/${alchemyProgress}\` Points`,
+                                inline: false,
+                            },
+                        ),
                 ],
             });
         }
 
-        const item = stats.inventory.find((c) => c.item === itemName);
-        if (!item) {
+        const totalAssigned = stats.totalAssigned ?? 0;
+        const alchemyProgress = stats.alchemyProgress;
+
+        if (action === "allocate") {
+            if (totalAssigned + pointsToAssign > alchemyProgress) {
+                return r.edit(
+                    embedComment(
+                        `You cannot assign more points than your alchemy progress allows.`,
+                    ),
+                );
+            }
+
+            let newAssignedAtk = stats.assignedAtk ?? 0;
+            let newAssignedHp = stats.assignedHp ?? 0;
+            let newAssignedCritValue = stats.assignedCritValue ?? 0;
+            let newAssignedDefValue = stats.assignedDefValue ?? 0;
+            let newTotalAssigned = totalAssigned;
+
+            switch (stat) {
+                case "ATK":
+                    newAssignedAtk += pointsToAssign;
+                    break;
+                case "HP":
+                    newAssignedHp += pointsToAssign;
+                    break;
+                case "Crit Value":
+                    newAssignedCritValue += pointsToAssign;
+                    break;
+                case "DEF Value":
+                    newAssignedDefValue += pointsToAssign;
+                    break;
+                default:
+                    return r.edit(embedComment("Invalid stat chosen."));
+            }
+
+            newTotalAssigned += pointsToAssign;
+
+            await updateUserStats(i.user.id, {
+                assignedAtk: newAssignedAtk,
+                assignedHp: newAssignedHp,
+                assignedCritValue: newAssignedCritValue,
+                assignedDefValue: newAssignedDefValue,
+                totalAssigned: newTotalAssigned,
+            });
+
             return r.edit(
                 embedComment(
-                    `You don't have "Life Essence" in your inventory.`,
+                    `You have successfully assigned \`${pointsToAssign}\` points to ${stat}. \nYou have \`${
+                        alchemyProgress - newTotalAssigned
+                    }\` points remaining to assign.`,
                 ),
             );
         }
 
-        if (item.amount < amountToUse) {
+        if (action === "deallocate") {
+            let newAssignedAtk = stats.assignedAtk ?? 0;
+            let newAssignedHp = stats.assignedHp ?? 0;
+            let newAssignedCritValue = stats.assignedCritValue ?? 0;
+            let newAssignedDefValue = stats.assignedDefValue ?? 0;
+            let newTotalAssigned = totalAssigned;
+
+            switch (stat) {
+                case "ATK":
+                    if (newAssignedAtk < pointsToAssign) {
+                        return r.edit(
+                            embedComment(
+                                "You cannot deallocate more points than you have assigned to ATK.",
+                            ),
+                        );
+                    }
+                    newAssignedAtk -= pointsToAssign;
+                    break;
+                case "HP":
+                    if (newAssignedHp < pointsToAssign) {
+                        return r.edit(
+                            embedComment(
+                                "You cannot deallocate more points than you have assigned to HP.",
+                            ),
+                        );
+                    }
+                    newAssignedHp -= pointsToAssign;
+                    break;
+                case "Crit Value":
+                    if (newAssignedCritValue < pointsToAssign) {
+                        return r.edit(
+                            embedComment(
+                                "You cannot deallocate more points than you have assigned to Crit DMG.",
+                            ),
+                        );
+                    }
+                    newAssignedCritValue -= pointsToAssign;
+                    break;
+                case "DEF Value":
+                    if (newAssignedDefValue < pointsToAssign) {
+                        return r.edit(
+                            embedComment(
+                                "You cannot deallocate more points than you have assigned to DEF Value.",
+                            ),
+                        );
+                    }
+                    newAssignedDefValue -= pointsToAssign;
+                    break;
+                default:
+                    return r.edit(embedComment("Invalid stat chosen."));
+            }
+
+            newTotalAssigned -= pointsToAssign;
+
+            await updateUserStats(i.user.id, {
+                assignedAtk: newAssignedAtk,
+                assignedHp: newAssignedHp,
+                assignedCritValue: newAssignedCritValue,
+                assignedDefValue: newAssignedDefValue,
+                totalAssigned: newTotalAssigned,
+            });
+
             return r.edit(
-                embedComment(`You don't have enough "Life Essence" to use.`),
+                embedComment(
+                    `You have successfully deallocated \`${pointsToAssign}\` points from ${stat.toUpperCase()}. \nYou now have \`${
+                        alchemyProgress - newTotalAssigned
+                    }\` points remaining to assign.`,
+                ),
             );
         }
-
-        const alchemyIncrease = amountToUse;
-        const newAlchemyProgress = stats.alchemyProgress + alchemyIncrease;
-
-        item.amount -= amountToUse;
-        if (item.amount <= 0) {
-            stats.inventory = stats.inventory.filter(
-                (c) => c.item !== item.item,
-            );
-        }
-
-        const alchemyAttackIncrease = newAlchemyProgress * 0.25;
-
-        await Promise.all([
-            updateUserStats(i.user.id, {
-                inventory: { set: stats.inventory },
-                alchemyProgress: newAlchemyProgress,
-                baseAttack: { set: alchemyAttackIncrease },
-            }),
-        ]);
-
-        return r.edit({
-            embeds: [
-                new EmbedBuilder()
-                    .setTitle("Alchemy Progress")
-                    .setDescription(
-                        `You used \`${amountToUse}x\` **Life Essence**.`,
-                    )
-                    .setColor("Green"),
-            ],
-        });
     },
 });

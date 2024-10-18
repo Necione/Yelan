@@ -74,7 +74,10 @@ export const rebirth = buildCommand<SlashCommand>({
 
         let totalSellPrice = 0;
 
-        const rebirthMultiplier = 1 + Math.min(stats.rebirths, 3) * 0.2 + Math.max(0, stats.rebirths - 3) * 0.1;
+        const rebirthMultiplier =
+            1 +
+            Math.min(stats.rebirths, 3) * 0.2 +
+            Math.max(0, stats.rebirths - 3) * 0.1;
         let appraiseBonus = 0;
 
         const hasAppraiseSkill = stats.skills.some(

@@ -13,9 +13,9 @@ import {
     initializeMonsters,
     type Monster,
 } from "../../../utils/hunt";
-import { floor1Monsters, floor2Monsters } from "../abyssHelpers/monsterSets";
-import { monsterAttack, playerAttack } from "./battleHandler";
-import { handleAbyssDefeat, handleAbyssVictory } from "./conditions";
+import { monsterAttack, playerAttack } from "../handlers/battleHandler";
+import { handleAbyssDefeat, handleAbyssVictory } from "../handlers/conditions";
+import { floor1Monsters, floor2Monsters } from "./monsterSets";
 
 export async function handleAbyssBattle(
     i: ChatInputCommandInteraction,

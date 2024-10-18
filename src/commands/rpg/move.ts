@@ -9,12 +9,12 @@ import {
 } from "../../services";
 import { locked } from "../../utils";
 import { handleAbyssChest } from "./abyssHelpers/abyssChest";
+import { handleAbyssBattle } from "./abyssHelpers/abyssHandler";
 import { handleTrap } from "./abyssHelpers/abyssTrap";
 import { findPositionInMap } from "./abyssHelpers/directionHelper";
 import { floor1Map } from "./abyssHelpers/floor1map";
 import { floor2Map } from "./abyssHelpers/floor2map";
 import { handleFloorTransition } from "./abyssHelpers/floorTransition";
-import { handleAbyssBattle } from "./handlers/abyssHandler";
 
 const tileWithoutMonsters = ["f", "s", "c"];
 

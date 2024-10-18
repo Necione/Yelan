@@ -81,8 +81,8 @@ export async function handleAbyssChest(
 
     const resultMessage =
         chestLoot.coins > 0
-            ? `You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!\nIt contained ${customEmoji.a.z_coins} \`${chestLoot.coins}\``
-            : `You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!`;
+            ? `<a:z_reward:1091219256395452517> You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!\nIt contained ${customEmoji.a.z_coins} \`${chestLoot.coins}\``
+            : `<a:z_reward:1091219256395452517> You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!`;
 
     return chestLoot.loot.length > 0
         ? `${resultMessage} and the following items:\n${lootDescription}`
