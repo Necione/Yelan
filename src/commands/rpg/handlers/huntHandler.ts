@@ -365,7 +365,7 @@ export async function handleHunt(
 
                 isPlayerTurn = true;
             }
-            await sleep(get.secs(2));
+            await sleep(get.secs(1));
 
             stats.hp = Math.min(currentPlayerHp, stats.maxHP);
             await updateUserStats(stats.userId, { hp: stats.hp });
