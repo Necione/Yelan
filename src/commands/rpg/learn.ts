@@ -8,163 +8,7 @@ import {
     removeBalance,
     updateUserStats,
 } from "../../services";
-
-type SkillName =
-    | "Vigilance"
-    | "Leech"
-    | "Appraise"
-    | "Totem"
-    | "Insomnia"
-    | "Energize"
-    | "Scrounge"
-    | "Distraction"
-    | "Backstab"
-    | "Heartbroken"
-    | "Vampirism"
-    | "Crystallize"
-    | "Kindle"
-    | "Growth"
-    | "Sloth"
-    | "Wrath";
-
-const skillRequirements: Record<
-    SkillName,
-    {
-        worldLevel: number;
-        coins: number;
-        items: { item: string; amount: number }[];
-        rebirthsRequired?: number;
-    }
-> = {
-    Vigilance: {
-        worldLevel: 2,
-        coins: 100,
-        items: [
-            { item: "Ominous Mask", amount: 2 },
-            { item: "Divining Scroll", amount: 3 },
-        ],
-    },
-    Leech: {
-        worldLevel: 3,
-        coins: 150,
-        items: [{ item: "Slime Concentrate", amount: 2 }],
-    },
-    Appraise: {
-        worldLevel: 1,
-        coins: 50,
-        items: [
-            { item: "Slime Condensate", amount: 2 },
-            { item: "Sharp Arrowhead", amount: 2 },
-        ],
-    },
-    Totem: {
-        worldLevel: 1,
-        coins: 100,
-        items: [{ item: "Stained Mask", amount: 5 }],
-    },
-    Insomnia: {
-        worldLevel: 4,
-        coins: 250,
-        items: [
-            { item: "Firm Arrowhead", amount: 3 },
-            { item: "Sealed Scroll", amount: 5 },
-        ],
-    },
-    Energize: {
-        worldLevel: 4,
-        coins: 250,
-        items: [
-            { item: "Ominous Mask", amount: 5 },
-            { item: "Sealed Scroll", amount: 10 },
-        ],
-    },
-    Scrounge: {
-        worldLevel: 3,
-        coins: 250,
-        items: [
-            { item: "Sealed Scroll", amount: 3 },
-            { item: "Slime Concentrate", amount: 5 },
-        ],
-    },
-    Kindle: {
-        worldLevel: 5,
-        coins: 100,
-        items: [
-            { item: "Forbidden Curse Scroll", amount: 2 },
-            { item: "Heavy Horn", amount: 5 },
-            { item: "Silver Raven Insignia", amount: 3 },
-        ],
-    },
-    Vampirism: {
-        worldLevel: 3,
-        coins: 150,
-        items: [{ item: "Slime Concentrate", amount: 10 }],
-        rebirthsRequired: 1,
-    },
-    Backstab: {
-        worldLevel: 5,
-        coins: 100,
-        items: [
-            { item: "Golden Raven Insignia", amount: 2 },
-            { item: "Sealed Scroll", amount: 1 },
-        ],
-        rebirthsRequired: 1,
-    },
-    Crystallize: {
-        worldLevel: 10,
-        coins: 200,
-        items: [
-            { item: "Recruit's Insignia", amount: 5 },
-            { item: "A Flower Yet to Bloom", amount: 5 },
-            { item: "Slime Secretions", amount: 15 },
-        ],
-        rebirthsRequired: 1,
-    },
-    Heartbroken: {
-        worldLevel: 10,
-        coins: 500,
-        items: [
-            { item: "Mist Grass", amount: 2 },
-            { item: "Agent's Sacrificial Knife", amount: 2 },
-        ],
-        rebirthsRequired: 1,
-    },
-    Distraction: {
-        worldLevel: 10,
-        coins: 250,
-        items: [{ item: "Dismal Prism", amount: 2 }],
-        rebirthsRequired: 1,
-    },
-    Growth: {
-        worldLevel: 10,
-        coins: 500,
-        items: [
-            { item: "Black Bronze Horn", amount: 5 },
-            { item: "Dead Ley Line Leaves", amount: 10 },
-        ],
-        rebirthsRequired: 2,
-    },
-    Sloth: {
-        worldLevel: 15,
-        coins: 500,
-        items: [
-            { item: "Mist Grass", amount: 10 },
-            { item: "Slime Concentrate", amount: 20 },
-            { item: "Life Essence", amount: 5 },
-        ],
-        rebirthsRequired: 2,
-    },
-    Wrath: {
-        worldLevel: 15,
-        coins: 500,
-        items: [
-            { item: "Crystal Prism", amount: 10 },
-            { item: "Slime Concentrate", amount: 20 },
-            { item: "Life Essence", amount: 5 },
-        ],
-        rebirthsRequired: 2,
-    },
-};
+import { type SkillName, skillsMap } from "../../utils/skillsData";
 
 export const learn = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -176,24 +20,13 @@ export const learn = buildCommand<SlashCommand>({
                 .setDescription("The skill you want to learn")
                 .setRequired(true)
                 .addChoices(
-                    { name: "Vigilance", value: "Vigilance" },
-                    { name: "Leech", value: "Leech" },
-                    { name: "Vampirism", value: "Vampirism" },
-                    { name: "Appraise", value: "Appraise" },
-                    { name: "Totem", value: "Totem" },
-                    { name: "Insomnia", value: "Insomnia" },
-                    { name: "Kindle", value: "Kindle" },
-                    { name: "Scrounge", value: "Scrounge" },
-                    { name: "Energize", value: "Energize" },
-                    { name: "Distraction", value: "Distraction" },
-                    { name: "Backstab", value: "Backstab" },
-                    { name: "Heartbroken", value: "Heartbroken" },
-                    { name: "Crystallize", value: "Crystallize" },
-                    { name: "Growth", value: "Growth" },
-                    { name: "Sloth", value: "Sloth" },
-                    { name: "Wrath", value: "Wrath" },
+                    ...Object.values(skillsMap).map((skill) => ({
+                        name: skill.name,
+                        value: skill.name,
+                    })),
                 ),
         ),
+
     defer: { silent: false },
     async execute(i, r) {
         const skillName = i.options.getString("skill", true) as SkillName;
@@ -220,7 +53,7 @@ export const learn = buildCommand<SlashCommand>({
             return r.edit(embedComment("You cannot learn while hunting!"));
         }
 
-        const skillData = skillRequirements[skillName];
+        const skillData = skillsMap[skillName];
 
         if (!skillData) {
             return r.edit(
@@ -240,29 +73,31 @@ export const learn = buildCommand<SlashCommand>({
         const missingRequirements = make.array<string>();
 
         if (
-            skillData.rebirthsRequired &&
-            (stats.rebirths || 0) < skillData.rebirthsRequired
+            skillData.requirements?.rebirthsRequired &&
+            (stats.rebirths || 0) < skillData.requirements?.rebirthsRequired
         ) {
             missingRequirements.push(
                 `**Rebirths**: You need to have at least **${
-                    skillData.rebirthsRequired
-                } Rebirth${skillData.rebirthsRequired > 1 ? "s" : ""}**.`,
+                    skillData.requirements.rebirthsRequired
+                } Rebirth${
+                    skillData.requirements.rebirthsRequired > 1 ? "s" : ""
+                }**.`,
             );
         }
 
-        if (stats.worldLevel < skillData.worldLevel) {
+        if (stats.worldLevel < (skillData.requirements?.worldLevel || 0)) {
             missingRequirements.push(
-                `**World Level**: You need to be at least **World Level ${skillData.worldLevel}**.`,
+                `**World Level**: You need to be at least **World Level ${skillData.requirements?.worldLevel}**.`,
             );
         }
 
-        if (userProfile.balance < skillData.coins) {
+        if (userProfile.balance < (skillData.requirements?.coins || 0)) {
             missingRequirements.push(
-                `**${texts.c.u}**: You need at least **${skillData.coins} ${texts.c.u}**.`,
+                `**${texts.c.u}**: You need at least **${skillData.requirements?.coins} ${texts.c.u}**.`,
             );
         }
 
-        for (const reqItem of skillData.items) {
+        for (const reqItem of skillData.requirements?.items || []) {
             const invItem = stats.inventory.find(
                 (item) => item.item === reqItem.item,
             );
@@ -283,7 +118,7 @@ export const learn = buildCommand<SlashCommand>({
             );
         }
 
-        for (const reqItem of skillData.items) {
+        for (const reqItem of skillData.requirements?.items || []) {
             const invItem = stats.inventory.find(
                 (item) => item.item === reqItem.item,
             );
@@ -300,7 +135,7 @@ export const learn = buildCommand<SlashCommand>({
         await Promise.all([
             removeBalance(
                 i.user.id,
-                skillData.coins,
+                skillData.requirements?.coins || 0,
                 true,
                 `Learned skill ${skillName}`,
             ),

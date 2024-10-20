@@ -1,4 +1,4 @@
-import { MonsterGroup } from "../../groups";
+import { MonsterGroup } from "../../monsterHelper";
 
 export default {
     name: "Treasure Hoarder Potioneer",

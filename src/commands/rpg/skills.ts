@@ -11,99 +11,14 @@ import {
     SlashCommandBuilder,
 } from "discord.js";
 import { getUserStats } from "../../services";
-
-const availableSkills = [
-    {
-        name: "Vigilance",
-        description:
-            "Attack twice at the start of battle, the second attack dealing 50% your base ATK",
-        emoji: "✨",
-    },
-    {
-        name: "Leech",
-        description:
-            "Gain 5% lifesteal from each enemy's Max HP 50% of the time",
-        emoji: "💖",
-    },
-    {
-        name: "Vampirism",
-        description: "Gain 20% lifesteal from each enemy's Max HP on victory",
-        emoji: "🦇",
-    },
-    {
-        name: "Appraise",
-        description: "Sell things for a little bit more than they're worth",
-        emoji: "🔍",
-    },
-    {
-        name: "Totem",
-        description: "Heal 5% of your Max HP after every battle",
-        emoji: "⭐",
-    },
-    {
-        name: "Insomnia",
-        description: "Reduce your hunt cooldown from 30 minutes to 20 minutes",
-        emoji: "🌙",
-    },
-    {
-        name: "Kindle",
-        description: "Deal 10% of your Max HP as bonus damage per turn",
-        emoji: "💥",
-    },
-    {
-        name: "Scrounge",
-        description: `In addition to drops, earn coins per hunt`,
-        emoji: "💸",
-    },
-    {
-        name: "Energize",
-        description:
-            "Reduce your explore cooldown from 20 minutes to 15 minutes",
-        emoji: "⚡",
-    },
-    {
-        name: "Distraction",
-        description: "Go first 75% of the time when hunting",
-        emoji: "💫",
-    },
-    {
-        name: "Backstab",
-        description: "Deal 150% more DMG to humans",
-        emoji: "🔪",
-    },
-    {
-        name: "Growth",
-        description: "Earn 150% more EXP at the end of each battle",
-        emoji: "🌱",
-    },
-    {
-        name: "Heartbroken",
-        description: "Deal 1/4 of your HP as bonus DMG on your first turn",
-        emoji: "💔",
-    },
-    {
-        name: "Crystallize",
-        description: "Monsters deal less DMG early, but more later on",
-        emoji: "🧊",
-    },
-    {
-        name: "Sloth",
-        description: "Start each round with 125% your current HP",
-        emoji: "💤",
-    },
-    {
-        name: "Wrath",
-        description: "Deal 150% more DMG, start each round with 25% less HP",
-        emoji: "💢",
-    },
-];
+import { skills } from "../../utils/skillsData";
 
 const getSkillEmoji = (skillName: string) => {
-    const skill = availableSkills.find((s) => s.name === skillName);
+    const skill = skills.find((s) => s.name === skillName);
     return skill ? skill.emoji : "";
 };
 
-export const skills = buildCommand<SlashCommand>({
+export const skillsCommand = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("skills")
         .setDescription(
@@ -184,7 +99,7 @@ export const skills = buildCommand<SlashCommand>({
                 time: 60000,
             });
 
-            const allSkillsList = availableSkills
+            const allSkillsList = skills
                 .map(
                     (skill) =>
                         `${skill.emoji} **${skill.name}**: ${skill.description}`,

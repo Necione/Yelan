@@ -2,27 +2,14 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
+import { skills } from "../../utils/skillsData";
 
 const MAX_ACTIVE_SKILLS = 5;
 
-const skillChoices = [
-    { name: "Vigilance", value: "Vigilance", emoji: "✨" },
-    { name: "Leech", value: "Leech", emoji: "💖" },
-    { name: "Vampirism", value: "Vampirism", emoji: "🦇" },
-    { name: "Appraise", value: "Appraise", emoji: "🔍" },
-    { name: "Totem", value: "Totem", emoji: "⭐" },
-    { name: "Insomnia", value: "Insomnia", emoji: "🌙" },
-    { name: "Kindle", value: "Kindle", emoji: "💥" },
-    { name: "Scrounge", value: "Scrounge", emoji: "💸" },
-    { name: "Distraction", value: "Distraction", emoji: "💫" },
-    { name: "Energize", value: "Energize", emoji: "🔮" },
-    { name: "Backstab", value: "Backstab", emoji: "🔪" },
-    { name: "Crystallize", value: "Crystallize", emoji: "🧊" },
-    { name: "Heartbroken", value: "Heartbroken", emoji: "💔" },
-    { name: "Growth", value: "Growth", emoji: "🌱" },
-    { name: "Sloth", value: "Sloth", emoji: "💤" },
-    { name: "Wrath", value: "Wrath", emoji: "💢" },
-];
+const skillChoices = skills.map((skill) => ({
+    name: `${skill.emoji} ${skill.name}`,
+    value: skill.name,
+}));
 
 export const activate = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -33,12 +20,7 @@ export const activate = buildCommand<SlashCommand>({
                 .setName("skill")
                 .setDescription("The skill you want to activate or deactivate")
                 .setRequired(true)
-                .addChoices(
-                    ...skillChoices.map((skill) => ({
-                        name: `${skill.emoji} ${skill.name}`,
-                        value: skill.value,
-                    })),
-                ),
+                .addChoices(...skillChoices),
         ),
     defer: { silent: false },
     async execute(i, r) {

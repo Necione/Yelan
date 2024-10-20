@@ -9,3 +9,14 @@ export enum MonsterGroup {
     Eremite = "Eremite",
     Boss = "Boss",
 }
+
+export enum MonsterElement {
+    Pyro = "Pyro",
+    Hydro = "Hydro",
+    Anemo = "Anemo",
+    Cryo = "Cryo",
+    Electro = "Electro",
+    Geo = "Geo",
+    Dendro = "Dendro",
+    Physical = "Physical",
+}

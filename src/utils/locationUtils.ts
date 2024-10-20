@@ -1,5 +1,5 @@
-import { type MonsterGroup } from "./groups";
 import { locationGroupWeights } from "./locationGroupWeights";
+import { type MonsterGroup } from "./monsterHelper";
 
 export function getCommonLocationsForGroup(
     group: MonsterGroup,

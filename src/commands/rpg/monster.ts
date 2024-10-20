@@ -1,9 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { MonsterGroup } from "../../utils/groups";
 import { initializeMonsters, monsters, monstersLoaded } from "../../utils/hunt";
 import { getCommonLocationsForGroup } from "../../utils/locationUtils";
+import { MonsterGroup } from "../../utils/monsterHelper";
 
 export const monster = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

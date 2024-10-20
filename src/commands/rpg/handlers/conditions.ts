@@ -3,6 +3,7 @@ import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction, ThreadChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
+import { skills } from "../../../plugins/other/utils";
 import {
     addBalance,
     addItemToInventory,
@@ -15,7 +16,6 @@ import {
     getAvailableDirections,
     getCurrentMap,
 } from "../abyssHelpers/directionHelper";
-import { skills } from "../../../plugins/other/utils";
 
 const maxWorldLevel = 25;
 
@@ -94,15 +94,16 @@ export async function handleVictory(
     const hasTotemSkill = skills.has(stats, "Totem");
 
     if (hasTotemSkill) {
-        const healAmount = Math.ceil(stats.maxHP * 0.05);
+        const totemHeal = Math.random() * (0.3 - 0.1) + 0.1;
+        const healAmount = Math.ceil(stats.maxHP * totemHeal);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
 
         skillsActivated += `\`💖\` Healed \`${healAmount}\` HP due to the Totem skill.\n`;
-
-        await updateUserStats(i.user.id, {
-            hp: currentPlayerHp,
-        });
     }
+
+    await updateUserStats(i.user.id, {
+        hp: currentPlayerHp,
+    });
 
     const hasScroungeSkill = skills.has(stats, "Scrounge");
 
@@ -175,15 +176,16 @@ export async function handleAbyssVictory(
     const hasTotemSkill = skills.has(stats, "Totem");
 
     if (hasTotemSkill) {
-        const healAmount = Math.ceil(stats.maxHP * 0.05);
+        const totemHeal = Math.random() * (0.3 - 0.1) + 0.1;
+        const healAmount = Math.ceil(stats.maxHP * totemHeal);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
 
         skillsActivated += `\`💖\` Healed \`${healAmount}\` HP due to the Totem skill.\n`;
-
-        await updateUserStats(i.user.id, {
-            hp: currentPlayerHp,
-        });
     }
+
+    await updateUserStats(i.user.id, {
+        hp: currentPlayerHp,
+    });
 
     if (skillsActivated) {
         finalEmbed.addFields({

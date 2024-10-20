@@ -297,7 +297,7 @@ export async function handleHunt(
 
                 if (currentMonsterHp <= 0) {
                     if (hasVampirism) {
-                        const healAmount = stats.maxHP * 0.2;
+                        const healAmount = stats.maxHP * 0.1;
                         currentPlayerHp = Math.min(
                             currentPlayerHp + healAmount,
                             stats.maxHP,

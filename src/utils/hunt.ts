@@ -1,8 +1,8 @@
 import { log } from "@elara-services/utils";
 import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
-import { type MonsterGroup } from "./groups";
 import { locationGroupWeights } from "./locationGroupWeights";
+import { type MonsterGroup } from "./monsterHelper";
 
 export interface Monster {
     currentHp: number;
