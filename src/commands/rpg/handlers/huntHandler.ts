@@ -26,7 +26,7 @@ export async function handleHunt(
     stats: UserStats,
     userWallet: UserWallet,
 ) {
-    if (Math.random() < 1) {
+    if (Math.random() < 0.1) {
         await handleRandomEvent(i, stats, userWallet);
         await updateUserStats(i.user.id, { isHunting: false });
         return;
