@@ -69,7 +69,7 @@ export const skills: Skill[] = [
     },
     {
         name: "Totem",
-        description: "Heal 10% to 30% of your Max HP after every battle",
+        description: "Heal 5% of your Max HP after every battle",
         emoji: "⭐",
         requirements: {
             worldLevel: 1,
@@ -157,7 +157,7 @@ export const skills: Skill[] = [
     },
     {
         name: "Vampirism",
-        description: "Gain 10% lifesteal from each enemy's Max HP on victory",
+        description: "Gain 3% lifesteal from each enemy's Max HP on victory",
         emoji: "🦇",
         requirements: {
             worldLevel: 15,

@@ -32,6 +32,36 @@ export async function handleVictory(
     let dropsCollected: { item: string; amount: number }[] = [];
 
     let skillsActivated = "";
+    let effectsActivated = "";
+
+    for (const effect of stats.activeEffects) {
+        if (effect.remainingUses > 0) {
+            if (effect.name === "Regeneration") {
+                const healAmount = Math.ceil(stats.maxHP * effect.effectValue);
+                currentPlayerHp = Math.min(
+                    currentPlayerHp + healAmount,
+                    stats.maxHP,
+                );
+                effectsActivated += `\`🩹\` Regeneration effect healed you for \`${healAmount}\` HP. (${
+                    effect.remainingUses - 1
+                } uses left)\n`;
+            } else if (effect.name === "Poisoning") {
+                const damageAmount = Math.ceil(
+                    stats.maxHP * Math.abs(effect.effectValue),
+                );
+                currentPlayerHp = Math.max(currentPlayerHp - damageAmount, 0);
+                effectsActivated += `\`☠️\` Poisoning effect damaged you for \`${damageAmount}\` HP. (${
+                    effect.remainingUses - 1
+                } uses left)\n`;
+            }
+
+            effect.remainingUses -= 1;
+        }
+    }
+
+    stats.activeEffects = stats.activeEffects.filter(
+        (effect) => effect.remainingUses > 0,
+    );
 
     for (const monster of monstersEncountered) {
         const expGained = calculateExp(monster.minExp, monster.maxExp);
@@ -94,7 +124,7 @@ export async function handleVictory(
     const hasTotemSkill = skills.has(stats, "Totem");
 
     if (hasTotemSkill) {
-        const totemHeal = Math.random() * (0.3 - 0.1) + 0.1;
+        const totemHeal = 0.05;
         const healAmount = Math.ceil(stats.maxHP * totemHeal);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
 
@@ -103,7 +133,34 @@ export async function handleVictory(
 
     await updateUserStats(i.user.id, {
         hp: currentPlayerHp,
+        activeEffects: stats.activeEffects,
     });
+
+    if (effectsActivated) {
+        finalEmbed.addFields({
+            name: "Effects Applied",
+            value: effectsActivated,
+        });
+    }
+
+    if (currentPlayerHp <= 0) {
+        finalEmbed.setColor("Red");
+        finalEmbed.setTitle("Defeat after Victory...");
+        finalEmbed.setDescription(
+            `You defeated the monsters but succumbed to poisoning afterwards...`,
+        );
+
+        await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+
+        await thread.edit({ archived: true, locked: true }).catch(noop);
+
+        await updateUserStats(i.user.id, {
+            hp: 0,
+            isHunting: false,
+        });
+
+        return;
+    }
 
     const hasScroungeSkill = skills.has(stats, "Scrounge");
 
@@ -176,7 +233,7 @@ export async function handleAbyssVictory(
     const hasTotemSkill = skills.has(stats, "Totem");
 
     if (hasTotemSkill) {
-        const totemHeal = Math.random() * (0.3 - 0.1) + 0.1;
+        const totemHeal = 0.05;
         const healAmount = Math.ceil(stats.maxHP * totemHeal);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
 

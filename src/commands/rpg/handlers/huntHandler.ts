@@ -16,6 +16,7 @@ import {
     initializeMonsters,
     type Monster,
 } from "../../../utils/hunt";
+import { handleRandomEvent } from "../../../utils/randomEvents";
 import { monsterAttack, playerAttack } from "./battleHandler";
 import { handleDefeat, handleVictory } from "./conditions";
 
@@ -25,6 +26,12 @@ export async function handleHunt(
     stats: UserStats,
     userWallet: UserWallet,
 ) {
+    if (Math.random() < 1) {
+        await handleRandomEvent(i, stats, userWallet);
+        await updateUserStats(i.user.id, { isHunting: false });
+        return;
+    }
+
     await initializeMonsters();
 
     const bossEncounters: { [key: number]: string } = {
@@ -297,7 +304,7 @@ export async function handleHunt(
 
                 if (currentMonsterHp <= 0) {
                     if (hasVampirism) {
-                        const healAmount = stats.maxHP * 0.1;
+                        const healAmount = stats.maxHP * 0.05;
                         currentPlayerHp = Math.min(
                             currentPlayerHp + healAmount,
                             stats.maxHP,
