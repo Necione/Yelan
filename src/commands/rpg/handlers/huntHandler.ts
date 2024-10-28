@@ -252,7 +252,7 @@ export async function handleHunt(
             if (isPlayerTurn) {
                 const playerMessages: string[] = [];
 
-                const result = playerAttack(
+                const result = await playerAttack(
                     stats,
                     monster,
                     currentPlayerHp,
@@ -265,10 +265,10 @@ export async function handleHunt(
                     hasWrath,
                 );
 
-                currentMonsterHp = (await result).currentMonsterHp;
-                currentPlayerHp = (await result).currentPlayerHp;
-                vigilanceUsed = (await result).vigilanceUsed;
-                monsterState = (await result).monsterState;
+                currentMonsterHp = result.currentMonsterHp;
+                currentPlayerHp = result.currentPlayerHp;
+                vigilanceUsed = result.vigilanceUsed;
+                monsterState = result.monsterState;
 
                 if (playerMessages.length > 0) {
                     if (thread) {
