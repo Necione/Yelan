@@ -265,10 +265,10 @@ export async function handleHunt(
                     hasWrath,
                 );
 
-                currentMonsterHp = result.currentMonsterHp;
-                currentPlayerHp = result.currentPlayerHp;
-                vigilanceUsed = result.vigilanceUsed;
-                monsterState = result.monsterState;
+                currentMonsterHp = (await result).currentMonsterHp;
+                currentPlayerHp = (await result).currentPlayerHp;
+                vigilanceUsed = (await result).vigilanceUsed;
+                monsterState = (await result).monsterState;
 
                 if (playerMessages.length > 0) {
                     if (thread) {

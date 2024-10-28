@@ -9,9 +9,7 @@ import {
 } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 
-export async function secretCultEvent(
-    i: ChatInputCommandInteraction,
-) {
+export async function secretCultEvent(i: ChatInputCommandInteraction) {
     const embed = new EmbedBuilder()
         .setTitle("You Encounter a Secret Cult!")
         .setDescription(

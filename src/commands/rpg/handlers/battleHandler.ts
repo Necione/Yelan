@@ -3,7 +3,7 @@ import { skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
 import { getRandomValue, type Monster } from "../../../utils/hunt";
 
-export function playerAttack(
+export async function playerAttack(
     stats: UserStats,
     monster: Monster,
     currentPlayerHp: number,
@@ -14,12 +14,12 @@ export function playerAttack(
     isFirstTurn: boolean,
     messages: string[],
     hasWrath: boolean,
-): {
+): Promise<{
     currentMonsterHp: number;
     currentPlayerHp: number;
     vigilanceUsed: boolean;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
-} {
+}> {
     let attackPower = stats.attackPower;
 
     if (hasWrath) {
@@ -66,6 +66,31 @@ export function playerAttack(
         messages.push(
             `\`💜\` You are poisoned due to **OVERHEAL**, and your damage has been halved.`,
         );
+    }
+
+    if (stats.activeEffects && stats.activeEffects.length > 0) {
+        const weaknessEffect = stats.activeEffects.find(
+            (effect) => effect.name === "Weakness" && effect.remainingUses > 0,
+        );
+        if (weaknessEffect) {
+            attackPower *= 0.75;
+            messages.push(
+                `\`🥀\` Weakness effect reduces your attack power by 25%. (${
+                    weaknessEffect.remainingUses - 1
+                } uses left)`,
+            );
+
+            weaknessEffect.remainingUses -= 1;
+            if (weaknessEffect.remainingUses <= 0) {
+                stats.activeEffects = stats.activeEffects.filter(
+                    (effect) => effect !== weaknessEffect,
+                );
+            }
+
+            await updateUserStats(stats.userId, {
+                activeEffects: stats.activeEffects,
+            });
+        }
     }
 
     const defenseResult = checkMonsterDefenses(
