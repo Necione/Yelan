@@ -190,7 +190,7 @@ export async function handleAbyssBattle(
             if (isPlayerTurn) {
                 const playerMessages: string[] = [];
 
-                const result = playerAttack(
+                const result = await playerAttack(
                     stats,
                     monster,
                     currentPlayerHp,

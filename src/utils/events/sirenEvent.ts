@@ -1,5 +1,5 @@
 import { noop } from "@elara-services/utils";
-import type { UserStats, UserWallet } from "@prisma/client";
+import type { UserStats } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { updateUserStats } from "../../services";
@@ -7,7 +7,6 @@ import { updateUserStats } from "../../services";
 export async function sirenEvent(
     i: ChatInputCommandInteraction,
     stats: UserStats,
-    _userWallet: UserWallet,
 ) {
     const embed = new EmbedBuilder()
         .setTitle("You Hear a Mysterious Song...")
@@ -40,8 +39,8 @@ export async function sirenEvent(
     } else {
         stats.activeEffects.push({
             name: effectName,
-            effectValue: effectValue,
-            remainingUses: remainingUses,
+            effectValue,
+            remainingUses,
         });
     }
 
