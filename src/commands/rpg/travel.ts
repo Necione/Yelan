@@ -3,12 +3,12 @@ import { sleep } from "@elara-services/utils";
 import {
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonInteraction,
+    type ButtonInteraction,
     ButtonStyle,
-    Collection,
+    type Collection,
     ComponentType,
     EmbedBuilder,
-    Message,
+    type Message,
     SlashCommandBuilder,
 } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
@@ -131,8 +131,12 @@ export const travel = buildCommand<SlashCommand>({
         const directionalLocations: DirectionalLocations = {};
 
         for (const [locationName, coords] of Object.entries(locations)) {
-            if (locationName === currentLocation) continue;
-            if (coords.region !== currentRegion) continue;
+            if (locationName === currentLocation) {
+                continue;
+            }
+            if (coords.region !== currentRegion) {
+                continue;
+            }
 
             const dx = coords.x - currentCoords.x;
             const dy = coords.y - currentCoords.y;
