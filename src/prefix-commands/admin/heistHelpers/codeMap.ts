@@ -25,9 +25,9 @@ export const morseCodeMap: { [key: string]: string } = {
     X: "-..-",
     Y: "-.--",
     Z: "--..",
-  };
-  
-  export const binaryCodeMap: { [key: string]: string } = {
+};
+
+export const binaryCodeMap: { [key: string]: string } = {
     A: "01000001",
     B: "01000010",
     C: "01000011",
@@ -54,4 +54,4 @@ export const morseCodeMap: { [key: string]: string } = {
     X: "01011000",
     Y: "01011001",
     Z: "01011010",
-  };
+};

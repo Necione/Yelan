@@ -25,7 +25,8 @@ export const sell = buildCommand<SlashCommand>({
             option
                 .setName("amount")
                 .setDescription("The amount to sell")
-                .setRequired(true),
+                .setRequired(true)
+                .setMinValue(1),
         ),
     defer: { silent: false },
     async autocomplete(i) {
@@ -52,6 +53,10 @@ export const sell = buildCommand<SlashCommand>({
     async execute(i, r) {
         const itemName = i.options.getString("item", true);
         const amountToSell = i.options.getInteger("amount", true);
+
+        if (amountToSell <= 0) {
+            return r.edit(embedComment(`Something went wrong...`));
+        }
 
         if (itemName === "n/a") {
             return r.edit(embedComment(`You didn't select a valid item.`));
