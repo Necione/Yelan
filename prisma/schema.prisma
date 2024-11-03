@@ -209,6 +209,7 @@ model UserStats {
   equippedSands                   String?
   equippedGoblet                  String?
   equippedCirclet                 String?
+  region                          String         @default("Liyue")
   location                        String         @default("Liyue Harbor")
   isTravelling                    Boolean        @default(false)
   isHunting                       Boolean        @default(false)

@@ -68,7 +68,6 @@ export async function initializeMonsters(): Promise<void> {
     if (!monstersLoaded) {
         await loadMonsters(monstersDir);
         monstersLoaded = true;
-        log(`Total monsters loaded: ${monsters.length}`);
     }
 }
 
@@ -130,12 +129,8 @@ export async function getRandomMonster(
         ...new Set(availableMonsters.map((monster) => monster.group)),
     ] as MonsterGroup[];
 
-    log(`Unique Groups Available: ${uniqueGroups.join(", ")}`);
-
     const groupWeightsForLocation =
         locationGroupWeights[location] || locationGroupWeights["Default"] || {};
-
-    log(`Group Weights for Location "${location}":`, groupWeightsForLocation);
 
     const groupWeights: { group: MonsterGroup; weight: number }[] =
         uniqueGroups.map((group) => ({
@@ -146,14 +141,10 @@ export async function getRandomMonster(
                 1,
         }));
 
-    log(`Group Weights:`, groupWeights);
-
     const totalGroupWeight = groupWeights.reduce(
         (acc, gw) => acc + gw.weight,
         0,
     );
-
-    log(`Total Group Weight: ${totalGroupWeight}`);
 
     let randomGroupWeight = Math.random() * totalGroupWeight;
     let selectedGroup: MonsterGroup | null = null;
@@ -165,8 +156,6 @@ export async function getRandomMonster(
             break;
         }
     }
-
-    log(`Selected Group: ${selectedGroup}`);
 
     if (!selectedGroup) {
         return null;
@@ -180,18 +169,9 @@ export async function getRandomMonster(
         return null;
     }
 
-    log(
-        `Monsters in Selected Group "${selectedGroup}":`,
-        monstersInGroup.map((m) => m.name),
-    );
-
     const totalMonsterWeight = monstersInGroup.reduce(
         (acc, monster) => acc + monster.minWorldLevel,
         0,
-    );
-
-    log(
-        `Total Monster Weight in Group "${selectedGroup}": ${totalMonsterWeight}`,
     );
 
     let randomMonsterWeight = Math.random() * totalMonsterWeight;
@@ -204,8 +184,6 @@ export async function getRandomMonster(
             break;
         }
     }
-
-    log(`Selected Monster: ${selectedMonster ? selectedMonster.name : "None"}`);
 
     if (!selectedMonster) {
         return null;
@@ -225,7 +203,6 @@ export async function getRandomMonster(
             maxHp: playerStats.maxHp,
         };
 
-        log(`Created MonsterInstance for Mirror Maiden.`);
         return monsterInstance;
     }
 
@@ -250,7 +227,6 @@ export async function getRandomMonster(
             currentHp: stats.minHp,
         };
 
-        log(`Created MonsterInstance for ${selectedMonster.name}.`);
         return monsterInstance;
     } else {
         console.error(

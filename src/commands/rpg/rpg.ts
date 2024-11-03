@@ -56,9 +56,6 @@ export const rpg = buildCommand<SlashCommand>({
         const embed = new EmbedBuilder()
             .setColor(embedColor)
             .setTitle(`${i.user.username}'s RPG Stats`)
-            .setDescription(
-                `- Use the </bag:1282456807100387411> command to see your inventory\n- Use the </travel:1281778318160691301> command to find new enemies`,
-            )
             .setThumbnail(i.user.displayAvatarURL())
             .addFields({
                 name: "Your Stats",
@@ -66,7 +63,9 @@ export const rpg = buildCommand<SlashCommand>({
                     stats.worldLevel
                 }\` | <:Item_Adventure_EXP:1287247325135114356> EXP: \`${
                     stats.exp
-                }/${expRequired.toFixed(0)}\`\n📍 Location: \`${
+                }/${expRequired.toFixed(0)}\`\n🗺️ Region: \`${
+                    stats.region
+                }\` | 📍 Location: \`${
                     stats.location
                 }\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
                     2,
@@ -96,41 +95,39 @@ export const rpg = buildCommand<SlashCommand>({
             });
         }
 
+        const equippedItems: string[] = [];
+
         if (stats.equippedWeapon) {
             const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
             const weaponBonusAttack = equippedWeapon.attackPower;
 
-            embed.addFields({
-                name: "Equipped Weapon",
-                value: `${equippedWeapon.emoji} ${
+            equippedItems.push(
+                `🗡️ **Weapon:** ${equippedWeapon.emoji} ${
                     stats.equippedWeapon
                 } (${formatChange(weaponBonusAttack)} ATK)`,
-                inline: false,
-            });
+            );
         }
-
-        const equippedArtifacts: string[] = [];
 
         if (stats.equippedFlower) {
-            equippedArtifacts.push(`🌸 Flower: **${stats.equippedFlower}**`);
+            equippedItems.push(`🌸 **Flower:** ${stats.equippedFlower}`);
         }
         if (stats.equippedPlume) {
-            equippedArtifacts.push(`🪶 Plume: **${stats.equippedPlume}**`);
+            equippedItems.push(`🪶 **Plume:** ${stats.equippedPlume}`);
         }
         if (stats.equippedSands) {
-            equippedArtifacts.push(`⏳ Sands: **${stats.equippedSands}**`);
+            equippedItems.push(`⏳ **Sands:** ${stats.equippedSands}`);
         }
         if (stats.equippedGoblet) {
-            equippedArtifacts.push(`🍷 Goblet: **${stats.equippedGoblet}**`);
+            equippedItems.push(`🍷 **Goblet:** ${stats.equippedGoblet}`);
         }
         if (stats.equippedCirclet) {
-            equippedArtifacts.push(`👑 Circlet: **${stats.equippedCirclet}**`);
+            equippedItems.push(`👑 **Circlet:** ${stats.equippedCirclet}`);
         }
 
-        if (equippedArtifacts.length > 0) {
+        if (equippedItems.length > 0) {
             embed.addFields({
-                name: "Equipped Artifacts",
-                value: equippedArtifacts.join("\n"),
+                name: "Equipped Items",
+                value: equippedItems.join("\n"),
                 inline: false,
             });
         }
@@ -145,7 +142,7 @@ export const rpg = buildCommand<SlashCommand>({
             inline: false,
         });
 
-        await r.edit({ embeds: [embed] });
+        return r.edit({ embeds: [embed] });
     },
 });
 
