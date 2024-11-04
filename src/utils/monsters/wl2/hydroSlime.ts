@@ -2,16 +2,16 @@ import { MonsterGroup } from "../../monsterHelper";
 
 export default {
     currentHp: 0,
-    name: "Dendro Slime",
+    name: "Hydro Slime",
     group: MonsterGroup.Slime,
-    minExp: 5,
-    maxExp: 10,
-    minWorldLevel: 4,
+    minExp: 4,
+    maxExp: 8,
+    minWorldLevel: 2,
     critChance: 10,
     critValue: 1.5,
     defChance: 20,
     defValue: 0.2,
-    image: "https://lh.elara.workers.dev/rpg/monsters/dendro_slime.png",
+    image: "https://lh.elara.workers.dev/rpg/monsters/hydro_slime.png",
     drops: [
         {
             item: "Slime Condensate",
