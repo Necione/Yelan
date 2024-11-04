@@ -19,7 +19,9 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         locked.del(i.user.id);
-        return r.edit(embedComment("The Spiral Abyss is currently closed and resetting"));
+        return r.edit(
+            embedComment("The Spiral Abyss is currently closed and resetting"),
+        );
         /*
         const userWallet = await getProfileByUserId(i.user.id);
         if (!userWallet) {

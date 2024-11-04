@@ -3,7 +3,6 @@ import { embedComment } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
-import { cooldowns } from "../../utils";
 import { formatChange } from "../../utils/hunt";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
 
@@ -38,9 +37,6 @@ export const rpg = buildCommand<SlashCommand>({
         if (!stats) {
             return r.edit(embedComment(`No stats found for you :(`));
         }
-
-        const huntCooldown = cooldowns.get(p, "hunt");
-        const exploreCooldown = cooldowns.get(p, "explore");
 
         const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
 
@@ -102,9 +98,9 @@ export const rpg = buildCommand<SlashCommand>({
             const weaponBonusAttack = equippedWeapon.attackPower;
 
             equippedItems.push(
-                `🗡️ **Weapon:** ${equippedWeapon.emoji} ${
+                `${equippedWeapon.emoji} ${
                     stats.equippedWeapon
-                } (${formatChange(weaponBonusAttack)} ATK)`,
+                } (${formatChange(weaponBonusAttack)} ATK)\n`,
             );
         }
 
@@ -131,16 +127,6 @@ export const rpg = buildCommand<SlashCommand>({
                 inline: false,
             });
         }
-
-        embed.addFields({
-            name: "Cooldowns",
-            value: `Hunt: ${
-                huntCooldown.status ? "Ready" : huntCooldown.message
-            }\nExplore: ${
-                exploreCooldown.status ? "Ready" : exploreCooldown.message
-            }`,
-            inline: false,
-        });
 
         return r.edit({ embeds: [embed] });
     },

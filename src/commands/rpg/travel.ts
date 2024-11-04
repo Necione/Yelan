@@ -171,7 +171,7 @@ export const travel = buildCommand<SlashCommand>({
 
         if (isAtPort) {
             if (currentLocation === "Liyue Harbor") {
-                if (stats.worldLevel >= 20) {
+                if (stats.worldLevel >= 30) {
                     travelOptions.push("Ritou");
                 }
             } else if (currentLocation === "Ritou") {
