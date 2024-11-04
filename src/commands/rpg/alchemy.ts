@@ -137,7 +137,7 @@ export const alchemy = buildCommand<SlashCommand>({
                 getAlchemyRankWithEmoji(alchemyProgress);
 
             const assignedAtkBonus = stats.assignedAtk * 0.25;
-            const assignedHpBonus = stats.assignedHp * 5;
+            const assignedHpBonus = stats.assignedHp * 2;
             const assignedCritValueBonus = (
                 stats.assignedCritValue * 0.01
             ).toFixed(2);

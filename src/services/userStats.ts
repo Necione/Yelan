@@ -31,7 +31,7 @@ export async function syncStats(userId: string) {
     const calculatedMaxHP =
         100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
 
-    const assignedHpBonus = (stats.assignedHp || 0) * 5;
+    const assignedHpBonus = (stats.assignedHp || 0) * 2;
     const finalMaxHP = calculatedMaxHP + assignedHpBonus;
 
     const assignedCritValueBonus = (stats.assignedCritValue || 0) * 0.01;
