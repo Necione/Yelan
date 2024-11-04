@@ -110,7 +110,8 @@ export const alchemy = buildCommand<SlashCommand>({
                 .setDescription(
                     "The number of points to allocate or deallocate.",
                 )
-                .setRequired(false),
+                .setRequired(false)
+                .setMinValue(1),
         ),
     defer: { silent: false },
 

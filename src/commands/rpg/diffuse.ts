@@ -27,7 +27,8 @@ export const diffuse = buildCommand<SlashCommand>({
             option
                 .setName("amount")
                 .setDescription("The amount to diffuse")
-                .setRequired(true),
+                .setRequired(true)
+                .setMinValue(1),
         ),
     defer: { silent: false },
     async autocomplete(i) {

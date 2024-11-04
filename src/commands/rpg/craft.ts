@@ -44,7 +44,8 @@ export const craft = buildCommand<SlashCommand>({
             option
                 .setName("amount")
                 .setDescription("The number of items to craft")
-                .setRequired(true),
+                .setRequired(true)
+                .setMinValue(1),
         ),
     async autocomplete(i) {
         const craftableItems = upgradeChains.flatMap((chain) => {

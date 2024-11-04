@@ -20,7 +20,8 @@ export const cook = buildCommand<SlashCommand>({
             option
                 .setName("amount")
                 .setDescription("The number of times to cook the recipe")
-                .setRequired(false),
+                .setRequired(false)
+                .setMinValue(1),
         ),
     async autocomplete(i) {
         const focusedValue = i.options.getFocused() || "";
