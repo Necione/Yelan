@@ -26,6 +26,7 @@ const upgradeChains: Array<Array<DropName>> = [
     ["Chaos Device", "Chaos Circuit", "Chaos Core"],
     ["Chaos Gear", "Chaos Axis", "Chaos Oculus"],
     ["A Flower Yet to Bloom", "Treasured Flower", "Wanderer's Blooming Flower"],
+    ["Faded Red Satin", "Trimmed Red Silk", "Rich Red Brocade"],
 ];
 
 export const craft = buildCommand<SlashCommand>({

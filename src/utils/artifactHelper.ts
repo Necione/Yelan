@@ -18,7 +18,7 @@ export function calculateStatChanges(
         { key: "critValue", label: "💥 Crit Value", isMultiplier: true },
         { key: "maxHP", label: "❤️ Max HP" },
         { key: "defChance", label: "🛡️ DEF Rate", isPercentage: true },
-        { key: "defValue", label: "🛡️ DEF Value", isPercentage: true },
+        { key: "defValue", label: "🛡️ DEF Value" },
     ];
 
     for (const stat of statsToCheck) {
