@@ -1,6 +1,14 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import {
+  ActionRowBuilder,
+  ComponentType,
+  EmbedBuilder,
+  Message,
+  SlashCommandBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
+} from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 
 const alchemyRankEmojis = {
@@ -12,6 +20,7 @@ const alchemyRankEmojis = {
     Diamond: "💠",
     Emerald: "🟩",
     Ruby: "🟥",
+    Ascended: "🔳",
 };
 
 const alchemyRanks = [
@@ -23,6 +32,7 @@ const alchemyRanks = [
     { name: "Diamond", min: 150, max: 210 },
     { name: "Emerald", min: 210, max: 280 },
     { name: "Ruby", min: 280, max: 360 },
+    { name: "Ascended", min: 360, max: Infinity },
 ];
 
 function getAlchemyRank(progress: number): { name: string; rankIndex: number } {
@@ -55,10 +65,10 @@ const createAlchemyBar = (
     const rankMin = alchemyRanks[rankIndex].min;
     const rankMax = alchemyRanks[rankIndex].max;
 
-    const relativeCurrent = Math.max(
-        0,
-        Math.min(current - rankMin, rankMax - rankMin),
-    );
+    const relativeCurrent =
+        rankName === "Ascended"
+            ? rankMax - rankMin
+            : Math.max(0, Math.min(current - rankMin, rankMax - rankMin));
     const relativeMax = rankMax - rankMin;
 
     const filledLength = Math.round((relativeCurrent / relativeMax) * length);
@@ -122,17 +132,117 @@ export const alchemy = buildCommand<SlashCommand>({
 
         const stats = await getUserStats(i.user.id);
         if (!stats) {
-            return r.edit(
+            await i.editReply(
                 embedComment(
                     "No stats found for you, please set up your profile.",
                 ),
             );
+            return;
+        }
+
+        const alchemyProgress = stats.alchemyProgress;
+        const alchemyMax = 360;
+        const { name: rankName } = getAlchemyRank(alchemyProgress);
+        const isAscended = rankName === "Ascended";
+
+        if (isAscended && !stats.deity) {
+            const deityOptions = [
+                { label: "The End", value: "The End" },
+                { label: "The Harvest", value: "The Harvest" },
+                { label: "The Wisened", value: "The Wisened" },
+                { label: "The Wanderer", value: "The Wanderer" },
+                { label: "The Chaos", value: "The Chaos" },
+                { label: "Go Alone", value: "None" },
+            ];
+
+            const selectMenu = new StringSelectMenuBuilder()
+                .setCustomId("deity_select")
+                .setPlaceholder("Select a deity")
+                .addOptions(
+                    deityOptions.map((option) => ({
+                        label: option.label,
+                        value: option.value,
+                    })),
+                );
+
+            const row =
+                new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                    selectMenu,
+                );
+
+            const message = (await i.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle("Choose Your Deity")
+                        .setDescription(
+                            "You have reached the **Ascended** rank. Please choose a deity to follow:\n**⚠️ You will not be able to change this decision.**",
+                        )
+                        .setColor(0x4b52bb),
+                ],
+                components: [row],
+            })) as Message;
+
+            const collector = message.createMessageComponentCollector({
+                componentType: ComponentType.StringSelect,
+                time: 60000,
+                filter: (interaction: StringSelectMenuInteraction) =>
+                    interaction.user.id === i.user.id &&
+                    interaction.customId === "deity_select",
+            });
+
+            collector.on(
+                "collect",
+                async (interaction: StringSelectMenuInteraction) => {
+                    const chosenDeity = interaction.values[0];
+
+                    await updateUserStats(i.user.id, { deity: chosenDeity });
+
+                    const disabledSelectMenu = new StringSelectMenuBuilder()
+                        .setCustomId("deity_select")
+                        .setPlaceholder("Deity Selected")
+                        .setDisabled(true)
+                        .addOptions(
+                            deityOptions.map((option) => ({
+                                label: option.label,
+                                value: option.value,
+                            })),
+                        );
+
+                    const disabledRow =
+                        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                            disabledSelectMenu,
+                        );
+
+                    await interaction.update({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setTitle("Deity Chosen")
+                                .setDescription(
+                                    chosenDeity === "None"
+                                        ? "You have chosen to **Go Alone**."
+                                        : `You have chosen to follow **${chosenDeity}**.`,
+                                )
+                                .setColor(0x4b52bb),
+                        ],
+                        components: [disabledRow],
+                    });
+                },
+            );
+
+            collector.on("end", async (_collected, reason: string) => {
+                if (reason === "time" && !stats.deity) {
+                    await message.edit({
+                        content: "You did not choose a deity in time.",
+                        embeds: [],
+                        components: [],
+                    });
+                }
+            });
+
+            return;
         }
 
         if (!action || !stat || !pointsToAssign) {
-            const alchemyProgress = stats.alchemyProgress;
-            const alchemyMax = 360;
-            const alchemyBar = createAlchemyBar(alchemyProgress, alchemyMax);
             const alchemyRankWithEmoji =
                 getAlchemyRankWithEmoji(alchemyProgress);
 
@@ -145,13 +255,29 @@ export const alchemy = buildCommand<SlashCommand>({
                 2,
             );
 
-            return r.edit({
+            const deityInfo =
+                isAscended && stats.deity
+                    ? `\nDeity: **${
+                          stats.deity === "None"
+                              ? "None (Going Alone)"
+                              : stats.deity
+                      }**`
+                    : "";
+
+            const essenceDisplay = isAscended
+                ? `🍃 Total Essence: \`${alchemyProgress}\``
+                : `🍃 Essence: ${createAlchemyBar(
+                      alchemyProgress,
+                      alchemyMax,
+                  )}`;
+
+            await i.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setTitle("Your Alchemy Profile")
                         .setDescription(
-                            `Alchemist Rank: ${alchemyRankWithEmoji}\n` +
-                                `🍃 Essence: ${alchemyBar}`,
+                            `Alchemist Rank: ${alchemyRankWithEmoji}${deityInfo}\n` +
+                                `${essenceDisplay}`,
                         )
                         .setColor(0x4b52bb)
                         .addFields(
@@ -172,18 +298,19 @@ export const alchemy = buildCommand<SlashCommand>({
                         ),
                 ],
             });
+            return;
         }
 
         const totalAssigned = stats.totalAssigned ?? 0;
-        const alchemyProgress = stats.alchemyProgress;
 
         if (action === "allocate") {
             if (totalAssigned + pointsToAssign > alchemyProgress) {
-                return r.edit(
+                await i.editReply(
                     embedComment(
                         `You cannot assign more points than your alchemy progress allows.`,
                     ),
                 );
+                return;
             }
 
             let newAssignedAtk = stats.assignedAtk ?? 0;
@@ -206,7 +333,8 @@ export const alchemy = buildCommand<SlashCommand>({
                     newAssignedDefValue += pointsToAssign;
                     break;
                 default:
-                    return r.edit(embedComment("Invalid stat chosen."));
+                    await i.editReply(embedComment("Invalid stat chosen."));
+                    return;
             }
 
             newTotalAssigned += pointsToAssign;
@@ -219,13 +347,14 @@ export const alchemy = buildCommand<SlashCommand>({
                 totalAssigned: newTotalAssigned,
             });
 
-            return r.edit(
+            await i.editReply(
                 embedComment(
                     `You have successfully assigned \`${pointsToAssign}\` points to ${stat}. \nYou have \`${
                         alchemyProgress - newTotalAssigned
                     }\` points remaining to assign.`,
                 ),
             );
+            return;
         }
 
         if (action === "deallocate") {
@@ -238,46 +367,51 @@ export const alchemy = buildCommand<SlashCommand>({
             switch (stat) {
                 case "ATK":
                     if (newAssignedAtk < pointsToAssign) {
-                        return r.edit(
+                        await i.editReply(
                             embedComment(
                                 "You cannot deallocate more points than you have assigned to ATK.",
                             ),
                         );
+                        return;
                     }
                     newAssignedAtk -= pointsToAssign;
                     break;
                 case "HP":
                     if (newAssignedHp < pointsToAssign) {
-                        return r.edit(
+                        await i.editReply(
                             embedComment(
                                 "You cannot deallocate more points than you have assigned to HP.",
                             ),
                         );
+                        return;
                     }
                     newAssignedHp -= pointsToAssign;
                     break;
                 case "Crit Value":
                     if (newAssignedCritValue < pointsToAssign) {
-                        return r.edit(
+                        await i.editReply(
                             embedComment(
-                                "You cannot deallocate more points than you have assigned to Crit DMG.",
+                                "You cannot deallocate more points than you have assigned to Crit Value.",
                             ),
                         );
+                        return;
                     }
                     newAssignedCritValue -= pointsToAssign;
                     break;
                 case "DEF Value":
                     if (newAssignedDefValue < pointsToAssign) {
-                        return r.edit(
+                        await i.editReply(
                             embedComment(
                                 "You cannot deallocate more points than you have assigned to DEF Value.",
                             ),
                         );
+                        return;
                     }
                     newAssignedDefValue -= pointsToAssign;
                     break;
                 default:
-                    return r.edit(embedComment("Invalid stat chosen."));
+                    await i.editReply(embedComment("Invalid stat chosen."));
+                    return;
             }
 
             newTotalAssigned -= pointsToAssign;
@@ -290,13 +424,14 @@ export const alchemy = buildCommand<SlashCommand>({
                 totalAssigned: newTotalAssigned,
             });
 
-            return r.edit(
+            await i.editReply(
                 embedComment(
-                    `You have successfully deallocated \`${pointsToAssign}\` points from ${stat.toUpperCase()}. \nYou now have \`${
+                    `You have successfully deallocated \`${pointsToAssign}\` points from ${stat}. \nYou now have \`${
                         alchemyProgress - newTotalAssigned
                     }\` points remaining to assign.`,
                 ),
             );
+            return;
         }
     },
 });

@@ -226,6 +226,7 @@ model UserStats {
   abyssCoordY                     Int?
   collectedChests                 String[]       @default([])
   hasKey                          Boolean        @default(false)
+  deity                           String?
 }
 
 type UserRequest {
