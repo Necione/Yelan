@@ -85,14 +85,20 @@ export const rpg = buildCommand<SlashCommand>({
                         : ""
                 }`,
                 inline: false,
+            })
+            .addFields({
+                name: "Cooldowns",
+                value: `Hunt: ${
+                    huntCooldown.status ? "Ready" : huntCooldown.message
+                }\nExplore: ${
+                    exploreCooldown.status ? "Ready" : exploreCooldown.message
+                }`,
+                inline: false,
             });
+
         embed.addFields({
-            name: "Cooldowns",
-            value: `Hunt: ${
-                huntCooldown.status ? "Ready" : huntCooldown.message
-            }\nExplore: ${
-                exploreCooldown.status ? "Ready" : exploreCooldown.message
-            }`,
+            name: "Your Party",
+            value: `- <:Aether_Item:1303603425497579530> (5★) Traveller`,
             inline: false,
         });
 
