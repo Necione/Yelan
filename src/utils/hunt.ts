@@ -2,7 +2,8 @@ import { log } from "@elara-services/utils";
 import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import { locationGroupWeights } from "./locationGroupWeights";
-import { type MonsterGroup } from "./monsterHelper";
+import { MonsterGroup } from "./monsterHelper";
+import { WeaponType } from "./rpgitems/weapons";
 
 export interface Monster {
     currentHp: number;
@@ -417,3 +418,11 @@ export async function getMonsterByName(
         return null;
     }
 }
+
+export const weaponAdvantages: { [key in WeaponType]?: MonsterGroup[] } = {
+    Sword: [MonsterGroup.Nobushi, MonsterGroup.Eremite],
+    Polearm: [MonsterGroup.Slime, MonsterGroup.Hilichurl],
+    Catalyst: [MonsterGroup.Fatui, MonsterGroup.Abyss],
+    Claymore: [MonsterGroup.Machine],
+    Bow: [MonsterGroup.Human, MonsterGroup.Abyss],
+};

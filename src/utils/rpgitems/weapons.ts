@@ -1,4 +1,8 @@
+export type WeaponType = "Claymore" | "Bow" | "Sword" | "Catalyst" | "Polearm";
+
 interface WeaponData {
+    name: string;
+    type: WeaponType;
     sellPrice: number;
     attackPower: number;
     critChance: number;
@@ -9,10 +13,13 @@ interface WeaponData {
     minWorldLevel: number;
     chestChance: number;
     emoji: string;
+    imageURL: string;
 }
 
 const baseWeapons: { [key: string]: WeaponData } = {
     "Dull Blade": {
+        name: "Dull Blade",
+        type: "Sword",
         sellPrice: 5,
         attackPower: 2,
         critChance: 0,
@@ -23,8 +30,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 1,
         chestChance: 30,
         emoji: "<:Weapon_Dull_Blade:1282455010222800968>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/dull_blade.png",
     },
     "Waster Greatsword": {
+        name: "Waster Greatsword",
+        type: "Claymore",
         sellPrice: 5,
         attackPower: 3.5,
         critChance: 10,
@@ -35,8 +45,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 2,
         chestChance: 20,
         emoji: "<:Weapon_Waster_Greatsword:1282455085741510857>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/waster_greatsword.png",
     },
     "Iron Point": {
+        name: "Iron Point",
+        type: "Polearm",
         sellPrice: 5,
         attackPower: 4,
         critChance: 15,
@@ -47,8 +61,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 3,
         chestChance: 10,
         emoji: "<:Weapon_Iron_Point:1282455154427170987>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/iron_point.png",
     },
     "Silver Sword": {
+        name: "Silver Sword",
+        type: "Sword",
         sellPrice: 5,
         attackPower: 4.5,
         critChance: 15,
@@ -59,8 +76,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 3,
         chestChance: 5,
         emoji: "<:Weapon_Silver_Sword:1282455291153223774>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/silver_sword.png",
     },
     "Cool Steel": {
+        name: "Cool Steel",
+        type: "Sword",
         sellPrice: 5,
         attackPower: 5,
         critChance: 15,
@@ -71,8 +91,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 4,
         chestChance: 5,
         emoji: "<:Weapon_Cool_Steel:1282455365161582643>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/cool_steel.png",
     },
     "White Tassel": {
+        name: "White Tassel",
+        type: "Polearm",
         sellPrice: 5,
         attackPower: 0,
         critChance: 50,
@@ -83,8 +106,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 4,
         chestChance: 5,
         emoji: "<:Weapon_White_Tassel:1282455432715047003>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/white_tassel.png",
     },
     "Skyrider Sword": {
+        name: "Skyrider Sword",
+        type: "Sword",
         sellPrice: 10,
         attackPower: 6,
         critChance: 20,
@@ -95,8 +121,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 5,
         chestChance: 5,
         emoji: "<:Weapon_Skyrider_Sword:1282455504269869109>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/skyrider_sword.png",
     },
     "Twin Nephrite": {
+        name: "Twin Nephrite",
+        type: "Catalyst",
         sellPrice: 10,
         attackPower: -10,
         critChance: 5,
@@ -107,8 +136,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 5,
         chestChance: 5,
         emoji: "<:Weapon_Twin_Nephrite:1282455571370606653>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/twin_nephrite.png",
     },
     "Harbinger of Dawn": {
+        name: "Harbinger of Dawn",
+        type: "Sword",
         sellPrice: 15,
         attackPower: 8,
         critChance: 25,
@@ -119,8 +151,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 6,
         chestChance: 5,
         emoji: "<:Weapon_Harbinger_of_Dawn:1282455645273981039>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/harbinger_of_dawn.png",
     },
     "Magic Guide": {
+        name: "Magic Guide",
+        type: "Catalyst",
         sellPrice: 15,
         attackPower: 5,
         critChance: 10,
@@ -131,8 +167,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 6,
         chestChance: 10,
         emoji: "<:Weapon_Magic_Guide:1282455719580270624>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/magic_guide.png",
     },
     Messenger: {
+        name: "Messenger",
+        type: "Bow",
         sellPrice: 15,
         attackPower: 9,
         critChance: 5,
@@ -143,8 +182,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 6,
         chestChance: 5,
         emoji: "<:Weapon_Messenger:1282455784940245032>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/messenger.png",
     },
     "Raven Bow": {
+        name: "Raven Bow",
+        type: "Bow",
         sellPrice: 15,
         attackPower: 7,
         critChance: 15,
@@ -155,8 +197,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 7,
         chestChance: 5,
         emoji: "<:Weapon_Raven_Bow:1282455848810971136>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/raven_bow.png",
     },
     "Recurve Bow": {
+        name: "Recurve Bow",
+        type: "Bow",
         sellPrice: 15,
         attackPower: 6.5,
         critChance: 10,
@@ -167,8 +212,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 7,
         chestChance: 5,
         emoji: "<:Weapon_Recurve_Bow:1282455914556952576>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/recurve_bow.png",
     },
     "Otherworldly Story": {
+        name: "Otherworldly Story",
+        type: "Catalyst",
         sellPrice: 15,
         attackPower: 5,
         critChance: 25,
@@ -179,8 +227,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 7,
         chestChance: 5,
         emoji: "<:Weapon_Otherworldly_Story:1282455997994238033>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/otherworldly_story.png",
     },
     "The Black Sword": {
+        name: "The Black Sword",
+        type: "Sword",
         sellPrice: 15,
         attackPower: 0,
         critChance: -80,
@@ -191,8 +243,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 7,
         chestChance: 5,
         emoji: "<:Weapon_The_Black_Sword:1282998131432230933>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/the_black-sword.png",
     },
     "The Bell": {
+        name: "The Bell",
+        type: "Claymore",
         sellPrice: 15,
         attackPower: -10,
         critChance: -20,
@@ -203,8 +259,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 7,
         chestChance: 5,
         emoji: "<:Weapon_The_Bell:1282998169830952960>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_bell.png",
     },
     "Emerald Orb": {
+        name: "Emerald orb",
+        type: "Catalyst",
         sellPrice: 15,
         attackPower: 8,
         critChance: 20,
@@ -215,8 +274,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 8,
         chestChance: 5,
         emoji: "<:Weapon_Emerald_Orb:1282456084505952286>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/emerald_orb.png",
     },
     "The Halberd": {
+        name: "The Halberd",
+        type: "Polearm",
         sellPrice: 15,
         attackPower: 15,
         critChance: 0,
@@ -227,8 +289,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 8,
         chestChance: 5,
         emoji: "<:Weapon_Halberd:1291432656986312766>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_halberd.png",
     },
     "Ferrous Shadow": {
+        name: "Ferrous Shadow",
+        type: "Sword",
         sellPrice: 30,
         attackPower: 12,
         critChance: 5,
@@ -239,8 +304,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 8,
         chestChance: 5,
         emoji: "<:Weapon_Ferrous_Shadow:1282456147210535013>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/ferrous_shadow.png",
     },
     "Fillet Blade": {
+        name: "Fillet Blade",
+        type: "Sword",
         sellPrice: 30,
         attackPower: 15,
         critChance: 5,
@@ -251,8 +319,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 8,
         chestChance: 5,
         emoji: "<:Weapon_Fillet_Blade:1282456217150558258>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/fillet_blade.png",
     },
     "Sacrificial Sword": {
+        name: "Sacrificial Sword",
+        type: "Sword",
         sellPrice: 30,
         attackPower: -5,
         critChance: 0,
@@ -263,8 +334,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 8,
         chestChance: 5,
         emoji: "<:Weapon_Sacrificial_Sword:1282504118518284338>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/sacrificial_sword.png",
     },
     "The Widsith": {
+        name: "The Widsith",
+        type: "Catalyst",
         sellPrice: 30,
         attackPower: -10,
         critChance: 90,
@@ -275,11 +350,14 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 8,
         chestChance: 5,
         emoji: "<:Weapon_The_Widsith:1291432715622547478>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_widsith.png",
     },
     "The Flute": {
+        name: "The Flute",
+        type: "Sword",
         sellPrice: 30,
         attackPower: 5,
-        critChance: 50,
+        critChance: 40,
         critValue: 0.5,
         defValue: 0,
         defChance: 0,
@@ -287,8 +365,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 8,
         chestChance: 5,
         emoji: "<:Weapon_The_Flute:1282504448538837013>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_flute.png",
     },
     "Blackcliff Agate": {
+        name: "Blackcliff Agate",
+        type: "Polearm",
         sellPrice: 30,
         attackPower: 15,
         critChance: 20,
@@ -299,8 +380,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 10,
         chestChance: 5,
         emoji: "<:Weapon_Blackcliff_Agate:1284390885836066847>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/blackcliff_agate.png",
     },
     "Chain Breaker": {
+        name: "Chain Breaker",
+        type: "Bow",
         sellPrice: 30,
         attackPower: 20,
         critChance: 20,
@@ -311,22 +396,29 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 10,
         chestChance: 5,
         emoji: "<:Weapon_Chain_Breaker:1284617740899844176>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/chain_breaker.png",
     },
     "Cinnabar Spindle": {
+        name: "Cinnabar Spindle",
+        type: "Sword",
         sellPrice: 30,
         attackPower: 20,
         critChance: 0,
         critValue: 2,
-        defValue: 25,
+        defValue: 100,
         defChance: 10,
         additionalHP: 0,
         minWorldLevel: 10,
         chestChance: 5,
         emoji: "<:Weapon_Cinnabar_Spindle:1292283663329005621>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/cinnabar_spindle.png",
     },
     Deathmatch: {
+        name: "Deathmatch",
+        type: "Polearm",
         sellPrice: 30,
-        attackPower: 12,
+        attackPower: 15,
         critChance: -50,
         critValue: 3,
         defValue: 0,
@@ -335,8 +427,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 10,
         chestChance: 5,
         emoji: "<:Weapon_Deathmatch:1284617953509245082>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/deathmatch.png",
     },
     "The Stringless": {
+        name: "The Stringless",
+        type: "Bow",
         sellPrice: 30,
         attackPower: 20,
         critChance: 5,
@@ -347,32 +442,42 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 10,
         chestChance: 5,
         emoji: "<:Weapon_The_Stringless:1291432822808117338>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_stringless.png",
     },
     "The Alley Flash": {
+        name: "The Alley Flash",
+        type: "Sword",
         sellPrice: 30,
         attackPower: 25,
         critChance: -10,
         critValue: 3,
-        defValue: 0,
+        defValue: 20,
         defChance: 0,
         additionalHP: -100,
         minWorldLevel: 15,
         chestChance: 5,
         emoji: "<:Weapon_The_Alley_Flash:1289482689778548736>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/the_alley_flash.png",
     },
     "Lithic Blade": {
+        name: "Lithic Blade",
+        type: "Sword",
         sellPrice: 30,
         attackPower: 35,
         critChance: -5,
         critValue: 1.5,
-        defValue: 0,
+        defValue: 50,
         defChance: 0,
-        additionalHP: 150,
+        additionalHP: 100,
         minWorldLevel: 15,
         chestChance: 5,
         emoji: "<:Weapon_Lithic_Blade:1294565079554981898>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/lithic_blade.png",
     },
     "Pro­to­type Ar­cha­ic": {
+        name: "Prototype Archaic",
+        type: "Claymore",
         sellPrice: 30,
         attackPower: 30,
         critChance: -10,
@@ -383,8 +488,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 15,
         chestChance: 5,
         emoji: "<:Weapon_Prototype_Archaic:1289482979793698896>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/prototype_archaic.png",
     },
     "Black­cliff War­bow": {
+        name: "Blackcliff Warbow",
+        type: "Bow",
         sellPrice: 30,
         attackPower: 25,
         critChance: -10,
@@ -395,20 +504,27 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 15,
         chestChance: 5,
         emoji: "<:Weapon_Blackcliff_Warbow:1289483143304314940>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/blackcliff_warbow.png",
     },
     Rainslasher: {
+        name: "Rainslasher",
+        type: "Claymore",
         sellPrice: 40,
         attackPower: 30,
         critChance: 0,
         critValue: 2.5,
         defValue: -0.5,
         defChance: 0,
-        additionalHP: 100,
+        additionalHP: 300,
         minWorldLevel: 15,
         chestChance: 5,
         emoji: "<:Weapon_Rainslasher:1292670965121159250>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/rainslasher.png",
     },
     "Roy­al Gri­moire": {
+        name: "Royal Grimoire",
+        type: "Catalyst",
         sellPrice: 40,
         attackPower: 50,
         critChance: 0,
@@ -419,8 +535,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 15,
         chestChance: 5,
         emoji: "<:Weapon_Royal_Grimoire:1289486411061395517>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/royal_grimoire.png",
     },
     "Eye of Perception": {
+        name: "Eye of Perception",
+        type: "Catalyst",
         sellPrice: 40,
         attackPower: 50,
         critChance: 20,
@@ -431,8 +550,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 18,
         chestChance: 3,
         emoji: "<:Weapon_Eye_of_Perception:1291133932711972955>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/eye_of_perception.png",
     },
     "Kagotsurube Isshin": {
+        name: "Kagotsurube Isshin",
+        type: "Sword",
         sellPrice: 40,
         attackPower: 30,
         critChance: 10,
@@ -443,8 +566,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 18,
         chestChance: 3,
         emoji: "<:Weapon_Kagotsurube_Isshin:1291134317984092262>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/kagotsurube_isshin.png",
     },
     "Amenoma Kageuchi": {
+        name: "Amenoma Kageuchi",
+        type: "Sword",
         sellPrice: 40,
         attackPower: 20,
         critChance: 10,
@@ -455,8 +582,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 20,
         chestChance: 3,
         emoji: "<:Weapon_Amenoma_Kageuchi:1296678201065603112>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/amenoma_kageuchi.png",
     },
     Akuoumaru: {
+        name: "Akuoumaru",
+        type: "Claymore",
         sellPrice: 40,
         attackPower: 25,
         critChance: 15,
@@ -467,8 +598,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 20,
         chestChance: 3,
         emoji: "<:Weapon_Akuoumaru:1303587310788411392>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/akuoumaru.png",
     },
     "Compound Bow": {
+        name: "Compound Bow",
+        type: "Bow",
         sellPrice: 40,
         attackPower: 40,
         critChance: 20,
@@ -479,9 +613,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 20,
         chestChance: 3,
         emoji: "<:Weapon_Compound_Bow:1303587466300751912>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/compound_bow.png",
     },
     // Reworking
     "Aqua Simulacra": {
+        name: "Aqua Simulacra",
+        type: "Bow",
         sellPrice: 25,
         attackPower: 0,
         critChance: -100,
@@ -492,8 +629,11 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 5,
         chestChance: 0,
         emoji: "<:Weapon_Aqua_Simulacra:1283303723082190902>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/aqua_simulacra.png",
     },
     "Staff of Homa": {
+        name: "Staff of Homa",
+        type: "Polearm",
         sellPrice: 25,
         attackPower: 0,
         critChance: -100,
@@ -504,9 +644,12 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 10,
         chestChance: 0,
         emoji: "<:Weapon_Staff_of_Homa:1283341597425008640>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/staff_of_homa.png",
     },
     // Special Weapons
     "Engulfing Lightning": {
+        name: "Engulfing Lightning",
+        type: "Polearm",
         sellPrice: 25,
         attackPower: 50,
         critChance: 30,
@@ -517,6 +660,8 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minWorldLevel: 15,
         chestChance: 0,
         emoji: "<:Weapon_Engulfing_Lightning:1294565987710009344>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/engulfing_lightning.png",
     },
 };
 

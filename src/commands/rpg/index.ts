@@ -23,4 +23,5 @@ export * from "./sellall";
 export * from "./skills";
 export * from "./travel";
 export * from "./unequip";
+export * from "./weapon";
 export * from "./whereami";
