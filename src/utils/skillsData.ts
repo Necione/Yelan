@@ -46,7 +46,7 @@ export const skills: Skill[] = [
     {
         name: "Leech",
         description:
-            "Gain 5% lifesteal from each enemy's Max HP 50% of the time",
+            "Gain 10% lifesteal from each enemy's Max HP 50% of the time",
         emoji: "💖",
         requirements: {
             worldLevel: 3,

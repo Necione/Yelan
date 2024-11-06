@@ -103,6 +103,7 @@ export async function playerAttack(
     attackPower = defenseResult.attackPower;
     const attackMissed = defenseResult.attackMissed;
     const monsterDefended = defenseResult.monsterDefended;
+    const damageReduced = defenseResult.damageReduced;
     monsterState = defenseResult.monsterState;
 
     if (attackMissed) {
@@ -133,7 +134,7 @@ export async function playerAttack(
         monster.name,
         isCrit,
         monsterDefended,
-        monster.defValue,
+        damageReduced,
         messages,
     );
 
@@ -181,7 +182,7 @@ export async function monsterAttack(
     );
 
     if (monster.isMutated) {
-        monsterDamage *= 1.5;
+        monsterDamage *= 1.2;
     }
 
     const { isCrit, multiplier } = calculateCriticalHit(
@@ -191,42 +192,42 @@ export async function monsterAttack(
     monsterDamage *= multiplier;
 
     if (hasCrystallize) {
-        const segment = Math.ceil(turnNumber / 2);
+        const monsterTurn = Math.ceil(turnNumber / 2);
+
         let damageMultiplier: number;
-
-        if (segment <= 6) {
-            damageMultiplier = 0.4 + segment * 0.1;
-        } else {
-            damageMultiplier = 1.0 + (segment - 6) * 0.1;
-            damageMultiplier = Math.min(damageMultiplier, 2.0);
-        }
-
-        monsterDamage *= damageMultiplier;
-
         let effectDescription = "";
-        if (segment <= 6) {
-            const reductionPercent = (1 - damageMultiplier) * 100;
-            effectDescription = `\`🧊\` Crystallize reduces the ${
-                monster.name
-            }'s damage by ${reductionPercent.toFixed(0)}%.`;
+
+        if (monsterTurn <= 6) {
+            const reductionPercent = 25 - Math.floor(monsterTurn - 1) * 5;
+            damageMultiplier = 1 - reductionPercent / 100;
+
+            monsterDamage *= damageMultiplier;
+
+            effectDescription = `\`🧊\` Crystallize reduces the ${monster.name}'s damage by ${reductionPercent}%.`;
         } else {
-            const increasePercent = (damageMultiplier - 1) * 100;
-            effectDescription = `\`🧊\` Crystallize increases the ${
-                monster.name
-            }'s damage by ${increasePercent.toFixed(0)}%.`;
+            const increasePercent = (monsterTurn - 6) * 5;
+            damageMultiplier = 1 + increasePercent / 100;
+
+            monsterDamage *= damageMultiplier;
+
+            effectDescription = `\`🧊\` Crystallize increases the ${monster.name}'s damage by ${increasePercent}%.`;
         }
+
         messages.push(effectDescription);
     }
 
     const defChance = stats.defChance || 0;
     const defValue = stats.defValue || 0;
     let defended = false;
+    let damageReduced = 0;
 
     if (monster.group !== "Machine") {
         defended = Math.random() * 100 < defChance;
 
         if (defended) {
-            monsterDamage = Math.max(monsterDamage * (1 - defValue), 0);
+            const initialMonsterDamage = monsterDamage;
+            monsterDamage = (100 * monsterDamage) / (defValue + 100);
+            damageReduced = initialMonsterDamage - monsterDamage;
         }
     } else {
         messages.push(
@@ -266,7 +267,7 @@ export async function monsterAttack(
 
     const leechTriggered = Math.random() < 0.5;
     if (hasLeechSkill && leechTriggered) {
-        const healAmount = Math.ceil(monsterStats.maxHp * 0.05);
+        const healAmount = Math.ceil(monsterStats.maxHp * 0.1);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
         messages.push(
             `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}.`,
@@ -279,7 +280,7 @@ export async function monsterAttack(
         `\`⚔️\` The ${monster.name} dealt \`${monsterDamage.toFixed(
             2,
         )}\` damage to you${
-            defended ? ` 🛡️ (Defended: -${(defValue * 100).toFixed(2)}%)` : ""
+            defended ? ` 🛡️ (Reduced DMG by ${damageReduced.toFixed(2)})` : ""
         }${isCrit ? " 💢 (Critical Hit!)" : ""}.`,
     );
 
@@ -330,10 +331,12 @@ export function checkMonsterDefenses(
     attackPower: number;
     attackMissed: boolean;
     monsterDefended: boolean;
+    damageReduced: number;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
 } {
     let attackMissed = false;
     let monsterDefended = false;
+    let damageReduced = 0;
 
     if (monster.name.includes("Agent") && !monsterState.vanishedUsed) {
         attackMissed = true;
@@ -383,17 +386,25 @@ export function checkMonsterDefenses(
         );
     }
 
-    const monsterDefChance = (monster.defChance || 0) * 100;
+    const monsterDefChance = monster.defChance || 0;
     const monsterDefValue = monster.defValue || 0;
 
     const monsterDefendedCheck = Math.random() * 100 < monsterDefChance;
 
     if (monsterDefendedCheck) {
-        attackPower = Math.max(attackPower * (1 - monsterDefValue), 0);
+        const initialAttackPower = attackPower;
+        attackPower = (100 * attackPower) / (monsterDefValue + 100);
+        damageReduced = initialAttackPower - attackPower;
         monsterDefended = true;
     }
 
-    return { attackPower, attackMissed, monsterDefended, monsterState };
+    return {
+        attackPower,
+        attackMissed,
+        monsterDefended,
+        damageReduced,
+        monsterState,
+    };
 }
 
 function calculateCriticalHit(
@@ -409,7 +420,7 @@ function sendDamageMessage(
     monsterName: string,
     isCrit: boolean,
     monsterDefended: boolean,
-    defValue: number | undefined,
+    damageReduced: number,
     messages: string[],
 ) {
     let message = `\`⚔️\` You dealt \`${damage.toFixed(
@@ -418,8 +429,8 @@ function sendDamageMessage(
     if (isCrit) {
         message += " 💢 (Critical Hit!)";
     }
-    if (monsterDefended && defValue !== undefined) {
-        message += ` 🛡️ (Defended: -${(defValue * 100).toFixed(2)}%)`;
+    if (monsterDefended && damageReduced > 0) {
+        message += ` 🛡️ (Reduced DMG by ${damageReduced.toFixed(2)})`;
     }
     messages.push(message);
 }

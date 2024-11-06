@@ -55,15 +55,21 @@ export async function handleHunt(
 
     const numberOfMonsters = isBossEncounter
         ? 1
-        : stats.worldLevel >= 20
-          ? Math.floor(Math.random() * 2) + 3
-          : stats.worldLevel === 15
-            ? 3
-            : stats.worldLevel >= 10
-              ? Math.floor(Math.random() * 2) + 2
-              : stats.worldLevel >= 5
-                ? Math.floor(Math.random() * 2) + 1
-                : 1;
+        : stats.worldLevel <= 5
+          ? 1
+          : stats.worldLevel <= 15
+            ? Math.random() < 0.75
+                ? 2
+                : 1
+            : stats.worldLevel <= 25
+              ? Math.random() < 0.75
+                  ? 2
+                  : 3
+              : stats.worldLevel <= 35
+                ? Math.random() < 0.5
+                    ? 2
+                    : 3
+                : 3;
 
     const monstersEncountered: Monster[] = [];
 
@@ -136,7 +142,7 @@ export async function handleHunt(
         );
 
         if (monster.isMutated) {
-            currentMonsterHp *= 1.5;
+            currentMonsterHp *= 1.2;
         }
 
         const initialMonsterHp = currentMonsterHp;

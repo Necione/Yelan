@@ -3,6 +3,7 @@ import { embedComment } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
+import { cooldowns } from "../../utils";
 import { formatChange } from "../../utils/hunt";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
 
@@ -33,6 +34,9 @@ export const rpg = buildCommand<SlashCommand>({
         }
 
         const stats = await syncStats(i.user.id);
+
+        const huntCooldown = cooldowns.get(p, "hunt");
+        const exploreCooldown = cooldowns.get(p, "explore");
 
         if (!stats) {
             return r.edit(embedComment(`No stats found for you :(`));
@@ -77,13 +81,20 @@ export const rpg = buildCommand<SlashCommand>({
                     stats.defChance > 0 || stats.defValue > 0
                         ? `\n🛡️ DEF Rate: \`${
                               stats.defChance
-                          }%\` | 🛡️ DEF Value: \`${(
-                              stats.defValue * 100
-                          ).toFixed(2)}%\``
+                          }%\` | 🛡️ DEF Value: \`${stats.defValue.toFixed(2)}\``
                         : ""
                 }`,
                 inline: false,
             });
+        embed.addFields({
+            name: "Cooldowns",
+            value: `Hunt: ${
+                huntCooldown.status ? "Ready" : huntCooldown.message
+            }\nExplore: ${
+                exploreCooldown.status ? "Ready" : exploreCooldown.message
+            }`,
+            inline: false,
+        });
 
         if (stats.rebirths > 0) {
             embed.setFooter({

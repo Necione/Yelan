@@ -35,7 +35,7 @@ export async function syncStats(userId: string) {
     const finalMaxHP = calculatedMaxHP + assignedHpBonus;
 
     const assignedCritValueBonus = (stats.assignedCritValue || 0) * 0.01;
-    const assignedDefValueBonus = (stats.assignedDefValue || 0) * 0.01;
+    const assignedDefValueBonus = (stats.assignedDefValue || 0) * 1;
 
     const totalStats = {
         critChance: 1,
@@ -111,7 +111,7 @@ export async function syncStats(userId: string) {
     totalStats.critChance = Math.max(0, totalStats.critChance);
     totalStats.critValue = Math.max(0, totalStats.critValue);
     totalStats.defChance = Math.max(0, totalStats.defChance);
-    totalStats.defValue = Math.min(Math.max(0, totalStats.defValue), 0.9);
+    totalStats.defValue = Math.max(0, totalStats.defValue);
     totalStats.maxHP = Math.floor(totalStats.maxHP);
     totalStats.healEffectiveness = Math.max(0, totalStats.healEffectiveness);
 

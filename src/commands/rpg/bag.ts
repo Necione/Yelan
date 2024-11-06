@@ -1,14 +1,27 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { chunk, embedComment, noop } from "@elara-services/utils";
+import { chunk, embedComment } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
 import { getPaginatedMessage } from "../../utils";
-import { artifacts } from "../../utils/rpgitems/artifacts";
+import {
+    type ArtifactName,
+    artifacts,
+    type ArtifactType,
+    getArtifactType,
+} from "../../utils/rpgitems/artifacts";
 import { drops } from "../../utils/rpgitems/drops";
 import { food } from "../../utils/rpgitems/food";
 import { misc } from "../../utils/rpgitems/misc";
 import { weapons } from "../../utils/rpgitems/weapons";
+
+const artifactTypeEmojis: { [key in ArtifactType]: string } = {
+    Flower: "🌸",
+    Plume: "🪶",
+    Sands: "⏳",
+    Goblet: "🍷",
+    Circlet: "👑",
+};
 
 export const bag = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -126,12 +139,32 @@ export const bag = buildCommand<SlashCommand>({
                 )
                 .setDescription(
                     c
-                        .map((item) => `\`${item.amount}x\` ${item.item}`)
+                        .map((item) => {
+                            let displayItem = `\`${item.amount}x\` ${item.item}`;
+                            if (item.item in artifacts) {
+                                const artifactType = getArtifactType(
+                                    item.item as ArtifactName,
+                                );
+                                if (artifactType) {
+                                    const emoji =
+                                        artifactTypeEmojis[artifactType];
+                                    if (emoji) {
+                                        displayItem += ` (${emoji})`;
+                                    }
+                                }
+                            }
+                            return displayItem;
+                        })
                         .join("\n"),
                 );
             pager.pages.push({ embeds: [embed] });
         }
 
-        return pager.run(i, i.user).catch(noop);
+        return pager.run(i, i.user).catch((error) => {
+            console.error("Error running pager:", error);
+            r.edit(
+                embedComment("An error occurred while displaying your bag."),
+            );
+        });
     },
 });

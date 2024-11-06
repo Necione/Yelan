@@ -1,4 +1,5 @@
 import { MonsterGroup } from "../../monsterHelper";
+import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
@@ -28,166 +29,29 @@ export default {
             chance: 10,
         },
     ],
+    baseHp: 11,
+    baseAtk: 3,
     getStatsForWorldLevel(worldLevel: number) {
-        const stats = [
-            { worldLevel: 1, minHp: 12, maxHp: 16, minDamage: 2, maxDamage: 3 },
-            { worldLevel: 2, minHp: 18, maxHp: 27, minDamage: 3, maxDamage: 4 },
-            { worldLevel: 3, minHp: 29, maxHp: 38, minDamage: 4, maxDamage: 7 },
-            {
-                worldLevel: 4,
-                minHp: 40,
-                maxHp: 54,
-                minDamage: 5,
-                maxDamage: 10,
-            },
-            {
-                worldLevel: 5,
-                minHp: 57,
-                maxHp: 75,
-                minDamage: 7,
-                maxDamage: 11,
-            },
-            {
-                worldLevel: 6,
-                minHp: 80,
-                maxHp: 105,
-                minDamage: 8,
-                maxDamage: 13,
-            },
-            {
-                worldLevel: 7,
-                minHp: 112,
-                maxHp: 135,
-                minDamage: 9,
-                maxDamage: 14,
-            },
-            {
-                worldLevel: 8,
-                minHp: 142,
-                maxHp: 161,
-                minDamage: 12,
-                maxDamage: 18,
-            },
-            {
-                worldLevel: 9,
-                minHp: 162,
-                maxHp: 190,
-                minDamage: 13,
-                maxDamage: 20,
-            },
-            {
-                worldLevel: 10,
-                minHp: 192,
-                maxHp: 217,
-                minDamage: 14,
-                maxDamage: 21,
-            },
-            {
-                worldLevel: 11,
-                minHp: 217,
-                maxHp: 270,
-                minDamage: 16,
-                maxDamage: 22,
-            },
-            {
-                worldLevel: 12,
-                minHp: 265,
-                maxHp: 325,
-                minDamage: 19,
-                maxDamage: 25,
-            },
-            {
-                worldLevel: 13,
-                minHp: 318,
-                maxHp: 375,
-                minDamage: 22,
-                maxDamage: 28,
-            },
-            {
-                worldLevel: 14,
-                minHp: 378,
-                maxHp: 432,
-                minDamage: 24,
-                maxDamage: 32,
-            },
-            {
-                worldLevel: 15,
-                minHp: 450,
-                maxHp: 492,
-                minDamage: 28,
-                maxDamage: 37,
-            },
-            {
-                worldLevel: 16,
-                minHp: 570,
-                maxHp: 595,
-                minDamage: 39,
-                maxDamage: 52,
-            },
-            {
-                worldLevel: 17,
-                minHp: 594,
-                maxHp: 652,
-                minDamage: 48,
-                maxDamage: 63,
-            },
-            {
-                worldLevel: 18,
-                minHp: 655,
-                maxHp: 720,
-                minDamage: 62,
-                maxDamage: 72,
-            },
-            {
-                worldLevel: 19,
-                minHp: 739,
-                maxHp: 765,
-                minDamage: 73,
-                maxDamage: 98,
-            },
-            {
-                worldLevel: 20,
-                minHp: 873,
-                maxHp: 1150,
-                minDamage: 85,
-                maxDamage: 117,
-            },
-            {
-                worldLevel: 21,
-                minHp: 920,
-                maxHp: 1200,
-                minDamage: 90,
-                maxDamage: 120,
-            },
-            {
-                worldLevel: 22,
-                minHp: 970,
-                maxHp: 1250,
-                minDamage: 95,
-                maxDamage: 125,
-            },
-            {
-                worldLevel: 23,
-                minHp: 1025,
-                maxHp: 1300,
-                minDamage: 100,
-                maxDamage: 130,
-            },
-            {
-                worldLevel: 24,
-                minHp: 1080,
-                maxHp: 1350,
-                minDamage: 105,
-                maxDamage: 135,
-            },
-            {
-                worldLevel: 25,
-                minHp: 1150,
-                maxHp: 1450,
-                minDamage: 110,
-                maxDamage: 140,
-            },
-        ];
-        return stats.find((stat) => stat.worldLevel === worldLevel) || null;
+        if (worldLevel < 1 || worldLevel > 30) {
+            return null;
+        }
+
+        const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
+        const newBaseHp = this.baseHp * hpScaleMultiplier;
+        const minHp = Math.ceil(newBaseHp * 0.9);
+        const maxHp = Math.ceil(newBaseHp * 1.1);
+
+        const atkScaleMultiplier = getAtkScaleMultiplier(worldLevel);
+        const newBaseAtk = Math.ceil(this.baseAtk * atkScaleMultiplier);
+        const minDamage = Math.floor(newBaseAtk * 0.95);
+        const maxDamage = Math.ceil(newBaseAtk * 1.05);
+
+        return {
+            worldLevel,
+            minHp,
+            maxHp,
+            minDamage,
+            maxDamage,
+        };
     },
 };

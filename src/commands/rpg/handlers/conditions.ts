@@ -17,7 +17,7 @@ import {
     getCurrentMap,
 } from "../abyssHelpers/directionHelper";
 
-const maxWorldLevel = 25;
+const maxWorldLevel = 30;
 
 export async function handleVictory(
     i: ChatInputCommandInteraction,

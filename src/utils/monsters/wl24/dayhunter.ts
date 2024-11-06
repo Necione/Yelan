@@ -3,18 +3,18 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Hydro Hilichurl Rogue",
-    group: MonsterGroup.Hilichurl,
-    minExp: 5,
-    maxExp: 10,
-    minWorldLevel: 8,
-    image: "https://lh.elara.workers.dev/rpg/monsters/hydro_hilichurl_rouge.png",
+    name: "Eremite: Dayhunter",
+    group: MonsterGroup.Eremite,
+    minExp: 40,
+    maxExp: 60,
+    minWorldLevel: 24,
+    image: "https://lh.elara.workers.dev/rpg/monsters/dayhunter.png",
     drops: [
         {
-            item: "A Flower Yet to Bloom",
+            item: "Faded Red Satin",
             minAmount: 1,
-            maxAmount: 2,
-            chance: 50,
+            maxAmount: 1,
+            chance: 75,
         },
         {
             item: "Life Essence",
@@ -24,12 +24,12 @@ export default {
         },
     ],
 
-    critChance: 10,
-    critValue: 2,
+    critChance: 25,
+    critValue: 1.25,
     defChance: 75,
-    defValue: 30,
-    baseHp: 19.5,
-    baseAtk: 7,
+    defValue: 60,
+    baseHp: 16,
+    baseAtk: 9,
     getStatsForWorldLevel(worldLevel: number) {
         if (worldLevel < 1 || worldLevel > 30) {
             return null;

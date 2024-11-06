@@ -1,4 +1,5 @@
 import { MonsterGroup } from "../../monsterHelper";
+import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
@@ -32,143 +33,30 @@ export default {
     critChance: 10,
     critValue: 1.5,
     defchance: 90,
-    defValue: 0.5,
+    defValue: 50,
+    baseHp: 15,
+    baseAtk: 4,
     getStatsForWorldLevel(worldLevel: number) {
-        const stats = [
-            {
-                worldLevel: 7,
-                minHp: 60,
-                maxHp: 222,
-                minDamage: 10,
-                maxDamage: 15,
-            },
-            {
-                worldLevel: 8,
-                minHp: 74,
-                maxHp: 262.5,
-                minDamage: 12,
-                maxDamage: 17,
-            },
-            {
-                worldLevel: 9,
-                minHp: 87.5,
-                maxHp: 304.5,
-                minDamage: 14,
-                maxDamage: 19,
-            },
-            {
-                worldLevel: 10,
-                minHp: 101.5,
-                maxHp: 345,
-                minDamage: 15,
-                maxDamage: 20,
-            },
-            {
-                worldLevel: 11,
-                minHp: 115,
-                maxHp: 427.5,
-                minDamage: 17,
-                maxDamage: 23,
-            },
-            {
-                worldLevel: 12,
-                minHp: 142.5,
-                maxHp: 510,
-                minDamage: 20,
-                maxDamage: 25,
-            },
-            {
-                worldLevel: 13,
-                minHp: 170,
-                maxHp: 592.5,
-                minDamage: 23,
-                maxDamage: 27,
-            },
-            {
-                worldLevel: 14,
-                minHp: 197.5,
-                maxHp: 675,
-                minDamage: 25,
-                maxDamage: 30,
-            },
-            {
-                worldLevel: 15,
-                minHp: 225,
-                maxHp: 757.5,
-                minDamage: 27,
-                maxDamage: 35,
-            },
-            {
-                worldLevel: 16,
-                minHp: 280,
-                maxHp: 922.5,
-                minDamage: 40,
-                maxDamage: 50,
-            },
-            {
-                worldLevel: 17,
-                minHp: 307.5,
-                maxHp: 1005,
-                minDamage: 50,
-                maxDamage: 60,
-            },
-            {
-                worldLevel: 18,
-                minHp: 335,
-                maxHp: 1087.5,
-                minDamage: 60,
-                maxDamage: 75,
-            },
-            {
-                worldLevel: 19,
-                minHp: 362.5,
-                maxHp: 1170,
-                minDamage: 75,
-                maxDamage: 100,
-            },
-            {
-                worldLevel: 20,
-                minHp: 445,
-                maxHp: 1665,
-                minDamage: 80,
-                maxDamage: 120,
-            },
-            {
-                worldLevel: 21,
-                minHp: 470,
-                maxHp: 1750,
-                minDamage: 85,
-                maxDamage: 130,
-            },
-            {
-                worldLevel: 22,
-                minHp: 495,
-                maxHp: 1835,
-                minDamage: 90,
-                maxDamage: 135,
-            },
-            {
-                worldLevel: 23,
-                minHp: 520,
-                maxHp: 1920,
-                minDamage: 95,
-                maxDamage: 140,
-            },
-            {
-                worldLevel: 24,
-                minHp: 550,
-                maxHp: 2005,
-                minDamage: 100,
-                maxDamage: 145,
-            },
-            {
-                worldLevel: 25,
-                minHp: 580,
-                maxHp: 2090,
-                minDamage: 105,
-                maxDamage: 150,
-            },
-        ];
-        return stats.find((stat) => stat.worldLevel === worldLevel) || null;
+        if (worldLevel < 1 || worldLevel > 30) {
+            return null;
+        }
+
+        const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
+        const newBaseHp = this.baseHp * hpScaleMultiplier;
+        const minHp = Math.ceil(newBaseHp * 0.9);
+        const maxHp = Math.ceil(newBaseHp * 1.1);
+
+        const atkScaleMultiplier = getAtkScaleMultiplier(worldLevel);
+        const newBaseAtk = Math.ceil(this.baseAtk * atkScaleMultiplier);
+        const minDamage = Math.floor(newBaseAtk * 0.95);
+        const maxDamage = Math.ceil(newBaseAtk * 1.05);
+
+        return {
+            worldLevel,
+            minHp,
+            maxHp,
+            minDamage,
+            maxDamage,
+        };
     },
 };

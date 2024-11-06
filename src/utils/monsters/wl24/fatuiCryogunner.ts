@@ -3,19 +3,15 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Hydro Hilichurl Rogue",
-    group: MonsterGroup.Hilichurl,
-    minExp: 5,
-    maxExp: 10,
-    minWorldLevel: 8,
-    image: "https://lh.elara.workers.dev/rpg/monsters/hydro_hilichurl_rouge.png",
+    name: "Fatui Cryogunner",
+    group: MonsterGroup.Fatui,
+    minExp: 50,
+    maxExp: 75,
+    minWorldLevel: 24,
+    image: "https://lh.elara.workers.dev/rpg/monsters/fatui_cryogunner.png",
     drops: [
-        {
-            item: "A Flower Yet to Bloom",
-            minAmount: 1,
-            maxAmount: 2,
-            chance: 50,
-        },
+        { item: "Recruit's Insignia", minAmount: 1, maxAmount: 2, chance: 75 },
+        { item: "Sergeant's Insignia", minAmount: 1, maxAmount: 2, chance: 25 },
         {
             item: "Life Essence",
             minAmount: 1,
@@ -23,12 +19,11 @@ export default {
             chance: 10,
         },
     ],
-
-    critChance: 10,
-    critValue: 2,
+    critChance: 33,
+    critValue: 1.5,
     defChance: 75,
-    defValue: 30,
-    baseHp: 19.5,
+    defValue: 40,
+    baseHp: 18,
     baseAtk: 7,
     getStatsForWorldLevel(worldLevel: number) {
         if (worldLevel < 1 || worldLevel > 30) {

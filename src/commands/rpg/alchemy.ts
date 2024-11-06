@@ -141,9 +141,9 @@ export const alchemy = buildCommand<SlashCommand>({
             const assignedCritValueBonus = (
                 stats.assignedCritValue * 0.01
             ).toFixed(2);
-            const assignedDefValueBonus = (
-                stats.assignedDefValue * 0.01
-            ).toFixed(2);
+            const assignedDefValueBonus = (stats.assignedDefValue * 1).toFixed(
+                2,
+            );
 
             return r.edit({
                 embeds: [
