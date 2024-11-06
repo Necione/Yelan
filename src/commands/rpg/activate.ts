@@ -4,7 +4,9 @@ import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { skills } from "../../utils/skillsData";
 
-const MAX_ACTIVE_SKILLS = 5;
+function getMaxActiveSkills(alchemyProgress: number): number {
+    return alchemyProgress >= 100 ? 6 : 5;
+}
 
 const skillChoices = skills.map((skill) => ({
     name: `${skill.emoji} ${skill.name}`,
@@ -38,6 +40,9 @@ export const activate = buildCommand<SlashCommand>({
         const learnedSkills = stats.skills || [];
         let activeSkills = stats.activeSkills || [];
 
+        const alchemyProgress = stats.alchemyProgress || 0;
+        const MAX_ACTIVE_SKILLS = getMaxActiveSkills(alchemyProgress);
+
         const skillToActivate = learnedSkills.find(
             (skill) => skill.name === skillName,
         );
@@ -66,7 +71,7 @@ export const activate = buildCommand<SlashCommand>({
         if (activeSkills.length >= MAX_ACTIVE_SKILLS) {
             return r.edit(
                 embedComment(
-                    `You can only have ${MAX_ACTIVE_SKILLS} active skills at a time.`,
+                    `You can only have ${MAX_ACTIVE_SKILLS} active skills at a time based on your Alchemy rank.`,
                 ),
             );
         }

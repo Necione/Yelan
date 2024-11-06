@@ -13,6 +13,8 @@ export type SkillName =
     | "Heartbroken"
     | "Crystallize"
     | "Growth"
+    | "Vigor"
+    | "Paladin"
     | "Sloth"
     | "Wrath";
 
@@ -209,6 +211,35 @@ export const skills: Skill[] = [
                 { item: "Recruit's Insignia", amount: 5 },
                 { item: "A Flower Yet to Bloom", amount: 5 },
                 { item: "Slime Secretions", amount: 15 },
+            ],
+        },
+    },
+    {
+        name: "Vigor",
+        description: "Deal more damage at lower HP",
+        emoji: "💪",
+        requirements: {
+            worldLevel: 10,
+            rebirthsRequired: 2,
+            coins: 500,
+            items: [
+                { item: "Rich Red Brocade", amount: 5 },
+                { item: "Golden Raven Insignia", amount: 5 },
+                { item: "Slime Concentrate", amount: 10 },
+            ],
+        },
+    },
+    {
+        name: "Paladin",
+        description: "Your DEF Value and ATK Value are swapped",
+        emoji: "⚜️",
+        requirements: {
+            worldLevel: 10,
+            rebirthsRequired: 2,
+            coins: 500,
+            items: [
+                { item: "Wanderer's Blooming Flower", amount: 3 },
+                { item: "Mist Grass", amount: 10 },
             ],
         },
     },

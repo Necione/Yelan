@@ -13,6 +13,10 @@ import {
 import { getUserStats } from "../../services";
 import { skills } from "../../utils/skillsData";
 
+function getMaxActiveSkills(alchemyProgress: number): number {
+    return alchemyProgress >= 100 ? 6 : 5;
+}
+
 const getSkillEmoji = (skillName: string) => {
     const skill = skills.find((s) => s.name === skillName);
     return skill ? skill.emoji : "";
@@ -39,6 +43,9 @@ export const skillsCommand = buildCommand<SlashCommand>({
 
         const learnedSkills = stats.skills || [];
         const activeSkills = stats.activeSkills || [];
+
+        const alchemyProgress = stats.alchemyProgress || 0;
+        const MAX_ACTIVE_SKILLS = getMaxActiveSkills(alchemyProgress);
 
         const activeList = activeSkills.length
             ? activeSkills
@@ -68,7 +75,7 @@ export const skillsCommand = buildCommand<SlashCommand>({
             )
             .addFields(
                 {
-                    name: `Active Skills (${activeSkills.length}/5)`,
+                    name: `Active Skills (${activeSkills.length}/${MAX_ACTIVE_SKILLS})`,
                     value: activeList,
                     inline: true,
                 },

@@ -21,11 +21,33 @@ export async function playerAttack(
     monsterState: { displaced: boolean; vanishedUsed: boolean };
 }> {
     let attackPower = stats.attackPower;
+    let defValue = stats.defValue;
 
     if (hasWrath) {
         attackPower *= 1.5;
         messages.push(
             `\`💢\` Wrath skill activated! You deal 150% more damage.`,
+        );
+    }
+
+    const hasVigor = skills.has(stats, "Vigor");
+    if (hasVigor) {
+        const hpPercentage = (currentPlayerHp / stats.maxHP) * 100;
+        if (hpPercentage < 25) {
+            attackPower *= 1.5;
+            messages.push(
+                `\`💪\` Vigor skill activated! Your low HP grants you 150% more damage.`,
+            );
+        }
+    }
+
+    const hasPaladin = skills.has(stats, "Paladin");
+    if (hasPaladin) {
+        const temp = attackPower;
+        attackPower = defValue;
+        defValue = temp;
+        messages.push(
+            `\`🛡️\` Paladin skill activated! Your Attack Power and Defense VALUE have been swapped.`,
         );
     }
 
