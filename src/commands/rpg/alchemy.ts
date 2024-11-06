@@ -1,13 +1,13 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import {
-  ActionRowBuilder,
-  ComponentType,
-  EmbedBuilder,
-  Message,
-  SlashCommandBuilder,
-  StringSelectMenuBuilder,
-  StringSelectMenuInteraction,
+    ActionRowBuilder,
+    ComponentType,
+    EmbedBuilder,
+    type Message,
+    SlashCommandBuilder,
+    StringSelectMenuBuilder,
+    type StringSelectMenuInteraction,
 } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 
@@ -125,7 +125,7 @@ export const alchemy = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
 
-    async execute(i, r) {
+    async execute(i) {
         const action = i.options.getString("action", false);
         const stat = i.options.getString("stat", false);
         const pointsToAssign = i.options.getInteger("points", false);
@@ -175,7 +175,7 @@ export const alchemy = buildCommand<SlashCommand>({
                     new EmbedBuilder()
                         .setTitle("Choose Your Deity")
                         .setDescription(
-                            "You have reached the **Ascended** rank. Please choose a deity to follow:\n**⚠️ You will not be able to change this decision.**",
+                            "You have reached the **Ascended** rank. Please choose a deity to follow:\n**⚠️ You will __NEVER__ be able to change this decision.**\n*You may choose to ignore this and choose later*",
                         )
                         .setColor(0x4b52bb),
                 ],
