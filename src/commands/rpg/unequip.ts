@@ -103,14 +103,39 @@ export const unequip = buildCommand<SlashCommand>({
             return r.edit(embedComment("You cannot unequip while hunting!"));
         }
 
+        if (stats.castQueue.length > 0) {
+            if (itemName === "All" && stats.equippedWeapon) {
+                return r.edit(
+                    embedComment(
+                        `You cannot unequip your weapon while you have spells in your queue.`,
+                    ),
+                );
+            }
+
+            if (itemName === stats.equippedWeapon) {
+                return r.edit(
+                    embedComment(
+                        `You cannot unequip your weapon while you have spells in your queue.`,
+                    ),
+                );
+            }
+        }
+
         const updatedStats: string[] = [];
         const beforeStats = { ...stats };
 
         if (itemName === "All") {
             const updates: any = {};
+            const unequippableItems: string[] = [];
 
             if (stats.equippedWeapon) {
-                updates.equippedWeapon = { set: null };
+                if (stats.castQueue.length > 0) {
+                    unequippableItems.push(
+                        `**${stats.equippedWeapon}** (Weapon)`,
+                    );
+                } else {
+                    updates.equippedWeapon = { set: null };
+                }
             }
 
             const artifactTypes: ArtifactType[] = [
@@ -126,6 +151,32 @@ export const unequip = buildCommand<SlashCommand>({
                 if (stats[field]) {
                     updates[field] = { set: null };
                 }
+            }
+
+            if (
+                unequippableItems.length > 0 &&
+                Object.keys(updates).length === 0
+            ) {
+                return r.edit(
+                    embedComment(
+                        `You cannot unequip the following items while you have spells in your queue:\n${unequippableItems
+                            .map((item) => `- ${item}`)
+                            .join("\n")}`,
+                    ),
+                );
+            }
+
+            if (unequippableItems.length > 0) {
+                r.edit(
+                    embedComment(
+                        `You cannot unequip the following items while you have spells in your queue:\n${unequippableItems
+                            .map((item) => `- ${item}`)
+                            .join(
+                                "\n",
+                            )}\n\nOther equipped artifacts have been unequipped.`,
+                        "Yellow",
+                    ),
+                ).catch(noop);
             }
 
             if (Object.keys(updates).length === 0) {
@@ -152,7 +203,7 @@ export const unequip = buildCommand<SlashCommand>({
 
             return r.edit(
                 embedComment(
-                    `You have unequipped all items.\n${updatedStats.join(
+                    `You have unequipped all items you can.\n${updatedStats.join(
                         "\n",
                     )}`,
                     "Green",
@@ -161,6 +212,14 @@ export const unequip = buildCommand<SlashCommand>({
         }
 
         if (itemName === stats.equippedWeapon) {
+            if (stats.castQueue.length > 0) {
+                return r.edit(
+                    embedComment(
+                        `You cannot unequip your weapon while you have spells in your queue.`,
+                    ),
+                );
+            }
+
             await updateUserStats(i.user.id, {
                 equippedWeapon: { set: null },
             });

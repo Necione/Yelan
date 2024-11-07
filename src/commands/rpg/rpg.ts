@@ -44,12 +44,54 @@ export const rpg = buildCommand<SlashCommand>({
 
         const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
 
-        const hpDisplay =
-            stats.hp > stats.maxHP
-                ? `💜 \`${stats.hp}/${stats.maxHP}\` **OVERHEALED**`
-                : stats.hp < stats.maxHP * 0.3
-                  ? `🧡 \`${stats.hp}/${stats.maxHP}\` **LOW HP**`
-                  : `❤️ \`${stats.hp}/${stats.maxHP}\``;
+        let hasCatalyst = false;
+
+        const equippedItems: string[] = [];
+
+        if (stats.equippedWeapon) {
+            const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
+            const weaponBonusAttack = equippedWeapon.attackPower;
+
+            equippedItems.push(
+                `${equippedWeapon.emoji} ${
+                    stats.equippedWeapon
+                } (${formatChange(weaponBonusAttack)} ATK)`,
+            );
+
+            if (equippedWeapon.type.toLowerCase() === "catalyst") {
+                hasCatalyst = true;
+            }
+        }
+
+        if (stats.equippedFlower) {
+            equippedItems.push(`🌸 **Flower:** ${stats.equippedFlower}`);
+        }
+        if (stats.equippedPlume) {
+            equippedItems.push(`🪶 **Plume:** ${stats.equippedPlume}`);
+        }
+        if (stats.equippedSands) {
+            equippedItems.push(`⏳ **Sands:** ${stats.equippedSands}`);
+        }
+        if (stats.equippedGoblet) {
+            equippedItems.push(`🍷 **Goblet:** ${stats.equippedGoblet}`);
+        }
+        if (stats.equippedCirclet) {
+            equippedItems.push(`👑 **Circlet:** ${stats.equippedCirclet}`);
+        }
+
+        let hpDisplay: string;
+
+        if (stats.hp > stats.maxHP) {
+            hpDisplay = `💜 \`${stats.hp}/${stats.maxHP}\` **OVERHEALED**`;
+        } else if (stats.hp < stats.maxHP * 0.3) {
+            hpDisplay = `🧡 \`${stats.hp}/${stats.maxHP}\` **LOW HP**`;
+        } else {
+            hpDisplay = `❤️ \`${stats.hp}/${stats.maxHP}\``;
+        }
+
+        if (hasCatalyst) {
+            hpDisplay += ` | ✨ Mana: \`${stats.mana}/${stats.maxMana}\``;
+        }
 
         const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
 
@@ -96,45 +138,10 @@ export const rpg = buildCommand<SlashCommand>({
                 inline: false,
             });
 
-        embed.addFields({
-            name: "Your Party",
-            value: `- <:Aether_Item:1303603425497579530> (5★) Traveller`,
-            inline: false,
-        });
-
         if (stats.rebirths > 0) {
             embed.setFooter({
                 text: getRebirthString(stats.rebirths),
             });
-        }
-
-        const equippedItems: string[] = [];
-
-        if (stats.equippedWeapon) {
-            const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
-            const weaponBonusAttack = equippedWeapon.attackPower;
-
-            equippedItems.push(
-                `${equippedWeapon.emoji} ${
-                    stats.equippedWeapon
-                } (${formatChange(weaponBonusAttack)} ATK)\n`,
-            );
-        }
-
-        if (stats.equippedFlower) {
-            equippedItems.push(`🌸 **Flower:** ${stats.equippedFlower}`);
-        }
-        if (stats.equippedPlume) {
-            equippedItems.push(`🪶 **Plume:** ${stats.equippedPlume}`);
-        }
-        if (stats.equippedSands) {
-            equippedItems.push(`⏳ **Sands:** ${stats.equippedSands}`);
-        }
-        if (stats.equippedGoblet) {
-            equippedItems.push(`🍷 **Goblet:** ${stats.equippedGoblet}`);
-        }
-        if (stats.equippedCirclet) {
-            equippedItems.push(`👑 **Circlet:** ${stats.equippedCirclet}`);
         }
 
         if (equippedItems.length > 0) {

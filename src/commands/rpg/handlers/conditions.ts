@@ -12,6 +12,7 @@ import {
 } from "../../../services";
 import { cooldowns, texts } from "../../../utils";
 import { calculateDrop, calculateExp, type Monster } from "../../../utils/hunt";
+import { weapons, type WeaponName } from "../../../utils/rpgitems/weapons";
 import {
     getAvailableDirections,
     getCurrentMap,
@@ -131,8 +132,30 @@ export async function handleVictory(
         skillsActivated += `\`💖\` Healed \`${healAmount}\` HP due to the Totem skill.\n`;
     }
 
+    let manaRestored = 0;
+    let manaFieldAdded = false;
+
+    if (stats.equippedWeapon) {
+        const weaponName = stats.equippedWeapon as WeaponName;
+        const equippedWeapon = weapons[weaponName];
+
+        if (equippedWeapon && equippedWeapon.type === "Catalyst") {
+            manaRestored = Math.floor(stats.maxMana * 0.5);
+            const newMana = Math.min(stats.mana + manaRestored, stats.maxMana);
+            stats.mana = newMana;
+
+            finalEmbed.addFields({
+                name: "Mana Restored",
+                value: `\`✨\` Restored \`${manaRestored}\` Mana`,
+            });
+
+            manaFieldAdded = true;
+        }
+    }
+
     await updateUserStats(i.user.id, {
         hp: currentPlayerHp,
+        ...(manaFieldAdded && { mana: stats.mana }),
         activeEffects: stats.activeEffects,
     });
 
@@ -195,8 +218,8 @@ export async function handleVictory(
     }
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
-    await updateUserStats(i.user.id, { isHunting: false });
 
+    await updateUserStats(i.user.id, { isHunting: false });
     await thread.edit({ archived: true, locked: true }).catch(noop);
 
     const hasInsomniaSkill = skills.has(stats, "Insomnia");

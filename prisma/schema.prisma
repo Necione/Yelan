@@ -183,6 +183,8 @@ model UserStats {
   id                              String         @id @default(auto()) @map("_id") @db.ObjectId
   userId                          String         @unique
   rebirths                        Int            @default(0)
+  mana                            Int            @default(20)
+  maxMana                         Int            @default(20)
   hp                              Int            @default(100)
   maxHP                           Int            @default(100)
   baseAttack                      Float          @default(5)
@@ -227,6 +229,7 @@ model UserStats {
   collectedChests                 String[]       @default([])
   hasKey                          Boolean        @default(false)
   deity                           String?
+  castQueue                       String[]       @default([])
 }
 
 type UserRequest {

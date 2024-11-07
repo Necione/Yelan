@@ -27,6 +27,74 @@ export async function playerAttack(
     vigilanceUsed: boolean;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
 }> {
+    if (stats.castQueue.length > 0) {
+        const spellName = stats.castQueue[0];
+
+        switch (spellName) {
+            case "Heal": {
+                const healAmount = Math.floor(0.15 * stats.maxHP);
+                currentPlayerHp = Math.min(
+                    currentPlayerHp + healAmount,
+                    stats.maxHP,
+                );
+                messages.push(
+                    `\`✨\` Heal spell casted! Restored \`${healAmount} HP\`.`,
+                );
+                break;
+            }
+
+            case "Fury": {
+                stats.attackPower *= 2;
+                messages.push(
+                    `\`⚡\` Fury spell casted! Your next attack will deal double damage.`,
+                );
+                break;
+            }
+
+            case "Burn": {
+                const burnDamage = Math.floor(0.5 * monster.currentHp);
+                currentMonsterHp = Math.max(currentMonsterHp - burnDamage, 0);
+                messages.push(
+                    `\`🔥\` Burn spell casted! Dealt \`${burnDamage} damage\` to the ${monster.name}.`,
+                );
+                break;
+            }
+
+            case "Cripple": {
+                const crippleDamage = Math.floor(0.2 * monster.currentHp);
+                currentMonsterHp = Math.max(
+                    currentMonsterHp - crippleDamage,
+                    0,
+                );
+                messages.push(
+                    `\`❄️\` Cripple spell casted! Dealt \`${crippleDamage} damage\` to the ${monster.name}.`,
+                );
+                break;
+            }
+
+            default:
+                messages.push(
+                    `\`❓\` The spell "${spellName}" was found but has no effect.`,
+                );
+                break;
+        }
+
+        stats.castQueue.shift();
+
+        const updateData: Partial<UserStats> = {
+            castQueue: stats.castQueue,
+        };
+
+        if (spellName === "Heal") {
+            updateData.hp = currentPlayerHp;
+        }
+        if (spellName === "Fury") {
+            updateData.attackPower = stats.attackPower;
+        }
+
+        await updateUserStats(stats.userId, updateData);
+    }
+
     let attackPower = stats.attackPower;
     let defValue = stats.defValue;
 
@@ -366,6 +434,23 @@ export function applyAttackModifiers(
         }
     }
 
+    const furyEffect = stats.activeEffects.find(
+        (effect) => effect.name === "Fury" && effect.remainingUses > 0,
+    );
+
+    if (furyEffect) {
+        attackPower *= 2;
+        messages.push(
+            `\`⚡\` Fury effect activated! Your attack deals double damage this turn.`,
+        );
+
+        furyEffect.remainingUses -= 1;
+        if (furyEffect.remainingUses <= 0) {
+            stats.activeEffects = stats.activeEffects.filter(
+                (effect) => effect !== furyEffect,
+            );
+        }
+    }
     return { attackPower, monsterState };
 }
 

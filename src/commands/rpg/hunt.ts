@@ -5,7 +5,7 @@ import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { handleHunt } from "./handlers/huntHandler";
 
-const sinSkills = ["Wrath", "Sloth"]; 
+const sinSkills = ["Wrath", "Sloth"];
 
 export const hunt = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -78,21 +78,24 @@ export const hunt = buildCommand<SlashCommand>({
 
         if (stats.hp <= 0) {
             locked.del(i.user.id);
-            return r.edit(embedComment("You don't have enough HP to go on a hunt :("),
+            return r.edit(
+                embedComment("You don't have enough HP to go on a hunt :("),
             );
         }
 
         const activeSkills = stats.activeSkills || [];
         const activeSinSkills = activeSkills.filter((skill) =>
-            sinSkills.includes(skill)
+            sinSkills.includes(skill),
         );
 
         if (activeSinSkills.length > 1) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
-                    `You cannot go on a hunt while having multiple Sin skills active. Currently active Sin skills: **${activeSinSkills.join(", ")}**. Please deactivate some Sin skills before hunting.`
-                )
+                    `You cannot go on a hunt while having multiple Sin skills active. Currently active Sin skills: **${activeSinSkills.join(
+                        ", ",
+                    )}**. Please deactivate some Sin skills before hunting.`,
+                ),
             );
         }
 
