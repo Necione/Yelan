@@ -155,6 +155,14 @@ export const weapon = buildCommand<SlashCommand>({
                 });
             }
 
+            if (fullWeaponName && fullWeaponName.includes("Memory of Dust")) {
+                embed.addFields({
+                    name: "Special Effect",
+                    value: "Keep hunting for another 500 HP after death.",
+                    inline: false,
+                });
+            }
+
             return r.edit({ embeds: [embed] });
         } catch (error) {
             console.error("Error executing /weapon command:", error);

@@ -10,6 +10,14 @@ import { MonsterGroup } from "../../../utils/monsterHelper";
 import type { WeaponName, WeaponType } from "../../../utils/rpgitems/weapons";
 import { weapons } from "../../../utils/rpgitems/weapons";
 
+export function getDeathThreshold(stats: UserStats): number {
+    const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
+    if (equippedWeaponName && equippedWeaponName.includes("Memory of Dust")) {
+        return -500;
+    }
+    return 0;
+}
+
 export async function playerAttack(
     stats: UserStats,
     monster: Monster,
@@ -257,6 +265,11 @@ export async function playerAttack(
         );
     }
 
+    const deathThreshold = getDeathThreshold(stats);
+    if (currentPlayerHp <= deathThreshold) {
+        currentPlayerHp = deathThreshold;
+    }
+
     return { currentMonsterHp, currentPlayerHp, vigilanceUsed, monsterState };
 }
 
@@ -369,8 +382,10 @@ export async function monsterAttack(
     }
 
     currentPlayerHp -= monsterDamage;
-    if (currentPlayerHp < 0) {
-        currentPlayerHp = 0;
+
+    const deathThreshold = getDeathThreshold(stats);
+    if (currentPlayerHp < deathThreshold) {
+        currentPlayerHp = deathThreshold;
     }
 
     const hasLeechSkill = skills.has(stats, "Leech");

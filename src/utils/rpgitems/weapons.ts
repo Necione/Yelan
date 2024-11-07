@@ -630,6 +630,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Absolution1:1303960695653535776>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/absolution.png",
     },
+    "Memory of Dust": {
+        name: "Memory of Dust",
+        type: "Catalyst",
+        sellPrice: 100,
+        attackPower: 40,
+        critChance: 20,
+        critValue: 1.5,
+        defValue: 125,
+        defChance: 0.25,
+        additionalHP: 0,
+        minWorldLevel: 25,
+        chestChance: 1,
+        emoji: "<:Weapon_Memory_of_Dust:1303985604060643359>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/memory_of_dust.png",
+    },
     // Reworking
     "Aqua Simulacra": {
         name: "Aqua Simulacra",

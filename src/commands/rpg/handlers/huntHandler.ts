@@ -17,7 +17,11 @@ import {
     type Monster,
 } from "../../../utils/hunt";
 import { handleRandomEvent } from "../../../utils/randomEvents";
-import { monsterAttack, playerAttack } from "./battleHandler";
+import {
+    getDeathThreshold,
+    monsterAttack,
+    playerAttack,
+} from "./battleHandler";
 import { handleDefeat, handleVictory } from "./conditions";
 
 export async function handleHunt(
@@ -76,7 +80,6 @@ export async function handleHunt(
     let currentPlayerHp = stats.hp;
 
     const hasSloth = skills.has(stats, "Sloth");
-
     const hasWrath = skills.has(stats, "Wrath");
 
     if (hasSloth) {
@@ -153,15 +156,20 @@ export async function handleHunt(
         const createHealthBar = (
             current: number,
             max: number,
+            deathThreshold: number,
             length: number = 20,
         ): string => {
-            current = Math.max(0, Math.min(current, max));
-            const filledLength = Math.round((current / max) * length);
+            const minHP = deathThreshold;
+            const cappedCurrent = Math.min(Math.max(current, minHP), max);
+            const ratio = (cappedCurrent - minHP) / (max - minHP);
+            const filledLength = Math.round(ratio * length);
             const emptyLength = Math.max(length - filledLength, 0);
 
             const bar = "█".repeat(filledLength) + "░".repeat(emptyLength);
             return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
         };
+
+        const deathThreshold = getDeathThreshold(stats);
 
         const battleEmbed = new EmbedBuilder()
             .setColor(monster.isMutated ? "#658e4d" : "Aqua")
@@ -171,12 +179,20 @@ export async function handleHunt(
             .addFields(
                 {
                     name: "Your HP",
-                    value: createHealthBar(currentPlayerHp, initialPlayerHp),
+                    value: createHealthBar(
+                        currentPlayerHp,
+                        initialPlayerHp,
+                        deathThreshold,
+                    ),
                     inline: true,
                 },
                 {
                     name: "Monster HP",
-                    value: createHealthBar(currentMonsterHp, initialMonsterHp),
+                    value: createHealthBar(
+                        currentMonsterHp,
+                        initialMonsterHp,
+                        0,
+                    ),
                     inline: true,
                 },
             );
@@ -209,7 +225,6 @@ export async function handleHunt(
         }
 
         const hasVigilance = skills.has(stats, "Vigilance");
-
         const hasDistraction = skills.has(stats, "Distraction");
 
         let vigilanceUsed = false;
@@ -254,7 +269,7 @@ export async function handleHunt(
             }
         }
 
-        while (currentPlayerHp > 0 && currentMonsterHp > 0) {
+        while (currentPlayerHp > deathThreshold && currentMonsterHp > 0) {
             if (isPlayerTurn) {
                 const playerMessages: string[] = [];
 
@@ -287,10 +302,12 @@ export async function handleHunt(
                 const playerHpBar = createHealthBar(
                     currentPlayerHp,
                     initialPlayerHp,
+                    deathThreshold,
                 );
                 const monsterHpBar = createHealthBar(
                     currentMonsterHp,
                     initialMonsterHp,
+                    0,
                 );
 
                 battleEmbed.setFields([
@@ -351,10 +368,12 @@ export async function handleHunt(
                 const playerHpBar = createHealthBar(
                     currentPlayerHp,
                     initialPlayerHp,
+                    deathThreshold,
                 );
                 const monsterHpBar = createHealthBar(
                     currentMonsterHp,
                     initialMonsterHp,
+                    0,
                 );
 
                 battleEmbed.setFields([
@@ -372,7 +391,7 @@ export async function handleHunt(
 
                 await i.editReply({ embeds: [battleEmbed] }).catch(noop);
 
-                if (currentPlayerHp <= 0) {
+                if (currentPlayerHp <= deathThreshold) {
                     break;
                 }
 
@@ -380,7 +399,7 @@ export async function handleHunt(
             }
             await sleep(get.secs(1));
 
-            stats.hp = Math.min(currentPlayerHp, stats.maxHP);
+            stats.hp = currentPlayerHp;
             await updateUserStats(stats.userId, { hp: stats.hp });
 
             if (isFirstTurn) {
@@ -390,7 +409,7 @@ export async function handleHunt(
             turnNumber++;
         }
 
-        if (currentPlayerHp > 0) {
+        if (currentPlayerHp > deathThreshold) {
             if (currentMonsterIndex < monstersEncountered.length - 1) {
                 currentMonsterIndex++;
                 await handleMonsterBattle(thread);
