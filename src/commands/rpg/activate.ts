@@ -4,6 +4,8 @@ import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { skills } from "../../utils/skillsData";
 
+const sinSkills = ["Wrath", "Sloth"]; 
+
 function getMaxActiveSkills(alchemyProgress: number): number {
     return alchemyProgress >= 100 ? 6 : 5;
 }
@@ -66,6 +68,21 @@ export const activate = buildCommand<SlashCommand>({
             return r.edit(
                 embedComment(`The skill "${skillName}" has been deactivated.`),
             );
+        }
+
+        if (sinSkills.includes(skillName)) {
+
+            const activeSinSkills = activeSkills.filter((skill) =>
+                sinSkills.includes(skill),
+            );
+
+            if (activeSinSkills.length >= 1) {
+                return r.edit(
+                    embedComment(
+                        `You can only have one Sin skill active at a time. Currently active: **${activeSinSkills.join(", ")}**.`,
+                    ),
+                );
+            }
         }
 
         if (activeSkills.length >= MAX_ACTIVE_SKILLS) {

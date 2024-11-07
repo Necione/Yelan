@@ -86,7 +86,7 @@ export async function secretCultEvent(i: ChatInputCommandInteraction) {
                     .catch(noop);
             } else {
                 effectName = "Poisoning";
-                effectValue = -0.2;
+                effectValue = -0.25;
                 await i
                     .editReply({
                         embeds: [
