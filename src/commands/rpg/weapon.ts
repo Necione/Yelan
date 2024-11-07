@@ -1,5 +1,4 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
@@ -20,40 +19,68 @@ export const weapon = buildCommand<SlashCommand>({
         try {
             const profile = await getProfileByUserId(i.user.id);
             if (!profile) {
-                return r.edit(
-                    embedComment(
-                        `You don't have a user profile yet. Please create one using \`/profile\`.`,
-                    ),
-                );
+                const noProfileEmbed = new EmbedBuilder()
+                    .setColor("Red")
+                    .setTitle("Profile Not Found")
+                    .setDescription(
+                        "You don't have a user profile yet. Please create one using `/profile`.",
+                    )
+                    .setTimestamp();
+
+                return r.edit({ embeds: [noProfileEmbed] });
             }
 
             if (profile.locked) {
-                return r.edit(
-                    embedComment(
-                        `Your user profile is locked. You cannot use this command.`,
-                    ),
-                );
+                const lockedProfileEmbed = new EmbedBuilder()
+                    .setColor("Red")
+                    .setTitle("Profile Locked")
+                    .setDescription(
+                        "Your user profile is locked. You cannot use this command.",
+                    )
+                    .setTimestamp();
+
+                return r.edit({ embeds: [lockedProfileEmbed] });
             }
 
             const stats = await syncStats(i.user.id);
             if (!stats) {
-                return r.edit(embedComment(`No stats found for you.`));
+                const noStatsEmbed = new EmbedBuilder()
+                    .setColor("Red")
+                    .setTitle("No Stats Found")
+                    .setDescription("No stats found for you.")
+                    .setTimestamp();
+
+                return r.edit({ embeds: [noStatsEmbed] });
             }
 
             if (!stats.equippedWeapon) {
-                return r.edit(
-                    embedComment(`You don't have any weapon equipped.`),
-                );
+                const noWeaponEmbed = new EmbedBuilder()
+                    .setColor("Gold")
+                    .setTitle(`${i.user.username}'s Equipped Weapon`)
+                    .setDescription("You don't have any weapon equipped.")
+                    .setThumbnail(i.user.displayAvatarURL())
+                    .setFooter({
+                        text: "Use `/equip` to change your equipment.",
+                    })
+                    .setTimestamp();
+
+                return r.edit({ embeds: [noWeaponEmbed] });
             }
 
             const weaponName = stats.equippedWeapon as WeaponName;
             const equippedWeapon = weapons[weaponName];
 
             if (!equippedWeapon) {
-                return r.edit(
-                    embedComment(`Your equipped weapon could not be found.`),
-                );
+                const weaponNotFoundEmbed = new EmbedBuilder()
+                    .setColor("Red")
+                    .setTitle("Weapon Not Found")
+                    .setDescription("Your equipped weapon could not be found.")
+                    .setTimestamp();
+
+                return r.edit({ embeds: [weaponNotFoundEmbed] });
             }
+
+            const fullWeaponName = equippedWeapon.name;
 
             const weaponStats: string[] = [];
             for (const [key, value] of Object.entries(equippedWeapon)) {
@@ -64,6 +91,7 @@ export const weapon = buildCommand<SlashCommand>({
                         "sellPrice",
                         "chestChance",
                         "minWorldLevel",
+                        "name",
                     ].includes(key)
                 ) {
                     continue;
@@ -102,37 +130,44 @@ export const weapon = buildCommand<SlashCommand>({
                           .join("\n")
                     : "No advantages.";
 
+            let description = `**${fullWeaponName}**\n\nThis weapon deals more damage to the following monster groups:\n${advantageDisplay}`;
+
+            if (weaponType === "Catalyst") {
+                description += `\nThis weapon can cast spells using </spell:1303910605257969695>. Spells are pre-casted and activate during combat in the same order they are casted.`;
+            }
+
             const embed = new EmbedBuilder()
                 .setColor("Gold")
                 .setTitle(`${i.user.username}'s Equipped Weapon`)
-                .setDescription(
-                    `This weapon deals more damage to the following monster groups:\n${advantageDisplay}`,
-                )
+                .setDescription(description)
                 .setThumbnail(equippedWeapon.imageURL)
-                .addFields(
-                    {
-                        name: "Weapon Stats",
-                        value: statsDisplay,
-                        inline: false,
-                    },
-                    {
-                        name: "Runes",
-                        value: "You have no runes equipped on this weapon.",
-                        inline: false,
-                    },
-                )
-                .setFooter({ text: "Use /equip to change your equipment." })
-                .setTimestamp();
+                .addFields({
+                    name: "Weapon Stats",
+                    value: statsDisplay,
+                    inline: false,
+                });
+
+            if (fullWeaponName && fullWeaponName.includes("Absolution")) {
+                embed.addFields({
+                    name: "Special Effect",
+                    value: "Enemies can never land a Critical Attack on you.",
+                    inline: false,
+                });
+            }
 
             return r.edit({ embeds: [embed] });
         } catch (error) {
             console.error("Error executing /weapon command:", error);
 
-            return r.edit(
-                embedComment(
+            const errorEmbed = new EmbedBuilder()
+                .setColor("Red")
+                .setTitle("Error")
+                .setDescription(
                     "An unexpected error occurred while processing your command. Please try again later.",
-                ),
-            );
+                )
+                .setTimestamp();
+
+            return r.edit({ embeds: [errorEmbed] });
         }
     },
 });

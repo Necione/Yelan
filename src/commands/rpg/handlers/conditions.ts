@@ -132,7 +132,6 @@ export async function handleVictory(
         skillsActivated += `\`💖\` Healed \`${healAmount}\` HP due to the Totem skill.\n`;
     }
 
-    let manaRestored = 0;
     let manaFieldAdded = false;
 
     if (stats.equippedWeapon) {

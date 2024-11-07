@@ -615,6 +615,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Compound_Bow:1303587466300751912>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/compound_bow.png",
     },
+    Absolution: {
+        name: "Absolution",
+        type: "Sword",
+        sellPrice: 100,
+        attackPower: 45,
+        critChance: 25,
+        critValue: 2,
+        defValue: 150,
+        defChance: 0.2,
+        additionalHP: 350,
+        minWorldLevel: 25,
+        chestChance: 1,
+        emoji: "<:Weapon_Absolution1:1303960695653535776>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/absolution.png",
+    },
     // Reworking
     "Aqua Simulacra": {
         name: "Aqua Simulacra",
@@ -705,8 +720,10 @@ for (const weaponName in baseWeapons) {
         const modifierFunction = prefixes[prefix];
         const newWeaponName = prefix ? `${prefix} ${weaponName}` : weaponName;
         const modifiedStats = modifierFunction(baseWeaponData);
+
         weapons[newWeaponName] = {
             ...baseWeaponData,
+            name: newWeaponName,
             ...modifiedStats,
         };
     }

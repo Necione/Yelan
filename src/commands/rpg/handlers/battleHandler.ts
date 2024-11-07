@@ -282,9 +282,22 @@ export async function monsterAttack(
         monsterDamage *= 1.2;
     }
 
+    const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
+
+    let monsterCritChance = monster.critChance || 0;
+    let monsterCritValue = monster.critValue || 1;
+
+    if (equippedWeaponName && equippedWeaponName.includes("Absolution")) {
+        monsterCritChance = 0;
+        monsterCritValue = 1;
+        messages.push(
+            `\`⚜️\` Your **Absolution** prevents enemies from landing Critical Hits on you.`,
+        );
+    }
+
     const { isCrit, multiplier } = calculateCriticalHit(
-        monster.critChance || 0,
-        monster.critValue || 1,
+        monsterCritChance,
+        monsterCritValue,
     );
     monsterDamage *= multiplier;
 
@@ -373,12 +386,23 @@ export async function monsterAttack(
 
     await updateUserStats(stats.userId, { hp: currentPlayerHp });
 
+    let critText = "";
+    if (
+        isCrit &&
+        (!equippedWeaponName || !equippedWeaponName.includes("Absolution"))
+    ) {
+        critText = " 💢 (Critical Hit!)";
+    }
+
+    let defendText = "";
+    if (defended && damageReduced > 0) {
+        defendText = ` 🛡️ (Reduced DMG by ${damageReduced.toFixed(2)})`;
+    }
+
     messages.push(
         `\`⚔️\` The ${monster.name} dealt \`${monsterDamage.toFixed(
             2,
-        )}\` damage to you${
-            defended ? ` 🛡️ (Reduced DMG by ${damageReduced.toFixed(2)})` : ""
-        }${isCrit ? " 💢 (Critical Hit!)" : ""}.`,
+        )}\` damage to you${defendText}${critText}.`,
     );
 
     return currentPlayerHp;

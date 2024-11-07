@@ -1,6 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
-import { SlashCommandBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
     getUserStats,
@@ -62,9 +62,13 @@ export const spell = buildCommand<SlashCommand>({
             if (spellName) {
                 const spell: Spell | undefined = spells[spellName];
                 if (!spell) {
-                    return r.edit(
-                        embedComment(`Spell "${spellName}" does not exist.`),
-                    );
+                    const invalidSpellEmbed = new EmbedBuilder()
+                        .setColor("Red")
+                        .setTitle("Invalid Spell")
+                        .setDescription(`Spell "${spellName}" does not exist.`)
+                        .setTimestamp();
+
+                    return r.edit({ embeds: [invalidSpellEmbed] });
                 }
 
                 if (stats.equippedWeapon) {
@@ -72,38 +76,53 @@ export const spell = buildCommand<SlashCommand>({
                     const equippedWeapon = weapons[weaponName];
 
                     if (!equippedWeapon) {
-                        return r.edit(
-                            embedComment(
+                        const weaponNotFoundEmbed = new EmbedBuilder()
+                            .setColor("Red")
+                            .setTitle("Weapon Not Found")
+                            .setDescription(
                                 `Your equipped weapon could not be found.`,
-                            ),
-                        );
+                            )
+                            .setTimestamp();
+
+                        return r.edit({ embeds: [weaponNotFoundEmbed] });
                     }
 
                     if (equippedWeapon.type !== "Catalyst") {
-                        return r.edit(
-                            embedComment(
+                        const wrongWeaponTypeEmbed = new EmbedBuilder()
+                            .setColor("Red")
+                            .setTitle("Wrong Weapon Type")
+                            .setDescription(
                                 `You must have a **Catalyst** equipped to cast spells.`,
-                            ),
-                        );
+                            )
+                            .setTimestamp();
+
+                        return r.edit({ embeds: [wrongWeaponTypeEmbed] });
                     }
                 } else {
-                    return r.edit(
-                        embedComment(
+                    const noWeaponEmbed = new EmbedBuilder()
+                        .setColor("Red")
+                        .setTitle("No Weapon Equipped")
+                        .setDescription(
                             `You must equip a **Catalyst** as your weapon to cast spells.`,
-                        ),
-                    );
+                        )
+                        .setTimestamp();
+
+                    return r.edit({ embeds: [noWeaponEmbed] });
                 }
 
                 if (stats.mana < spell.cost) {
-                    return r.edit(
-                        embedComment(
-                            `You don't have enough mana to cast "${spellName}".\n- **Cost**: ${spell.cost} Mana\n- **Your Mana**: ${stats.mana}/${stats.maxMana}`,
-                        ),
-                    );
+                    const insufficientManaEmbed = new EmbedBuilder()
+                        .setColor("Red")
+                        .setTitle("Insufficient Mana")
+                        .setDescription(
+                            `You don't have enough mana to cast "${spellName}".\n\n- **Cost**: ${spell.cost} Mana\n- **Your Mana**: ${stats.mana}/${stats.maxMana}`,
+                        )
+                        .setTimestamp();
+
+                    return r.edit({ embeds: [insufficientManaEmbed] });
                 }
 
                 stats.mana -= spell.cost;
-
                 stats.castQueue.push(spellName);
 
                 await updateUserStats(i.user.id, {
@@ -111,12 +130,15 @@ export const spell = buildCommand<SlashCommand>({
                     castQueue: stats.castQueue,
                 });
 
-                return r.edit(
-                    embedComment(
-                        `You have casted "${spellName}". It has been added to your spell queue.\n- **Remaining Mana**: ${stats.mana}/${stats.maxMana}`,
-                        "Green",
-                    ),
-                );
+                const spellCastEmbed = new EmbedBuilder()
+                    .setColor("Green")
+                    .setTitle("Spell Casted")
+                    .setDescription(
+                        `You have casted "**${spellName}**". It has been added to your spell queue.\n\n- **Remaining Mana**: ${stats.mana}/${stats.maxMana}`,
+                    )
+                    .setTimestamp();
+
+                return r.edit({ embeds: [spellCastEmbed] });
             } else {
                 const availableSpells = Object.values(spells)
                     .map(
@@ -125,26 +147,37 @@ export const spell = buildCommand<SlashCommand>({
                     )
                     .join("\n");
 
-                const castQueue =
+                const castQueueDisplay =
                     stats.castQueue.length > 0
-                        ? stats.castQueue.join(", ")
+                        ? stats.castQueue
+                              .map((spell) => `**${spell}**`)
+                              .join(", ")
                         : "No spells in queue.";
 
-                return r.edit(
-                    embedComment(
-                        `**Available Spells:**\n${availableSpells}\n\n**Current Cast Queue:**\n${castQueue}`,
-                        "Blue",
-                    ),
-                );
+                const additionalDescription =
+                    "Skills are activated during a battle in the same order they are casted. Mana is restored at the end of battle.";
+
+                const availableSpellsEmbed = new EmbedBuilder()
+                    .setColor("Blue")
+                    .setTitle(`${i.user.username}'s Spells`)
+                    .setDescription(
+                        `**Available Spells:**\n${availableSpells}\n\n**Current Cast Queue:**\n${castQueueDisplay}\n\n${additionalDescription}`,
+                    );
+
+                return r.edit({ embeds: [availableSpellsEmbed] });
             }
         } catch (error) {
             console.error("Error executing /spell command:", error);
-            return r.edit(
-                embedComment(
+
+            const errorEmbed = new EmbedBuilder()
+                .setColor("Red")
+                .setTitle("Error")
+                .setDescription(
                     "An unexpected error occurred while processing your command. Please try again later.",
-                    "Red",
-                ),
-            );
+                )
+                .setTimestamp();
+
+            return r.edit({ embeds: [errorEmbed] });
         }
     },
 });
