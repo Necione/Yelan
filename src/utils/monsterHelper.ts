@@ -7,6 +7,7 @@ export enum MonsterGroup {
     Nobushi = "Nobushi",
     Machine = "Machine",
     Eremite = "Eremite",
+    Specter = "Specter",
     Boss = "Boss",
 }
 

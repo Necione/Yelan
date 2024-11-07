@@ -3,28 +3,33 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Fatui Cryogunner",
-    group: MonsterGroup.Fatui,
-    minExp: 50,
-    maxExp: 75,
-    minWorldLevel: 24,
-    image: "https://lh.elara.workers.dev/rpg/monsters/fatui_cryogunner.png",
+    name: "Pyro Specter",
+    group: MonsterGroup.Specter,
+    minExp: 40,
+    maxExp: 60,
+    minWorldLevel: 26,
+    image: "https://lh.elara.workers.dev/rpg/monsters/pyro_specter.png",
     drops: [
-        { item: "Recruit's Insignia", minAmount: 1, maxAmount: 2, chance: 75 },
-        { item: "Sergeant's Insignia", minAmount: 1, maxAmount: 2, chance: 25 },
         {
-            item: "Life Essence",
+            item: "Spectral Husk",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 75,
+        },
+        {
+            item: "Spectral Heart",
             minAmount: 1,
             maxAmount: 1,
             chance: 10,
         },
     ],
-    critChance: 33,
-    critValue: 1.5,
+
+    critChance: 20,
+    critValue: 1.2,
     defChance: 75,
-    defValue: 100,
-    baseHp: 18,
-    baseAtk: 7,
+    defValue: 500,
+    baseHp: 25,
+    baseAtk: 8,
     getStatsForWorldLevel(worldLevel: number) {
         if (worldLevel < 1 || worldLevel > 30) {
             return null;

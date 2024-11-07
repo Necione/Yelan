@@ -422,6 +422,7 @@ export async function monsterAttack(
         );
     }
 
+    currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP);
     await updateUserStats(stats.userId, { hp: currentPlayerHp });
 
     let critText = "";
