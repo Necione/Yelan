@@ -1,5 +1,4 @@
 import { get, noop } from "@elara-services/utils";
-import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction, ThreadChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
@@ -7,7 +6,6 @@ import { skills } from "../../../plugins/other/utils";
 import {
     addBalance,
     addItemToInventory,
-    removeBalance,
     updateUserStats,
 } from "../../../services";
 import { cooldowns, texts } from "../../../utils";
@@ -335,28 +333,6 @@ export async function handleDefeat(
         .setDescription(
             `Oh no :( You were defeated by the **${monster.name}**...\n-# Use </downgrade:1282035993242767450> if this WL is too hard.`,
         );
-
-    const rebirths = typeof stats.rebirths === "number" ? stats.rebirths : 0;
-
-    const baseDeduction = 25;
-    const additionalDeduction = 25 * rebirths;
-    const totalDeduction = baseDeduction + additionalDeduction;
-
-    const amountToDeduct = Math.min(totalDeduction);
-
-    if (amountToDeduct > 0) {
-        await removeBalance(
-            i.user.id,
-            amountToDeduct,
-            true,
-            `Lost due to defeat`,
-        );
-
-        finalEmbed.addFields({
-            name: "Loss",
-            value: `You lost ${customEmoji.a.z_coins} \`${amountToDeduct}\` ${texts.c.u} due to your defeat.`,
-        });
-    }
 
     await updateUserStats(i.user.id, {
         hp: Math.max(currentPlayerHp, 0),

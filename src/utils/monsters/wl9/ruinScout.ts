@@ -22,7 +22,7 @@ export default {
     defChance: 25,
     defValue: 50,
     baseHp: 14,
-    baseAtk: 7,
+    baseAtk: 6,
     getStatsForWorldLevel(worldLevel: number) {
         if (worldLevel < 1 || worldLevel > 30) {
             return null;

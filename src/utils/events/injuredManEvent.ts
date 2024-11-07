@@ -11,6 +11,17 @@ import {
 } from "discord.js";
 import { addItemToInventory, removeBalance } from "../../services";
 
+const items = [
+    { item: "Sweet Madame", amount: 1 },
+    { item: "Apple", amount: 2 },
+    { item: "Almond", amount: 1 },
+    { item: "Jewelry Soup", amount: 1 },
+    { item: "Jade Parcels", amount: 1 },
+    { item: "Golden Crab", amount: 1 },
+];
+
+const randomItem = items[Math.floor(Math.random() * items.length)];
+
 export async function injuredManEvent(
     i: ChatInputCommandInteraction,
     stats: UserStats,
@@ -72,7 +83,7 @@ export async function injuredManEvent(
                 })
                 .catch(noop);
         } else if (interaction.customId === "event_help") {
-            const coinAmount = 100;
+            const coinAmount = 50;
             if (userWallet.balance < coinAmount) {
                 await i
                     .editReply({
@@ -95,14 +106,12 @@ export async function injuredManEvent(
             );
 
             if (Math.random() < 0.5) {
-                await addItemToInventory(i.user.id, [
-                    { item: "Sweet Madame", amount: 1 },
-                ]);
+                await addItemToInventory(i.user.id, [randomItem]);
                 await i
                     .editReply({
                         embeds: [
                             embed.setDescription(
-                                "You gave the man `100 Coins`. The man thanks you and gives you a `Sweet Madame` as a token of his appreciation.",
+                                `You gave the man \`100 Coins\`. The man thanks you and gives you a \`${randomItem.item}\` as a token of his appreciation.`,
                             ),
                         ],
                         components: [],
