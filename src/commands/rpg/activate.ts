@@ -4,7 +4,7 @@ import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { skills } from "../../utils/skillsData";
 
-const sinSkills = ["Wrath", "Sloth"];
+const sinSkills = ["Wrath", "Sloth", "Pride", "Greed"];
 
 function getMaxActiveSkills(alchemyProgress: number): number {
     return alchemyProgress >= 100 ? 6 : 5;

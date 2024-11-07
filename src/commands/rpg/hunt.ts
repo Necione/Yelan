@@ -5,7 +5,7 @@ import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { handleHunt } from "./handlers/huntHandler";
 
-const sinSkills = ["Wrath", "Sloth"];
+const sinSkills = ["Wrath", "Sloth", "Pride", "Greed"];
 
 export const hunt = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

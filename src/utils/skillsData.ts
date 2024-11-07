@@ -15,6 +15,8 @@ export type SkillName =
     | "Growth"
     | "Vigor"
     | "Paladin"
+    | "Pride"
+    | "Greed"
     | "Sloth"
     | "Wrath";
 
@@ -269,6 +271,48 @@ export const skills: Skill[] = [
             items: [
                 { item: "Crystal Prism", amount: 10 },
                 { item: "Slime Concentrate", amount: 20 },
+                { item: "Life Essence", amount: 5 },
+            ],
+        },
+    },
+    {
+        name: "Pride",
+        description: "Never go first, deal 250% more damage afterwards.",
+        emoji: "🏅",
+        requirements: {
+            worldLevel: 15,
+            rebirthsRequired: 6,
+            coins: 1000,
+            items: [
+                { item: "Weathered Arrowhead", amount: 10 },
+                { item: "Famed Handguard", amount: 5 },
+                { item: "Life Essence", amount: 5 },
+            ],
+        },
+    },
+    {
+        name: "Greed",
+        description: "Get max drops 100% of the time after a hunt.",
+        emoji: "🖤",
+        requirements: {
+            worldLevel: 20,
+            rebirthsRequired: 6,
+            coins: 5000,
+            items: [
+                { item: "Wanderer's Blooming Flower", amount: 3 },
+                { item: "Slime Concentrate", amount: 3 },
+                { item: "Polarizing Prism", amount: 3 },
+                { item: "Ominous Mask", amount: 3 },
+                { item: "Weathered Arrowhead", amount: 3 },
+                { item: "Forbidden Curse Scroll", amount: 3 },
+                { item: "Black Crystal Horn", amount: 3 },
+                { item: "Golden Raven Insignia", amount: 3 },
+                { item: "Ley Line Sprout", amount: 3 },
+                { item: "Mist Grass Wick", amount: 3 },
+                { item: "Chaos Core", amount: 3 },
+                { item: "Chaos Oculus", amount: 3 },
+                { item: "Rich Red Brocade", amount: 3 },
+                { item: "Famed Handguard", amount: 3 },
                 { item: "Life Essence", amount: 5 },
             ],
         },
