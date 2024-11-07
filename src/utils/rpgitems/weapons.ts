@@ -369,7 +369,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     },
     "Blackcliff Agate": {
         name: "Blackcliff Agate",
-        type: "Polearm",
+        type: "Catalyst",
         sellPrice: 30,
         attackPower: 15,
         critChance: 20,
