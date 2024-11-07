@@ -292,7 +292,7 @@ export const skills: Skill[] = [
     },
     {
         name: "Greed",
-        description: "Get max drops 100% of the time after a hunt.",
+        description: "Get max drops, all drops, 100% of the time after a hunt.",
         emoji: "🖤",
         requirements: {
             worldLevel: 20,
