@@ -14,7 +14,13 @@ import { getUserStats } from "../../services";
 import { skills } from "../../utils/skillsData";
 
 function getMaxActiveSkills(alchemyProgress: number): number {
-    return alchemyProgress >= 100 ? 6 : 5;
+    if (alchemyProgress >= 360) {
+        return 7;
+    } else if (alchemyProgress >= 100) {
+        return 6;
+    } else {
+        return 5;
+    }
 }
 
 const getSkillEmoji = (skillName: string) => {
