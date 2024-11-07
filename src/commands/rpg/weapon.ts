@@ -1,18 +1,12 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
-import { PrismaClient } from "@prisma/client";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
 import { weaponAdvantages } from "../../utils/hunt";
-import { MonsterGroup } from "../../utils/monsterHelper";
-import {
-    weapons,
-    WeaponType,
-    type WeaponName,
-} from "../../utils/rpgitems/weapons";
-
-const prisma = new PrismaClient();
+import type { MonsterGroup } from "../../utils/monsterHelper";
+import type { WeaponType } from "../../utils/rpgitems/weapons";
+import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 export const weapon = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -23,10 +17,6 @@ export const weapon = buildCommand<SlashCommand>({
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
-        if (!i.deferred) {
-            return;
-        }
-
         try {
             const profile = await getProfileByUserId(i.user.id);
             if (!profile) {
@@ -137,11 +127,12 @@ export const weapon = buildCommand<SlashCommand>({
             return r.edit({ embeds: [embed] });
         } catch (error) {
             console.error("Error executing /weapon command:", error);
+
             return r.edit(
-                embedComment(`An error occurred while fetching your weapon.`),
+                embedComment(
+                    "An unexpected error occurred while processing your command. Please try again later.",
+                ),
             );
-        } finally {
-            await prisma.$disconnect();
         }
     },
 });

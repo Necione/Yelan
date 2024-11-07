@@ -7,11 +7,8 @@ import {
     type Monster,
 } from "../../../utils/hunt";
 import { MonsterGroup } from "../../../utils/monsterHelper";
-import {
-    WeaponName,
-    weapons,
-    WeaponType,
-} from "../../../utils/rpgitems/weapons";
+import type { WeaponName, WeaponType } from "../../../utils/rpgitems/weapons";
+import { weapons } from "../../../utils/rpgitems/weapons";
 
 export async function playerAttack(
     stats: UserStats,

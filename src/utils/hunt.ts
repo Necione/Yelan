@@ -3,7 +3,7 @@ import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import { locationGroupWeights } from "./locationGroupWeights";
 import { MonsterGroup } from "./monsterHelper";
-import { WeaponType } from "./rpgitems/weapons";
+import type { WeaponType } from "./rpgitems/weapons";
 
 export interface Monster {
     currentHp: number;
