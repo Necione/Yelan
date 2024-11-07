@@ -6,7 +6,11 @@ import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
 import { weaponAdvantages } from "../../utils/hunt";
 import { MonsterGroup } from "../../utils/monsterHelper";
-import { weapons, WeaponType, type WeaponName } from "../../utils/rpgitems/weapons";
+import {
+    weapons,
+    WeaponType,
+    type WeaponName,
+} from "../../utils/rpgitems/weapons";
 
 const prisma = new PrismaClient();
 
@@ -47,14 +51,18 @@ export const weapon = buildCommand<SlashCommand>({
             }
 
             if (!stats.equippedWeapon) {
-                return r.edit(embedComment(`You don't have any weapon equipped.`));
+                return r.edit(
+                    embedComment(`You don't have any weapon equipped.`),
+                );
             }
 
             const weaponName = stats.equippedWeapon as WeaponName;
             const equippedWeapon = weapons[weaponName];
 
             if (!equippedWeapon) {
-                return r.edit(embedComment(`Your equipped weapon could not be found.`));
+                return r.edit(
+                    embedComment(`Your equipped weapon could not be found.`),
+                );
             }
 
             const weaponStats: string[] = [];
@@ -99,13 +107,17 @@ export const weapon = buildCommand<SlashCommand>({
 
             const advantageDisplay =
                 effectiveGroups.length > 0
-                    ? effectiveGroups.map((group: MonsterGroup) => `- **${group}**`).join("\n")
+                    ? effectiveGroups
+                          .map((group: MonsterGroup) => `- **${group}**`)
+                          .join("\n")
                     : "No advantages.";
 
             const embed = new EmbedBuilder()
                 .setColor("Gold")
                 .setTitle(`${i.user.username}'s Equipped Weapon`)
-                .setDescription(`This weapon deals more damage to the following monster groups:\n${advantageDisplay}`)
+                .setDescription(
+                    `This weapon deals more damage to the following monster groups:\n${advantageDisplay}`,
+                )
                 .setThumbnail(equippedWeapon.imageURL)
                 .addFields(
                     {

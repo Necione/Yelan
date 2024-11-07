@@ -4,6 +4,7 @@ import { injuredManEvent } from "../utils/events/injuredManEvent";
 import { cliffFallEvent } from "./events/cliffFallEvent";
 import { healingWellEvent } from "./events/healingWellEvent";
 import { secretCultEvent } from "./events/secretCultEvent";
+import { sirenEvent } from "./events/sirenEvent";
 
 export async function handleRandomEvent(
     i: ChatInputCommandInteraction,
@@ -15,6 +16,7 @@ export async function handleRandomEvent(
         healingWellEvent,
         cliffFallEvent,
         secretCultEvent,
+        sirenEvent,
     ];
 
     const randomIndex = Math.floor(Math.random() * events.length);

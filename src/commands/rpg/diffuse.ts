@@ -80,7 +80,6 @@ export const diffuse = buildCommand<SlashCommand>({
             return r.edit(embedComment("You cannot diffuse while hunting!"));
         }
 
-        // Handle Life Essence separately to add alchemy progress
         if (itemName === "Life Essence") {
             const item = stats.inventory.find((c) => c.item === itemName);
             if (!item || item.amount < amountToDiffuse) {
@@ -91,7 +90,6 @@ export const diffuse = buildCommand<SlashCommand>({
                 );
             }
 
-            // Increase alchemy progress
             const alchemyIncrease = amountToDiffuse;
             const newAlchemyProgress = stats.alchemyProgress + alchemyIncrease;
 
@@ -115,7 +113,6 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
-        // Handle other items (weapons, artifacts) as before
         const itemData =
             drops[itemName as DropName] ||
             weapons[itemName as WeaponName] ||

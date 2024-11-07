@@ -1,9 +1,17 @@
 import type { UserStats } from "@prisma/client";
 import { skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
-import { getRandomValue, weaponAdvantages, type Monster } from "../../../utils/hunt";
+import {
+    getRandomValue,
+    weaponAdvantages,
+    type Monster,
+} from "../../../utils/hunt";
 import { MonsterGroup } from "../../../utils/monsterHelper";
-import { WeaponName, weapons, WeaponType } from "../../../utils/rpgitems/weapons";
+import {
+    WeaponName,
+    weapons,
+    WeaponType,
+} from "../../../utils/rpgitems/weapons";
 
 export async function playerAttack(
     stats: UserStats,
@@ -99,7 +107,8 @@ export async function playerAttack(
         if (weaknessEffect) {
             attackPower *= 0.75;
             messages.push(
-                `\`🥀\` Weakness effect reduces your attack power by 25%. (${weaknessEffect.remainingUses - 1
+                `\`🥀\` Weakness effect reduces your attack power by 25%. (${
+                    weaknessEffect.remainingUses - 1
                 } uses left)`,
             );
 
@@ -302,7 +311,8 @@ export async function monsterAttack(
     messages.push(
         `\`⚔️\` The ${monster.name} dealt \`${monsterDamage.toFixed(
             2,
-        )}\` damage to you${defended ? ` 🛡️ (Reduced DMG by ${damageReduced.toFixed(2)})` : ""
+        )}\` damage to you${
+            defended ? ` 🛡️ (Reduced DMG by ${damageReduced.toFixed(2)})` : ""
         }${isCrit ? " 💢 (Critical Hit!)" : ""}.`,
     );
 
@@ -319,7 +329,6 @@ export function applyAttackModifiers(
     attackPower: number;
     monsterState: { displaced: boolean; vanishedUsed: boolean };
 } {
-
     const hasBackstab = skills.has(stats, "Backstab");
 
     const isHumanOrFatui: boolean = [
@@ -349,12 +358,13 @@ export function applyAttackModifiers(
         const equippedWeapon = weapons[equippedWeaponName];
         const weaponType = equippedWeapon.type as WeaponType;
 
-        const effectiveGroups: MonsterGroup[] = weaponAdvantages[weaponType] || [];
+        const effectiveGroups: MonsterGroup[] =
+            weaponAdvantages[weaponType] || [];
 
         if (effectiveGroups.includes(monster.group)) {
             attackPower *= 1.1;
             messages.push(
-                `\`⚔️\` **${(weaponType)}** advantage! You deal 110% more DMG to **${monster.group}**.`,
+                `\`⚔️\` **${weaponType}** advantage! You deal 110% more DMG to **${monster.group}**.`,
             );
         }
     }

@@ -24,7 +24,7 @@ export async function sirenEvent(
 
     const effectName = "Weakness";
     const effectValue = -0.25;
-    const remainingUses = 3;
+    const remainingUses = 2;
 
     stats.activeEffects = stats.activeEffects.filter(
         (effect) => effect.remainingUses > 0,

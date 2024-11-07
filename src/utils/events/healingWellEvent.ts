@@ -70,7 +70,7 @@ export async function healingWellEvent(
                 })
                 .catch(noop);
         } else if (interaction.customId === "event_drink") {
-            const healAmount = 50;
+            const healAmount = stats.maxHP * 0.2;
             const newHP = Math.min(stats.hp + healAmount, stats.maxHP);
             await updateUserStats(i.user.id, { hp: { set: newHP } });
 
