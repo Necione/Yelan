@@ -140,7 +140,7 @@ export async function handleVictory(
         const equippedWeapon = weapons[weaponName];
 
         if (equippedWeapon && equippedWeapon.type === "Catalyst") {
-            manaRestored = Math.floor(stats.maxMana * 0.5);
+            const manaRestored = Math.floor(Math.random() * 11) + 5;
             const newMana = Math.min(stats.mana + manaRestored, stats.maxMana);
             stats.mana = newMana;
 
