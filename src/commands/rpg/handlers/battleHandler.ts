@@ -10,6 +10,12 @@ import { MonsterGroup } from "../../../utils/monsterHelper";
 import type { WeaponName, WeaponType } from "../../../utils/rpgitems/weapons";
 import { weapons } from "../../../utils/rpgitems/weapons";
 
+type MonsterState = {
+    displaced: boolean;
+    vanishedUsed: boolean;
+    stunned?: boolean;
+};
+
 export function getDeathThreshold(stats: UserStats): number {
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
     if (equippedWeaponName && equippedWeaponName.includes("Memory of Dust")) {
@@ -25,7 +31,7 @@ export async function playerAttack(
     currentMonsterHp: number,
     hasVigilance: boolean,
     vigilanceUsed: boolean,
-    monsterState: { displaced: boolean; vanishedUsed: boolean },
+    monsterState: MonsterState,
     isFirstTurn: boolean,
     messages: string[],
     hasWrath: boolean,
@@ -33,7 +39,7 @@ export async function playerAttack(
     currentMonsterHp: number;
     currentPlayerHp: number;
     vigilanceUsed: boolean;
-    monsterState: { displaced: boolean; vanishedUsed: boolean };
+    monsterState: MonsterState;
 }> {
     if (stats.castQueue.length > 0) {
         const spellName = stats.castQueue[0];
@@ -76,6 +82,14 @@ export async function playerAttack(
                 );
                 messages.push(
                     `\`❄️\` Cripple spell casted! Dealt \`${crippleDamage} damage\` to the ${monster.name}.`,
+                );
+                break;
+            }
+
+            case "Stun": {
+                monsterState.stunned = true;
+                messages.push(
+                    `\`💫\` Stun spell casted! The enemy is stunned and will miss its next attack.`,
                 );
                 break;
             }
@@ -280,7 +294,16 @@ export async function monsterAttack(
     messages: string[],
     turnNumber: number,
     hasCrystallize: boolean,
+    monsterState: MonsterState,
 ): Promise<number> {
+    if (monsterState.stunned) {
+        messages.push(
+            `\`💫\` The ${monster.name} is stunned and couldn't attack this turn!`,
+        );
+        monsterState.stunned = false;
+        return currentPlayerHp;
+    }
+
     const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
     if (!monsterStats) {
         throw new Error(`Stats not found for monster: ${monster.name}`);
@@ -411,7 +434,7 @@ export async function monsterAttack(
 
     let defendText = "";
     if (defended && damageReduced > 0) {
-        defendText = ` 🛡️ (Reduced DMG by ${damageReduced.toFixed(2)})`;
+        defendText = ` 🛡️ (Defended ${damageReduced.toFixed(2)})`;
     }
 
     messages.push(
@@ -427,11 +450,11 @@ export function applyAttackModifiers(
     attackPower: number,
     stats: UserStats,
     monster: Monster,
-    monsterState: { displaced: boolean; vanishedUsed: boolean },
+    monsterState: MonsterState,
     messages: string[],
 ): {
     attackPower: number;
-    monsterState: { displaced: boolean; vanishedUsed: boolean };
+    monsterState: MonsterState;
 } {
     const hasBackstab = skills.has(stats, "Backstab");
 
@@ -497,14 +520,14 @@ export function checkMonsterDefenses(
     attackPower: number,
     stats: UserStats,
     monster: Monster,
-    monsterState: { displaced: boolean; vanishedUsed: boolean },
+    monsterState: MonsterState,
     messages: string[],
 ): {
     attackPower: number;
     attackMissed: boolean;
     monsterDefended: boolean;
     damageReduced: number;
-    monsterState: { displaced: boolean; vanishedUsed: boolean };
+    monsterState: MonsterState;
 } {
     let attackMissed = false;
     let monsterDefended = false;
@@ -602,7 +625,7 @@ function sendDamageMessage(
         message += " 💢 (Critical Hit!)";
     }
     if (monsterDefended && damageReduced > 0) {
-        message += ` 🛡️ (Reduced DMG by ${damageReduced.toFixed(2)})`;
+        message += ` 🛡️ (Defended ${damageReduced.toFixed(2)})`;
     }
     messages.push(message);
 }

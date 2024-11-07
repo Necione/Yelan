@@ -20,10 +20,10 @@ export const spell = buildCommand<SlashCommand>({
                 .setDescription("The spell you want to cast")
                 .setRequired(false)
                 .addChoices(
-                    { name: "Heal", value: "Heal" },
-                    { name: "Fury", value: "Fury" },
-                    { name: "Burn", value: "Burn" },
-                    { name: "Cripple", value: "Cripple" },
+                    ...Object.keys(spells).map((spellName) => ({
+                        name: spellName,
+                        value: spellName,
+                    })),
                 ),
         )
         .setDMPermission(false),
@@ -65,8 +65,7 @@ export const spell = buildCommand<SlashCommand>({
                     const invalidSpellEmbed = new EmbedBuilder()
                         .setColor("Red")
                         .setTitle("Invalid Spell")
-                        .setDescription(`Spell "${spellName}" does not exist.`)
-                        .setTimestamp();
+                        .setDescription(`Spell "${spellName}" does not exist.`);
 
                     return r.edit({ embeds: [invalidSpellEmbed] });
                 }
@@ -81,8 +80,7 @@ export const spell = buildCommand<SlashCommand>({
                             .setTitle("Weapon Not Found")
                             .setDescription(
                                 `Your equipped weapon could not be found.`,
-                            )
-                            .setTimestamp();
+                            );
 
                         return r.edit({ embeds: [weaponNotFoundEmbed] });
                     }
@@ -93,8 +91,7 @@ export const spell = buildCommand<SlashCommand>({
                             .setTitle("Wrong Weapon Type")
                             .setDescription(
                                 `You must have a **Catalyst** equipped to cast spells.`,
-                            )
-                            .setTimestamp();
+                            );
 
                         return r.edit({ embeds: [wrongWeaponTypeEmbed] });
                     }
@@ -104,8 +101,7 @@ export const spell = buildCommand<SlashCommand>({
                         .setTitle("No Weapon Equipped")
                         .setDescription(
                             `You must equip a **Catalyst** as your weapon to cast spells.`,
-                        )
-                        .setTimestamp();
+                        );
 
                     return r.edit({ embeds: [noWeaponEmbed] });
                 }
@@ -116,8 +112,7 @@ export const spell = buildCommand<SlashCommand>({
                         .setTitle("Insufficient Mana")
                         .setDescription(
                             `You don't have enough mana to cast "${spellName}".\n\n- **Cost**: ${spell.cost} Mana\n- **Your Mana**: ${stats.mana}/${stats.maxMana}`,
-                        )
-                        .setTimestamp();
+                        );
 
                     return r.edit({ embeds: [insufficientManaEmbed] });
                 }
@@ -174,8 +169,7 @@ export const spell = buildCommand<SlashCommand>({
                 .setTitle("Error")
                 .setDescription(
                     "An unexpected error occurred while processing your command. Please try again later.",
-                )
-                .setTimestamp();
+                );
 
             return r.edit({ embeds: [errorEmbed] });
         }

@@ -12,7 +12,7 @@ export const spells: Record<string, Spell> = {
     },
     Fury: {
         spellName: "Fury",
-        description: "Makes your next attack deal 2x damage.",
+        description: "Makes your attack deal 2x damage.",
         cost: 15,
     },
     Burn: {
@@ -24,5 +24,10 @@ export const spells: Record<string, Spell> = {
         spellName: "Cripple",
         description: "Deals 20% of the enemy's max HP as damage.",
         cost: 3,
+    },
+    Stun: {
+        spellName: "Stun",
+        description: "The monter misses their __next__ attack.",
+        cost: 10,
     },
 };

@@ -60,20 +60,20 @@ export async function handleHunt(
     const numberOfMonsters = isBossEncounter
         ? 1
         : stats.worldLevel <= 5
-          ? 1
-          : stats.worldLevel <= 15
-            ? Math.random() < 0.75
-                ? 2
-                : 1
-            : stats.worldLevel <= 25
-              ? Math.random() < 0.75
-                  ? 2
-                  : 3
-              : stats.worldLevel <= 35
-                ? Math.random() < 0.5
+            ? 1
+            : stats.worldLevel <= 15
+                ? Math.random() < 0.75
                     ? 2
-                    : 3
-                : 3;
+                    : 1
+                : stats.worldLevel <= 25
+                    ? Math.random() < 0.75
+                        ? 2
+                        : 3
+                    : stats.worldLevel <= 35
+                        ? Math.random() < 0.5
+                            ? 2
+                            : 3
+                        : 3;
 
     const monstersEncountered: Monster[] = [];
 
@@ -355,6 +355,7 @@ export async function handleHunt(
                     monsterMessages,
                     turnNumber,
                     hasCrystallize,
+                    monsterState,
                 );
 
                 if (monsterMessages.length > 0) {

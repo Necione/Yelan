@@ -270,6 +270,7 @@ export async function handleAbyssBattle(
                     monsterMessages,
                     turnNumber,
                     hasCrystallize,
+                    monsterState,
                 );
 
                 if (updatedPlayerHp !== undefined) {
