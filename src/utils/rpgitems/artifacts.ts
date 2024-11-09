@@ -657,7 +657,6 @@ export const artifacts = {
         minWorldLevel: 13,
         chestChance: 3,
     },
-
     "Royal Flora": {
         type: "Flower",
         artifactSet: "Noblesse Oblige",
@@ -797,7 +796,7 @@ export const artifacts = {
         critValue: 0.3,
         maxHP: 100,
         defChance: -10,
-        defValue: 50,
+        defValue: 40,
         minWorldLevel: 20,
         chestChance: 2,
     },
@@ -862,7 +861,7 @@ export const artifacts = {
         critValue: 0.1,
         maxHP: 150,
         defChance: -10,
-        defValue: 100,
+        defValue: 75,
         minWorldLevel: 23,
         chestChance: 2,
     },
@@ -875,7 +874,7 @@ export const artifacts = {
         critValue: 0.15,
         maxHP: 200,
         defChance: 10,
-        defValue: 50,
+        defValue: 25,
         minWorldLevel: 23,
         chestChance: 2,
     },
@@ -901,7 +900,7 @@ export const artifacts = {
         critValue: 0.25,
         maxHP: 150,
         defChance: 15,
-        defValue: 100,
+        defValue: 50,
         minWorldLevel: 20,
         chestChance: 2,
     },
@@ -1039,11 +1038,11 @@ export const artifactSets = {
     },
     "Ocean-Hued Clam": {
         "2pc": {
-            defValuePercentage: 0.5,
+            defValuePercentage: 0.05,
             attackPowerPercentage: -0.1,
         },
         "4pc": {
-            defValuePercentage: 0.75,
+            defValuePercentage: 0.1,
             attackPowerPercentage: -0.25,
         },
     },

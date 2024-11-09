@@ -3,33 +3,27 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Ruin Grader",
-    group: MonsterGroup.Machine,
-    minExp: 40,
-    maxExp: 60,
-    minWorldLevel: 24,
-    image: "https://lh.elara.workers.dev/rpg/monsters/ruin_grader.png",
+    name: "Cryo Cicin",
+    group: MonsterGroup.Abyss,
+    minExp: 45,
+    maxExp: 50,
+    minWorldLevel: 19,
+    image: "https://lh.elara.workers.dev/rpg/monsters/cryo_cicin.png",
     drops: [
         {
-            item: "Chaos Gear",
+            item: "Life Essence",
             minAmount: 1,
             maxAmount: 1,
-            chance: 50,
-        },
-        {
-            item: "Chaos Axis",
-            minAmount: 1,
-            maxAmount: 1,
-            chance: 25,
+            chance: 10,
         },
     ],
 
-    critChance: 10,
-    critValue: 2,
-    defChance: 75,
+    critChance: 20,
+    critValue: 1.5,
+    defChance: 50,
     defValue: 300,
-    baseHp: 30,
-    baseAtk: 8,
+    baseHp: 25,
+    baseAtk: 22,
     getStatsForWorldLevel(worldLevel: number) {
         if (worldLevel < 1 || worldLevel > 30) {
             return null;

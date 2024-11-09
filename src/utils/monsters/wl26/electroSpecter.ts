@@ -3,33 +3,33 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Ruin Grader",
-    group: MonsterGroup.Machine,
-    minExp: 40,
-    maxExp: 60,
-    minWorldLevel: 24,
-    image: "https://lh.elara.workers.dev/rpg/monsters/ruin_grader.png",
+    name: "Electro Specter",
+    group: MonsterGroup.Specter,
+    minExp: 45,
+    maxExp: 50,
+    minWorldLevel: 26,
+    image: "https://lh.elara.workers.dev/rpg/monsters/electro_specter.png",
     drops: [
         {
-            item: "Chaos Gear",
+            item: "Spectral Husk",
             minAmount: 1,
             maxAmount: 1,
-            chance: 50,
+            chance: 75,
         },
         {
-            item: "Chaos Axis",
+            item: "Spectral Heart",
             minAmount: 1,
             maxAmount: 1,
-            chance: 25,
+            chance: 10,
         },
     ],
 
-    critChance: 10,
-    critValue: 2,
+    critChance: 20,
+    critValue: 1.2,
     defChance: 75,
-    defValue: 300,
-    baseHp: 30,
-    baseAtk: 8,
+    defValue: 500,
+    baseHp: 19,
+    baseAtk: 11,
     getStatsForWorldLevel(worldLevel: number) {
         if (worldLevel < 1 || worldLevel > 30) {
             return null;

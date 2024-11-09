@@ -5,8 +5,8 @@ export default {
     currentHp: 0,
     name: "Fatui Cryogunner",
     group: MonsterGroup.Fatui,
-    minExp: 50,
-    maxExp: 75,
+    minExp: 40,
+    maxExp: 60,
     minWorldLevel: 24,
     image: "https://lh.elara.workers.dev/rpg/monsters/fatui_cryogunner.png",
     drops: [

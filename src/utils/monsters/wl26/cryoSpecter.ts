@@ -5,8 +5,8 @@ export default {
     currentHp: 0,
     name: "Cryo Specter",
     group: MonsterGroup.Specter,
-    minExp: 40,
-    maxExp: 60,
+    minExp: 45,
+    maxExp: 50,
     minWorldLevel: 26,
     image: "https://lh.elara.workers.dev/rpg/monsters/cryo_specter.png",
     drops: [
