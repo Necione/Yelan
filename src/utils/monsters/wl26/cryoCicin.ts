@@ -7,7 +7,7 @@ export default {
     group: MonsterGroup.Abyss,
     minExp: 45,
     maxExp: 50,
-    minWorldLevel: 19,
+    minWorldLevel: 26,
     image: "https://lh.elara.workers.dev/rpg/monsters/cryo_cicin.png",
     drops: [
         {
