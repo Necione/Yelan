@@ -455,7 +455,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         defChance: 0.1,
         additionalHP: 500,
         minWorldLevel: 12,
-        chestChance: 5,
+        chestChance: 1,
         emoji: "<:Weapon_Vortex_Vanquisher:1304700656400994376>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/vortex_vanquisher.png",
