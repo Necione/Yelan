@@ -444,6 +444,22 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Stringless:1291432822808117338>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_stringless.png",
     },
+    "Vortex Vanquisher": {
+        name: "Vortex Vanquisher",
+        type: "Polearm",
+        sellPrice: 50,
+        attackPower: -50,
+        critChance: 5,
+        critValue: 0,
+        defValue: 25,
+        defChance: 0.1,
+        additionalHP: 500,
+        minWorldLevel: 12,
+        chestChance: 5,
+        emoji: "<:Weapon_Vortex_Vanquisher:1304700656400994376>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/vortex_vanquisher.png",
+    },
     "The Alley Flash": {
         name: "The Alley Flash",
         type: "Sword",

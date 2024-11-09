@@ -294,6 +294,7 @@ export async function monsterAttack(
     messages: string[],
     turnNumber: number,
     hasCrystallize: boolean,
+    hasFatigue: boolean,
     monsterState: MonsterState,
 ): Promise<number> {
     if (monsterState.stunned) {
@@ -362,6 +363,28 @@ export async function monsterAttack(
         messages.push(effectDescription);
     }
 
+    if (hasFatigue) {
+        const monsterTurn = Math.ceil(turnNumber / 2);
+
+        let damageMultiplier: number;
+        let effectDescription = "";
+
+        const percentChange = 50 - (monsterTurn - 1) * 10;
+
+        if (percentChange >= 0) {
+            damageMultiplier = 1 + percentChange / 100;
+            effectDescription = `\`🐌\` Fatigue increases the ${monster.name}'s damage by ${percentChange}%.`;
+        } else {
+            damageMultiplier = 1 + percentChange / 100;
+            effectDescription = `\`🐌\` Fatigue reduces the ${
+                monster.name
+            }'s damage by ${Math.abs(percentChange)}%.`;
+        }
+
+        monsterDamage *= damageMultiplier;
+        messages.push(effectDescription);
+    }
+
     const defChance = stats.defChance || 0;
     const defValue = stats.defValue || 0;
     let defended = false;
@@ -381,13 +404,24 @@ export async function monsterAttack(
         );
     }
 
+    const hasVortexVanquisher =
+        equippedWeaponName && equippedWeaponName.includes("Vortex Vanquisher");
+
+    const damageReductionFactor = hasVortexVanquisher ? 0.5 : 1;
+    if (hasVortexVanquisher) {
+        messages.push(
+            `\`🌀\` **Vortex Vanquisher** has reduced all damage taken by 50%.`,
+        );
+    }
+
     if (monster.name.includes("Pyro") || monster.name.includes("Flames")) {
         const burnDamage = Math.ceil(
             stats.maxHP * (0.03 + 0.01 * Math.floor(stats.worldLevel / 2)),
         );
-        currentPlayerHp -= burnDamage;
+        const reducedBurnDamage = burnDamage * damageReductionFactor;
+        currentPlayerHp -= reducedBurnDamage;
         messages.push(
-            `\`🔥\` The ${monster.name} inflicted Burn! You took \`${burnDamage}\` Burn damage.`,
+            `\`🔥\` The ${monster.name} inflicted Burn! You took \`${reducedBurnDamage}\` Burn damage.`,
         );
     }
 
@@ -398,13 +432,16 @@ export async function monsterAttack(
         const crippleDamage = Math.ceil(
             stats.maxHP * (0.05 + 0.01 * Math.floor(stats.worldLevel / 2)),
         );
-        currentPlayerHp -= crippleDamage;
+
+        const reducedCrippleDamage = crippleDamage * damageReductionFactor;
+        currentPlayerHp -= reducedCrippleDamage;
         messages.push(
-            `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${crippleDamage}\` Cripple damage.`,
+            `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${reducedCrippleDamage}\` Cripple damage.`,
         );
     }
 
-    currentPlayerHp -= monsterDamage;
+    const reducedMonsterDamage = monsterDamage * damageReductionFactor;
+    currentPlayerHp -= reducedMonsterDamage;
 
     const deathThreshold = getDeathThreshold(stats);
     if (currentPlayerHp < deathThreshold) {
@@ -438,8 +475,12 @@ export async function monsterAttack(
         defendText = ` 🛡️ (Defended ${damageReduced.toFixed(2)})`;
     }
 
+    const finalDamageDealt = hasVortexVanquisher
+        ? reducedMonsterDamage
+        : monsterDamage;
+
     messages.push(
-        `\`⚔️\` The ${monster.name} dealt \`${monsterDamage.toFixed(
+        `\`⚔️\` The ${monster.name} dealt \`${finalDamageDealt.toFixed(
             2,
         )}\` damage to you${defendText}${critText}.`,
     );

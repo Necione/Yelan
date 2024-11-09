@@ -16,6 +16,7 @@ export type SkillName =
     | "Vigor"
     | "Paladin"
     | "Pride"
+    | "Fatigue"
     | "Greed"
     | "Sloth"
     | "Wrath";
@@ -184,6 +185,21 @@ export const skills: Skill[] = [
             items: [
                 { item: "Black Bronze Horn", amount: 5 },
                 { item: "Dead Ley Line Leaves", amount: 10 },
+            ],
+        },
+    },
+    {
+        name: "Fatigue",
+        description: "Monsters deal more DMG early, but less later on",
+        emoji: "🐌",
+        requirements: {
+            worldLevel: 10,
+            rebirthsRequired: 2,
+            coins: 150,
+            items: [
+                { item: "Forbidden Curse Scroll", amount: 3 },
+                { item: "Slime Secretions", amount: 10 },
+                { item: "Chaos Device", amount: 5 },
             ],
         },
     },

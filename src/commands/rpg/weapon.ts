@@ -163,6 +163,17 @@ export const weapon = buildCommand<SlashCommand>({
                 });
             }
 
+            if (
+                fullWeaponName &&
+                fullWeaponName.includes("Vortex Vanquisher")
+            ) {
+                embed.addFields({
+                    name: "Special Effect",
+                    value: "Reduce all damage taken by 50%.",
+                    inline: false,
+                });
+            }
+
             return r.edit({ embeds: [embed] });
         } catch (error) {
             console.error("Error executing /weapon command:", error);

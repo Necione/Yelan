@@ -246,6 +246,7 @@ export async function handleHunt(
         let isFirstTurn = true;
 
         const hasCrystallize = skills.has(stats, "Crystallize");
+        const hasFatigue = skills.has(stats, "Fatigue");
 
         let turnNumber = 1;
 
@@ -355,6 +356,7 @@ export async function handleHunt(
                     monsterMessages,
                     turnNumber,
                     hasCrystallize,
+                    hasFatigue,
                     monsterState,
                 );
 

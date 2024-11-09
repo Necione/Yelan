@@ -5,6 +5,7 @@ import { getUserStats, updateUserStats } from "../../services";
 import { skills } from "../../utils/skillsData";
 
 const sinSkills = ["Wrath", "Sloth", "Pride", "Greed"];
+const conflictingSkills = ["Fatigue", "Crystallize"];
 
 function getMaxActiveSkills(alchemyProgress: number): number {
     if (alchemyProgress >= 360) {
@@ -85,6 +86,22 @@ export const activate = buildCommand<SlashCommand>({
                 return r.edit(
                     embedComment(
                         `You can only have one Sin skill active at a time. Currently active: **${activeSinSkills.join(
+                            ", ",
+                        )}**.`,
+                    ),
+                );
+            }
+        }
+
+        if (conflictingSkills.includes(skillName)) {
+            const activeConflictingSkills = activeSkills.filter((skill) =>
+                conflictingSkills.includes(skill),
+            );
+
+            if (conflictingSkills.length >= 1) {
+                return r.edit(
+                    embedComment(
+                        `You have a skill that will conflict with this. Currently active: **${activeConflictingSkills.join(
                             ", ",
                         )}**.`,
                     ),

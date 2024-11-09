@@ -164,6 +164,7 @@ export async function handleAbyssBattle(
         let isFirstTurn = true;
 
         const hasCrystallize = skills.has(stats, "Crystallize");
+        const hasFatigue = skills.has(stats, "Fatigue");
 
         let turnNumber = 1;
         const startingMessages = make.array<string>();
@@ -270,6 +271,7 @@ export async function handleAbyssBattle(
                     monsterMessages,
                     turnNumber,
                     hasCrystallize,
+                    hasFatigue,
                     monsterState,
                 );
 
