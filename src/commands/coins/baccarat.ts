@@ -1,10 +1,15 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
-import { customEmoji } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
-import { checkBelowBalance, checks, locked, userLockedData } from "../../utils";
+import {
+    checkBelowBalance,
+    checks,
+    getAmount,
+    locked,
+    userLockedData,
+} from "../../utils";
 
 type CardKey =
     | "2"
@@ -103,6 +108,7 @@ export const baccarat: SlashCommand = {
         const p1 = await getProfileByUserId(interaction.user.id);
 
         if (p1.locked) {
+            locked.del(interaction.user.id);
             return responder.edit(userLockedData(interaction.user.id));
         }
 
@@ -136,18 +142,20 @@ export const baccarat: SlashCommand = {
 
         const result =
             finalPlayerValue === finalBankerValue
-                ? "Tie"
+                ? "tie"
                 : finalPlayerValue > finalBankerValue
-                  ? "Player Wins"
-                  : "Banker Wins";
+                  ? "player"
+                  : "banker";
 
         const e = new EmbedBuilder()
             .setTitle("`🎩` Baccarat Game")
             .setColor(Colors.Green);
-
-        const didPlayerWin =
-            (result === "Player Wins" && playerChoice === "player") ||
-            (result === "Banker Wins" && playerChoice === "banker");
+        let didPlayerWin = false;
+        for (const v of ["player", "banker"] as const) {
+            if (result === v && playerChoice === v) {
+                didPlayerWin = true;
+            }
+        }
 
         const winnings = Math.floor(betAmount * 0.98);
         const theoreticalWinnings = Math.floor(winnings + betAmount);
@@ -162,11 +170,11 @@ export const baccarat: SlashCommand = {
             e.setDescription(
                 `Player hand: ${playerHand.join(
                     ", ",
-                )}\nBanker hand: ${bankerHand.join(", ")}\n\nYou won ${
-                    customEmoji.a.z_coins
-                } \`${theoreticalWinnings}\` Mora!`,
+                )}\nBanker hand: ${bankerHand.join(
+                    ", ",
+                )}\n\nYou won ${getAmount(theoreticalWinnings)}`,
             );
-        } else if (result === "Tie") {
+        } else if (result === "tie") {
             e.setDescription(
                 `Player hand: ${playerHand.join(
                     ", ",
@@ -182,10 +190,10 @@ export const baccarat: SlashCommand = {
             e.setDescription(
                 `Player hand: ${playerHand.join(
                     ", ",
-                )}\nBanker hand: ${bankerHand.join(", ")}\n\nYou lost ${
-                    customEmoji.a.z_coins
-                } \`${betAmount}\` Mora!`,
-            );
+                )}\nBanker hand: ${bankerHand.join(
+                    ", ",
+                )}\n\nYou lost ${getAmount(betAmount)}`,
+            ).setColor(Colors.Red);
         }
         locked.del(interaction.user.id);
 

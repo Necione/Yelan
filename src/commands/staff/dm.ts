@@ -4,7 +4,7 @@ import {
     getUser,
     type SlashCommand,
 } from "@elara-services/botbuilder";
-import { discord, noop } from "@elara-services/utils";
+import { discord, make, noop } from "@elara-services/utils";
 import { Colors, SlashCommandBuilder, type User } from "discord.js";
 import { roles } from "../../config";
 
@@ -36,7 +36,7 @@ export const dm = buildCommand<SlashCommand>({
         const user = i.options.getUser("user", true);
         const message = i.options.getString("message", true);
         const other = i.options.getString("other_users", false);
-        const users = new Set<User>([user]);
+        const users = make.array<User>([user]);
         if (other) {
             const ids = other.split(" ");
             for await (const id of ids) {
@@ -45,7 +45,7 @@ export const dm = buildCommand<SlashCommand>({
                     mock: false,
                 });
                 if (u && !u.bot) {
-                    users.add(u);
+                    users.push(u);
                 }
             }
         }

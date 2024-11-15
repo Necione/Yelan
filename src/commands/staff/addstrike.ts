@@ -29,7 +29,7 @@ export const addStrike = buildCommand<SlashCommand>({
         ),
     defer: { silent: true },
     locked: {
-        roles: [roles.moderator],
+        roles: [...roles.main, roles.moderator],
     },
     async execute(i, r) {
         if (!i.inCachedGuild()) {

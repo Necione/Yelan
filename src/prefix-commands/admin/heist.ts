@@ -1,5 +1,5 @@
 import { type PrefixCommand } from "@elara-services/botbuilder";
-import { addButtonRow, error, get, sleep } from "@elara-services/utils";
+import { addButtonRow, error, get, noop, sleep } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import {
     ButtonStyle,
@@ -60,7 +60,7 @@ async function handleHeistFailure(
 
     await heistChannel
         .send("The heist has failed... Better luck next time!")
-        .catch(() => null);
+        .catch(noop);
 }
 
 function generateMaps(
@@ -193,7 +193,7 @@ function moveVanguard(
         position.y = prevY; // Revert Y position
         heistChannel
             .send("You've hit a wall and cannot move in that direction.")
-            .catch(() => null);
+            .catch(noop);
         return { gameMap, position, currentCell: " " };
     }
 
@@ -278,7 +278,7 @@ async function handleAttack(
             `${gunnerMention}, shoot by saying the following __numbers as words__: \`${randomNumberString}\``,
         );
 
-    await heistChannel.send({ embeds: [challengeEmbed] }).catch(() => null);
+    await heistChannel.send({ embeds: [challengeEmbed] }).catch(noop);
 
     const filter = (m: { author: { id: string }; content: string }) =>
         m.author.id === gunnerId;
@@ -296,7 +296,7 @@ async function handleAttack(
             if (collected.content.trim().toLowerCase() === numberWords) {
                 await heistChannel
                     .send(`${gunnerMention}, you successfully shot the guards!`)
-                    .catch(() => null);
+                    .catch(noop);
                 await onComplete();
             } else {
                 gameState.isActive = false;
@@ -305,7 +305,7 @@ async function handleAttack(
                     .send(
                         `\`💀\` ${gunnerMention}, you failed to shoot correctly and got shot!`,
                     )
-                    .catch(() => null);
+                    .catch(noop);
                 await onComplete();
                 await handleHeistFailure(heistChannel, participants);
             }
@@ -325,7 +325,7 @@ async function handleAttack(
                         .send(
                             `${gunnerMention}, you failed to respond in time and were killed!`,
                         )
-                        .catch(() => null);
+                        .catch(noop);
                     await handleHeistFailure(heistChannel, participants);
                 }
 
@@ -673,6 +673,7 @@ export const heist: PrefixCommand = {
         ],
     },
     execute: async (message, responder) => {
+        await responder.delete();
         gameState.isActive = true;
         gameState.vanguardMoveInProgress = false;
         gameState.vanguardMoveHandled = false;
@@ -693,7 +694,7 @@ export const heist: PrefixCommand = {
             channels.heist,
         ) as TextChannel;
         if (!targetChannel || !targetChannel.isTextBased()) {
-            return responder.reply("Unable to find the target channel.");
+            return responder.send("Unable to find the target channel.");
         }
 
         const warningEmbed = new EmbedBuilder()
@@ -740,6 +741,7 @@ export const heist: PrefixCommand = {
 
         collector.on("collect", async (interaction) => {
             if (participants.size >= roles.length) {
+                collector.stop();
                 return void interaction
                     .reply({
                         content: "The heist is already full!",
@@ -755,7 +757,7 @@ export const heist: PrefixCommand = {
                         content: "You are already in the heist!",
                         ephemeral: true,
                     })
-                    .catch(() => null);
+                    .catch(noop);
             }
 
             const availableRoles = roles.filter(
@@ -772,10 +774,13 @@ export const heist: PrefixCommand = {
                     content: `You have joined the heist as a ${assignedRole}!`,
                     ephemeral: true,
                 })
-                .catch(() => null);
+                .catch(noop);
 
             embed.setDescription(embedDescription());
-            await sentMessage.edit({ embeds: [embed] }).catch(() => null);
+            await sentMessage.edit({ embeds: [embed] }).catch(noop);
+            if (participants.size === roles.length) {
+                collector.stop();
+            }
         });
 
         collector.on("end", async () => {
@@ -784,7 +789,7 @@ export const heist: PrefixCommand = {
                     .send(
                         "All roles are filled. Let the Heist Begin!\nPlease head to <#1302379209859141674> to play/spectate!",
                     )
-                    .catch(() => null);
+                    .catch(noop);
 
                 const heistChannel = (await message.client.channels.fetch(
                     "1302379209859141674",
@@ -811,7 +816,7 @@ export const heist: PrefixCommand = {
                     .send(
                         `${participantsMention}\nYou four broke into the Liyue Harbor Bank... good luck!\n\nFulfill your individual duties, the heist will end if one fails. **The game will begin in 20 seconds.**`,
                     )
-                    .catch(() => null);
+                    .catch(noop);
 
                 setTimeout(async () => {
                     let gameMap = generateMaps();
@@ -824,7 +829,7 @@ export const heist: PrefixCommand = {
                                 gameState.floor,
                             )}\`\`\``,
                         )
-                        .catch(() => null);
+                        .catch(noop);
 
                     const handleVanguardMove = async () => {
                         if (
@@ -848,7 +853,7 @@ export const heist: PrefixCommand = {
                                 .send(
                                     "No Vanguard present. The heist has failed...",
                                 )
-                                .catch(() => null);
+                                .catch(noop);
                             return;
                         }
 
@@ -856,7 +861,7 @@ export const heist: PrefixCommand = {
                             .send(
                                 `<@${vanguardId}> Choose your next move (Left, Right, Up, Down). You have 10 seconds.`,
                             )
-                            .catch(() => null);
+                            .catch(noop);
 
                         const moveCollector =
                             heistChannel.createMessageCollector({
@@ -903,7 +908,7 @@ export const heist: PrefixCommand = {
                                             gameState.floor,
                                         )}\`\`\``,
                                     )
-                                    .catch(() => null);
+                                    .catch(noop);
 
                                 if (result.currentCell === "X") {
                                     const challengeFunctions = [
@@ -957,7 +962,7 @@ export const heist: PrefixCommand = {
                                     .send(
                                         "Invalid move. Please choose a valid direction.",
                                     )
-                                    .catch(() => null);
+                                    .catch(noop);
 
                                 if (gameState.isActive) {
                                     gameState.vanguardMoveInProgress = false;
@@ -1004,7 +1009,7 @@ export const heist: PrefixCommand = {
                                         customEmoji.a.z_coins
                                     } \`${totalCoinsEarned * 4} Coins\``,
                                 )
-                                .catch(() => null);
+                                .catch(noop);
 
                             for (const [participantId] of participants) {
                                 await addBalance(
@@ -1026,7 +1031,7 @@ export const heist: PrefixCommand = {
                     .send(
                         "The heist couldn't start, not all roles were filled.",
                     )
-                    .catch(() => null);
+                    .catch(noop);
             }
         });
     },

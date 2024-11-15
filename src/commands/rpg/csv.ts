@@ -1,10 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
-import {
-    EmbedBuilder,
-    SlashCommandBuilder,
-} from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { skills } from "../../plugins/other/utils";
 import { getUserStats } from "../../services";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
@@ -15,35 +12,42 @@ export const csv = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("csv")
         .setDescription("[RPG] Check the rebirth sell value of a user.")
-        .addUserOption(option => 
+        .addUserOption((option) =>
             option
                 .setName("user")
                 .setDescription("The user to check the rebirth sell value for.")
-                .setRequired(true)
+                .setRequired(true),
         ),
     defer: { silent: false },
     async execute(i, r) {
         const targetUser = i.options.getUser("user");
         if (!targetUser) {
-            return r.edit(
-                embedComment("User not found.", "Red"),
-            );
+            return r.edit(embedComment("User not found.", "Red"));
         }
 
         const stats = await getUserStats(targetUser.id);
         if (!stats) {
             return r.edit(
-                embedComment(`No stats found for ${targetUser.username}.`, "Red"),
+                embedComment(
+                    `No stats found for ${targetUser.username}.`,
+                    "Red",
+                ),
             );
         }
 
         let totalSellPrice = 0;
-        const rebirthMultiplier = 1 + Math.min(stats.rebirths, 3) * 0.2 + Math.max(0, stats.rebirths - 3) * 0.1;
+        const rebirthMultiplier =
+            1 +
+            Math.min(stats.rebirths, 3) * 0.2 +
+            Math.max(0, stats.rebirths - 3) * 0.1;
         let appraiseBonus = 0;
         const hasAppraiseSkill = skills.has(stats, "Appraise", false);
 
         for (const item of stats.inventory) {
-            const itemData = drops[item.item as DropName] || weapons[item.item as WeaponName] || artifacts[item.item as ArtifactName];
+            const itemData =
+                drops[item.item as DropName] ||
+                weapons[item.item as WeaponName] ||
+                artifacts[item.item as ArtifactName];
 
             if (itemData) {
                 const baseSellPrice = itemData.sellPrice * item.amount;
@@ -59,9 +63,10 @@ export const csv = buildCommand<SlashCommand>({
             }
         }
 
-        const appraiseBonusText = appraiseBonus > 0
-            ? `\n🔍 (Appraisal Skill Bonus: +${appraiseBonus} ${texts.c.u})`
-            : "";
+        const appraiseBonusText =
+            appraiseBonus > 0
+                ? `\n🔍 (Appraisal Skill Bonus: +${appraiseBonus} ${texts.c.u})`
+                : "";
 
         const resultEmbed = new EmbedBuilder()
             .setColor("Blue")
