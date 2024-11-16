@@ -116,7 +116,11 @@ export async function handleHunt(
             return;
         }
 
-        if (stats.rebirths >= 2 && Math.random() < 0.05) {
+        const mutationChance = stats.rebirths * 5;
+        const actualMutationChance = Math.min(mutationChance, 100);
+        const isMutated = Math.random() * 100 < actualMutationChance;
+
+        if (isMutated) {
             monster.name = `Mutated ${monster.name}`;
             monster.isMutated = true;
         }

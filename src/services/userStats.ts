@@ -29,7 +29,7 @@ export async function syncStats(userId: string) {
     const alchemyBaseAttack = calculatedBaseAttack + assignedAttackBonus;
 
     const calculatedMaxHP =
-        100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 50;
+        100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 5;
 
     const assignedHpBonus = (stats.assignedHp || 0) * 2;
     const finalMaxHP = calculatedMaxHP + assignedHpBonus;

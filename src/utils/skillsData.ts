@@ -125,7 +125,7 @@ export const skills: Skill[] = [
     {
         name: "Energize",
         description:
-            "Reduce your explore cooldown from 20 minutes to 15 minutes",
+            "Reduce your explore cooldown from 30 minutes to 20 minutes",
         emoji: "⚡",
         requirements: {
             worldLevel: 5,
@@ -311,7 +311,7 @@ export const skills: Skill[] = [
         description: "Get max drops, all drops, 100% of the time after a hunt.",
         emoji: "🖤",
         requirements: {
-            worldLevel: 20,
+            worldLevel: 25,
             rebirthsRequired: 6,
             coins: 5000,
             items: [

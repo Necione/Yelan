@@ -5,7 +5,7 @@ import { getUserStats, updateUserStats } from "../../services";
 import { skills } from "../../utils/skillsData";
 
 const sinSkills = ["Wrath", "Sloth", "Pride", "Greed"];
-const conflictingSkills = ["Fatigue", "Crystallize"];
+const mutuallyExclusiveSkills = ["Crystallize", "Fatigue"];
 
 function getMaxActiveSkills(alchemyProgress: number): number {
     if (alchemyProgress >= 360) {
@@ -93,15 +93,15 @@ export const activate = buildCommand<SlashCommand>({
             }
         }
 
-        if (conflictingSkills.includes(skillName)) {
-            const activeConflictingSkills = activeSkills.filter((skill) =>
-                conflictingSkills.includes(skill),
+        if (mutuallyExclusiveSkills.includes(skillName)) {
+            const activeExclusiveSkills = activeSkills.filter((skill) =>
+                mutuallyExclusiveSkills.includes(skill),
             );
 
-            if (conflictingSkills.length >= 1) {
+            if (activeExclusiveSkills.length >= 1) {
                 return r.edit(
                     embedComment(
-                        `You have a skill that will conflict with this. Currently active: **${activeConflictingSkills.join(
+                        `You cannot activate "${skillName}" while the following skill is active: **${activeExclusiveSkills.join(
                             ", ",
                         )}**.`,
                     ),
