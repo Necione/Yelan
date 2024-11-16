@@ -6,5 +6,6 @@ export * from "./lock";
 export * from "./remove";
 export * from "./reset";
 export * from "./restore";
+export * from "./stats";
 export * from "./transfer";
 export * from "./view";
