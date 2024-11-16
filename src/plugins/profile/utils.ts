@@ -4,6 +4,7 @@ import {
     discord,
     embedComment,
     is,
+    make,
     noop,
     type ButtonOptions,
 } from "@elara-services/utils";
@@ -24,6 +25,7 @@ import { levels } from "../../services/levels";
 import { locked, userLockedData } from "../../utils";
 import { images } from "../../utils/images";
 import { createProfile } from "../canvas/profile";
+import { getRankedRegion } from "../other/ranked";
 
 export function getBackgroundUrl(backgroundUrl?: string | null | undefined) {
     if (backgroundUrl && backgroundUrl.match(/https:\/\//gi)) {
@@ -238,22 +240,34 @@ export async function fetchData(
         }
     }
 
-    const regionNames: { [key: number]: string } = {
-        8: "Asia",
-        7: "Europe",
-        6: "America",
-    };
-    const regionName =
-        p.rankedRegion != null && regionNames[p.rankedRegion]
-            ? regionNames[p.rankedRegion]
-            : "Other";
-    const uidContent = p.rankedUID
-        ? `> UID: \`${p.rankedUID}\` (${regionName})`
-        : "> UID: Not Set, use </uid:1204385940231950397>";
-
+    const content = make.array<string>();
+    let showCmd = false;
+    if (p.rankedUID) {
+        content.push(
+            `-# Genshin UID: **\`${p.rankedUID}\`** (${getRankedRegion(
+                parseInt(p.rankedUID.toString().slice(0, 1)),
+            )})`,
+        );
+    } else {
+        showCmd = true;
+        content.push(`-# Genshin UID: Not Set`);
+    }
+    if (p.starrail) {
+        content.push(
+            `-# Star Rail UID: **\`${p.starrail}\`** (${getRankedRegion(
+                parseInt(p.starrail.toString().slice(0, 1)),
+            )})`,
+        );
+    } else {
+        showCmd = true;
+        content.push(`-# Star Rail: Not Set`);
+    }
+    if (showCmd) {
+        content.push(`> -# Use </uid:1204385940231950397> to set a UID`);
+    }
     return {
         embeds: [],
-        content: uidContent,
+        content: content.join("\n"),
         files: [{ name: "profile.png", attachment: data }],
         components: row.components.length ? [row] : [],
     };

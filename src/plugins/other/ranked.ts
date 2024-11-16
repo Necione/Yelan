@@ -2,6 +2,7 @@ import {
     discord,
     embedComment,
     formatNumber,
+    getEntries,
     is,
     noop,
     time,
@@ -211,4 +212,22 @@ export function getRankedRoles(
         }
     }
     return { roles, should, currentRank };
+}
+
+export const regions = {
+    asia: [1, 2, 5, 8],
+    america: [6],
+    europe: [7],
+    other: [9],
+};
+export function getRankedRegion(region: number) {
+    for (const [name, value] of getEntries(regions)) {
+        if (value.includes(region)) {
+            return `${name.slice(0, 1).toUpperCase()}${name.slice(
+                1,
+                name.length,
+            )}`;
+        }
+    }
+    return "";
 }

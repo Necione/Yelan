@@ -1,7 +1,15 @@
-import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
+import {
+    buildCommand,
+    getBool,
+    type SlashCommand,
+} from "@elara-services/botbuilder";
 import { embedComment, is } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { getAllUserProfiles, getProfileByUserId } from "../../services";
+import {
+    getAllUserProfiles,
+    getProfileByUserId,
+    updateUserProfile,
+} from "../../services";
 import { logs } from "../../utils";
 
 const regions = {
@@ -29,10 +37,17 @@ export const uid = buildCommand<SlashCommand>({
         .addStringOption((o) =>
             o
                 .setName(`id`)
-                .setDescription(`What's your Genshin UID?`)
+                .setDescription(`What's your UID?`)
                 .setRequired(true)
                 .setMinLength(5)
                 .setMaxLength(10),
+        )
+        .addBooleanOption((o) =>
+            getBool(o, {
+                name: "starrail",
+                description: `Are you trying to set your Star Rail UID?`,
+                required: false,
+            }),
         ),
     defer: { silent: true },
     async execute(i, r) {
@@ -40,10 +55,9 @@ export const uid = buildCommand<SlashCommand>({
             return;
         }
         const uid = parseInt(i.options.getString("id", true));
+        const isStarRail = i.options.getBoolean("starrail", false);
         if (!isValidRegion(uid)) {
-            return r.edit(
-                embedComment(`The Genshin UID you provided isn't valid.`),
-            );
+            return r.edit(embedComment(`The UID you provided isn't valid.`));
         }
         const db = await getProfileByUserId(i.user.id);
         if (!db) {
@@ -55,6 +69,52 @@ export const uid = buildCommand<SlashCommand>({
             return r.edit(
                 embedComment(
                     `Your profile has been locked, you can't use this command.`,
+                ),
+            );
+        }
+        if (isStarRail) {
+            if (db.starrail) {
+                return r.edit(
+                    embedComment(
+                        `You already have a Star Rail UID registered with your account.`,
+                    ),
+                );
+            }
+            const others = (
+                await getAllUserProfiles({
+                    where: {
+                        starrail: uid,
+                    },
+                })
+            ).filter((c) => c.userId !== i.user.id);
+            if (is.array(others)) {
+                await logs.handle(
+                    {
+                        content: `${i.user.toString()} (\`${
+                            i.user.id
+                        }\`) has tried using an already taken Star Rail UID \`${uid}\`\n> Other user(s): ${others
+                            .map((c) => `<@${c.userId}>`)
+                            .join(", ")}`,
+                        allowed_mentions: { parse: [] },
+                        allowedMentions: { parse: [] },
+                    },
+                    "1079648430743363704",
+                );
+                return r.edit(
+                    embedComment(
+                        `UID (${uid}) is already registered to another user.`,
+                    ),
+                );
+            }
+            await updateUserProfile(i.user.id, {
+                starrail: {
+                    set: uid,
+                },
+            });
+            return r.edit(
+                embedComment(
+                    `Your Star Rail UID is now set to \`${uid}\``,
+                    "Green",
                 ),
             );
         }

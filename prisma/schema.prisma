@@ -164,6 +164,7 @@ model UserWallet {
   active           Active?
   dailyStats       DailyStats[]
   roles            Roles[]
+  starrail         Int?          @default(0)
 }
 
 model DailyCommand {
@@ -180,56 +181,56 @@ type Roles {
 }
 
 model UserStats {
-  id                              String         @id @default(auto()) @map("_id") @db.ObjectId
-  userId                          String         @unique
-  rebirths                        Int            @default(0)
-  mana                            Int            @default(20)
-  maxMana                         Int            @default(20)
-  hp                              Int            @default(100)
-  maxHP                           Int            @default(100)
-  baseAttack                      Float          @default(5)
-  attackPower                     Float          @default(5)
-  critChance                      Float          @default(0)
-  critValue                       Float          @default(0)
-  defChance                       Float          @default(0)
-  defValue                        Float          @default(0)
-  healEffectiveness               Float          @default(0)
-  inventory                       UserStatsInv[]
-  skills                          UserSkill[]
-  cooking                         UserCooking[]
-  activeSkills                    String[]       @default([]) 
-  activeEffects                   UserEffect[]
-  requests                        UserRequest[]
-  exp                             Int            @default(0)
-  worldLevel                      Int            @default(1)
-  highestWL                       Int            @default(1)
-  currentAbyssFloor               Int            @default(1)
-  abyssFloor                      Int            @default(0)
-  equippedWeapon                  String?
-  equippedFlower                  String?
-  equippedPlume                   String?
-  equippedSands                   String?
-  equippedGoblet                  String?
-  equippedCirclet                 String?
-  region                          String         @default("Liyue")
-  location                        String         @default("Liyue Harbor")
-  isTravelling                    Boolean        @default(false)
-  isHunting                       Boolean        @default(false)
-  alchemyProgress                 Int            @default(0)
-  totalAssigned                   Int            @default(0)
-  assignedHp                      Int            @default(0)
-  assignedAtk                     Int            @default(0)
-  assignedCritValue               Int            @default(0)
-  assignedDefValue                Int            @default(0)
-  lifetimeRequestsCompleted       Int            @default(0)
-  beatenBosses                    String[]       @default([])
-  abyssMode                       Boolean        @default(false) 
-  abyssCoordX                     Int?
-  abyssCoordY                     Int?
-  collectedChests                 String[]       @default([])
-  hasKey                          Boolean        @default(false)
-  deity                           String?
-  castQueue                       String[]       @default([])
+  id                        String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId                    String         @unique
+  rebirths                  Int            @default(0)
+  mana                      Int            @default(20)
+  maxMana                   Int            @default(20)
+  hp                        Int            @default(100)
+  maxHP                     Int            @default(100)
+  baseAttack                Float          @default(5)
+  attackPower               Float          @default(5)
+  critChance                Float          @default(0)
+  critValue                 Float          @default(0)
+  defChance                 Float          @default(0)
+  defValue                  Float          @default(0)
+  healEffectiveness         Float          @default(0)
+  inventory                 UserStatsInv[]
+  skills                    UserSkill[]
+  cooking                   UserCooking[]
+  activeSkills              String[]       @default([])
+  activeEffects             UserEffect[]
+  requests                  UserRequest[]
+  exp                       Int            @default(0)
+  worldLevel                Int            @default(1)
+  highestWL                 Int            @default(1)
+  currentAbyssFloor         Int            @default(1)
+  abyssFloor                Int            @default(0)
+  equippedWeapon            String?
+  equippedFlower            String?
+  equippedPlume             String?
+  equippedSands             String?
+  equippedGoblet            String?
+  equippedCirclet           String?
+  region                    String         @default("Liyue")
+  location                  String         @default("Liyue Harbor")
+  isTravelling              Boolean        @default(false)
+  isHunting                 Boolean        @default(false)
+  alchemyProgress           Int            @default(0)
+  totalAssigned             Int            @default(0)
+  assignedHp                Int            @default(0)
+  assignedAtk               Int            @default(0)
+  assignedCritValue         Int            @default(0)
+  assignedDefValue          Int            @default(0)
+  lifetimeRequestsCompleted Int            @default(0)
+  beatenBosses              String[]       @default([])
+  abyssMode                 Boolean        @default(false)
+  abyssCoordX               Int?
+  abyssCoordY               Int?
+  collectedChests           String[]       @default([])
+  hasKey                    Boolean        @default(false)
+  deity                     String?
+  castQueue                 String[]       @default([])
 }
 
 type UserRequest {
@@ -240,9 +241,9 @@ type UserRequest {
 }
 
 type UserEffect {
-  name           String  @default("")
-  effectValue    Float   @default(0)
-  remainingUses  Int     @default(0)
+  name          String @default("")
+  effectValue   Float  @default(0)
+  remainingUses Int    @default(0)
 }
 
 type UserStatsInv {
