@@ -20,6 +20,7 @@ export const stats = buildCommand({
     locked: {
         roles: roles.main,
     },
+    defer: { silent: false },
     async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;

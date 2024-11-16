@@ -28,6 +28,7 @@ export const restore = buildCommand({
                 }),
             ),
     locked: { roles: roles.main },
+    defer: { silent: true },
     async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;

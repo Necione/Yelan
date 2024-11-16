@@ -35,6 +35,7 @@ export const view = buildCommand({
             roles.management.econ,
         ],
     },
+    defer: { silent: true },
     async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
@@ -75,7 +76,8 @@ export const view = buildCommand({
                         `Elo: ${formatNumber(p.elo || 0)}`,
                         `Trivia Points: ${formatNumber(p.triviaPoints || 0)}`,
                         `Genshin UID: ${p.rankedUID || "NOT SET"}`,
-                        `Frame URL: ${p.frameUrl || "NOT_SET"}`,
+                        `Star Rail UID: ${p.starrail || "NOT SET"}`,
+                        `Frame URL: ${p.frameUrl || "NOT SET"}`,
                         `Profile Background: ${p.backgroundUrl || "NOT SET"}`,
                         `Mute Mentions: ${toggle(
                             is.boolean(p.muteMentions) ? p.muteMentions : false,

@@ -17,6 +17,7 @@ export const left = buildCommand({
     subCommand: (b) =>
         b.setName(`left`).setDescription(`Resets the left users profiles`),
     locked: { roles: roles.main },
+    defer: { silent: true },
     async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;

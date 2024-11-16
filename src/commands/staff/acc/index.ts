@@ -17,7 +17,6 @@ export const acc = buildCommand<SlashCommand>({
             .setDMPermission(false),
         commands,
     ),
-    defer: { silent: true },
     execute(interaction) {
         return handleSubCommands(
             interaction,

@@ -41,16 +41,16 @@ export async function handleUserToUID(message: Message) {
         return message.react(`❌`).catch(noop);
     }
     const embed = new EmbedBuilder()
-        .setTitle(`Genshin UID`)
+        .setTitle(`Game UIDs`)
         .setColor(Colors.Aqua);
     const desc: string[] = [];
     for (const user of users) {
         const f = dbs.find((c) => c.userId === user.id);
-        if (!f || !f.rankedUID) {
-            desc.push(`${user.toString()}:\n - UID: \`None\``);
-        } else {
-            desc.push(`${user.toString()}:\n - UID: \`${f.rankedUID}\``);
-        }
+        desc.push(
+            `${user.toString()}:\n-# Genshin: \`${
+                f?.rankedUID || "None"
+            }\`\n-# Star Rail: \`${f?.starrail || "None"}\``,
+        );
     }
     if (!is.array(desc)) {
         return message.react(`❌`).catch(noop);

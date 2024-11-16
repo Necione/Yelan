@@ -20,6 +20,7 @@ export const badges = buildCommand<SubCommand>({
             .setDescription(`Manage the badges for a user`)
             .addUserOption((o) => getUser(o, { required: true })),
     locked: { roles: roles.main },
+    defer: { silent: true },
     async execute(i, r) {
         const user = i.options.getUser("user", true);
         if (user.bot) {

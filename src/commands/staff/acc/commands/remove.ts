@@ -23,6 +23,7 @@ export const remove = buildCommand({
             "1113509442223345734", // Aqua
         ],
     },
+    defer: { silent: true },
     async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;

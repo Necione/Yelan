@@ -20,6 +20,7 @@ const choices = [
     "daily",
     "backgroundUrl",
     "rankedUID",
+    "starrail",
     "vault",
     "balance",
     "messagesSent",
@@ -45,6 +46,7 @@ const ints = [
     "lemon",
     "claimed",
     "rankedUID",
+    "starrail",
 ];
 const arrays = ["achievements", "collectables", "badges"];
 const texts = ["backgroundUrl"];
@@ -64,6 +66,7 @@ export const reset = buildCommand({
                 }),
             ),
     locked: { roles: roles.main },
+    defer: { silent: true },
     async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
             return;
