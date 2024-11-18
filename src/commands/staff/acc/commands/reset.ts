@@ -6,7 +6,7 @@ import {
     getKeys,
 } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
-import { roles } from "../../../../config";
+import { devId, roles } from "../../../../config";
 import {
     getProfileByUserId,
     updateUserProfile,
@@ -72,6 +72,9 @@ export const reset = buildCommand({
             return;
         }
         const user = i.options.getUser("user", true);
+        if (i.user.id !== devId && user.id === devId) {
+            return r.edit(embedComment(`Respectfully, fuck off.`));
+        }
         const type = i.options.getString("type", true);
         if (!choices.includes(type)) {
             return r.edit(embedComment(`You provided an invalid type.`));

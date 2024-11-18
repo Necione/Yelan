@@ -8,6 +8,7 @@ import {
 import { prisma } from "../../../../prisma";
 import { getProfileByUserId } from "../../../../services";
 import { logs } from "../../../../utils";
+import { devId } from "../../../../config";
 
 export const remove = buildCommand({
     subCommand: (b) =>
@@ -29,7 +30,9 @@ export const remove = buildCommand({
             return;
         }
         const user = i.options.getUser("user", true);
-
+        if (i.user.id !== devId && user.id === devId) {
+            return r.edit(embedComment(`Respectfully, fuck off.`));
+        }
         if (user.bot) {
             return r.edit(embedComment(`Bots don't have a profile.`));
         }

@@ -5,7 +5,7 @@ import {
 } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, proper } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { roles } from "../../config";
+import { devId, roles } from "../../config";
 import { getProfileByUserId } from "../../services";
 
 export const strikes = buildCommand<SlashCommand>({
@@ -33,6 +33,9 @@ export const strikes = buildCommand<SlashCommand>({
         ) {
             user = u;
         }
+        if (i.user.id !== devId && user.id === devId) {
+            return r.edit(embedComment(`Respectfully, fuck off.`));
+        }
         const term = i.user.id === user.id ? "your" : "their";
         if (user.bot) {
             return r.edit(embedComment(`Bots can't have strikes...`));
@@ -40,9 +43,7 @@ export const strikes = buildCommand<SlashCommand>({
 
         const p = await getProfileByUserId(user.id);
         if (!p) {
-            return r.edit(
-                embedComment(`Unable to find/create ${term} user profile.`),
-            );
+            return r.edit(embedComment(`No user profile found.`));
         }
 
         const strikes = p.strikes || 0;
@@ -51,9 +52,7 @@ export const strikes = buildCommand<SlashCommand>({
             .setColor(0xff5856)
             .setTitle(`Moderation Strikes`)
             .setDescription(
-                `${proper(
-                    term === "their" ? "they" : term,
-                )} have \`🔥\` **${formatNumber(
+                `${user.toString()} has \`🔥\` **${formatNumber(
                     strikes,
                 )} Strike(s)**.\n-# Strikes will reset monthly on the 1st`,
             )

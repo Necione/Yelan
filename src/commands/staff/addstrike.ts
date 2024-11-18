@@ -2,7 +2,7 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { roles } from "../../config";
+import { devId, roles } from "../../config";
 import {
     getProfileByUserId,
     removeBalance,
@@ -39,7 +39,9 @@ export const addStrike = buildCommand<SlashCommand>({
         const user = i.options.getUser("user", true);
         const reason = i.options.getString("reason", true);
         const initiator = i.user;
-
+        if (i.user.id !== devId && user.id === devId) {
+            return r.edit(embedComment(`Respectfully, fuck off.`));
+        }
         const profile = await getProfileByUserId(user.id);
         if (!profile) {
             return r.edit(embedComment("Unable to find/create user profile."));

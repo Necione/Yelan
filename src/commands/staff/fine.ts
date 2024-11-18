@@ -2,7 +2,7 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, is, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { roles } from "../../config";
+import { devId, roles } from "../../config";
 import { removeBalance } from "../../services";
 import { logs } from "../../utils";
 
@@ -50,6 +50,9 @@ export const fine = buildCommand<SlashCommand>({
         }
         if (user.bot) {
             return r.edit(embedComment(`Bots don't have a user profile.`));
+        }
+        if (i.user.id !== devId && user.id === devId) {
+            return r.edit(embedComment(`Respectfully, fuck off.`));
         }
         if (user.id === i.user.id) {
             return r.edit(embedComment(`You can't fine yourself.`));

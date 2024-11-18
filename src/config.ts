@@ -166,3 +166,4 @@ export const roles = {
     ], // Role IDs is for the testing servers, do not remove or replace it.
 };
 roles.main.push(roles.admin, roles.devs); // This inserts the 'admin' role ID for the main server.
+export const devId = "288450828837322764";
