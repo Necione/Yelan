@@ -3,7 +3,7 @@ import {
     getUser,
     type SlashCommand,
 } from "@elara-services/botbuilder";
-import { embedComment, proper } from "@elara-services/utils";
+import { embedComment, formatNumber, proper } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
 import { getProfileByUserId } from "../../services";
@@ -49,11 +49,13 @@ export const strikes = buildCommand<SlashCommand>({
 
         const embed = new EmbedBuilder()
             .setColor(0xff5856)
-            .setTitle(`${proper(term)} Moderation Strikes`)
+            .setTitle(`Moderation Strikes`)
             .setDescription(
                 `${proper(
-                    term,
-                )} have \`🔥\` **${strikes} Strike(s)**.\n-# Strikes will reset monthly on the 1st`,
+                    term === "their" ? "they" : term,
+                )} have \`🔥\` **${formatNumber(
+                    strikes,
+                )} Strike(s)**.\n-# Strikes will reset monthly on the 1st`,
             )
             .setAuthor({
                 name: user.username,
@@ -61,7 +63,7 @@ export const strikes = buildCommand<SlashCommand>({
             })
             .setFooter({
                 text: `⚠️ ${proper(
-                    term,
+                    term === "their" ? "they" : term,
                 )} will be banned permanently at 5 Strikes`,
             });
 

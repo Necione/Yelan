@@ -1,4 +1,4 @@
-import { discord, is, noop } from "@elara-services/utils";
+import { discord, is, make, noop } from "@elara-services/utils";
 import { Colors, EmbedBuilder, type Message, type User } from "discord.js";
 import { getAllUserProfiles } from "../../services";
 
@@ -17,7 +17,7 @@ export async function handleUserToUID(message: Message) {
     if (!is.array(ids)) {
         return;
     }
-    const users: User[] = [];
+    const users = make.array<User>();
     for await (const id of ids) {
         const u = await discord.user(message.client, id, {
             fetch: true,
