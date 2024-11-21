@@ -135,7 +135,7 @@ export const rpg = buildCommand<SlashCommand>({
                     huntCooldown.status ? "Ready" : huntCooldown.message
                 }\nExplore: ${
                     exploreCooldown.status ? "Ready" : exploreCooldown.message
-                }\Fish: ${
+                }\nFish: ${
                     fishCooldown.status ? "Ready" : exploreCooldown.message
                 }`,
                 inline: false,

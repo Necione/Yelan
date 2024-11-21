@@ -15,7 +15,8 @@ import {
     updateUserStats,
 } from "../../services";
 import { cooldowns, locked } from "../../utils";
-import { FishData, fishList } from "../../utils/rpgitems/fish";
+import type { FishData } from "../../utils/rpgitems/fish";
+import { fishList } from "../../utils/rpgitems/fish";
 
 export const fishCommand = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -85,7 +86,9 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         const fishCaughtEmbed = new EmbedBuilder()
             .setTitle("A fish is biting!")
-            .setDescription("Quick! Press the \`Reel In\` correct button to catch it!")
+            .setDescription(
+                "Quick! Press the `Reel In` correct button to catch it!",
+            )
             .setColor("Green");
 
         const reelInButton = new ButtonBuilder()
@@ -93,7 +96,12 @@ export const fishCommand = buildCommand<SlashCommand>({
             .setLabel("Reel In")
             .setStyle(ButtonStyle.Secondary);
 
-        const fakeButtonLabels = ["Pull Line", "Cut Line", "Release", "Reel Out"];
+        const fakeButtonLabels = [
+            "Pull Line",
+            "Cut Line",
+            "Release",
+            "Reel Out",
+        ];
         const fakeButtons = fakeButtonLabels.map((label, index) =>
             new ButtonBuilder()
                 .setCustomId(`fake_button_${index}`)
@@ -147,7 +155,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                         newTimesFishedForLevel,
                     );
 
-                let updateData: any = {
+                const updateData: any = {
                     timesFished: newTimesFished,
                     timesFishedForLevel: newTimesFishedForLevel,
                 };
@@ -208,7 +216,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                         newTimesFishedForLevel,
                     );
 
-                let updateData: any = {
+                const updateData: any = {
                     timesFished: newTimesFished,
                 };
 
@@ -263,7 +271,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                         newTimesFishedForLevel,
                     );
 
-                let updateData: any = {
+                const updateData: any = {
                     timesFished: newTimesFished,
                 };
 
