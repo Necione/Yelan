@@ -37,6 +37,7 @@ export const rpg = buildCommand<SlashCommand>({
 
         const huntCooldown = cooldowns.get(p, "hunt");
         const exploreCooldown = cooldowns.get(p, "explore");
+        const fishCooldown = cooldowns.get(p, "fish");
 
         if (!stats) {
             return r.edit(embedComment(`No stats found for you :(`));
@@ -134,6 +135,8 @@ export const rpg = buildCommand<SlashCommand>({
                     huntCooldown.status ? "Ready" : huntCooldown.message
                 }\nExplore: ${
                     exploreCooldown.status ? "Ready" : exploreCooldown.message
+                }\Fish: ${
+                    fishCooldown.status ? "Ready" : exploreCooldown.message
                 }`,
                 inline: false,
             });

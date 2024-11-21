@@ -231,6 +231,9 @@ model UserStats {
   hasKey                    Boolean        @default(false)
   deity                     String?
   castQueue                 String[]       @default([])
+  timesFished               Int            @default(0)
+  timesFishedForLevel       Int            @default(0)
+  fishingLevel              Int            @default(1)
 }
 
 type UserRequest {

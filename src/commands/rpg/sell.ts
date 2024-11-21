@@ -6,6 +6,7 @@ import { skills } from "../../plugins/other/utils";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
+import { fish, type FishName } from "../../utils/rpgitems/fish";
 import { misc, type MiscName } from "../../utils/rpgitems/misc";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
@@ -35,6 +36,7 @@ export const sell = buildCommand<SlashCommand>({
             ...getKeys(weapons),
             ...getKeys(artifacts),
             ...getKeys(misc),
+            ...getKeys(fish),
         ].map((c) => ({ name: String(c), value: c }));
         const item = i.options.getString("item", false) ?? "";
         if (!item) {
@@ -43,7 +45,7 @@ export const sell = buildCommand<SlashCommand>({
         const items = list.filter((c) =>
             c.name.toLowerCase().includes(item.toLowerCase()),
         );
-        if (!is.array(items)) {
+        if (!is.array(items) || items.length === 0) {
             return i
                 .respond([{ name: "No match found for that.", value: "n/a" }])
                 .catch(noop);
@@ -66,7 +68,8 @@ export const sell = buildCommand<SlashCommand>({
             drops[itemName as DropName] ||
             weapons[itemName as WeaponName] ||
             artifacts[itemName as ArtifactName] ||
-            misc[itemName as MiscName];
+            misc[itemName as MiscName] ||
+            fish[itemName as FishName];
 
         if (!itemData) {
             return r.edit(
@@ -119,15 +122,22 @@ export const sell = buildCommand<SlashCommand>({
         if (!item) {
             return r.edit(
                 embedComment(
-                    `You don't have "${itemName}" to sell.\n-# Check your inventory with </rpg:1279824112566665297>`,
+                    `You don't have "${itemName}" to sell.\n-# Check your inventory with </bag:1282456807100387411>`,
                 ),
             );
         }
         if (item.amount < amountToSell) {
             return r.edit(
                 embedComment(
-                    `You don't have enough of "${itemName}" to sell.\n-# Check your inventory with </rpg:1279824112566665297>`,
+                    `You don't have enough of "${itemName}" to sell.\n-# Check your inventory with </bag:1282456807100387411>`,
                 ),
+            );
+        }
+
+        const baseSellPrice = (itemData as any).sellPrice;
+        if (!baseSellPrice) {
+            return r.edit(
+                embedComment(`The item "${itemName}" cannot be sold.`),
             );
         }
 
@@ -136,10 +146,9 @@ export const sell = buildCommand<SlashCommand>({
             Math.min(stats.rebirths, 3) * 0.2 +
             Math.max(0, stats.rebirths - 3) * 0.1;
         const rebirthBonus =
-            (rebirthMultiplier - 1) * itemData.sellPrice * amountToSell;
+            (rebirthMultiplier - 1) * baseSellPrice * amountToSell;
 
-        let totalSellPrice =
-            itemData.sellPrice * amountToSell * rebirthMultiplier;
+        let totalSellPrice = baseSellPrice * amountToSell * rebirthMultiplier;
         let appraiseBonusMessage = "";
         let appraiseBonus = 0;
         const hasAppraiseSkill = skills.has(stats, "Appraise", false);
