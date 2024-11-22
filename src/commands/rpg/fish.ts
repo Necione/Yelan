@@ -47,28 +47,6 @@ export const fishCommand = buildCommand<SlashCommand>({
             );
         }
 
-        const baitItem = stats.inventory.find(
-            (item) => item.item === "Fruit Paste Bait",
-        );
-        if (!baitItem || baitItem.amount < 1) {
-            locked.del(i.user.id);
-            return r.edit(
-                embedComment(
-                    `You need \`1x\` **Fruit Paste Bait** to fish. Please get some before fishing!`,
-                ),
-            );
-        }
-
-        baitItem.amount -= 1;
-        if (baitItem.amount <= 0) {
-            stats.inventory = stats.inventory.filter(
-                (item) => item.item !== baitItem.item,
-            );
-        }
-        await updateUserStats(i.user.id, {
-            inventory: { set: stats.inventory },
-        });
-
         const fishCooldown = cooldowns.get(user, "fish");
         if (!fishCooldown.status) {
             locked.del(i.user.id);
@@ -203,7 +181,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 } else {
                     caughtEmbed.addFields({
                         name: "Fishing Progress",
-                        value: `Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fish caught)`,
+                        value: `Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fishes caught)`,
                     });
                 }
 
@@ -256,7 +234,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 } else {
                     escapedEmbed.addFields({
                         name: "Fishing Progress",
-                        value: `\`🐠\` Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fish caught)`,
+                        value: `\`🐠\` Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fishes caught)`,
                     });
                 }
 
@@ -311,7 +289,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 } else {
                     escapedEmbed.addFields({
                         name: "Fishing Progress",
-                        value: `Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fish caught)`,
+                        value: `Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fishes caught)`,
                     });
                 }
 
