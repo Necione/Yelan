@@ -1,4 +1,10 @@
-export type WeaponType = "Claymore" | "Bow" | "Sword" | "Catalyst" | "Polearm";
+export type WeaponType =
+    | "Claymore"
+    | "Bow"
+    | "Sword"
+    | "Catalyst"
+    | "Polearm"
+    | "Rod";
 
 interface WeaponData {
     name: string;
@@ -108,6 +114,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_White_Tassel:1282455432715047003>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/white_tassel.png",
     },
+    "Wilderness Rod": {
+        name: "Wilderness Rod",
+        type: "Rod",
+        sellPrice: 0,
+        attackPower: 1,
+        critChance: 0,
+        critValue: 0,
+        defValue: 0,
+        defChance: 0,
+        additionalHP: 0,
+        minWorldLevel: 5,
+        chestChance: 10,
+        emoji: "<:Item_Wilderness_Rod1:1309627118803750932>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/wilderness_rod.png",
+    },
     "Skyrider Sword": {
         name: "Skyrider Sword",
         type: "Sword",
@@ -183,6 +204,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Messenger:1282455784940245032>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/messenger.png",
+    },
+    Wishmaker: {
+        name: "Wishmaker",
+        type: "Rod",
+        sellPrice: 0,
+        attackPower: 3,
+        critChance: 10,
+        critValue: 0,
+        defValue: 0,
+        defChance: 0,
+        additionalHP: 50,
+        minWorldLevel: 5,
+        chestChance: 10,
+        emoji: "<:Item_Wishmaker:1309629861081387080>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/wishmaker.png",
     },
     "Raven Bow": {
         name: "Raven Bow",

@@ -18,6 +18,7 @@ import {
 import { cooldowns, locked } from "../../utils";
 import type { FishData } from "../../utils/rpgitems/fish";
 import { fishList } from "../../utils/rpgitems/fish";
+import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
 
 export const fishCommand = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -44,6 +45,21 @@ export const fishCommand = buildCommand<SlashCommand>({
                 embedComment(
                     "No stats found for you, please set up your profile.",
                 ),
+            );
+        }
+
+        if (!stats.equippedWeapon) {
+            locked.del(i.user.id);
+            return r.edit(
+                embedComment("You need to equip a fishing rod to fish!"),
+            );
+        }
+
+        const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
+        if (!equippedWeapon || equippedWeapon.type !== "Rod") {
+            locked.del(i.user.id);
+            return r.edit(
+                embedComment("You need to equip a fishing rod to fish!"),
             );
         }
 
@@ -90,13 +106,17 @@ export const fishCommand = buildCommand<SlashCommand>({
         await sleep(timeBeforeFishBites);
 
         const availableFish = fishList.filter(
-            (fish) => fish.fishingLevel <= stats.fishingLevel,
+            (fish) =>
+                fish.fishingLevel <= stats.fishingLevel &&
+                fish.rods.some((rod) => equippedWeapon.name.includes(rod)),
         );
 
         if (!Array.isArray(availableFish) || availableFish.length === 0) {
             locked.del(i.user.id);
             return r.edit(
-                embedComment("No fish are available for your fishing level."),
+                embedComment(
+                    "No fish are available for your fishing level or with your current rod.",
+                ),
             );
         }
 
