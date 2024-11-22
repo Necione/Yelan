@@ -112,6 +112,39 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
+        if (itemName === "Life Essence") {
+            const item = stats.inventory.find((c) => c.item === itemName);
+            if (!item || item.amount < amountToDiffuse) {
+                return r.edit(
+                    embedComment(
+                        `You don't have enough "Life Essence" to diffuse.`,
+                    ),
+                );
+            }
+
+            const alchemyIncrease = amountToDiffuse;
+            const newAlchemyProgress = stats.alchemyProgress + alchemyIncrease;
+
+            item.amount -= amountToDiffuse;
+            if (item.amount <= 0) {
+                stats.inventory = stats.inventory.filter(
+                    (c) => c.item !== item.item,
+                );
+            }
+
+            await updateUserStats(i.user.id, {
+                inventory: { set: stats.inventory },
+                alchemyProgress: newAlchemyProgress,
+            });
+
+            return r.edit(
+                embedComment(
+                    `You diffused \`${amountToDiffuse}x\` **Life Essence** and gained \`${alchemyIncrease}\` Alchemy Point!`,
+                    "Green",
+                ),
+            );
+        }
+
         if (itemName in misc) {
             const baitAmount = amountToDiffuse;
             const existingBait = stats.inventory.find(
