@@ -45,7 +45,7 @@ export const sell = buildCommand<SlashCommand>({
         const items = list.filter((c) =>
             c.name.toLowerCase().includes(item.toLowerCase()),
         );
-        if (!is.array(items) || items.length === 0) {
+        if (!is.array(items)) {
             return i
                 .respond([{ name: "No match found for that.", value: "n/a" }])
                 .catch(noop);
@@ -134,8 +134,10 @@ export const sell = buildCommand<SlashCommand>({
             );
         }
 
-        const baseSellPrice = (itemData as any).sellPrice;
-        if (!baseSellPrice) {
+        let baseSellPrice: number;
+        if ("sellPrice" in itemData && typeof itemData.sellPrice === "number") {
+            baseSellPrice = itemData.sellPrice;
+        } else {
             return r.edit(
                 embedComment(`The item "${itemName}" cannot be sold.`),
             );

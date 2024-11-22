@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, noop, sleep } from "@elara-services/utils";
+import { embedComment, get, noop, shuffle, sleep } from "@elara-services/utils";
+import type { ButtonInteraction, Message } from "discord.js";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -27,11 +28,6 @@ export const fishCommand = buildCommand<SlashCommand>({
     defer: { silent: false },
     async execute(i, r) {
         locked.set(i.user);
-
-        if (!i.deferred) {
-            locked.del(i.user.id);
-            return;
-        }
 
         const user = await getProfileByUserId(i.user.id);
         if (!user) {
@@ -62,10 +58,10 @@ export const fishCommand = buildCommand<SlashCommand>({
             .setDescription("You cast your line and wait for a fish to bite...")
             .setColor("Blue");
 
-        await i.editReply({ embeds: [embed] }).catch(noop);
+        await r.edit({ embeds: [embed] }).catch(noop);
 
-        const minTime = 5000;
-        const maxTime = 60000;
+        const minTime = get.secs(5);
+        const maxTime = get.mins(1);
         const timeBeforeFishBites =
             Math.random() * (maxTime - minTime) + minTime;
 
@@ -75,7 +71,7 @@ export const fishCommand = buildCommand<SlashCommand>({
             (fish) => fish.fishingLevel <= stats.fishingLevel,
         );
 
-        if (availableFish.length === 0) {
+        if (!Array.isArray(availableFish) || availableFish.length === 0) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment("No fish are available for your fishing level."),
@@ -110,33 +106,34 @@ export const fishCommand = buildCommand<SlashCommand>({
         );
 
         const allButtons = [reelInButton, ...fakeButtons];
-        shuffleArray(allButtons);
+        shuffle(allButtons);
 
         const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
             allButtons,
         );
 
-        const message = await i
-            .editReply({ embeds: [fishCaughtEmbed], components: [actionRow] })
-            .catch(noop);
+        const message = (await r
+            .edit({ embeds: [fishCaughtEmbed], components: [actionRow] })
+            .catch(noop)) as Message | undefined;
 
         if (!message) {
             locked.del(i.user.id);
             return;
         }
 
-        const filter = (interaction: any) => interaction.user.id === i.user.id;
+        const filter = (interaction: ButtonInteraction) =>
+            interaction.user.id === i.user.id;
 
         const collector = message.createMessageComponentCollector({
             filter,
             componentType: ComponentType.Button,
-            time: 2000,
+            time: get.secs(3),
             max: 1,
         });
 
         let caughtFish = false;
 
-        collector.on("collect", async (interaction: any) => {
+        collector.on("collect", async (interaction: ButtonInteraction) => {
             if (interaction.customId === "reel_in") {
                 caughtFish = true;
                 await interaction.deferUpdate().catch(noop);
@@ -188,8 +185,8 @@ export const fishCommand = buildCommand<SlashCommand>({
                     });
                 }
 
-                await i
-                    .editReply({ embeds: [caughtEmbed], components: [] })
+                await r
+                    .edit({ embeds: [caughtEmbed], components: [] })
                     .catch(noop);
 
                 await cooldowns.set(user, "fish", get.hrs(1));
@@ -241,8 +238,8 @@ export const fishCommand = buildCommand<SlashCommand>({
                     });
                 }
 
-                await i
-                    .editReply({ embeds: [escapedEmbed], components: [] })
+                await r
+                    .edit({ embeds: [escapedEmbed], components: [] })
                     .catch(noop);
 
                 await cooldowns.set(user, "fish", get.hrs(1));
@@ -296,8 +293,8 @@ export const fishCommand = buildCommand<SlashCommand>({
                     });
                 }
 
-                await i
-                    .editReply({ embeds: [escapedEmbed], components: [] })
+                await r
+                    .edit({ embeds: [escapedEmbed], components: [] })
                     .catch(noop);
 
                 await cooldowns.set(user, "fish", get.hrs(1));
@@ -305,13 +302,6 @@ export const fishCommand = buildCommand<SlashCommand>({
                 locked.del(i.user.id);
             }
         });
-
-        function shuffleArray(array: any[]) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
     },
 });
 
