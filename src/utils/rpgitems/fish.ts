@@ -30,6 +30,13 @@ export const fish: { [key: string]: FishData } = {
         emoji: "<:Item_Medaka:1309018341184110745>",
         sellPrice: 10,
     },
+    "Venomspine Fish": {
+        rarity: "Common",
+        fishingLevel: 2,
+        weight: 50,
+        emoji: "<:Item_Venomspine_Fish:1309557115282653294>",
+        sellPrice: 10,
+    },
     "Golden Koi": {
         rarity: "Rare",
         fishingLevel: 2,

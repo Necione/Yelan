@@ -207,6 +207,7 @@ model UserStats {
   currentAbyssFloor         Int            @default(1)
   abyssFloor                Int            @default(0)
   equippedWeapon            String?
+  equippedRod               String?
   equippedFlower            String?
   equippedPlume             String?
   equippedSands             String?

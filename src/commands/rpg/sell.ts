@@ -135,7 +135,7 @@ export const sell = buildCommand<SlashCommand>({
         }
 
         let baseSellPrice: number;
-        if ("sellPrice" in itemData && typeof itemData.sellPrice === "number") {
+        if (is.number(itemData.sellPrice)) {
             baseSellPrice = itemData.sellPrice;
         } else {
             return r.edit(
