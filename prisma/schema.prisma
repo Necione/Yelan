@@ -257,6 +257,7 @@ type UserStatsInv {
 
 type UserStatsMetaData {
   length Int?
+  star   Int?
 }
 
 type UserSkill {

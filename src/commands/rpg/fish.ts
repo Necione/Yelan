@@ -65,6 +65,15 @@ export const fishCommand = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.abyssMode) {
+            locked.del(i.user.id);
+            return r.edit(
+                embedComment(
+                    "You cannot start a hunt while in The Spiral Abyss!",
+                ),
+            );
+        }
+
         const baitItem = stats.inventory.find(
             (item) => item.item === "Fruit Paste Bait",
         );
@@ -72,7 +81,7 @@ export const fishCommand = buildCommand<SlashCommand>({
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
-                    `You need \`1x\` **Fruit Paste Bait** to fish. Please get some before fishing!`,
+                    `You need \`1x\` **Fruit Paste Bait** to fish.\nDiffuse any **Misc** item to obtain some!`,
                 ),
             );
         }
@@ -252,6 +261,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 amount: 1,
                 metadata: {
                     length: fishLength,
+                    star: null,
                 },
             };
             stats.inventory.push(newFishItem);
@@ -285,7 +295,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 .setTitle("You caught a fish!")
                 .setDescription(
                     `You caught a ${selectedFish.rarity} ${selectedFish.emoji} **${selectedFish.name}**!\n` +
-                        `📏 Length: **${fishLength} cm**`,
+                        `\`📏\` Length: **${fishLength} cm**`,
                 )
                 .setColor("Aqua");
 

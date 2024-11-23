@@ -1,7 +1,16 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
-import { SlashCommandBuilder } from "discord.js";
-import { locked } from "../../utils";
+import { embedComment, get, noop } from "@elara-services/utils";
+import {
+    ChannelType,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+} from "discord.js";
+import {
+    getProfileByUserId,
+    getUserStats,
+    updateUserStats,
+} from "../../services";
+import { cooldowns, locked } from "../../utils";
 
 export const abyss = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -19,10 +28,7 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         locked.del(i.user.id);
-        return r.edit(
-            embedComment("The Spiral Abyss is currently closed and resetting"),
-        );
-        /*
+
         const userWallet = await getProfileByUserId(i.user.id);
         if (!userWallet) {
             locked.del(i.user.id);
@@ -96,7 +102,6 @@ export const abyss = buildCommand<SlashCommand>({
         }
         const categoryId = "1290188539828633600";
         const channelName = `abysspriv-${i.user.username}`;
-        const extraChannelId = "1295945026253226044";
 
         if (newAbyssMode) {
             const category = i.guild.channels.resolve(categoryId);
@@ -131,15 +136,6 @@ export const abyss = buildCommand<SlashCommand>({
 
             responseMessage += `\nA private channel has been created for you: ${channel}`;
 
-            const extraChannel = i.guild.channels.resolve(extraChannelId);
-            if (extraChannel && extraChannel.type === ChannelType.GuildText) {
-                await extraChannel.permissionOverwrites
-                    .edit(i.user.id, {
-                        ViewChannel: true,
-                    })
-                    .catch(noop);
-            }
-
             await channel
                 .send({
                     content: i.user.toString(),
@@ -167,18 +163,6 @@ export const abyss = buildCommand<SlashCommand>({
                 responseMessage += `\nNo Abyss channel found to delete.`;
             }
 
-            const extraChannel = i.guild.channels.resolve(extraChannelId);
-            if (extraChannel && extraChannel.type === ChannelType.GuildText) {
-                await extraChannel.permissionOverwrites
-                    .delete(i.user.id)
-                    .catch((error) => {
-                        console.error(
-                            "Error removing user's permissions from extra channel:",
-                            error,
-                        );
-                    });
-            }
-
             await r.edit({
                 embeds: [
                     {
@@ -193,6 +177,5 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         locked.del(i.user.id);
-            */
     },
 });
