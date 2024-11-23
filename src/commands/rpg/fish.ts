@@ -1,6 +1,12 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, noop, shuffle, sleep } from "@elara-services/utils";
-import type { ButtonInteraction, Message } from "discord.js";
+import {
+    embedComment,
+    get,
+    is,
+    noop,
+    shuffle,
+    sleep,
+} from "@elara-services/utils";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -66,7 +72,7 @@ export const fishCommand = buildCommand<SlashCommand>({
         const baitItem = stats.inventory.find(
             (item) => item.item === "Fruit Paste Bait",
         );
-        if (!baitItem || baitItem.amount < 1) {
+        if (!is.number(baitItem?.amount)) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
@@ -111,7 +117,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 fish.rods.some((rod) => equippedWeapon.name.includes(rod)),
         );
 
-        if (!Array.isArray(availableFish) || availableFish.length === 0) {
+        if (!is.array(availableFish)) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
@@ -154,20 +160,17 @@ export const fishCommand = buildCommand<SlashCommand>({
             allButtons,
         );
 
-        const message = (await r
+        const message = await r
             .edit({ embeds: [fishCaughtEmbed], components: [actionRow] })
-            .catch(noop)) as Message | undefined;
+            .catch(noop);
 
         if (!message) {
             locked.del(i.user.id);
             return;
         }
 
-        const filter = (interaction: ButtonInteraction) =>
-            interaction.user.id === i.user.id;
-
         const collector = message.createMessageComponentCollector({
-            filter,
+            filter: (interaction) => interaction.user.id === i.user.id,
             componentType: ComponentType.Button,
             time: get.secs(3),
             max: 1,
@@ -175,7 +178,7 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         let caughtFish = false;
 
-        collector.on("collect", async (interaction: ButtonInteraction) => {
+        collector.on("collect", async (interaction) => {
             if (interaction.customId === "reel_in") {
                 caughtFish = true;
                 await interaction.deferUpdate().catch(noop);

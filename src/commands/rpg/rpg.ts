@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, is, make } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
@@ -67,7 +67,6 @@ export const rpg = buildCommand<SlashCommand>({
                     value: `🕒 ${
                         fishCooldown.status ? "Ready" : fishCooldown.message
                     }`,
-                    inline: false,
                 });
 
             return r.edit({ embeds: [embed] });
@@ -79,7 +78,7 @@ export const rpg = buildCommand<SlashCommand>({
 
             let hasCatalyst = false;
 
-            const equippedItems: string[] = [];
+            const equippedItems = make.array<string>();
 
             if (stats.equippedWeapon) {
                 const equippedWeapon =
@@ -164,7 +163,6 @@ export const rpg = buildCommand<SlashCommand>({
                               )}\``
                             : ""
                     }`,
-                    inline: false,
                 })
                 .addFields({
                     name: "Cooldowns",
@@ -175,20 +173,18 @@ export const rpg = buildCommand<SlashCommand>({
                             ? "Ready"
                             : exploreCooldown.message
                     }`,
-                    inline: false,
                 });
 
-            if (stats.rebirths > 0) {
+            if (is.number(stats.rebirths)) {
                 embed.setFooter({
                     text: getRebirthString(stats.rebirths),
                 });
             }
 
-            if (equippedItems.length > 0) {
+            if (is.array(equippedItems)) {
                 embed.addFields({
                     name: "Equipped Items",
                     value: equippedItems.join("\n"),
-                    inline: false,
                 });
             }
 

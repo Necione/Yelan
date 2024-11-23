@@ -144,14 +144,12 @@ export const weapon = buildCommand<SlashCommand>({
                 .addFields({
                     name: "Weapon Stats",
                     value: statsDisplay,
-                    inline: false,
                 });
 
             if (fullWeaponName && fullWeaponName.includes("Absolution")) {
                 embed.addFields({
                     name: "Special Effect",
                     value: "Enemies can never land a Critical Attack on you.",
-                    inline: false,
                 });
             }
 
@@ -159,7 +157,6 @@ export const weapon = buildCommand<SlashCommand>({
                 embed.addFields({
                     name: "Special Effect",
                     value: "Keep hunting for another 500 HP after death.",
-                    inline: false,
                 });
             }
 
@@ -170,7 +167,6 @@ export const weapon = buildCommand<SlashCommand>({
                 embed.addFields({
                     name: "Special Effect",
                     value: "Reduce all damage taken by 50%.",
-                    inline: false,
                 });
             }
 

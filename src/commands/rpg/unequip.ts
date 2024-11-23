@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, noop } from "@elara-services/utils";
+import { embedComment, is, make, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, syncStats, updateUserStats } from "../../services";
 import {
@@ -36,7 +36,7 @@ export const unequip = buildCommand<SlashCommand>({
                 .catch(noop);
         }
 
-        const equippedItems: { name: string; value: string }[] = [];
+        const equippedItems = make.array<{ name: string; value: string }>();
 
         equippedItems.push({
             name: "All",
@@ -50,13 +50,13 @@ export const unequip = buildCommand<SlashCommand>({
             });
         }
 
-        const artifactTypes: ArtifactType[] = [
+        const artifactTypes = make.array<ArtifactType>([
             "Flower",
             "Plume",
             "Sands",
             "Goblet",
             "Circlet",
-        ];
+        ]);
 
         for (const type of artifactTypes) {
             const field = `equipped${type}` as keyof typeof stats;
@@ -78,7 +78,7 @@ export const unequip = buildCommand<SlashCommand>({
             );
         }
 
-        if (!is.array(items) || items.length === 0) {
+        if (!is.array(items)) {
             return i
                 .respond([{ name: "No match found.", value: "n/a" }])
                 .catch(noop);
@@ -121,12 +121,12 @@ export const unequip = buildCommand<SlashCommand>({
             }
         }
 
-        const updatedStats: string[] = [];
+        const updatedStats = make.array<string>();
         const beforeStats = { ...stats };
 
         if (itemName === "All") {
             const updates: any = {};
-            const unequippableItems: string[] = [];
+            const unequippableItems = make.array<string>();
 
             if (stats.equippedWeapon) {
                 if (stats.castQueue.length > 0) {
@@ -138,13 +138,13 @@ export const unequip = buildCommand<SlashCommand>({
                 }
             }
 
-            const artifactTypes: ArtifactType[] = [
+            const artifactTypes = make.array<ArtifactType>([
                 "Flower",
                 "Plume",
                 "Sands",
                 "Goblet",
                 "Circlet",
-            ];
+            ]);
 
             for (const type of artifactTypes) {
                 const field = `equipped${type}` as keyof typeof stats;
