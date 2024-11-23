@@ -131,12 +131,12 @@ export async function handleChest(
                 : "";
 
         const resultMessage = lootDescription
-            ? `You chose **Chest ${selectedChestIndex + 1}**!\nIt contained ${
+            ? `You chose **Chest ${selectedChestIndex + 1}**!\n\nIt contained ${
                   customEmoji.a.z_coins
               } \`${
                   selectedChest.coins
               }\` and the following items:\n${lootDescription}`
-            : `You chose **Chest ${selectedChestIndex + 1}**!\nIt contained ${
+            : `You chose **Chest ${selectedChestIndex + 1}**!\n\nIt contained ${
                   customEmoji.a.z_coins
               } \`${selectedChest.coins}\`.`;
 

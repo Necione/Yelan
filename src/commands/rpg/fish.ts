@@ -7,6 +7,7 @@ import {
     shuffle,
     sleep,
 } from "@elara-services/utils";
+import type { ButtonInteraction } from "discord.js";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -15,12 +16,7 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
 } from "discord.js";
-import {
-    addItemToInventory,
-    getProfileByUserId,
-    syncStats,
-    updateUserStats,
-} from "../../services";
+import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import type { FishData } from "../../utils/rpgitems/fish";
 import { fishList } from "../../utils/rpgitems/fish";
@@ -72,7 +68,7 @@ export const fishCommand = buildCommand<SlashCommand>({
         const baitItem = stats.inventory.find(
             (item) => item.item === "Fruit Paste Bait",
         );
-        if (!is.number(baitItem?.amount)) {
+        if (!is.number(baitItem?.amount) || baitItem.amount < 1) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
@@ -128,227 +124,225 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         const selectedFish = selectFish(availableFish);
 
-        const fishCaughtEmbed = new EmbedBuilder()
-            .setTitle("A fish is biting!")
-            .setDescription(
-                "Quick! Press the `Reel In` correct button to catch it!",
-            )
-            .setColor("Green");
-
-        const reelInButton = new ButtonBuilder()
-            .setCustomId("reel_in")
-            .setLabel("Reel In")
-            .setStyle(ButtonStyle.Secondary);
-
-        const fakeButtonLabels = [
-            "Pull Line",
-            "Cut Line",
-            "Release",
-            "Reel Out",
-        ];
-        const fakeButtons = fakeButtonLabels.map((label, index) =>
-            new ButtonBuilder()
-                .setCustomId(`fake_button_${index}`)
-                .setLabel(label)
-                .setStyle(ButtonStyle.Secondary),
+        const requiredReels = getRandomInt(
+            selectedFish.minReels,
+            selectedFish.maxReels,
         );
 
-        const allButtons = [reelInButton, ...fakeButtons];
-        shuffle(allButtons);
+        let reelsCompleted = 0;
+        let fishEscaped = false;
 
-        const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            allButtons,
-        );
+        while (reelsCompleted < requiredReels && !fishEscaped) {
+            const reelInButton = new ButtonBuilder()
+                .setCustomId(`reel_in_${reelsCompleted}`)
+                .setLabel("Reel In")
+                .setStyle(ButtonStyle.Secondary);
 
-        const message = await r
-            .edit({ embeds: [fishCaughtEmbed], components: [actionRow] })
-            .catch(noop);
+            const fakeButtonLabels = [
+                "Pull Line",
+                "Cut Line",
+                "Release",
+                "Reel Out",
+            ];
 
-        if (!message) {
-            locked.del(i.user.id);
-            return;
+            const fakeButtons = fakeButtonLabels.map((label, index) =>
+                new ButtonBuilder()
+                    .setCustomId(`fake_button_${index}_${reelsCompleted}`)
+                    .setLabel(label)
+                    .setStyle(ButtonStyle.Secondary),
+            );
+
+            const allButtons = [reelInButton, ...fakeButtons];
+            shuffle(allButtons);
+
+            const actionRow =
+                new ActionRowBuilder<ButtonBuilder>().addComponents(allButtons);
+
+            const promptEmbed = new EmbedBuilder()
+                .setTitle(
+                    reelsCompleted === 0
+                        ? "A fish is biting!"
+                        : "Keep reeling!",
+                )
+                .setDescription(
+                    reelsCompleted === 0
+                        ? "Quick! Press the correct button (`Reel In`) to catch it!"
+                        : "This catch is heavy for your rod, keep reeling!",
+                )
+                .setColor("Green");
+
+            const message = await r
+                .edit({ embeds: [promptEmbed], components: [actionRow] })
+                .catch(noop);
+
+            if (!message) {
+                locked.del(i.user.id);
+                return;
+            }
+
+            const collector = message.createMessageComponentCollector({
+                filter: (interaction) => interaction.user.id === i.user.id,
+                componentType: ComponentType.Button,
+                time: get.secs(3),
+                max: 1,
+            });
+
+            const buttonPressed = await new Promise<ButtonInteraction | null>(
+                (resolve) => {
+                    collector.on("collect", (interaction) => {
+                        resolve(interaction);
+                    });
+
+                    collector.on("end", (collected) => {
+                        if (collected.size === 0) {
+                            resolve(null);
+                        }
+                    });
+                },
+            );
+
+            if (
+                !buttonPressed ||
+                !buttonPressed.customId.startsWith("reel_in") ||
+                fishEscaped
+            ) {
+                fishEscaped = true;
+                break;
+            }
+
+            reelsCompleted++;
+
+            if (reelsCompleted < requiredReels) {
+                await buttonPressed.deferUpdate().catch(noop);
+                continue;
+            } else {
+                await buttonPressed.deferUpdate().catch(noop);
+                break;
+            }
         }
 
-        const collector = message.createMessageComponentCollector({
-            filter: (interaction) => interaction.user.id === i.user.id,
-            componentType: ComponentType.Button,
-            time: get.secs(3),
-            max: 1,
-        });
+        if (fishEscaped) {
+            const escapedEmbed = new EmbedBuilder()
+                .setTitle("The fish got away!")
+                .setDescription(
+                    "You didn't reel in the fish in time, and it escaped.",
+                )
+                .setColor("Red");
 
-        let caughtFish = false;
+            const newTimesFished = stats.timesFished + 1;
 
-        collector.on("collect", async (interaction) => {
-            if (interaction.customId === "reel_in") {
-                caughtFish = true;
-                await interaction.deferUpdate().catch(noop);
+            await updateUserStats(i.user.id, {
+                timesFished: newTimesFished,
+            });
 
-                await addItemToInventory(i.user.id, [
-                    { item: selectedFish.name, amount: 1 },
-                ]);
+            await r
+                .edit({ embeds: [escapedEmbed], components: [] })
+                .catch(noop);
 
-                const newTimesFished = stats.timesFished + 1;
-                const newTimesFishedForLevel =
-                    (stats.timesFishedForLevel || 0) + 1;
+            await cooldowns.set(user, "fish", get.hrs(1));
 
-                const { levelUp, requiredFishesForNextLevel } =
-                    calculateFishingLevel(
-                        stats.fishingLevel,
-                        newTimesFishedForLevel,
-                    );
+            locked.del(i.user.id);
 
-                const updateData: any = {
-                    timesFished: newTimesFished,
-                    timesFishedForLevel: newTimesFishedForLevel,
-                };
+            return;
+        } else {
+            const fishLength = selectFishLength();
 
-                if (levelUp) {
-                    updateData.fishingLevel = stats.fishingLevel + 1;
-                    updateData.timesFishedForLevel = 0;
-                }
+            const newFishItem = {
+                item: selectedFish.name,
+                amount: 1,
+                metadata: {
+                    length: fishLength,
+                },
+            };
+            stats.inventory.push(newFishItem);
 
-                await updateUserStats(i.user.id, updateData);
+            await updateUserStats(i.user.id, {
+                inventory: { set: stats.inventory },
+            });
 
-                const caughtEmbed = new EmbedBuilder()
-                    .setTitle("You caught a fish!")
-                    .setDescription(
-                        `You caught a ${selectedFish.rarity} ${selectedFish.emoji} **${selectedFish.name}**!`,
-                    )
-                    .setColor("Aqua");
+            const newTimesFished = stats.timesFished + 1;
+            const newTimesFishedForLevel = (stats.timesFishedForLevel || 0) + 1;
 
-                if (levelUp) {
-                    caughtEmbed.addFields({
-                        name: "Fishing Level Up!",
-                        value: `Congratulations! You reached Fishing Level ${
-                            stats.fishingLevel + 1
-                        }!`,
-                    });
-                } else {
-                    caughtEmbed.addFields({
-                        name: "Fishing Progress",
-                        value: `Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fish caught)`,
-                    });
-                }
+            const { levelUp, requiredFishesForNextLevel } =
+                calculateFishingLevel(
+                    stats.fishingLevel,
+                    newTimesFishedForLevel,
+                );
 
-                await r
-                    .edit({ embeds: [caughtEmbed], components: [] })
-                    .catch(noop);
+            const updateData: any = {
+                timesFished: newTimesFished,
+                timesFishedForLevel: newTimesFishedForLevel,
+            };
 
-                await cooldowns.set(user, "fish", get.hrs(1));
+            if (levelUp) {
+                updateData.fishingLevel = stats.fishingLevel + 1;
+                updateData.timesFishedForLevel = 0;
+            }
 
-                locked.del(i.user.id);
+            await updateUserStats(i.user.id, updateData);
 
-                collector.stop();
+            const caughtEmbed = new EmbedBuilder()
+                .setTitle("You caught a fish!")
+                .setDescription(
+                    `You caught a ${selectedFish.rarity} ${selectedFish.emoji} **${selectedFish.name}**!\n` +
+                        `📏 Length: **${fishLength} cm**`,
+                )
+                .setColor("Aqua");
+
+            if (levelUp) {
+                caughtEmbed.addFields({
+                    name: "Fishing Level Up!",
+                    value: `\`🌟\` Congratulations! You reached Fishing Level ${
+                        stats.fishingLevel + 1
+                    }!`,
+                });
             } else {
-                caughtFish = false;
-                await interaction.deferUpdate().catch(noop);
-                const escapedEmbed = new EmbedBuilder()
-                    .setTitle("The fish got away!")
-                    .setDescription(
-                        "You made the wrong move, and the fish escaped.",
-                    )
-                    .setColor("Red");
-
-                const newTimesFished = stats.timesFished + 1;
-                const newTimesFishedForLevel = stats.timesFishedForLevel || 0;
-
-                const { levelUp, requiredFishesForNextLevel } =
-                    calculateFishingLevel(
-                        stats.fishingLevel,
-                        newTimesFishedForLevel,
-                    );
-
-                const updateData: any = {
-                    timesFished: newTimesFished,
-                };
-
-                if (levelUp) {
-                    updateData.fishingLevel = stats.fishingLevel + 1;
-                    updateData.timesFishedForLevel = 0;
-                }
-
-                await updateUserStats(i.user.id, updateData);
-
-                if (levelUp) {
-                    escapedEmbed.addFields({
-                        name: "Fishing Level Up!",
-                        value: `\`🐟\` Congratulations! You reached Fishing Level ${
-                            stats.fishingLevel + 1
-                        }!`,
-                    });
-                } else {
-                    escapedEmbed.addFields({
-                        name: "Fishing Progress",
-                        value: `\`🐠\` Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fish caught)`,
-                    });
-                }
-
-                await r
-                    .edit({ embeds: [escapedEmbed], components: [] })
-                    .catch(noop);
-
-                await cooldowns.set(user, "fish", get.hrs(1));
-
-                locked.del(i.user.id);
-
-                collector.stop();
+                caughtEmbed.addFields({
+                    name: "Fishing Progress",
+                    value: `\`🎣\` Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fish caught)`,
+                });
             }
-        });
 
-        collector.on("end", async () => {
-            if (!caughtFish) {
-                const escapedEmbed = new EmbedBuilder()
-                    .setTitle("The fish got away!")
-                    .setDescription(
-                        "You didn't reel in the fish in time, and it escaped.",
-                    )
-                    .setColor("Red");
+            await r.edit({ embeds: [caughtEmbed], components: [] }).catch(noop);
 
-                const newTimesFished = stats.timesFished + 1;
-                const newTimesFishedForLevel = stats.timesFishedForLevel || 0;
+            await cooldowns.set(user, "fish", get.hrs(1));
 
-                const { levelUp, requiredFishesForNextLevel } =
-                    calculateFishingLevel(
-                        stats.fishingLevel,
-                        newTimesFishedForLevel,
-                    );
+            locked.del(i.user.id);
 
-                const updateData: any = {
-                    timesFished: newTimesFished,
-                };
-
-                if (levelUp) {
-                    updateData.fishingLevel = stats.fishingLevel + 1;
-                    updateData.timesFishedForLevel = 0;
-                }
-
-                await updateUserStats(i.user.id, updateData);
-
-                if (levelUp) {
-                    escapedEmbed.addFields({
-                        name: "Fishing Level Up!",
-                        value: `Congratulations! You reached Fishing Level ${
-                            stats.fishingLevel + 1
-                        }!`,
-                    });
-                } else {
-                    escapedEmbed.addFields({
-                        name: "Fishing Progress",
-                        value: `Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fish caught)`,
-                    });
-                }
-
-                await r
-                    .edit({ embeds: [escapedEmbed], components: [] })
-                    .catch(noop);
-
-                await cooldowns.set(user, "fish", get.hrs(1));
-
-                locked.del(i.user.id);
-            }
-        });
+            return;
+        }
     },
 });
+
+function selectFishLength(): number {
+    const fishLengths = [
+        { length: 30, weight: 25 },
+        { length: 60, weight: 20 },
+        { length: 90, weight: 15 },
+        { length: 120, weight: 12 },
+        { length: 150, weight: 10 },
+        { length: 180, weight: 7 },
+        { length: 210, weight: 5 },
+        { length: 240, weight: 3 },
+        { length: 370, weight: 2 },
+        { length: 400, weight: 1 },
+    ];
+
+    const totalWeight = fishLengths.reduce(
+        (acc, lengthObj) => acc + lengthObj.weight,
+        0,
+    );
+    let random = Math.random() * totalWeight;
+
+    for (const lengthObj of fishLengths) {
+        if (random < lengthObj.weight) {
+            return lengthObj.length;
+        }
+        random -= lengthObj.weight;
+    }
+
+    return fishLengths[fishLengths.length - 1].length;
+}
 
 function selectFish(
     fishArray: (FishData & { name: string })[],
@@ -376,4 +370,8 @@ function calculateFishingLevel(
     const levelUp = timesFishedForLevel >= requiredFishes;
 
     return { levelUp, requiredFishesForNextLevel: requiredFishes };
+}
+
+function getRandomInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }

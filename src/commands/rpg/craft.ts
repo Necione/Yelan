@@ -154,6 +154,7 @@ export const craft = buildCommand<SlashCommand>({
             stats.inventory.push({
                 item: craftOption,
                 amount: amountToCraft,
+                metadata: null,
             });
         }
 

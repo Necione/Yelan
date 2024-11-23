@@ -250,8 +250,13 @@ type UserEffect {
 }
 
 type UserStatsInv {
-  item   String @default("")
-  amount Int    @default(0)
+  item     String            @default("")
+  amount   Int               @default(0)
+  metadata UserStatsMetaData?
+}
+
+type UserStatsMetaData {
+  length Int?
 }
 
 type UserSkill {

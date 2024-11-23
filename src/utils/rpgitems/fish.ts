@@ -7,6 +7,8 @@ export interface FishData {
     emoji: string;
     sellPrice: number;
     rods: string[];
+    minReels: number;
+    maxReels: number;
 }
 
 export const fish: { [key: string]: FishData } = {
@@ -25,6 +27,8 @@ export const fish: { [key: string]: FishData } = {
             "Windtangler",
             "Serendipity",
         ],
+        minReels: 1,
+        maxReels: 2,
     },
     "Lunged Stickleback": {
         rarity: "Common",
@@ -41,6 +45,8 @@ export const fish: { [key: string]: FishData } = {
             "Windtangler",
             "Serendipity",
         ],
+        minReels: 1,
+        maxReels: 2,
     },
     Medaka: {
         rarity: "Common",
@@ -57,6 +63,8 @@ export const fish: { [key: string]: FishData } = {
             "Windtangler",
             "Serendipity",
         ],
+        minReels: 1,
+        maxReels: 3,
     },
     "Venomspine Fish": {
         rarity: "Common",
@@ -73,6 +81,8 @@ export const fish: { [key: string]: FishData } = {
             "Windtangler",
             "Serendipity",
         ],
+        minReels: 2,
+        maxReels: 4,
     },
     "Golden Koi": {
         rarity: "Rare",
@@ -89,6 +99,8 @@ export const fish: { [key: string]: FishData } = {
             "Windtangler",
             "Serendipity",
         ],
+        minReels: 3,
+        maxReels: 5,
     },
     "Abiding Angelfish": {
         rarity: "Epic",
@@ -105,6 +117,8 @@ export const fish: { [key: string]: FishData } = {
             "Windtangler",
             "Serendipity",
         ],
+        minReels: 4,
+        maxReels: 6,
     },
     Snowstrider: {
         rarity: "Legendary",
@@ -121,6 +135,8 @@ export const fish: { [key: string]: FishData } = {
             "Windtangler",
             "Serendipity",
         ],
+        minReels: 5,
+        maxReels: 7,
     },
 };
 

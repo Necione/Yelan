@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, getKeys, is, noop } from "@elara-services/utils";
+import { embedComment, is, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { skills } from "../../plugins/other/utils";
@@ -31,52 +31,49 @@ export const sell = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
     async autocomplete(i) {
-        const list = [
-            ...getKeys(drops),
-            ...getKeys(weapons),
-            ...getKeys(artifacts),
-            ...getKeys(misc),
-            ...getKeys(fish),
-        ].map((c) => ({ name: String(c), value: c }));
-        const item = i.options.getString("item", false) ?? "";
-        if (!item) {
-            return i.respond(list.slice(0, 25)).catch(noop);
-        }
-        const items = list.filter((c) =>
-            c.name.toLowerCase().includes(item.toLowerCase()),
-        );
-        if (!is.array(items)) {
+        const stats = await getUserStats(i.user.id);
+        if (!stats) {
             return i
-                .respond([{ name: "No match found for that.", value: "n/a" }])
+                .respond([{ name: "No items found.", value: "n/a" }])
                 .catch(noop);
         }
-        return i.respond(items.slice(0, 25)).catch(noop);
+
+        const inventoryItems = stats.inventory;
+
+        const options = inventoryItems.map((invItem, index) => {
+            let displayName = invItem.item;
+            if (invItem.metadata?.length) {
+                displayName += ` (${invItem.metadata.length} cm)`;
+            }
+            return {
+                name: displayName,
+                value: String(index),
+            };
+        });
+
+        const focusedValue = i.options.getFocused()?.toLowerCase() || "";
+
+        const filteredOptions = options.filter((option) =>
+            option.name.toLowerCase().includes(focusedValue),
+        );
+
+        return i.respond(filteredOptions.slice(0, 25)).catch(noop);
     },
     async execute(i, r) {
-        const itemName = i.options.getString("item", true);
+        const itemIndexStr = i.options.getString("item", true);
         const amountToSell = i.options.getInteger("amount", true);
 
         if (amountToSell <= 0) {
             return r.edit(embedComment(`Something went wrong...`));
         }
 
-        if (itemName === "n/a") {
+        if (itemIndexStr === "n/a") {
             return r.edit(embedComment(`You didn't select a valid item.`));
         }
 
-        const itemData =
-            drops[itemName as DropName] ||
-            weapons[itemName as WeaponName] ||
-            artifacts[itemName as ArtifactName] ||
-            misc[itemName as MiscName] ||
-            fish[itemName as FishName];
-
-        if (!itemData) {
-            return r.edit(
-                embedComment(
-                    `The item "${itemName}" doesn't exist. Make sure you typed it correctly.`,
-                ),
-            );
+        const itemIndex = parseInt(itemIndexStr, 10);
+        if (isNaN(itemIndex)) {
+            return r.edit(embedComment(`Invalid item selection.`));
         }
 
         const stats = await getUserStats(i.user.id);
@@ -91,6 +88,19 @@ export const sell = buildCommand<SlashCommand>({
         if (stats.isHunting) {
             return r.edit(embedComment("You cannot sell while hunting!"));
         }
+
+        const inventoryItems = stats.inventory || [];
+
+        const item = inventoryItems[itemIndex];
+        if (!item) {
+            return r.edit(
+                embedComment(
+                    `You don't have that item to sell.\n-# Check your inventory with </bag:1282456807100387411>`,
+                ),
+            );
+        }
+
+        const itemName = item.item;
 
         if (
             weapons[itemName as WeaponName] &&
@@ -118,18 +128,25 @@ export const sell = buildCommand<SlashCommand>({
             );
         }
 
-        const item = stats.inventory.find((c) => c.item === itemName);
-        if (!item) {
-            return r.edit(
-                embedComment(
-                    `You don't have "${itemName}" to sell.\n-# Check your inventory with </bag:1282456807100387411>`,
-                ),
-            );
-        }
         if (item.amount < amountToSell) {
             return r.edit(
                 embedComment(
                     `You don't have enough of "${itemName}" to sell.\n-# Check your inventory with </bag:1282456807100387411>`,
+                ),
+            );
+        }
+
+        const itemData =
+            drops[itemName as DropName] ||
+            weapons[itemName as WeaponName] ||
+            artifacts[itemName as ArtifactName] ||
+            misc[itemName as MiscName] ||
+            fish[itemName as FishName];
+
+        if (!itemData) {
+            return r.edit(
+                embedComment(
+                    `The item "${itemName}" doesn't exist. Make sure you typed it correctly.`,
                 ),
             );
         }
@@ -141,6 +158,12 @@ export const sell = buildCommand<SlashCommand>({
             return r.edit(
                 embedComment(`The item "${itemName}" cannot be sold.`),
             );
+        }
+
+        if (item.metadata?.length && fish[itemName as FishName]) {
+            const lengthMultiplier =
+                Math.floor(item.metadata.length / 30) * 0.05;
+            baseSellPrice = Math.round(baseSellPrice * (1 + lengthMultiplier));
         }
 
         const rebirthMultiplier =
@@ -165,22 +188,22 @@ export const sell = buildCommand<SlashCommand>({
 
         item.amount -= amountToSell;
         if (item.amount <= 0) {
-            stats.inventory = stats.inventory.filter(
-                (c) => c.item !== item.item,
-            );
+            inventoryItems.splice(itemIndex, 1);
         }
 
         await Promise.all([
             updateUserStats(i.user.id, {
                 inventory: {
-                    set: stats.inventory,
+                    set: inventoryItems,
                 },
             }),
             addBalance(
                 i.user.id,
                 totalSellPrice,
                 true,
-                `Sold ${amountToSell}x ${itemName}`,
+                `Sold ${amountToSell}x ${itemName}${
+                    item.metadata?.length ? ` (${item.metadata.length} cm)` : ""
+                }`,
             ),
         ]);
 
@@ -193,7 +216,11 @@ export const sell = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `You sold \`${amountToSell}x\` **${itemName}** for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\`${rebirthBonusMessage}${appraiseBonusMessage}!`,
+                `You sold \`${amountToSell}x\` **${itemName}${
+                    item.metadata?.length ? ` (${item.metadata.length} cm)` : ""
+                }** for ${customEmoji.a.z_coins} \`${totalSellPrice} ${
+                    texts.c.u
+                }\`${rebirthBonusMessage}${appraiseBonusMessage}!`,
                 "Green",
             ),
         );

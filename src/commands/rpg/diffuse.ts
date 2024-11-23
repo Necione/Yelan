@@ -100,14 +100,14 @@ export const diffuse = buildCommand<SlashCommand>({
         if (!item) {
             return r.edit(
                 embedComment(
-                    `You don't have "${itemName}" to diffuse.\n-# Check your inventory with </bag:command_id>`,
+                    `You don't have "${itemName}" to diffuse.\n-# Check your inventory with </bag:1282456807100387411>`,
                 ),
             );
         }
         if (item.amount < amountToDiffuse) {
             return r.edit(
                 embedComment(
-                    `You don't have enough of "${itemName}" to diffuse.\n-# Check your inventory with </bag:command_id>`,
+                    `You don't have enough of "${itemName}" to diffuse.\n-# Check your inventory with </bag:1282456807100387411>`,
                 ),
             );
         }
@@ -157,6 +157,7 @@ export const diffuse = buildCommand<SlashCommand>({
                 stats.inventory.push({
                     item: "Fruit Paste Bait",
                     amount: baitAmount,
+                    metadata: null,
                 });
             }
 

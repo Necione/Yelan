@@ -72,6 +72,7 @@ export const cook = buildCommand<SlashCommand>({
                                 item: recipe.result.item,
                                 amount:
                                     recipe.result.amount * cookingItem.amount,
+                                metadata: null,
                             });
                         }
                         cookedItems.push({

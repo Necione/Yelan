@@ -73,7 +73,7 @@ export const equip = buildCommand<SlashCommand>({
             if (!weapon) {
                 return r.edit(
                     embedComment(
-                        `You don't have "${weaponName}" in your inventory to equip.\n- Check your inventory with </rpg:1279824112566665297>`,
+                        `You don't have "${weaponName}" in your inventory to equip.\n- Check your inventory with </bag:1282456807100387411>`,
                     ),
                 );
             }
@@ -116,7 +116,7 @@ export const equip = buildCommand<SlashCommand>({
             if (!artifact) {
                 return r.edit(
                     embedComment(
-                        `You don't have "${artifactName}" in your inventory to equip.\n- Check your inventory with </rpg:1279824112566665297>`,
+                        `You don't have "${artifactName}" in your inventory to equip.\n- Check your inventory with </bag:1282456807100387411>`,
                     ),
                 );
             }

@@ -64,7 +64,7 @@ export const rpg = buildCommand<SlashCommand>({
                 )
                 .addFields({
                     name: "Cooldowns",
-                    value: `🕒 ${
+                    value: `Fishing: ${
                         fishCooldown.status ? "Ready" : fishCooldown.message
                     }`,
                 });
