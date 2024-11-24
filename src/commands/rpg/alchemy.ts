@@ -288,12 +288,10 @@ export const alchemy = buildCommand<SlashCommand>({
                                     `❤️ HP: \`+${assignedHpBonus}\` (${stats.assignedHp} Points)\n` +
                                     `💥 Crit Value: \`+${assignedCritValueBonus}\` (${stats.assignedCritValue} Points)\n` +
                                     `🛡️ DEF Value: \`+${assignedDefValueBonus}\` (${stats.assignedDefValue} Points)`,
-                                inline: false,
                             },
                             {
                                 name: "Total Assigned Points",
                                 value: `\`${stats.totalAssigned}/${alchemyProgress}\` Points`,
-                                inline: false,
                             },
                         ),
                 ],

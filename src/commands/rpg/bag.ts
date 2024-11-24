@@ -11,6 +11,7 @@ import {
     getArtifactType,
 } from "../../utils/rpgitems/artifacts";
 import { drops } from "../../utils/rpgitems/drops";
+import { fish } from "../../utils/rpgitems/fish";
 import { food } from "../../utils/rpgitems/food";
 import { misc } from "../../utils/rpgitems/misc";
 import { weapons } from "../../utils/rpgitems/weapons";
@@ -39,6 +40,7 @@ export const bag = buildCommand<SlashCommand>({
                     { name: "Artifacts", value: "Artifacts" },
                     { name: "Misc", value: "Misc" },
                     { name: "Food", value: "Food" },
+                    { name: "Fish", value: "Fish" },
                 ),
         )
         .addStringOption((option) =>
@@ -107,6 +109,9 @@ export const bag = buildCommand<SlashCommand>({
             case "Food":
                 filteredItems = items.filter((item) => item.item in food);
                 break;
+            case "Fish":
+                filteredItems = items.filter((item) => item.item in fish);
+                break;
             case "All":
             default:
                 filteredItems = items;
@@ -121,13 +126,39 @@ export const bag = buildCommand<SlashCommand>({
             );
         }
 
-        if (sortOption === "Alphabetical") {
-            filteredItems.sort((a, b) => a.item.localeCompare(b.item));
-        } else if (sortOption === "Quantity") {
-            filteredItems.sort((a, b) => b.amount - a.amount);
+        const groupedItemsMap = new Map<string, any>();
+
+        for (const item of filteredItems) {
+            let key = item.item;
+            if (item.metadata?.length) {
+                key += `|length:${item.metadata.length}`;
+            }
+            if (groupedItemsMap.has(key)) {
+                groupedItemsMap.get(key).amount += item.amount;
+            } else {
+                groupedItemsMap.set(key, { ...item });
+            }
         }
 
-        const chunks = chunk(filteredItems, 10);
+        const groupedItems = Array.from(groupedItemsMap.values());
+
+        if (sortOption === "Alphabetical") {
+            groupedItems.sort((a, b) => {
+                let nameA = a.item.toLowerCase();
+                let nameB = b.item.toLowerCase();
+                if (a.metadata?.length) {
+                    nameA += ` ${a.metadata.length} cm`;
+                }
+                if (b.metadata?.length) {
+                    nameB += ` ${b.metadata.length} cm`;
+                }
+                return nameA.localeCompare(nameB);
+            });
+        } else if (sortOption === "Quantity") {
+            groupedItems.sort((a, b) => b.amount - a.amount);
+        }
+
+        const chunks = chunk(groupedItems, 10);
         const pager = getPaginatedMessage();
         const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
 
@@ -152,6 +183,11 @@ export const bag = buildCommand<SlashCommand>({
                                         displayItem += ` (${emoji})`;
                                     }
                                 }
+                            } else if (
+                                item.item in fish &&
+                                item.metadata?.length
+                            ) {
+                                displayItem += ` (${item.metadata.length} cm)`;
                             }
                             return displayItem;
                         })

@@ -10,7 +10,7 @@ import { MonsterGroup } from "../../../utils/monsterHelper";
 import type { WeaponName, WeaponType } from "../../../utils/rpgitems/weapons";
 import { weapons } from "../../../utils/rpgitems/weapons";
 
-type MonsterState = {
+export type MonsterState = {
     displaced: boolean;
     vanishedUsed: boolean;
     stunned?: boolean;
@@ -117,8 +117,15 @@ export async function playerAttack(
         await updateUserStats(stats.userId, updateData);
     }
 
-    let attackPower = stats.attackPower;
-    let defValue = stats.defValue;
+    let attackPower;
+    const { paladinSwapped } = getEffectiveStats(stats);
+    ({ attackPower } = getEffectiveStats(stats));
+
+    if (paladinSwapped) {
+        messages.push(
+            `\`🛡️\` Paladin skill activated! Your ATK and DEF Value have been swapped.`,
+        );
+    }
 
     if (hasWrath) {
         attackPower *= 1.5;
@@ -136,16 +143,6 @@ export async function playerAttack(
                 `\`💪\` Vigor skill activated! Your low HP grants you 150% more damage.`,
             );
         }
-    }
-
-    const hasPaladin = skills.has(stats, "Paladin");
-    if (hasPaladin) {
-        const temp = attackPower;
-        attackPower = defValue;
-        defValue = temp;
-        messages.push(
-            `\`🛡️\` Paladin skill activated! Your Attack Power and Defense VALUE have been swapped.`,
-        );
     }
 
     const hasHeartbroken = skills.has(stats, "Heartbroken");
@@ -385,8 +382,9 @@ export async function monsterAttack(
         messages.push(effectDescription);
     }
 
+    const { defValue } = getEffectiveStats(stats);
+
     const defChance = stats.defChance || 0;
-    const defValue = stats.defValue || 0;
     let defended = false;
     let damageReduced = 0;
 
@@ -407,10 +405,10 @@ export async function monsterAttack(
     const hasVortexVanquisher =
         equippedWeaponName && equippedWeaponName.includes("Vortex Vanquisher");
 
-    const damageReductionFactor = hasVortexVanquisher ? 0.5 : 1;
+    const damageReductionFactor = hasVortexVanquisher ? 0.75 : 1;
     if (hasVortexVanquisher) {
         messages.push(
-            `\`🌀\` **Vortex Vanquisher** has reduced all damage taken by 50%.`,
+            `\`🌀\` **Vortex Vanquisher** has reduced all damage taken by 25%.`,
         );
     }
 
@@ -670,4 +668,23 @@ function sendDamageMessage(
         message += ` 🛡️ (Defended ${damageReduced.toFixed(2)})`;
     }
     messages.push(message);
+}
+
+function getEffectiveStats(stats: UserStats): {
+    attackPower: number;
+    defValue: number;
+    paladinSwapped: boolean;
+} {
+    let attackPower = stats.attackPower || 0;
+    let defValue = stats.defValue || 0;
+    let paladinSwapped = false;
+
+    if (skills.has(stats, "Paladin")) {
+        const temp = attackPower;
+        attackPower = defValue;
+        defValue = temp;
+        paladinSwapped = true;
+    }
+
+    return { attackPower, defValue, paladinSwapped };
 }

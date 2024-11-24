@@ -106,7 +106,6 @@ export const requests = buildCommand<SlashCommand>({
                     embed.addFields({
                         name: `Request ID: ${req.id}`,
                         value: `>>> **Item:** \`${req.quantity}x\` ${req.item}\n**Reward:** ${customEmoji.a.z_coins} \`${req.reward}\` ${texts.c.u}`,
-                        inline: false,
                     });
                 });
 

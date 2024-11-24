@@ -1,4 +1,10 @@
-export type WeaponType = "Claymore" | "Bow" | "Sword" | "Catalyst" | "Polearm";
+export type WeaponType =
+    | "Claymore"
+    | "Bow"
+    | "Sword"
+    | "Catalyst"
+    | "Polearm"
+    | "Rod";
 
 interface WeaponData {
     name: string;
@@ -108,6 +114,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_White_Tassel:1282455432715047003>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/white_tassel.png",
     },
+    "Wilderness Rod": {
+        name: "Wilderness Rod",
+        type: "Rod",
+        sellPrice: 0,
+        attackPower: 1,
+        critChance: 0,
+        critValue: 0,
+        defValue: 0,
+        defChance: 0,
+        additionalHP: 0,
+        minWorldLevel: 5,
+        chestChance: 10,
+        emoji: "<:Item_Wilderness_Rod1:1309627118803750932>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/wilderness_rod.png",
+    },
     "Skyrider Sword": {
         name: "Skyrider Sword",
         type: "Sword",
@@ -183,6 +204,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Messenger:1282455784940245032>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/messenger.png",
+    },
+    Wishmaker: {
+        name: "Wishmaker",
+        type: "Rod",
+        sellPrice: 0,
+        attackPower: 3,
+        critChance: 10,
+        critValue: 0,
+        defValue: 0,
+        defChance: 0,
+        additionalHP: 50,
+        minWorldLevel: 5,
+        chestChance: 10,
+        emoji: "<:Item_Wishmaker:1309629861081387080>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/wishmaker.png",
     },
     "Raven Bow": {
         name: "Raven Bow",
@@ -367,6 +403,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Flute:1282504448538837013>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_flute.png",
     },
+    "Narukawa Ukai": {
+        name: "Narukawa Ukai",
+        type: "Rod",
+        sellPrice: 0,
+        attackPower: 7,
+        critChance: 10,
+        critValue: 0,
+        defValue: 0,
+        defChance: 0,
+        additionalHP: 50,
+        minWorldLevel: 10,
+        chestChance: 10,
+        emoji: "<:Item_Narukawa_Ukai:1309632037803528242>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/narukawa_ukai.png",
+    },
     "Blackcliff Agate": {
         name: "Blackcliff Agate",
         type: "Catalyst",
@@ -459,6 +510,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Vortex_Vanquisher:1304700656400994376>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/vortex_vanquisher.png",
+    },
+    Wavepiercer: {
+        name: "Wavepiercer",
+        type: "Rod",
+        sellPrice: 0,
+        attackPower: 14,
+        critChance: 10,
+        critValue: 1.5,
+        defValue: 50,
+        defChance: 0,
+        additionalHP: 75,
+        minWorldLevel: 12,
+        chestChance: 10,
+        emoji: "<:Item_Wavepiercer:1309632428935090176>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/wavepiercer.png",
     },
     "The Alley Flash": {
         name: "The Alley Flash",
@@ -585,6 +651,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/kagotsurube_isshin.png",
     },
+    Moonstringer: {
+        name: "Moonstringer",
+        type: "Rod",
+        sellPrice: 0,
+        attackPower: 20,
+        critChance: 15,
+        critValue: 1.75,
+        defValue: 75,
+        defChance: 0.2,
+        additionalHP: 75,
+        minWorldLevel: 20,
+        chestChance: 10,
+        emoji: "<:Item_Moonstringer:1309632789057896448>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/moonstringer.png",
+    },
     "Amenoma Kageuchi": {
         name: "Amenoma Kageuchi",
         type: "Sword",
@@ -645,6 +726,21 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Favonius_Sword:1304141989092130937>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/favonius_sword.png",
+    },
+    Serendipity: {
+        name: "Serendipity",
+        type: "Rod",
+        sellPrice: 0,
+        attackPower: 30,
+        critChance: 10,
+        critValue: 1.5,
+        defValue: 20,
+        defChance: 0.3,
+        additionalHP: 50,
+        minWorldLevel: 25,
+        chestChance: 10,
+        emoji: "<:Item_Serendipity:1310102946142228573>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/serendipity.png",
     },
     Absolution: {
         name: "Absolution",

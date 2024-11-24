@@ -9,6 +9,7 @@ import {
 import { locked } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
+import { misc, type MiscName } from "../../utils/rpgitems/misc";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 export const diffuse = buildCommand<SlashCommand>({
@@ -36,6 +37,7 @@ export const diffuse = buildCommand<SlashCommand>({
             ...getKeys(drops),
             ...getKeys(weapons),
             ...getKeys(artifacts),
+            ...getKeys(misc),
         ].map((c) => ({ name: String(c), value: c }));
         const item = i.options.getString("item", false) ?? "";
         if (!item) {
@@ -80,6 +82,36 @@ export const diffuse = buildCommand<SlashCommand>({
             return r.edit(embedComment("You cannot diffuse while hunting!"));
         }
 
+        const itemData =
+            drops[itemName as DropName] ||
+            weapons[itemName as WeaponName] ||
+            artifacts[itemName as ArtifactName] ||
+            misc[itemName as MiscName];
+
+        if (!itemData) {
+            return r.edit(
+                embedComment(
+                    `The item "${itemName}" doesn't exist. Make sure you typed it correctly.`,
+                ),
+            );
+        }
+
+        const item = stats.inventory.find((c) => c.item === itemName);
+        if (!item) {
+            return r.edit(
+                embedComment(
+                    `You don't have "${itemName}" to diffuse.\n-# Check your inventory with </bag:1282456807100387411>`,
+                ),
+            );
+        }
+        if (item.amount < amountToDiffuse) {
+            return r.edit(
+                embedComment(
+                    `You don't have enough of "${itemName}" to diffuse.\n-# Check your inventory with </bag:1282456807100387411>`,
+                ),
+            );
+        }
+
         if (itemName === "Life Essence") {
             const item = stats.inventory.find((c) => c.item === itemName);
             if (!item || item.amount < amountToDiffuse) {
@@ -113,31 +145,37 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
-        const itemData =
-            drops[itemName as DropName] ||
-            weapons[itemName as WeaponName] ||
-            artifacts[itemName as ArtifactName];
-
-        if (!itemData) {
-            return r.edit(
-                embedComment(
-                    `The item "${itemName}" doesn't exist. Make sure you typed it correctly.`,
-                ),
+        if (itemName in misc) {
+            const baitAmount = amountToDiffuse;
+            const existingBait = stats.inventory.find(
+                (c) => c.item === "Fruit Paste Bait",
             );
-        }
 
-        const item = stats.inventory.find((c) => c.item === itemName);
-        if (!item) {
+            if (existingBait) {
+                existingBait.amount += baitAmount;
+            } else {
+                stats.inventory.push({
+                    item: "Fruit Paste Bait",
+                    amount: baitAmount,
+                    metadata: null,
+                });
+            }
+
+            item.amount -= amountToDiffuse;
+            if (item.amount <= 0) {
+                stats.inventory = stats.inventory.filter(
+                    (c) => c.item !== item.item,
+                );
+            }
+
+            await updateUserStats(i.user.id, {
+                inventory: { set: stats.inventory },
+            });
+
             return r.edit(
                 embedComment(
-                    `You don't have "${itemName}" to diffuse.\n-# Check your inventory with </rpg:1279824112566665297>`,
-                ),
-            );
-        }
-        if (item.amount < amountToDiffuse) {
-            return r.edit(
-                embedComment(
-                    `You don't have enough of "${itemName}" to diffuse.\n-# Check your inventory with </rpg:1279824112566665297>`,
+                    `You diffused \`${amountToDiffuse}x\` **${itemName}** and received \`${baitAmount}x\` **Fruit Paste Bait**!`,
+                    "Green",
                 ),
             );
         }

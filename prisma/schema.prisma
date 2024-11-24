@@ -231,6 +231,12 @@ model UserStats {
   hasKey                    Boolean        @default(false)
   deity                     String?
   castQueue                 String[]       @default([])
+  timesFished               Int            @default(0)
+  timesFishedForLevel       Int            @default(0)
+  fishingLevel              Int            @default(1)
+  longestFish               Float          @default(0)
+  lifetimeFishCaught        Int            @default(0)
+  legendariesCaught         Int            @default(0)
 }
 
 type UserRequest {
@@ -247,8 +253,14 @@ type UserEffect {
 }
 
 type UserStatsInv {
-  item   String @default("")
-  amount Int    @default(0)
+  item     String             @default("")
+  amount   Int                @default(0)
+  metadata UserStatsMetaData?
+}
+
+type UserStatsMetaData {
+  length Int?
+  star   Int?
 }
 
 type UserSkill {

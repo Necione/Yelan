@@ -1,4 +1,4 @@
-import { is, noop } from "@elara-services/utils";
+import { noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import type {
@@ -12,6 +12,16 @@ import {
     type ArtifactName,
 } from "../utils/rpgitems/artifacts";
 import { weapons, type WeaponName } from "../utils/rpgitems/weapons";
+
+interface InventoryItem {
+    item: string;
+    amount: number;
+    metadata?: UserStatsMetaData | null;
+}
+
+interface UserStatsMetaData {
+    length?: number | null;
+}
 
 export async function syncStats(userId: string) {
     const stats = await getUserStats(userId);
@@ -241,32 +251,54 @@ export const updateUserStats = async (
         .catch(noop);
 };
 
+function compareMetadata(
+    metadataA: UserStatsMetaData | null | undefined,
+    metadataB: UserStatsMetaData | null | undefined,
+): boolean {
+    if (metadataA == null && metadataB == null) {
+        return true;
+    }
+    if (metadataA == null || metadataB == null) {
+        return false;
+    }
+    return metadataA.length === metadataB.length;
+}
+
 export const addItemToInventory = async (
     userId: string,
-    items: { item: string; amount: number }[],
+    items: InventoryItem[],
 ) => {
     const stats = await getUserStats(userId);
     if (!stats) {
         return null;
     }
-    if (!is.array(stats.inventory, false)) {
-        stats.inventory = [];
+
+    let inventory: InventoryItem[] = stats.inventory as InventoryItem[];
+
+    if (!Array.isArray(inventory)) {
+        inventory = [];
     }
 
-    if (is.array(items)) {
+    if (Array.isArray(items)) {
         for (const i of items) {
-            const f = stats.inventory.find((c) => c.item === i.item);
-            if (f) {
-                f.amount = Math.floor(f.amount + i.amount);
+            const existingItem = inventory.find(
+                (c) =>
+                    c.item === i.item &&
+                    compareMetadata(c.metadata, i.metadata),
+            );
+            if (existingItem) {
+                existingItem.amount = Math.floor(
+                    existingItem.amount + i.amount,
+                );
             } else {
-                stats.inventory.push(i);
+                inventory.push(i);
             }
         }
     }
 
     return await updateUserStats(userId, {
         inventory: {
-            set: stats.inventory,
+            set: inventory,
         },
     });
 };
@@ -275,26 +307,36 @@ export const removeItemFromInventory = async (
     userId: string,
     itemName: string,
     amount: number,
+    metadata?: UserStatsMetaData | null,
 ) => {
     const stats = await getUserStats(userId);
     if (!stats) {
         return null;
     }
-    if (!is.array(stats.inventory, false)) {
-        stats.inventory = [];
+
+    let inventory: InventoryItem[] = stats.inventory as InventoryItem[];
+
+    if (!Array.isArray(inventory)) {
+        inventory = [];
     }
-    const item = stats.inventory.find((c) => c.item === itemName);
-    if (!item) {
+
+    const itemIndex = inventory.findIndex(
+        (c) => c.item === itemName && compareMetadata(c.metadata, metadata),
+    );
+    if (itemIndex === -1) {
         return null;
     }
+    const item = inventory[itemIndex];
     item.amount = Math.floor(item.amount - amount);
     if (item.amount <= 0) {
-        stats.inventory = stats.inventory.filter((c) => c.item !== itemName);
+        inventory.splice(itemIndex, 1);
+    } else {
+        inventory[itemIndex] = item;
     }
 
     return await updateUserStats(userId, {
         inventory: {
-            set: stats.inventory,
+            set: inventory,
         },
     });
 };

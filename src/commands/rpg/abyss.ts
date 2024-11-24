@@ -19,9 +19,8 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         locked.del(i.user.id);
-        return r.edit(
-            embedComment("The Spiral Abyss is currently closed and resetting"),
-        );
+        return r.edit(embedComment("Abyss is not open yet."));
+
         /*
         const userWallet = await getProfileByUserId(i.user.id);
         if (!userWallet) {
@@ -96,7 +95,6 @@ export const abyss = buildCommand<SlashCommand>({
         }
         const categoryId = "1290188539828633600";
         const channelName = `abysspriv-${i.user.username}`;
-        const extraChannelId = "1295945026253226044";
 
         if (newAbyssMode) {
             const category = i.guild.channels.resolve(categoryId);
@@ -131,15 +129,6 @@ export const abyss = buildCommand<SlashCommand>({
 
             responseMessage += `\nA private channel has been created for you: ${channel}`;
 
-            const extraChannel = i.guild.channels.resolve(extraChannelId);
-            if (extraChannel && extraChannel.type === ChannelType.GuildText) {
-                await extraChannel.permissionOverwrites
-                    .edit(i.user.id, {
-                        ViewChannel: true,
-                    })
-                    .catch(noop);
-            }
-
             await channel
                 .send({
                     content: i.user.toString(),
@@ -167,18 +156,6 @@ export const abyss = buildCommand<SlashCommand>({
                 responseMessage += `\nNo Abyss channel found to delete.`;
             }
 
-            const extraChannel = i.guild.channels.resolve(extraChannelId);
-            if (extraChannel && extraChannel.type === ChannelType.GuildText) {
-                await extraChannel.permissionOverwrites
-                    .delete(i.user.id)
-                    .catch((error) => {
-                        console.error(
-                            "Error removing user's permissions from extra channel:",
-                            error,
-                        );
-                    });
-            }
-
             await r.edit({
                 embeds: [
                     {
@@ -193,6 +170,6 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         locked.del(i.user.id);
-            */
+        */
     },
 });
