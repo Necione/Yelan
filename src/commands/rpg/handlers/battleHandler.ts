@@ -117,9 +117,8 @@ export async function playerAttack(
         await updateUserStats(stats.userId, updateData);
     }
 
-    let attackPower;
-    const { paladinSwapped } = getEffectiveStats(stats);
-    ({ attackPower } = getEffectiveStats(stats));
+    // eslint-disable-next-line prefer-const
+    let { paladinSwapped, attackPower } = getEffectiveStats(stats);
 
     if (paladinSwapped) {
         messages.push(
