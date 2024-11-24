@@ -221,9 +221,11 @@ export async function handleVictory(
     await updateUserStats(i.user.id, { isHunting: false });
     await thread.edit({ archived: true, locked: true }).catch(noop);
 
-    const hasInsomniaSkill = skills.has(stats, "Insomnia");
+    const insomniaSkill = getUserSkillLevelData(stats, "Insomnia");
 
-    const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
+    const huntCooldown = insomniaSkill?.levelData?.cooldown
+        ? get.mins(insomniaSkill.levelData.cooldown)
+        : get.mins(30);
     await cooldowns.set(userWallet, "hunt", huntCooldown);
 }
 
@@ -344,9 +346,12 @@ export async function handleDefeat(
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
 
-    const hasInsomniaSkill = skills.has(stats, "Insomnia");
+    const insomniaSkill = getUserSkillLevelData(stats, "Insomnia");
 
-    const huntCooldown = hasInsomniaSkill ? get.mins(20) : get.mins(30);
+    const huntCooldown = insomniaSkill?.levelData?.cooldown
+        ? get.mins(insomniaSkill.levelData.cooldown)
+        : get.mins(30);
+
     await cooldowns.set(userWallet, "hunt", huntCooldown);
 
     await thread.edit({ archived: true, locked: true }).catch(noop);

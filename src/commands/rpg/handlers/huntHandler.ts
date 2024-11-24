@@ -17,6 +17,7 @@ import {
     type Monster,
 } from "../../../utils/hunt";
 import { handleRandomEvent } from "../../../utils/randomEvents";
+import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {
     getDeathThreshold,
     monsterAttack,
@@ -226,17 +227,14 @@ export async function handleHunt(
             });
         }
 
-        const hasDistraction = skills.has(stats, "Distraction");
-
         let vigilanceUsed = false;
 
-        let isMonsterFirst: boolean;
-        if (hasDistraction) {
-            isMonsterFirst = Math.random() >= 0.75;
-        } else {
-            isMonsterFirst = Math.random() < 0.5;
-        }
+        const distractionSkill = getUserSkillLevelData(stats, "Distraction");
+        const hasDistraction = distractionSkill;
 
+        const isMonsterFirst = hasDistraction
+            ? Math.random() >= (distractionSkill?.levelData?.priority || 0)
+            : Math.random() < 0.5;
         let isPlayerTurn = !isMonsterFirst;
 
         let monsterState = {

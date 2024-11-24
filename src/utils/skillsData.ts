@@ -154,7 +154,18 @@ export const skills: Skill[] = [
             {
                 level: 1,
                 description:
-                    "Reduce your hunt cooldown from 30 minutes to 20 minutes",
+                    "Reduce your hunt cooldown from 30 minutes to **20 minutes**",
+                levelData: {
+                    cooldown: 20,
+                },
+            },
+            {
+                level: 2,
+                description:
+                    "Reduce your hunt cooldown from 20 minutes to **15 minutes**",
+                levelData: {
+                    cooldown: 15,
+                },
             },
         ],
         emoji: "🌙",
@@ -230,7 +241,18 @@ export const skills: Skill[] = [
             {
                 level: 1,
                 description:
-                    "Reduce your explore cooldown from 30 minutes to 20 minutes",
+                    "Reduce your explore cooldown from 30 minutes to **20 minutes",
+                levelData: {
+                    cooldown: 20,
+                },
+            },
+            {
+                level: 2,
+                description:
+                    "Reduce your explore cooldown from 20 minutes to **15 minutes**",
+                levelData: {
+                    cooldown: 15,
+                },
             },
         ],
         emoji: "⚡",
@@ -248,7 +270,24 @@ export const skills: Skill[] = [
         levels: [
             {
                 level: 1,
-                description: "Go first 75% of the time when hunting",
+                description: "Go first **75%** of the time when hunting",
+                levelData: {
+                    priority: 0.75,
+                },
+            },
+            {
+                level: 2,
+                description: "Go first **80%** of the time when hunting",
+                levelData: {
+                    priority: 0.8,
+                },
+            },
+            {
+                level: 3,
+                description: "Go first **95%** of the time when hunting",
+                levelData: {
+                    priority: 0.95,
+                },
             },
         ],
         emoji: "💫",
