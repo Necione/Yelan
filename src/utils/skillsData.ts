@@ -241,7 +241,7 @@ export const skills: Skill[] = [
             {
                 level: 1,
                 description:
-                    "Reduce your explore cooldown from 30 minutes to **20 minutes",
+                    "Reduce your explore cooldown from 30 minutes to **20 minutes**",
                 levelData: {
                     cooldown: 20,
                 },

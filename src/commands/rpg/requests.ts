@@ -2,8 +2,22 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { randomNumber } from "@elara-services/packages";
 import { embedComment, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { addBalance, getUserStats, updateUserStats } from "../../services";
+import type { ButtonInteraction } from "discord.js";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ComponentType,
+    EmbedBuilder,
+    SlashCommandBuilder,
+} from "discord.js";
+import {
+    addBalance,
+    getProfileByUserId,
+    getUserStats,
+    removeBalance,
+    updateUserStats,
+} from "../../services";
 import { getRandomDrop } from "../../utils/chest";
 
 type UserRequest = {
@@ -70,6 +84,18 @@ export const requests = buildCommand<SlashCommand>({
                 return;
             }
 
+            const userProfile = await getProfileByUserId(userId);
+
+            if (!userProfile) {
+                await r.edit(
+                    embedComment(
+                        "No profile found for your user. Please set up your profile.",
+                        "Red",
+                    ),
+                );
+                return;
+            }
+
             if (!requestId) {
                 if (!stats.requests || stats.requests.length === 0) {
                     const newRequests = generateRandomRequests(
@@ -109,7 +135,84 @@ export const requests = buildCommand<SlashCommand>({
                     });
                 });
 
-                await r.edit({ embeds: [embed.toJSON()] });
+                const refreshButton = new ButtonBuilder()
+                    .setCustomId("refresh_requests")
+                    .setLabel("Refresh Requests")
+                    .setStyle(ButtonStyle.Primary);
+
+                const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    refreshButton,
+                );
+
+                await r.edit({
+                    embeds: [embed.toJSON()],
+                    components: [row],
+                });
+
+                const message = await i.fetchReply();
+
+                const collector = message.createMessageComponentCollector({
+                    componentType: ComponentType.Button,
+                    time: 60000,
+                });
+
+                collector.on(
+                    "collect",
+                    async (interaction: ButtonInteraction) => {
+                        if (interaction.customId === "refresh_requests") {
+                            if (interaction.user.id !== userId) {
+                                await interaction.reply({
+                                    content:
+                                        "You cannot interact with this button.",
+                                    ephemeral: true,
+                                });
+                                return;
+                            }
+
+                            const userBalance = userProfile.balance || 0;
+
+                            if (userBalance < 500) {
+                                await interaction.reply({
+                                    content: `You don't have enough coins to refresh requests. You need ${customEmoji.a.z_coins} \`500\` Coins.`,
+                                    ephemeral: true,
+                                });
+                                return;
+                            }
+
+                            const newRequests = generateRandomRequests(3);
+
+                            await Promise.all([
+                                updateUserStats(userId, {
+                                    requests: { set: newRequests },
+                                }),
+                                removeBalance(
+                                    userId,
+                                    500,
+                                    true,
+                                    `Spent 500 coins to refresh requests.`,
+                                ),
+                            ]);
+
+                            embed.setFields([]);
+
+                            newRequests.forEach((req) => {
+                                embed.addFields({
+                                    name: `Request ID: ${req.id}`,
+                                    value: `>>> **Item:** \`${req.quantity}x\` ${req.item}\n**Reward:** ${customEmoji.a.z_coins} \`${req.reward}\` ${texts.c.u}`,
+                                });
+                            });
+
+                            await interaction.update({
+                                embeds: [embed],
+                                components: [row],
+                            });
+                        }
+                    },
+                );
+
+                collector.on("end", async () => {
+                    await r.edit({ components: [] }).catch(noop);
+                });
             } else {
                 const requestIndex = stats.requests.findIndex(
                     (req: UserRequest) => req.id === requestId,
@@ -164,7 +267,7 @@ export const requests = buildCommand<SlashCommand>({
                 ]);
 
                 const embed = new EmbedBuilder()
-                    .setTitle("✅ Request Completed!")
+                    .setTitle("`✅` Request Completed!")
                     .setColor("Green")
                     .setDescription(
                         `You received ${customEmoji.a.z_coins} \`${coinReward} ${texts.c.u}\`!`,
