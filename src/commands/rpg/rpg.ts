@@ -63,6 +63,16 @@ export const rpg = buildCommand<SlashCommand>({
                     `🎣 Fishing Level: \`${stats.fishingLevel}\` | 🐟 Fish Caught: \`${stats.timesFished}\``,
                 )
                 .addFields({
+                    name: "Fishing Records",
+                    value: `\`🏆\` **Longest Fish Caught:** ${
+                        stats.longestFish ? `${stats.longestFish} cm` : "N/A"
+                    }\n\`🐡\` **Total Fish Caught:** ${
+                        stats.lifetimeFishCaught || 0
+                    }\n\`🌟\` **Legendaries Caught:** ${
+                        stats.legendariesCaught || 0
+                    }`,
+                })
+                .addFields({
                     name: "Cooldowns",
                     value: `Fishing: ${
                         fishCooldown.status ? "Ready" : fishCooldown.message

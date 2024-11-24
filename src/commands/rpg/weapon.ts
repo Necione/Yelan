@@ -166,7 +166,7 @@ export const weapon = buildCommand<SlashCommand>({
             ) {
                 embed.addFields({
                     name: "Special Effect",
-                    value: "Reduce all damage taken by 50%.",
+                    value: "Reduce all damage taken by 25%.",
                 });
             }
 

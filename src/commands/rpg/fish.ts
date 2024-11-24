@@ -104,7 +104,7 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         const embed = new EmbedBuilder()
             .setTitle("Fishing...")
-            .setDescription("You cast your line and wait for a fish to bite...")
+            .setDescription("You cast your line and wait for a fish to bite <a:loading:1184700865303552031>")
             .setColor("Blue");
 
         await r.edit({ embeds: [embed] }).catch(noop);
@@ -256,6 +256,17 @@ export const fishCommand = buildCommand<SlashCommand>({
         } else {
             const fishLength = selectFishLength();
 
+            const newLongestFish =
+                fishLength > stats.longestFish ? fishLength : stats.longestFish;
+
+            const isLegendary =
+                selectedFish.rarity.toLowerCase() === "legendary";
+
+            const newLifetimeFishCaught = (stats.lifetimeFishCaught || 0) + 1;
+            const newLegendariesCaught = isLegendary
+                ? (stats.legendariesCaught || 0) + 1
+                : stats.legendariesCaught || 0;
+
             const newFishItem = {
                 item: selectedFish.name,
                 amount: 1,
@@ -282,7 +293,13 @@ export const fishCommand = buildCommand<SlashCommand>({
             const updateData: any = {
                 timesFished: newTimesFished,
                 timesFishedForLevel: newTimesFishedForLevel,
+                longestFish: newLongestFish,
+                lifetimeFishCaught: newLifetimeFishCaught,
             };
+
+            if (isLegendary) {
+                updateData.legendariesCaught = newLegendariesCaught;
+            }
 
             if (levelUp) {
                 updateData.fishingLevel = stats.fishingLevel + 1;

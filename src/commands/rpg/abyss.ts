@@ -1,16 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, noop } from "@elara-services/utils";
-import {
-    ChannelType,
-    PermissionFlagsBits,
-    SlashCommandBuilder,
-} from "discord.js";
-import {
-    getProfileByUserId,
-    getUserStats,
-    updateUserStats,
-} from "../../services";
-import { cooldowns, locked } from "../../utils";
+import { embedComment } from "@elara-services/utils";
+import { SlashCommandBuilder } from "discord.js";
+import { locked } from "../../utils";
 
 export const abyss = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -28,7 +19,9 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         locked.del(i.user.id);
+        return r.edit(embedComment("Abyss is not open yet."));
 
+        /*
         const userWallet = await getProfileByUserId(i.user.id);
         if (!userWallet) {
             locked.del(i.user.id);
@@ -177,5 +170,6 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         locked.del(i.user.id);
+        */
     },
 });

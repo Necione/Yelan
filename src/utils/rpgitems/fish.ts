@@ -17,7 +17,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 1,
         weight: 50,
         emoji: "<:Item_Betta:1309015028757692516>",
-        sellPrice: 5,
+        sellPrice: 7,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
@@ -35,7 +35,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 1,
         weight: 50,
         emoji: "<:Item_Lunged_Stickleback:1309015142335516773>",
-        sellPrice: 7,
+        sellPrice: 10,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
@@ -53,7 +53,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 1,
         weight: 50,
         emoji: "<:Item_Medaka:1309018341184110745>",
-        sellPrice: 10,
+        sellPrice: 15,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
@@ -71,7 +71,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 2,
         weight: 50,
         emoji: "<:Item_Venomspine_Fish:1309557115282653294>",
-        sellPrice: 10,
+        sellPrice: 20,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
