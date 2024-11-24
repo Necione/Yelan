@@ -137,7 +137,7 @@ export const requests = buildCommand<SlashCommand>({
 
                 const refreshButton = new ButtonBuilder()
                     .setCustomId("refresh_requests")
-                    .setLabel("Refresh Requests")
+                    .setLabel("Refresh Requests (500 Coins)")
                     .setStyle(ButtonStyle.Primary);
 
                 const row = new ActionRowBuilder<ButtonBuilder>().addComponents(

@@ -128,7 +128,7 @@ export const skillsCommand = buildCommand<SlashCommand>({
             .setTitle(`${i.user.username}'s Skills`)
             .setThumbnail(i.user.displayAvatarURL())
             .setDescription(
-                `- Use </learn:1282044626408308736> to learn new skills.\n- Use </activate:1284399993897353292> to enable/disable a skill.`,
+                `- Use </learn:1282044626408308736> to learn new skills.\n- Use </activate:1284399993897353292> to enable/disable a skill.\nUse </upgrade:1310180403385991250> to level up a skill.`,
             )
             .addFields(
                 {
