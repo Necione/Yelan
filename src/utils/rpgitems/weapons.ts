@@ -727,7 +727,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Favonius_Sword:1304141989092130937>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/favonius_sword.png",
     },
-    "Serendipity": {
+    Serendipity: {
         name: "Serendipity",
         type: "Rod",
         sellPrice: 0,

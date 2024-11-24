@@ -104,7 +104,9 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         const embed = new EmbedBuilder()
             .setTitle("Fishing...")
-            .setDescription("You cast your line and wait for a fish to bite <a:loading:1184700865303552031>")
+            .setDescription(
+                "You cast your line and wait for a fish to bite <a:loading:1184700865303552031>",
+            )
             .setColor("Blue");
 
         await r.edit({ embeds: [embed] }).catch(noop);

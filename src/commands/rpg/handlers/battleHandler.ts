@@ -117,7 +117,9 @@ export async function playerAttack(
         await updateUserStats(stats.userId, updateData);
     }
 
-    let { attackPower, defValue, paladinSwapped } = getEffectiveStats(stats);
+    let attackPower;
+    const { paladinSwapped } = getEffectiveStats(stats);
+    ({ attackPower } = getEffectiveStats(stats));
 
     if (paladinSwapped) {
         messages.push(

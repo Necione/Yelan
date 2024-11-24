@@ -425,5 +425,5 @@ export const weaponAdvantages: { [key in WeaponType]?: MonsterGroup[] } = {
     Catalyst: [MonsterGroup.Fatui, MonsterGroup.Abyss],
     Claymore: [MonsterGroup.Machine],
     Bow: [MonsterGroup.Human, MonsterGroup.Abyss],
-    Rod: [MonsterGroup.Slime]
+    Rod: [MonsterGroup.Slime],
 };
