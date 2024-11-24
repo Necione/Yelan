@@ -10,7 +10,6 @@ export type SkillName =
     | "Energize"
     | "Distraction"
     | "Backstab"
-    | "Heartbroken"
     | "Crystallize"
     | "Growth"
     | "Vigor"
@@ -352,26 +351,6 @@ export const skills: Skill[] = [
                 { item: "Forbidden Curse Scroll", amount: 3 },
                 { item: "Slime Secretions", amount: 10 },
                 { item: "Chaos Device", amount: 5 },
-            ],
-        },
-    },
-    {
-        name: "Heartbroken",
-        levels: [
-            {
-                level: 1,
-                description:
-                    "Deal 25% of your HP as bonus DMG on your first turn",
-            },
-        ],
-        emoji: "💔",
-        requirements: {
-            worldLevel: 10,
-            rebirthsRequired: 2,
-            coins: 150,
-            items: [
-                { item: "Mist Grass", amount: 2 },
-                { item: "Agent's Sacrificial Knife", amount: 2 },
             ],
         },
     },

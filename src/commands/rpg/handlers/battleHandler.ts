@@ -144,13 +144,6 @@ export async function playerAttack(
         }
     }
 
-    const hasHeartbroken = skills.has(stats, "Heartbroken");
-
-    let bonusDamage = 0;
-    if (hasHeartbroken && isFirstTurn) {
-        bonusDamage = currentPlayerHp / 4;
-    }
-
     const modifiersResult = applyAttackModifiers(
         attackPower,
         stats,
@@ -231,15 +224,6 @@ export async function playerAttack(
         damageReduced,
         messages,
     );
-
-    if (bonusDamage > 0) {
-        currentMonsterHp -= bonusDamage;
-        messages.push(
-            `\`💔\` You dealt an additional \`${bonusDamage.toFixed(
-                2,
-            )}\` bonus damage (Heartbroken).`,
-        );
-    }
 
     const kindleLevelData = getUserSkillLevelData(stats, "Kindle");
 
