@@ -240,12 +240,6 @@ export const fishCommand = buildCommand<SlashCommand>({
                 )
                 .setColor("Red");
 
-            const newTimesFished = stats.timesFished + 1;
-
-            await updateUserStats(i.user.id, {
-                timesFished: newTimesFished,
-            });
-
             await r
                 .edit({ embeds: [escapedEmbed], components: [] })
                 .catch(noop);

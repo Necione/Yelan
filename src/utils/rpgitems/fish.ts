@@ -17,7 +17,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 1,
         weight: 50,
         emoji: "<:Item_Betta:1309015028757692516>",
-        sellPrice: 7,
+        sellPrice: 15,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
@@ -35,7 +35,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 1,
         weight: 50,
         emoji: "<:Item_Lunged_Stickleback:1309015142335516773>",
-        sellPrice: 10,
+        sellPrice: 20,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
@@ -53,7 +53,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 1,
         weight: 50,
         emoji: "<:Item_Medaka:1309018341184110745>",
-        sellPrice: 15,
+        sellPrice: 25,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
@@ -71,7 +71,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 2,
         weight: 50,
         emoji: "<:Item_Venomspine_Fish:1309557115282653294>",
-        sellPrice: 20,
+        sellPrice: 30,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
@@ -89,7 +89,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 2,
         weight: 30,
         emoji: "<:Item_Golden_Koi:1309018445634994217>",
-        sellPrice: 50,
+        sellPrice: 75,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
@@ -107,7 +107,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 3,
         weight: 15,
         emoji: "<:Item_Abiding_Angelfish:1309018690775420978>",
-        sellPrice: 100,
+        sellPrice: 125,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
@@ -125,7 +125,7 @@ export const fish: { [key: string]: FishData } = {
         fishingLevel: 5,
         weight: 1,
         emoji: "<:Item_Snowstrider:1309018556888776787>",
-        sellPrice: 250,
+        sellPrice: 500,
         rods: [
             "Wilderness Rod",
             "Wishmaker",
