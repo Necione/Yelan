@@ -2,7 +2,6 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, getKeys, is, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
-import { skills } from "../../plugins/other/utils";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
@@ -109,10 +108,8 @@ export const sellall = buildCommand<SlashCommand>({
             Math.min(stats.rebirths, 3) * 0.2 +
             Math.max(0, stats.rebirths - 3) * 0.1;
         let totalRebirthBonus = 0;
-        let totalAppraiseBonus = 0;
-        const itemsSold = [];
 
-        const hasAppraiseSkill = skills.has(stats, "Appraise", false);
+        const itemsSold = [];
 
         for (const itemName of itemNames) {
             const itemData =
@@ -163,17 +160,8 @@ export const sellall = buildCommand<SlashCommand>({
                 (rebirthMultiplier - 1) * itemData.sellPrice * amountToSell;
             let itemTotalSellPrice =
                 itemData.sellPrice * amountToSell * rebirthMultiplier;
-            let appraiseBonus = 0;
 
-            if (hasAppraiseSkill) {
-                appraiseBonus = Math.round(itemTotalSellPrice * 0.05);
-                itemTotalSellPrice = Math.round(
-                    itemTotalSellPrice + appraiseBonus,
-                );
-                totalAppraiseBonus += appraiseBonus;
-            } else {
-                itemTotalSellPrice = Math.round(itemTotalSellPrice);
-            }
+            itemTotalSellPrice = Math.round(itemTotalSellPrice);
 
             totalSellPrice += itemTotalSellPrice;
             totalRebirthBonus += rebirthBonus;
@@ -213,20 +201,14 @@ export const sellall = buildCommand<SlashCommand>({
         let responseMessage = itemsSold
             .map(
                 (soldItem) =>
-                    `-# Sold \`${soldItem.amountToSell}x\` **${soldItem.itemName}** for ${customEmoji.a.z_coins} \`${soldItem.itemTotalSellPrice} ${texts.c.u}\`!`,
+                    `You sold \`${soldItem.amountToSell}x\` **${soldItem.itemName}** for ${customEmoji.a.z_coins} \`${soldItem.itemTotalSellPrice} ${texts.c.u}\``,
             )
             .join("\n");
 
         if (stats.rebirths > 0) {
             responseMessage += `\n-# (+${Math.round(totalRebirthBonus)} ${
                 texts.c.u
-            } from [${stats.rebirths}] Rebirth${
-                stats.rebirths > 1 ? "s" : ""
-            })`;
-        }
-
-        if (hasAppraiseSkill && totalAppraiseBonus > 0) {
-            responseMessage += `\n-# 🔍 (Total Appraisal Skill Bonus: +${totalAppraiseBonus} ${texts.c.u})`;
+            } from ${stats.rebirths} Rebirth${stats.rebirths > 1 ? "s" : ""})`;
         }
 
         if (messages.length > 0) {

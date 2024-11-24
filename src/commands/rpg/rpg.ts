@@ -6,7 +6,7 @@ import { syncStats } from "../../services/userStats";
 import { cooldowns } from "../../utils";
 import { formatChange } from "../../utils/hunt";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
-import { calculateFishingLevel } from "./fish";
+import { calculateFishingLevel } from "./handlers/fishHandler";
 
 export const rpg = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

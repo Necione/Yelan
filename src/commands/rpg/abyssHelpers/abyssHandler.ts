@@ -91,8 +91,6 @@ export async function handleAbyssBattle(
         const initialMonsterHp = currentMonsterHp;
         const initialPlayerHp = currentPlayerHp;
 
-        const hasVampirism = skills.has(stats, "Vampirism");
-
         const createHealthBar = (
             current: number,
             max: number,
@@ -150,8 +148,6 @@ export async function handleAbyssBattle(
             });
         }
 
-        const hasVigilance = skills.has(stats, "Vigilance");
-
         let vigilanceUsed = false;
 
         let isPlayerTurn = false;
@@ -196,7 +192,6 @@ export async function handleAbyssBattle(
                     monster,
                     currentPlayerHp,
                     currentMonsterHp,
-                    hasVigilance,
                     vigilanceUsed,
                     monsterState,
                     isFirstTurn,
@@ -240,25 +235,6 @@ export async function handleAbyssBattle(
                 ]);
 
                 await i.editReply({ embeds: [battleEmbed] }).catch(noop);
-
-                if (currentMonsterHp <= 0) {
-                    if (hasVampirism) {
-                        const healAmount = stats.maxHP * 0.05;
-                        currentPlayerHp = Math.min(
-                            currentPlayerHp + healAmount,
-                            stats.maxHP,
-                        );
-                        const vampirismMessage = `\`🦇\` Vampirism skill activated! You healed \`${healAmount.toFixed(
-                            2,
-                        )}\` HP.`;
-                        if (thread) {
-                            await sendToChannel(thread.id, {
-                                content: `>>> ${vampirismMessage}`,
-                            });
-                        }
-                    }
-                    break;
-                }
 
                 isPlayerTurn = false;
             } else {

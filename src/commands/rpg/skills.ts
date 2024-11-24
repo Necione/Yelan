@@ -1,17 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    type ButtonInteraction,
-    ButtonStyle,
-    ComponentType,
-    EmbedBuilder,
-    type Message,
-    SlashCommandBuilder,
-} from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats } from "../../services";
-import { skills } from "../../utils/skillsData";
+import { getUserSkillLevelData, skills } from "../../utils/skillsData";
 
 function getMaxActiveSkills(alchemyProgress: number): number {
     if (alchemyProgress >= 360) {
@@ -32,10 +23,31 @@ export const skillsCommand = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("skills")
         .setDescription(
-            "[RPG] Displays a list of your active and learned skills.",
+            "[RPG] Displays your skills or details about a specific skill.",
+        )
+        .addStringOption((option) =>
+            option
+                .setName("skill")
+                .setDescription("The skill you want to view")
+                .setRequired(false)
+                .setAutocomplete(true),
         )
         .setDMPermission(false),
     defer: { silent: false },
+    async autocomplete(i) {
+        const searchTerm = i.options.getFocused()?.toLowerCase() || "";
+
+        const options = skills.map((skill) => ({
+            name: `${skill.emoji} ${skill.name}`,
+            value: skill.name,
+        }));
+
+        const filteredOptions = options.filter((option) =>
+            option.name.toLowerCase().includes(searchTerm),
+        );
+
+        return i.respond(filteredOptions.slice(0, 25)).catch(noop);
+    },
     async execute(i, r) {
         const stats = await getUserStats(i.user.id);
 
@@ -45,6 +57,45 @@ export const skillsCommand = buildCommand<SlashCommand>({
                     `No stats found for you, please set up your profile.`,
                 ),
             );
+        }
+
+        const skillName = i.options.getString("skill");
+
+        if (skillName) {
+            const skill = skills.find((s) => s.name === skillName);
+
+            if (!skill) {
+                return r.edit(
+                    embedComment(`The skill "${skillName}" does not exist.`),
+                );
+            }
+
+            const userSkillLevelData = getUserSkillLevelData(stats, skillName);
+
+            const userSkillLevel = userSkillLevelData
+                ? userSkillLevelData.level
+                : 0;
+
+            const embed = new EmbedBuilder()
+                .setColor("Aqua")
+                .setTitle(`\`${skill.emoji}\` ${skill.name} Skill Details`)
+                .setDescription(
+                    skill.levels
+                        .map((level) => {
+                            const isCurrentLevel =
+                                level.level === userSkillLevel;
+                            const levelHeader = isCurrentLevel
+                                ? `**Level ${level.level}:** (Current)`
+                                : `**Level ${level.level}:**`;
+                            return `> ${levelHeader}\n${level.description}`;
+                        })
+                        .join("\n\n"),
+                )
+                .setFooter({
+                    text: `Use /learn to learn or upgrade this skill.`,
+                });
+
+            return r.edit({ embeds: [embed] });
         }
 
         const learnedSkills = stats.skills || [];
@@ -88,55 +139,6 @@ export const skillsCommand = buildCommand<SlashCommand>({
                 { name: "Learned Skills", value: skillsList, inline: true },
             );
 
-        const viewAllSkillsButton = new ButtonBuilder()
-            .setCustomId("view_all_skills")
-            .setLabel("View All Skills")
-            .setStyle(ButtonStyle.Primary);
-
-        const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            viewAllSkillsButton,
-        );
-
-        await i.editReply({ embeds: [embed], components: [actionRow] });
-
-        const message = (await i.fetchReply()) as Message;
-
-        const filter = (interaction: ButtonInteraction) =>
-            interaction.customId === "view_all_skills" &&
-            interaction.user.id === i.user.id;
-
-        try {
-            const buttonInteraction = await message.awaitMessageComponent({
-                filter,
-                componentType: ComponentType.Button,
-                time: 60000,
-            });
-
-            const allSkillsList = skills
-                .map(
-                    (skill) =>
-                        `${skill.emoji} **${skill.name}**: ${skill.description}`,
-                )
-                .join("\n");
-
-            const allSkillsEmbed = new EmbedBuilder()
-                .setColor("Aqua")
-                .setTitle("All Skills")
-                .setDescription(allSkillsList);
-
-            await buttonInteraction.reply({
-                embeds: [allSkillsEmbed],
-                ephemeral: true,
-            });
-        } catch (error) {
-            noop();
-        }
-
-        viewAllSkillsButton.setDisabled(true);
-        const disabledActionRow =
-            new ActionRowBuilder<ButtonBuilder>().addComponents(
-                viewAllSkillsButton,
-            );
-        await message.edit({ components: [disabledActionRow] }).catch(noop);
+        await i.editReply({ embeds: [embed] });
     },
 });

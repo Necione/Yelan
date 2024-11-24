@@ -9,6 +9,7 @@ import {
 import { MonsterGroup } from "../../../utils/monsterHelper";
 import type { WeaponName, WeaponType } from "../../../utils/rpgitems/weapons";
 import { weapons } from "../../../utils/rpgitems/weapons";
+import { getUserSkillLevelData } from "../../../utils/skillsData";
 
 export type MonsterState = {
     displaced: boolean;
@@ -29,7 +30,6 @@ export async function playerAttack(
     monster: Monster,
     currentPlayerHp: number,
     currentMonsterHp: number,
-    hasVigilance: boolean,
     vigilanceUsed: boolean,
     monsterState: MonsterState,
     isFirstTurn: boolean,
@@ -183,31 +183,6 @@ export async function playerAttack(
         );
     }
 
-    if (stats.activeEffects && stats.activeEffects.length > 0) {
-        const weaknessEffect = stats.activeEffects.find(
-            (effect) => effect.name === "Weakness" && effect.remainingUses > 0,
-        );
-        if (weaknessEffect) {
-            attackPower *= 0.75;
-            messages.push(
-                `\`🥀\` Weakness effect reduces your attack power by 25%. (${
-                    weaknessEffect.remainingUses - 1
-                } uses left)`,
-            );
-
-            weaknessEffect.remainingUses -= 1;
-            if (weaknessEffect.remainingUses <= 0) {
-                stats.activeEffects = stats.activeEffects.filter(
-                    (effect) => effect !== weaknessEffect,
-                );
-            }
-
-            await updateUserStats(stats.userId, {
-                activeEffects: stats.activeEffects,
-            });
-        }
-    }
-
     const defenseResult = checkMonsterDefenses(
         attackPower,
         stats,
@@ -230,8 +205,13 @@ export async function playerAttack(
         };
     }
 
-    if (hasVigilance && !vigilanceUsed) {
-        const vigilanceAttackPower = attackPower / 2;
+    const vigilanceLevelData = getUserSkillLevelData(stats, "Vigilance");
+
+    if (vigilanceLevelData && !vigilanceUsed) {
+        const levelData = vigilanceLevelData.levelData || {};
+        const secondAttackPercentage = levelData.secondAttackPercentage || 0;
+
+        const vigilanceAttackPower = attackPower * secondAttackPercentage;
         currentMonsterHp -= vigilanceAttackPower;
         vigilanceUsed = true;
 
@@ -241,7 +221,6 @@ export async function playerAttack(
             )}\` damage to the ${monster.name} ✨ (Vigilance).`,
         );
     }
-
     currentMonsterHp -= attackPower;
 
     sendDamageMessage(
@@ -262,10 +241,13 @@ export async function playerAttack(
         );
     }
 
-    const hasKindle = skills.has(stats, "Kindle");
+    const kindleLevelData = getUserSkillLevelData(stats, "Kindle");
 
-    if (hasKindle) {
-        const kindleBonusDamage = stats.maxHP * 0.1;
+    if (kindleLevelData) {
+        const levelData = kindleLevelData.levelData || {};
+        const damageBonus = levelData.damageBonus || 0;
+
+        const kindleBonusDamage = stats.maxHP * damageBonus;
         currentMonsterHp -= kindleBonusDamage;
 
         messages.push(
@@ -445,15 +427,28 @@ export async function monsterAttack(
         currentPlayerHp = deathThreshold;
     }
 
-    const hasLeechSkill = skills.has(stats, "Leech");
+    const leechLevelData = getUserSkillLevelData(stats, "Leech");
 
-    const leechTriggered = Math.random() < 0.5;
-    if (hasLeechSkill && leechTriggered) {
-        const healAmount = Math.ceil(monsterStats.maxHp * 0.1);
-        currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
-        messages.push(
-            `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}.`,
-        );
+    if (leechLevelData) {
+        const levelData = leechLevelData.levelData || {};
+
+        const lifestealPercentage = levelData.lifestealPercentage || 0;
+        const triggerChance = levelData.triggerChance || 0;
+
+        const leechTriggered = Math.random() < triggerChance;
+
+        if (leechTriggered) {
+            const healAmount = Math.ceil(
+                monsterStats.maxHp * lifestealPercentage,
+            );
+            currentPlayerHp = Math.min(
+                currentPlayerHp + healAmount,
+                stats.maxHP,
+            );
+            messages.push(
+                `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}.`,
+            );
+        }
     }
 
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP);

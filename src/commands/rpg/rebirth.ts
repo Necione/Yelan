@@ -10,7 +10,6 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
 } from "discord.js";
-import { skills } from "../../plugins/other/utils";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
@@ -79,8 +78,6 @@ export const rebirth = buildCommand<SlashCommand>({
             1 +
             Math.min(stats.rebirths, 3) * 0.2 +
             Math.max(0, stats.rebirths - 3) * 0.1;
-        let appraiseBonus = 0;
-        const hasAppraiseSkill = skills.has(stats, "Appraise", false);
 
         for (const item of stats.inventory) {
             const itemData =
@@ -91,13 +88,7 @@ export const rebirth = buildCommand<SlashCommand>({
             if (itemData) {
                 const baseSellPrice = itemData.sellPrice * item.amount;
 
-                let itemSellPrice = baseSellPrice * rebirthMultiplier;
-
-                if (hasAppraiseSkill) {
-                    const itemAppraiseBonus = Math.round(itemSellPrice * 0.05);
-                    itemSellPrice += itemAppraiseBonus;
-                    appraiseBonus += itemAppraiseBonus;
-                }
+                const itemSellPrice = baseSellPrice * rebirthMultiplier;
 
                 totalSellPrice += Math.round(itemSellPrice);
             }
@@ -124,12 +115,9 @@ export const rebirth = buildCommand<SlashCommand>({
 
         if (confirmation.customId === "confirm_rebirth") {
             await handleRebirth(i.user.id, stats, totalSellPrice);
-            const appraiseBonusText =
-                appraiseBonus > 0
-                    ? `\n🔍 (Appraisal Skill Bonus: +${appraiseBonus} ${texts.c.u})`
-                    : "";
+
             const successEmbed = embedComment(
-                `Rebirth complete! All stats and items have been reset.\nAll items have been sold for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\`${appraiseBonusText}`,
+                `Rebirth complete! All stats and items have been reset.\nAll items have been sold for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\``,
                 "Green",
             );
             await confirmation.update({

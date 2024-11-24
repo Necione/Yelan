@@ -1,8 +1,8 @@
+import { type UserStats } from "@prisma/client";
+
 export type SkillName =
     | "Vigilance"
     | "Leech"
-    | "Vampirism"
-    | "Appraise"
     | "Totem"
     | "Insomnia"
     | "Kindle"
@@ -21,10 +21,16 @@ export type SkillName =
     | "Sloth"
     | "Wrath";
 
+export interface SkillLevel {
+    level: number;
+    description: string;
+    levelData?: Record<string, any>;
+}
+
 export interface Skill {
     name: SkillName;
-    description: string;
     emoji: string;
+    levels: SkillLevel[];
     requirements?: {
         worldLevel: number;
         coins: number;
@@ -36,8 +42,32 @@ export interface Skill {
 export const skills: Skill[] = [
     {
         name: "Vigilance",
-        description:
-            "Attack twice at the start of battle, the second attack dealing 50% your base ATK",
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Attack twice at the start of battle, the second attack dealing **25%** of your base ATK",
+                levelData: {
+                    secondAttackPercentage: 0.25,
+                },
+            },
+            {
+                level: 2,
+                description:
+                    "Attack twice at the start of battle, the second attack dealing **50%** of your base ATK",
+                levelData: {
+                    secondAttackPercentage: 0.5,
+                },
+            },
+            {
+                level: 3,
+                description:
+                    "Attack twice at the start of battle, the second attack dealing **70%** of your base ATK",
+                levelData: {
+                    secondAttackPercentage: 0.7,
+                },
+            },
+        ],
         emoji: "✨",
         requirements: {
             worldLevel: 2,
@@ -50,8 +80,35 @@ export const skills: Skill[] = [
     },
     {
         name: "Leech",
-        description:
-            "Gain 10% lifesteal from each enemy's Max HP 50% of the time",
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Gain **5%** lifesteal from each enemy's Max HP **40%** of the time",
+                levelData: {
+                    lifestealPercentage: 0.05,
+                    triggerChance: 0.25,
+                },
+            },
+            {
+                level: 2,
+                description:
+                    "Gain **10%** lifesteal from each enemy's Max HP **50%** of the time",
+                levelData: {
+                    lifestealPercentage: 0.1,
+                    triggerChance: 0.5,
+                },
+            },
+            {
+                level: 3,
+                description:
+                    "Gain **13%** lifesteal from each enemy's Max HP **55%** of the time",
+                levelData: {
+                    lifestealPercentage: 0.13,
+                    triggerChance: 0.55,
+                },
+            },
+        ],
         emoji: "💖",
         requirements: {
             worldLevel: 3,
@@ -60,21 +117,30 @@ export const skills: Skill[] = [
         },
     },
     {
-        name: "Appraise",
-        description: "Sell things for a little bit more than they're worth",
-        emoji: "🔍",
-        requirements: {
-            worldLevel: 1,
-            coins: 100,
-            items: [
-                { item: "Slime Condensate", amount: 2 },
-                { item: "Sharp Arrowhead", amount: 2 },
-            ],
-        },
-    },
-    {
         name: "Totem",
-        description: "Heal 5% of your Max HP after every battle",
+        levels: [
+            {
+                level: 1,
+                description: "Heal **10%** of your Max HP after every battle.",
+                levelData: {
+                    healPercentage: 0.1,
+                },
+            },
+            {
+                level: 2,
+                description: "Heal **15%** of your Max HP after every battle.",
+                levelData: {
+                    healPercentage: 0.15,
+                },
+            },
+            {
+                level: 3,
+                description: "Heal **25%** of your Max HP after every battle.",
+                levelData: {
+                    healPercentage: 0.25,
+                },
+            },
+        ],
         emoji: "⭐",
         requirements: {
             worldLevel: 1,
@@ -84,7 +150,13 @@ export const skills: Skill[] = [
     },
     {
         name: "Insomnia",
-        description: "Reduce your hunt cooldown from 30 minutes to 20 minutes",
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Reduce your hunt cooldown from 30 minutes to 20 minutes",
+            },
+        ],
         emoji: "🌙",
         requirements: {
             worldLevel: 4,
@@ -97,7 +169,32 @@ export const skills: Skill[] = [
     },
     {
         name: "Kindle",
-        description: "Deal 10% of your Max HP as bonus damage per turn",
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Deal **10%** of your Max HP as bonus damage per turn",
+                levelData: {
+                    damageBonus: 0.1,
+                },
+            },
+            {
+                level: 2,
+                description:
+                    "Deal **15%** of your Max HP as bonus damage per turn",
+                levelData: {
+                    damageBonus: 0.15,
+                },
+            },
+            {
+                level: 3,
+                description:
+                    "Deal **25%** of your Max HP as bonus damage per turn",
+                levelData: {
+                    damageBonus: 0.25,
+                },
+            },
+        ],
         emoji: "💥",
         requirements: {
             worldLevel: 5,
@@ -111,7 +208,12 @@ export const skills: Skill[] = [
     },
     {
         name: "Scrounge",
-        description: "In addition to drops, earn coins per hunt",
+        levels: [
+            {
+                level: 1,
+                description: "In addition to drops, earn coins per hunt",
+            },
+        ],
         emoji: "💸",
         requirements: {
             worldLevel: 3,
@@ -124,8 +226,13 @@ export const skills: Skill[] = [
     },
     {
         name: "Energize",
-        description:
-            "Reduce your explore cooldown from 30 minutes to 20 minutes",
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Reduce your explore cooldown from 30 minutes to 20 minutes",
+            },
+        ],
         emoji: "⚡",
         requirements: {
             worldLevel: 5,
@@ -138,7 +245,12 @@ export const skills: Skill[] = [
     },
     {
         name: "Distraction",
-        description: "Go first 75% of the time when hunting",
+        levels: [
+            {
+                level: 1,
+                description: "Go first 75% of the time when hunting",
+            },
+        ],
         emoji: "💫",
         requirements: {
             worldLevel: 10,
@@ -148,7 +260,12 @@ export const skills: Skill[] = [
     },
     {
         name: "Backstab",
-        description: "Deal 150% more DMG to humans",
+        levels: [
+            {
+                level: 1,
+                description: "Deal 150% more DMG to humans",
+            },
+        ],
         emoji: "🔪",
         requirements: {
             worldLevel: 10,
@@ -161,22 +278,13 @@ export const skills: Skill[] = [
         },
     },
     {
-        name: "Vampirism",
-        description: "Gain 3% lifesteal from each enemy's Max HP on victory",
-        emoji: "🦇",
-        requirements: {
-            worldLevel: 15,
-            rebirthsRequired: 1,
-            coins: 250,
-            items: [
-                { item: "Slime Concentrate", amount: 10 },
-                { item: "Sergeant's Insignia", amount: 5 },
-            ],
-        },
-    },
-    {
         name: "Growth",
-        description: "Earn 150% more EXP at the end of each battle",
+        levels: [
+            {
+                level: 1,
+                description: "Earn 150% more EXP at the end of each battle",
+            },
+        ],
         emoji: "🌱",
         requirements: {
             worldLevel: 10,
@@ -190,7 +298,12 @@ export const skills: Skill[] = [
     },
     {
         name: "Fatigue",
-        description: "Monsters deal more DMG early, but less later on",
+        levels: [
+            {
+                level: 1,
+                description: "Monsters deal more DMG early, but less later on",
+            },
+        ],
         emoji: "🐌",
         requirements: {
             worldLevel: 10,
@@ -205,7 +318,13 @@ export const skills: Skill[] = [
     },
     {
         name: "Heartbroken",
-        description: "Deal 1/4 of your HP as bonus DMG on your first turn",
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Deal 25% of your HP as bonus DMG on your first turn",
+            },
+        ],
         emoji: "💔",
         requirements: {
             worldLevel: 10,
@@ -219,7 +338,12 @@ export const skills: Skill[] = [
     },
     {
         name: "Crystallize",
-        description: "Monsters deal less DMG early, but more later on",
+        levels: [
+            {
+                level: 1,
+                description: "Monsters deal less DMG early, but more later on",
+            },
+        ],
         emoji: "🧊",
         requirements: {
             worldLevel: 10,
@@ -234,7 +358,12 @@ export const skills: Skill[] = [
     },
     {
         name: "Vigor",
-        description: "Deal more damage at lower HP",
+        levels: [
+            {
+                level: 1,
+                description: "Deal more damage at lower HP",
+            },
+        ],
         emoji: "💪",
         requirements: {
             worldLevel: 10,
@@ -249,8 +378,13 @@ export const skills: Skill[] = [
     },
     {
         name: "Paladin",
-        description: "Your DEF Value and ATK Value are swapped",
-        emoji: "⚜️",
+        levels: [
+            {
+                level: 1,
+                description: "Your DEF Value and ATK Value are swapped",
+            },
+        ],
+        emoji: "🛡️",
         requirements: {
             worldLevel: 10,
             rebirthsRequired: 2,
@@ -263,7 +397,12 @@ export const skills: Skill[] = [
     },
     {
         name: "Sloth",
-        description: "Start each round with 125% your current HP",
+        levels: [
+            {
+                level: 1,
+                description: "Start each round with 125% your current HP",
+            },
+        ],
         emoji: "💤",
         requirements: {
             worldLevel: 15,
@@ -278,7 +417,13 @@ export const skills: Skill[] = [
     },
     {
         name: "Wrath",
-        description: "Deal 150% more DMG, start each round with 25% less HP",
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Deal 150% more DMG, start each round with 25% less HP",
+            },
+        ],
         emoji: "💢",
         requirements: {
             worldLevel: 15,
@@ -293,7 +438,13 @@ export const skills: Skill[] = [
     },
     {
         name: "Pride",
-        description: "Never go first, deal 250% more damage afterwards.",
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Never go first, deal 250% more damage afterwards.",
+            },
+        ],
         emoji: "🏅",
         requirements: {
             worldLevel: 15,
@@ -308,7 +459,13 @@ export const skills: Skill[] = [
     },
     {
         name: "Greed",
-        description: "Get max drops, all drops, 100% of the time after a hunt.",
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Get max drops, all drops, 100% of the time after a hunt.",
+            },
+        ],
         emoji: "🖤",
         requirements: {
             worldLevel: 25,
@@ -342,3 +499,26 @@ export const skillsMap: Record<SkillName, Skill> = skills.reduce(
     },
     {} as Record<SkillName, Skill>,
 );
+
+export function getUserSkillLevelData(
+    userStats: UserStats,
+    skillName: string,
+): SkillLevel | undefined {
+    if (!userStats.activeSkills.includes(skillName)) {
+        return undefined;
+    }
+
+    const userSkill = userStats.skills.find(
+        (skill) => skill.name === skillName,
+    );
+    if (!userSkill) {
+        return undefined;
+    }
+
+    const skillData = skills.find((skill) => skill.name === skillName);
+    if (!skillData) {
+        return undefined;
+    }
+
+    return skillData.levels.find((lvl) => lvl.level === userSkill.level);
+}

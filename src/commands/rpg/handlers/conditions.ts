@@ -11,6 +11,7 @@ import {
 import { cooldowns, texts } from "../../../utils";
 import { calculateDrop, calculateExp, type Monster } from "../../../utils/hunt";
 import { weapons, type WeaponName } from "../../../utils/rpgitems/weapons";
+import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {
     getAvailableDirections,
     getCurrentMap,
@@ -120,11 +121,12 @@ export async function handleVictory(
             monstersEncountered[monstersEncountered.length - 1].image,
         );
 
-    const hasTotemSkill = skills.has(stats, "Totem");
+    const totemLevelData = getUserSkillLevelData(stats, "Totem");
 
-    if (hasTotemSkill) {
-        const totemHeal = 0.05;
-        const healAmount = Math.ceil(stats.maxHP * totemHeal);
+    if (totemLevelData) {
+        const levelData = totemLevelData.levelData || {};
+        const healPercentage = levelData.healPercentage || 0;
+        const healAmount = Math.ceil(stats.maxHP * healPercentage);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
 
         skillsActivated += `\`💖\` Healed \`${healAmount}\` HP due to the Totem skill.\n`;
@@ -250,11 +252,12 @@ export async function handleAbyssVictory(
             monstersEncountered[monstersEncountered.length - 1].image,
         );
 
-    const hasTotemSkill = skills.has(stats, "Totem");
+    const totemLevelData = getUserSkillLevelData(stats, "Totem");
 
-    if (hasTotemSkill) {
-        const totemHeal = 0.05;
-        const healAmount = Math.ceil(stats.maxHP * totemHeal);
+    if (totemLevelData) {
+        const levelData = totemLevelData.levelData || {};
+        const healPercentage = levelData.healPercentage || 0;
+        const healAmount = Math.ceil(stats.maxHP * healPercentage);
         currentPlayerHp = Math.min(currentPlayerHp + healAmount, stats.maxHP);
 
         skillsActivated += `\`💖\` Healed \`${healAmount}\` HP due to the Totem skill.\n`;

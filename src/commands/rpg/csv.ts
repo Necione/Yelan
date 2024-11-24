@@ -2,7 +2,6 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { skills } from "../../plugins/other/utils";
 import { getUserStats } from "../../services";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
@@ -40,8 +39,6 @@ export const csv = buildCommand<SlashCommand>({
             1 +
             Math.min(stats.rebirths, 3) * 0.2 +
             Math.max(0, stats.rebirths - 3) * 0.1;
-        let appraiseBonus = 0;
-        const hasAppraiseSkill = skills.has(stats, "Appraise", false);
 
         for (const item of stats.inventory) {
             const itemData =
@@ -51,28 +48,17 @@ export const csv = buildCommand<SlashCommand>({
 
             if (itemData) {
                 const baseSellPrice = itemData.sellPrice * item.amount;
-                let itemSellPrice = baseSellPrice * rebirthMultiplier;
-
-                if (hasAppraiseSkill) {
-                    const itemAppraiseBonus = Math.round(itemSellPrice * 0.05);
-                    itemSellPrice += itemAppraiseBonus;
-                    appraiseBonus += itemAppraiseBonus;
-                }
+                const itemSellPrice = baseSellPrice * rebirthMultiplier;
 
                 totalSellPrice += Math.round(itemSellPrice);
             }
         }
 
-        const appraiseBonusText =
-            appraiseBonus > 0
-                ? `\n🔍 (Appraisal Skill Bonus: +${appraiseBonus} ${texts.c.u})`
-                : "";
-
         const resultEmbed = new EmbedBuilder()
             .setColor("Blue")
             .setTitle(`${targetUser.username}'s Rebirth Sell Value`)
             .setDescription(
-                `If ${targetUser.username} were to rebirth, all items could be sold for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\`${appraiseBonusText}.`,
+                `If ${targetUser.username} were to rebirth, all items could be sold for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\``,
             );
 
         return r.edit({

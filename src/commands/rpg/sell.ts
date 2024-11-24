@@ -2,7 +2,6 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
-import { skills } from "../../plugins/other/utils";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
@@ -174,17 +173,8 @@ export const sell = buildCommand<SlashCommand>({
             (rebirthMultiplier - 1) * baseSellPrice * amountToSell;
 
         let totalSellPrice = baseSellPrice * amountToSell * rebirthMultiplier;
-        let appraiseBonusMessage = "";
-        let appraiseBonus = 0;
-        const hasAppraiseSkill = skills.has(stats, "Appraise", false);
 
-        if (hasAppraiseSkill) {
-            appraiseBonus = Math.round(totalSellPrice * 0.05);
-            totalSellPrice = Math.round(totalSellPrice + appraiseBonus);
-            appraiseBonusMessage = `\n-# 🔍 (Appraisal Skill Bonus: +${appraiseBonus} ${texts.c.u})`;
-        } else {
-            totalSellPrice = Math.round(totalSellPrice);
-        }
+        totalSellPrice = Math.round(totalSellPrice);
 
         item.amount -= amountToSell;
         if (item.amount <= 0) {
@@ -209,9 +199,9 @@ export const sell = buildCommand<SlashCommand>({
 
         const rebirthBonusMessage =
             stats.rebirths > 0
-                ? ` (+${Math.round(rebirthBonus)} ${texts.c.u} from [${
+                ? `\n-# (+${Math.round(rebirthBonus)} ${texts.c.u} from ${
                       stats.rebirths
-                  }] Rebirth${stats.rebirths > 1 ? "s" : ""})`
+                  } Rebirth${stats.rebirths > 1 ? "s" : ""})`
                 : "";
 
         return r.edit(
@@ -220,7 +210,7 @@ export const sell = buildCommand<SlashCommand>({
                     item.metadata?.length ? ` (${item.metadata.length} cm)` : ""
                 }** for ${customEmoji.a.z_coins} \`${totalSellPrice} ${
                     texts.c.u
-                }\`${rebirthBonusMessage}${appraiseBonusMessage}!`,
+                }\`${rebirthBonusMessage}`,
                 "Green",
             ),
         );
