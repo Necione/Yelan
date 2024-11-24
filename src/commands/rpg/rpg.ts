@@ -6,6 +6,7 @@ import { syncStats } from "../../services/userStats";
 import { cooldowns } from "../../utils";
 import { formatChange } from "../../utils/hunt";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
+import { calculateFishingLevel } from "./fish";
 
 export const rpg = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -54,13 +55,21 @@ export const rpg = buildCommand<SlashCommand>({
         if (category === "Fishing") {
             const fishCooldown = cooldowns.get(p, "fish");
 
+            const { requiredFishesForNextLevel } = calculateFishingLevel(
+                stats.fishingLevel,
+                stats.timesFishedForLevel || 0,
+            );
+
+            const fishCaughtForLevel = stats.timesFishedForLevel || 0;
+            const fishNeededForNextLevel = requiredFishesForNextLevel;
+
             const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
             const embed = new EmbedBuilder()
                 .setColor(embedColor)
                 .setTitle(`${i.user.username}'s Fishing Stats`)
                 .setThumbnail(i.user.displayAvatarURL())
                 .setDescription(
-                    `🎣 Fishing Level: \`${stats.fishingLevel}\` | 🐟 Fish Caught: \`${stats.timesFished}\``,
+                    `🎣 Fishing Level: \`${stats.fishingLevel}\` (\`${fishCaughtForLevel}/${fishNeededForNextLevel}\` fish caught)`,
                 )
                 .addFields({
                     name: "Fishing Records",

@@ -383,7 +383,7 @@ function selectFish(
     return fishArray[fishArray.length - 1];
 }
 
-function calculateFishingLevel(
+export function calculateFishingLevel(
     currentLevel: number,
     timesFishedForLevel: number,
 ): { levelUp: boolean; requiredFishesForNextLevel: number } {
