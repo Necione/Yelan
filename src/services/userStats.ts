@@ -47,7 +47,8 @@ export async function syncStats(userId: string) {
 
     const assignedCritValueBonus = (stats.assignedCritValue || 0) * 0.01;
     const assignedDefValueBonus = (stats.assignedDefValue || 0) * 1;
-
+    const calculatedBaseMana =
+        100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 5;
     const totalStats = {
         critChance: 1,
         defChance: 0,
@@ -56,12 +57,11 @@ export async function syncStats(userId: string) {
         defValue: assignedDefValueBonus,
         maxHP: finalMaxHP,
         healEffectiveness: 0,
-        maxMana: stats.maxMana,
+        maxMana: calculatedBaseMana,
     };
 
     const catalystMasteryPoints = stats.masteryCatalyst || 0;
     const catalystMastery = calculateMasteryLevel(catalystMasteryPoints);
-
     const catalystManaBonuses: { [level: number]: number } = {
         1: 10,
         3: 30,
@@ -91,6 +91,7 @@ export async function syncStats(userId: string) {
         "Goblet",
         "Circlet",
     ];
+
     const equippedArtifacts: { [slot in ArtifactType]?: ArtifactName } = {};
 
     for (const type of artifactTypes) {
@@ -140,59 +141,50 @@ export async function syncStats(userId: string) {
     totalStats.defValue = Math.max(0, totalStats.defValue);
     totalStats.maxHP = Math.floor(totalStats.maxHP);
     totalStats.healEffectiveness = Math.max(0, totalStats.healEffectiveness);
+    totalStats.maxMana = Math.floor(totalStats.maxMana);
 
     let needsUpdate = false;
+    const updateData: Prisma.UserStatsUpdateInput = {};
 
     if (stats.maxMana !== totalStats.maxMana) {
-        stats.maxMana = totalStats.maxMana;
+        updateData.maxMana = { set: totalStats.maxMana };
         needsUpdate = true;
     }
-
     if (stats.baseAttack !== alchemyBaseAttack) {
-        stats.baseAttack = alchemyBaseAttack;
+        updateData.baseAttack = { set: alchemyBaseAttack };
         needsUpdate = true;
     }
     if (stats.attackPower !== totalStats.attackPower) {
-        stats.attackPower = totalStats.attackPower;
+        updateData.attackPower = { set: totalStats.attackPower };
         needsUpdate = true;
     }
     if (stats.maxHP !== totalStats.maxHP) {
-        stats.maxHP = totalStats.maxHP;
+        updateData.maxHP = { set: totalStats.maxHP };
         needsUpdate = true;
     }
     if (stats.critChance !== totalStats.critChance) {
-        stats.critChance = totalStats.critChance;
+        updateData.critChance = { set: totalStats.critChance };
         needsUpdate = true;
     }
     if (stats.critValue !== totalStats.critValue) {
-        stats.critValue = totalStats.critValue;
+        updateData.critValue = { set: totalStats.critValue };
         needsUpdate = true;
     }
     if (stats.defChance !== totalStats.defChance) {
-        stats.defChance = totalStats.defChance;
+        updateData.defChance = { set: totalStats.defChance };
         needsUpdate = true;
     }
     if (stats.defValue !== totalStats.defValue) {
-        stats.defValue = totalStats.defValue;
+        updateData.defValue = { set: totalStats.defValue };
         needsUpdate = true;
     }
     if (stats.healEffectiveness !== totalStats.healEffectiveness) {
-        stats.healEffectiveness = totalStats.healEffectiveness;
+        updateData.healEffectiveness = { set: totalStats.healEffectiveness };
         needsUpdate = true;
     }
 
     if (needsUpdate) {
-        return await updateUserStats(userId, {
-            baseAttack: { set: alchemyBaseAttack },
-            attackPower: { set: totalStats.attackPower },
-            maxHP: { set: totalStats.maxHP },
-            critChance: { set: totalStats.critChance },
-            critValue: { set: totalStats.critValue },
-            defChance: { set: totalStats.defChance },
-            defValue: { set: totalStats.defValue },
-            healEffectiveness: { set: totalStats.healEffectiveness },
-            maxMana: { set: totalStats.maxMana },
-        });
+        return await updateUserStats(userId, updateData);
     }
 
     return stats;
@@ -255,6 +247,7 @@ export const getUserStats = async (userId: string) => {
                 exp: 0,
                 worldLevel: 1,
                 healEffectiveness: 0,
+                maxMana: 20,
             },
             update: {},
         })
@@ -324,7 +317,6 @@ export const addItemToInventory = async (
         },
     });
 };
-
 export const removeItemFromInventory = async (
     userId: string,
     itemName: string,
@@ -345,9 +337,11 @@ export const removeItemFromInventory = async (
     const itemIndex = inventory.findIndex(
         (c) => c.item === itemName && compareMetadata(c.metadata, metadata),
     );
+
     if (itemIndex === -1) {
         return null;
     }
+
     const item = inventory[itemIndex];
     item.amount = Math.floor(item.amount - amount);
     if (item.amount <= 0) {

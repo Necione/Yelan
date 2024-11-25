@@ -18,7 +18,7 @@ import {
 } from "../../../utils/hunt";
 import { calculateMasteryLevel } from "../../../utils/masteryHelper";
 import { handleRandomEvent } from "../../../utils/randomEvents";
-import { WeaponName, weapons } from "../../../utils/rpgitems/weapons";
+import { type WeaponName, weapons } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {
     getDeathThreshold,
