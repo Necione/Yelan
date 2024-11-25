@@ -6,6 +6,8 @@ import {
     weaponAdvantages,
     type Monster,
 } from "../../../utils/hunt";
+import { masteryBenefits } from "../../../utils/masteryData";
+import { calculateMasteryLevel } from "../../../utils/masteryHelper";
 import { MonsterGroup } from "../../../utils/monsterHelper";
 import type { WeaponName, WeaponType } from "../../../utils/rpgitems/weapons";
 import { weapons } from "../../../utils/rpgitems/weapons";
@@ -512,6 +514,28 @@ export function applyAttackModifiers(
                 `\`⚔️\` **${weaponType}** advantage! You deal 110% more DMG to **${monster.group}**.`,
             );
         }
+
+        const masteryField = `mastery${weaponType}` as keyof UserStats;
+        const masteryPointsRaw = stats[masteryField];
+        const masteryPoints =
+            typeof masteryPointsRaw === "number" ? masteryPointsRaw : 0;
+
+        const { numericLevel } = calculateMasteryLevel(masteryPoints);
+
+        const masteryBenefit = masteryBenefits[weaponType]?.[numericLevel];
+        if (masteryBenefit?.description) {
+            const damageMultiplierMatch =
+                masteryBenefit.description.match(/(\d+)% damage/);
+            if (damageMultiplierMatch) {
+                const multiplier = parseInt(damageMultiplierMatch[1], 10) / 100;
+                attackPower *= multiplier;
+                messages.push(
+                    `\`➰\` Mastery effect activated! Your ${weaponType} deals ${(
+                        multiplier * 100
+                    ).toFixed(0)}% damage.`,
+                );
+            }
+        }
     }
 
     const furyEffect = stats.activeEffects.find(
@@ -531,6 +555,7 @@ export function applyAttackModifiers(
             );
         }
     }
+
     return { attackPower, monsterState };
 }
 
