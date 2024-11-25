@@ -138,6 +138,31 @@ export async function handleVictory(
         const weaponName = stats.equippedWeapon as WeaponName;
         const equippedWeapon = weapons[weaponName];
 
+        if (equippedWeapon) {
+            switch (equippedWeapon.type) {
+                case "Sword":
+                    stats.masterySword += 1;
+                    break;
+                case "Claymore":
+                    stats.masteryClaymore += 1;
+                    break;
+                case "Bow":
+                    stats.masteryBow += 1;
+                    break;
+                case "Polearm":
+                    stats.masteryPolearm += 1;
+                    break;
+                case "Catalyst":
+                    stats.masteryCatalyst += 1;
+                    break;
+                case "Rod":
+                    stats.masteryRod += 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         if (equippedWeapon && equippedWeapon.type === "Catalyst") {
             const manaRestored = Math.floor(Math.random() * 11) + 5;
             const newMana = Math.min(stats.mana + manaRestored, stats.maxMana);
@@ -156,6 +181,12 @@ export async function handleVictory(
         hp: currentPlayerHp,
         ...(manaFieldAdded && { mana: stats.mana }),
         activeEffects: stats.activeEffects,
+        masterySword: stats.masterySword,
+        masteryClaymore: stats.masteryClaymore,
+        masteryBow: stats.masteryBow,
+        masteryPolearm: stats.masteryPolearm,
+        masteryCatalyst: stats.masteryCatalyst,
+        masteryRod: stats.masteryRod,
     });
 
     if (effectsActivated) {

@@ -15,6 +15,7 @@ export * from "./fish";
 export * from "./heal";
 export * from "./hunt";
 export * from "./learn";
+export * from "./masteries";
 export * from "./monster";
 export * from "./move";
 export * from "./rebirth";

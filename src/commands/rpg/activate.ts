@@ -1,8 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { skills } from "../../utils/skillsData";
+import { specialSkills } from "../../utils/specialSkills";
 
 const sinSkills = ["Wrath", "Sloth", "Pride", "Greed"];
 const mutuallyExclusiveSkills = ["Crystallize", "Fatigue"];
@@ -17,11 +18,6 @@ function getMaxActiveSkills(alchemyProgress: number): number {
     }
 }
 
-const skillChoices = skills.map((skill) => ({
-    name: `${skill.emoji} ${skill.name}`,
-    value: skill.name,
-}));
-
 export const activate = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("activate")
@@ -31,9 +27,29 @@ export const activate = buildCommand<SlashCommand>({
                 .setName("skill")
                 .setDescription("The skill you want to activate or deactivate")
                 .setRequired(true)
-                .addChoices(...skillChoices),
+                .setAutocomplete(true),
         ),
     defer: { silent: false },
+    async autocomplete(i) {
+        const searchTerm = i.options.getFocused()?.toLowerCase() || "";
+
+        const allOptions = [
+            ...skills.map((skill) => ({
+                name: `${skill.name}`,
+                value: skill.name,
+            })),
+            ...specialSkills.map((special) => ({
+                name: `${special.skillName}`,
+                value: special.skillName,
+            })),
+        ];
+
+        const filteredOptions = allOptions.filter((option) =>
+            option.name.toLowerCase().includes(searchTerm),
+        );
+
+        return i.respond(filteredOptions.slice(0, 25)).catch(noop);
+    },
     async execute(i, r) {
         const skillName = i.options.getString("skill", true);
         const stats = await getUserStats(i.user.id);
@@ -48,17 +64,32 @@ export const activate = buildCommand<SlashCommand>({
 
         const learnedSkills = stats.skills || [];
         let activeSkills = stats.activeSkills || [];
+        const unlockedSpecialSkills = stats.unlockedSpecialSkills || [];
 
         const alchemyProgress = stats.alchemyProgress || 0;
         const MAX_ACTIVE_SKILLS = getMaxActiveSkills(alchemyProgress);
 
-        const skillToActivate = learnedSkills.find(
-            (skill) => skill.name === skillName,
+        const isSpecialSkill = specialSkills.some(
+            (skill) => skill.skillName === skillName,
         );
-        if (!skillToActivate) {
+        if (isSpecialSkill && !unlockedSpecialSkills.includes(skillName)) {
             return r.edit(
                 embedComment(
-                    `You haven't learned the skill "${skillName}" yet.`,
+                    `The special skill "${skillName}" is not yet unlocked.`,
+                ),
+            );
+        }
+
+        const isLearned = learnedSkills.find(
+            (skill) => skill.name === skillName,
+        );
+        const isUnlockedSpecial =
+            isSpecialSkill && unlockedSpecialSkills.includes(skillName);
+
+        if (!isLearned && !isUnlockedSpecial) {
+            return r.edit(
+                embedComment(
+                    `You haven't learned or unlocked the skill "${skillName}" yet.`,
                 ),
             );
         }

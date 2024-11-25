@@ -45,7 +45,7 @@ export const skills: Skill[] = [
             {
                 level: 1,
                 description:
-                    "Attack twice at the start of battle, the second attack dealing **25%** of your base ATK",
+                    "Attack twice at the start of battle, the second attack dealing **25%** of your ATK",
                 levelData: {
                     secondAttackPercentage: 0.25,
                 },
@@ -53,7 +53,7 @@ export const skills: Skill[] = [
             {
                 level: 2,
                 description:
-                    "Attack twice at the start of battle, the second attack dealing **50%** of your base ATK",
+                    "Attack twice at the start of battle, the second attack dealing **50%** of your ATK",
                 levelData: {
                     secondAttackPercentage: 0.5,
                 },
@@ -61,7 +61,7 @@ export const skills: Skill[] = [
             {
                 level: 3,
                 description:
-                    "Attack twice at the start of battle, the second attack dealing **70%** of your base ATK",
+                    "Attack twice at the start of battle, the second attack dealing **70%** of your ATK",
                 levelData: {
                     secondAttackPercentage: 0.7,
                 },

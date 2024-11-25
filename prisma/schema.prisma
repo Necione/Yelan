@@ -238,6 +238,13 @@ model UserStats {
   longestFish               Float          @default(0)
   lifetimeFishCaught        Int            @default(0)
   legendariesCaught         Int            @default(0)
+  masterySword              Int            @default(0)
+  masteryClaymore           Int            @default(0)
+  masteryBow                Int            @default(0)
+  masteryPolearm            Int            @default(0)
+  masteryCatalyst           Int            @default(0)
+  masteryRod                Int            @default(0)
+  unlockedSpecialSkills     String[]       @default([])
 }
 
 type UserRequest {
