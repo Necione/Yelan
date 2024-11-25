@@ -48,7 +48,7 @@ export async function syncStats(userId: string) {
     const assignedCritValueBonus = (stats.assignedCritValue || 0) * 0.01;
     const assignedDefValueBonus = (stats.assignedDefValue || 0) * 1;
     const calculatedBaseMana = 20;
-    
+
     const totalStats = {
         critChance: 1,
         defChance: 0,

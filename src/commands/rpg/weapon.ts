@@ -162,6 +162,16 @@ export const weapon = buildCommand<SlashCommand>({
 
             if (
                 fullWeaponName &&
+                fullWeaponName.includes("Wolf's Gravestone")
+            ) {
+                embed.addFields({
+                    name: "Special Effect",
+                    value: "Deal 50% more damage per 1000 HP the monster has.",
+                });
+            }
+
+            if (
+                fullWeaponName &&
                 fullWeaponName.includes("Vortex Vanquisher")
             ) {
                 embed.addFields({

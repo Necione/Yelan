@@ -536,6 +536,19 @@ export function applyAttackModifiers(
                 );
             }
         }
+
+        if (equippedWeaponName.includes("Wolf's Gravestone")) {
+            const hpThreshold = Math.floor(monster.currentHp / 1000);
+            if (hpThreshold > 0) {
+                const damageMultiplier = 1 + 0.5 * hpThreshold;
+                attackPower *= damageMultiplier;
+                messages.push(
+                    `\`🐺\` Wolf's Gravestone effect! You deal ${(
+                        damageMultiplier * 100
+                    ).toFixed(0)}% more damage based on the monster's HP.`,
+                );
+            }
+        }
     }
 
     const furyEffect = stats.activeEffects.find(

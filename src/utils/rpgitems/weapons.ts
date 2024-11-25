@@ -757,6 +757,22 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Absolution1:1303960695653535776>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/absolution.png",
     },
+    "Wolf's Gravestone": {
+        name: "Wolf's Gravestone",
+        type: "Claymore",
+        sellPrice: 100,
+        attackPower: 55,
+        critChance: 20,
+        critValue: 1.75,
+        defValue: 150,
+        defChance: 0.2,
+        additionalHP: -500,
+        minWorldLevel: 25,
+        chestChance: 1,
+        emoji: "<:Weapon_Wolfs_Gravestone:1310711268851716247>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/wolfs_gravestone.png",
+    },
     "Memory of Dust": {
         name: "Memory of Dust",
         type: "Catalyst",
