@@ -1,6 +1,7 @@
 import { noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
+import { calculateMasteryLevel } from "../utils/masteryHelper";
 import type {
     ArtifactSetName,
     ArtifactType,
@@ -55,7 +56,22 @@ export async function syncStats(userId: string) {
         defValue: assignedDefValueBonus,
         maxHP: finalMaxHP,
         healEffectiveness: 0,
+        maxMana: stats.maxMana,
     };
+
+    const catalystMasteryPoints = stats.masteryCatalyst || 0;
+    const catalystMastery = calculateMasteryLevel(catalystMasteryPoints);
+
+    const catalystManaBonuses: { [level: number]: number } = {
+        1: 10,
+        3: 30,
+    };
+
+    for (let level = 1; level <= catalystMastery.numericLevel; level++) {
+        if (catalystManaBonuses[level]) {
+            totalStats.maxMana += catalystManaBonuses[level];
+        }
+    }
 
     if (stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]) {
         const weapon = weapons[stats.equippedWeapon as WeaponName];
@@ -127,6 +143,11 @@ export async function syncStats(userId: string) {
 
     let needsUpdate = false;
 
+    if (stats.maxMana !== totalStats.maxMana) {
+        stats.maxMana = totalStats.maxMana;
+        needsUpdate = true;
+    }
+
     if (stats.baseAttack !== alchemyBaseAttack) {
         stats.baseAttack = alchemyBaseAttack;
         needsUpdate = true;
@@ -170,6 +191,7 @@ export async function syncStats(userId: string) {
             defChance: { set: totalStats.defChance },
             defValue: { set: totalStats.defValue },
             healEffectiveness: { set: totalStats.healEffectiveness },
+            maxMana: { set: totalStats.maxMana },
         });
     }
 

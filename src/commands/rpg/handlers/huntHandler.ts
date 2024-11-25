@@ -16,7 +16,9 @@ import {
     initializeMonsters,
     type Monster,
 } from "../../../utils/hunt";
+import { calculateMasteryLevel } from "../../../utils/masteryHelper";
 import { handleRandomEvent } from "../../../utils/randomEvents";
+import { WeaponName, weapons } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {
     getDeathThreshold,
@@ -82,6 +84,20 @@ export async function handleHunt(
 
     const hasSloth = skills.has(stats, "Sloth");
     const hasWrath = skills.has(stats, "Wrath");
+
+    const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
+    const weaponType = equippedWeaponName
+        ? weapons[equippedWeaponName]?.type
+        : undefined;
+
+    const isWieldingPolearm = weaponType === "Polearm";
+    const masteryPoints = stats.masteryPolearm || 0;
+    const polearmMastery = calculateMasteryLevel(masteryPoints);
+    const polearmMasteryLevel = polearmMastery.numericLevel;
+
+    if (isWieldingPolearm && polearmMasteryLevel >= 1) {
+        currentPlayerHp = Math.floor(currentPlayerHp * 1.1);
+    }
 
     if (hasSloth) {
         currentPlayerHp = Math.floor(currentPlayerHp * 1.25);
@@ -250,6 +266,13 @@ export async function handleHunt(
         let turnNumber = 1;
 
         const startingMessages = make.array<string>();
+
+        if (isWieldingPolearm && polearmMasteryLevel >= 1) {
+            startingMessages.push(
+                `\`💙\` **Polearm Mastery** activated. Your starting HP is increased by 10%.`,
+            );
+        }
+
         if (hasSloth) {
             startingMessages.push(
                 `\`💤\` **SIN OF SLOTH** activated. Your starting HP is increased by 25%.`,
