@@ -1,4 +1,11 @@
-import { formatNumber, is, sleep, status } from "@elara-services/utils";
+import {
+    formatNumber,
+    get,
+    is,
+    sleep,
+    snowflakes,
+    status,
+} from "@elara-services/utils";
 import {
     getBalanceLimit,
     getDifference,
@@ -8,7 +15,7 @@ import {
 } from "@liyueharbor/econ";
 import { Prisma, type UserWallet } from "@prisma/client";
 import { prisma } from "../prisma";
-import { logs } from "../utils";
+import { getAmount, logs } from "../utils";
 
 // This function is not atomic, be careful when calling
 export async function updateUserProfile(
@@ -40,18 +47,6 @@ export async function updateUserProfile(
                 return res(null);
             });
     });
-}
-
-export async function updateStrikes(userId: string, strikes: number) {
-    return await updateUserProfile(userId, { strikes });
-}
-
-export async function getStrikes(userId: string): Promise<number | null> {
-    const profile = await getProfileByUserId(userId);
-    if (!profile) {
-        return null;
-    }
-    return profile.strikes;
 }
 
 export async function updateRankedUID(userId: string, uid: number | null) {
@@ -233,4 +228,64 @@ export async function updatePets(userId: string, data: Prisma.PetsUpdateInput) {
         where: { userId },
         data,
     });
+}
+
+export async function addStrike(userId: string, mod: string, reason: string) {
+    const p = await getProfileByUserId(userId);
+    if (!p) {
+        return status.error(`Unable to find the user profile for ${userId}`);
+    }
+    if (!is.array(p.strike)) {
+        p.strike = [];
+    }
+    const id = snowflakes.generate();
+    p.strike.push({
+        date: new Date().toISOString(),
+        expires: new Date(Date.now() + get.days(30)).toISOString(),
+        id,
+        mod,
+        reason,
+    });
+    const fine = p.strike.length * 200;
+    const data = await updateUserProfile(userId, {
+        balance: { decrement: fine },
+        strike: { set: p.strike },
+    });
+    if (!data) {
+        return status.error(`Unable to add the strike to the user.`);
+    }
+    await logs.action(
+        userId,
+        fine,
+        "remove",
+        `Fine for strike (${id}) issued by <@${mod}> (\`${mod}\`). Reason: ${reason}`,
+    );
+    return {
+        status: true,
+        message: `Successfully added the strike to the user and fined them ${getAmount(
+            fine,
+        )}`,
+        data,
+        fine,
+    };
+}
+
+export async function removeStrike(userId: string, id: string) {
+    const db = await getProfileByUserId(userId);
+    if (!db) {
+        return status.error(`Unable to find/create (${userId})'s profile`);
+    }
+    const f = (db.strike || []).find((c) => c.id === id);
+    if (!f) {
+        return status.error(`Strike (${id}) not found.`);
+    }
+    const data = await updateUserProfile(userId, {
+        strike: {
+            set: db.strike.filter((c) => c.id !== f.id),
+        },
+    });
+    if (!data) {
+        return status.error(`Unable to remove (${id}) strike.`);
+    }
+    return status.data(data);
 }

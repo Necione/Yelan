@@ -62,8 +62,8 @@ export const stats = buildCommand({
             if (is.number(db.triviaPoints)) {
                 inc("trivia_points", db.triviaPoints);
             }
-            if (is.number(db.strikes)) {
-                inc("strikes", db.strikes);
+            if (is.array(db.strike)) {
+                inc("strikes", db.strike.length);
             }
 
             if (is.number(db.staffCredits)) {
