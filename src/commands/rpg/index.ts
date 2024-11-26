@@ -30,3 +30,4 @@ export * from "./unequip";
 export * from "./upgrade";
 export * from "./weapon";
 export * from "./whereami";
+export * from "./worship";

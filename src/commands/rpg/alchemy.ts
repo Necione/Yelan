@@ -147,17 +147,18 @@ export const alchemy = buildCommand<SlashCommand>({
 
         if (isAscended && !stats.deity) {
             const deityOptions = [
-                { label: "The End", value: "The End" },
-                { label: "The Harvest", value: "The Harvest" },
-                { label: "The Wisened", value: "The Wisened" },
-                { label: "The Wanderer", value: "The Wanderer" },
-                { label: "The Chaos", value: "The Chaos" },
-                { label: "Go Alone", value: "None" },
+                { label: "Barbatos", value: "Barbatos" },
+                { label: "Rex Lapis", value: "Rex Lapis" },
+                { label: "Focalors", value: "Focalors" },
+                { label: "The Tsaritsa", value: "The Tsaritsa" },
+                { label: "Raiden Shogun", value: "Raiden Shogun" },
+                { label: "Murata", value: "Murata" },
+                { label: "Kusanali", value: "Kusanali" },
             ];
 
             const selectMenu = new StringSelectMenuBuilder()
                 .setCustomId("deity_select")
-                .setPlaceholder("Select a deity")
+                .setPlaceholder("Select an Archon")
                 .addOptions(
                     deityOptions.map((option) => ({
                         label: option.label,
@@ -173,9 +174,9 @@ export const alchemy = buildCommand<SlashCommand>({
             const message = (await i.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle("Choose Your Deity")
+                        .setTitle("Choose Your Archon")
                         .setDescription(
-                            "You have reached the **Ascended** rank. Please choose a deity to follow:\n**⚠️ You will __NEVER__ be able to change this decision.**\n*You may choose to ignore this and choose later*",
+                            "You have reached the **Ascended** rank. Please choose an Archon to follow:\n**⚠️ You will __NEVER__ be able to change this decision.**\n*You may choose to ignore this and choose later*",
                         )
                         .setColor(0x4b52bb),
                 ],
@@ -199,7 +200,7 @@ export const alchemy = buildCommand<SlashCommand>({
 
                     const disabledSelectMenu = new StringSelectMenuBuilder()
                         .setCustomId("deity_select")
-                        .setPlaceholder("Deity Selected")
+                        .setPlaceholder("Archon Selected")
                         .setDisabled(true)
                         .addOptions(
                             deityOptions.map((option) => ({
@@ -216,11 +217,9 @@ export const alchemy = buildCommand<SlashCommand>({
                     await interaction.update({
                         embeds: [
                             new EmbedBuilder()
-                                .setTitle("Deity Chosen")
+                                .setTitle("Archon Chosen")
                                 .setDescription(
-                                    chosenDeity === "None"
-                                        ? "You have chosen to **Go Alone**."
-                                        : `You have chosen to follow **${chosenDeity}**.`,
+                                    `You have chosen to follow **${chosenDeity}**.`,
                                 )
                                 .setColor(0x4b52bb),
                         ],
@@ -232,7 +231,7 @@ export const alchemy = buildCommand<SlashCommand>({
             collector.on("end", async (_collected, reason: string) => {
                 if (reason === "time" && !stats.deity) {
                     await message.edit({
-                        content: "You did not choose a deity in time.",
+                        content: "You did not choose an Archon in time.",
                         embeds: [],
                         components: [],
                     });
@@ -257,7 +256,7 @@ export const alchemy = buildCommand<SlashCommand>({
 
             const deityInfo =
                 isAscended && stats.deity
-                    ? `\nDeity: **${
+                    ? `\nArchon: **${
                           stats.deity === "None"
                               ? "None (Going Alone)"
                               : stats.deity

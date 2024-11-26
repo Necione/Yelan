@@ -159,8 +159,10 @@ export const rpg = buildCommand<SlashCommand>({
                         stats.exp
                     }/${expRequired.toFixed(0)}\`\n🗺️ Region: \`${
                         stats.region
-                    }\` | 📍 Location: \`${
-                        stats.location
+                    }\` | 📍 Location: \`${stats.location}\`\n🌱 Resonance: \`${
+                        stats.resonance
+                    }\` | 🎗️ Archon: \`${
+                        stats.deity || "None"
                     }\`\n\n${hpDisplay}\n⚔️ ATK: \`${stats.attackPower.toFixed(
                         2,
                     )} (${formatChange(

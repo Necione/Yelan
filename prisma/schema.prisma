@@ -245,6 +245,7 @@ model UserStats {
   masteryCatalyst           Int            @default(0)
   masteryRod                Int            @default(0)
   unlockedSpecialSkills     String[]       @default([])
+  resonance                 Int            @default(0)
 }
 
 type UserRequest {
