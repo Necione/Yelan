@@ -18,6 +18,7 @@ export type MonsterState = {
     vanishedUsed: boolean;
     stunned?: boolean;
     poisoned?: boolean;
+    shieldUsed?: boolean;
 };
 
 export function getDeathThreshold(stats: UserStats): number {
@@ -35,7 +36,6 @@ export async function playerAttack(
     currentMonsterHp: number,
     vigilanceUsed: boolean,
     monsterState: MonsterState,
-    isFirstTurn: boolean,
     messages: string[],
     hasWrath: boolean,
 ): Promise<{
@@ -268,6 +268,16 @@ export async function playerAttack(
                 2,
             )}\` bonus damage with the Kindle skill!`,
         );
+    }
+
+    if (
+        monster.group === "Machine" &&
+        currentMonsterHp <= 0 &&
+        !monsterState.shieldUsed
+    ) {
+        currentMonsterHp = 1;
+        monsterState.shieldUsed = true;
+        messages.push("`⛔` The Machine's Shield prevents it from dying.");
     }
 
     const deathThreshold = getDeathThreshold(stats);

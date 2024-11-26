@@ -194,7 +194,6 @@ export async function handleAbyssBattle(
                     currentMonsterHp,
                     vigilanceUsed,
                     monsterState,
-                    isFirstTurn,
                     playerMessages,
                     hasWrath,
                 );

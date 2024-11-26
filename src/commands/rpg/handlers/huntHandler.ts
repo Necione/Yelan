@@ -303,7 +303,6 @@ export async function handleHunt(
                     currentMonsterHp,
                     vigilanceUsed,
                     monsterState,
-                    isFirstTurn,
                     playerMessages,
                     hasWrath,
                 );

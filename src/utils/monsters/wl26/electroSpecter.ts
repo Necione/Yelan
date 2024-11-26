@@ -27,7 +27,7 @@ export default {
     critChance: 20,
     critValue: 1.2,
     defChance: 75,
-    defValue: 500,
+    defValue: 400,
     baseHp: 19,
     baseAtk: 11,
     getStatsForWorldLevel(worldLevel: number) {

@@ -3,33 +3,27 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Cryo Specter",
-    group: MonsterGroup.Specter,
+    name: "Ruin Hunter",
+    group: MonsterGroup.Machine,
     minExp: 45,
     maxExp: 50,
     minWorldLevel: 26,
-    image: "https://lh.elara.workers.dev/rpg/monsters/cryo_specter.png",
+    image: "https://lh.elara.workers.dev/rpg/monsters/ruin_hunter.png",
     drops: [
         {
-            item: "Spectral Husk",
+            item: "Chaos Device",
             minAmount: 1,
             maxAmount: 1,
-            chance: 75,
-        },
-        {
-            item: "Spectral Heart",
-            minAmount: 1,
-            maxAmount: 1,
-            chance: 10,
+            chance: 50,
         },
     ],
 
-    critChance: 20,
-    critValue: 1.2,
-    defChance: 75,
-    defValue: 250,
-    baseHp: 20,
-    baseAtk: 9,
+    critChance: 25,
+    critValue: 1.25,
+    defChance: 50,
+    defValue: 150,
+    baseHp: 30,
+    baseAtk: 8,
     getStatsForWorldLevel(worldLevel: number) {
         if (worldLevel < 1 || worldLevel > 30) {
             return null;
