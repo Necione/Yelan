@@ -1,16 +1,15 @@
-import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, noop } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import {
+    buildCommand,
+    getStr,
+    type SlashCommand,
+} from "@elara-services/botbuilder";
+import { embedComment } from "@elara-services/utils";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { devId, roles } from "../../config";
-import {
-    getProfileByUserId,
-    removeBalance,
-    updateUserProfile,
-} from "../../services";
-import { logs } from "../../utils";
+import { addStrike } from "../../services";
+import { getAmount, logs } from "../../utils";
 
-export const addStrike = buildCommand<SlashCommand>({
+export const addstrike = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("addstrike")
         .setDescription("[STAFF] Add a strike to a user")
@@ -26,6 +25,17 @@ export const addStrike = buildCommand<SlashCommand>({
                 .setName("reason")
                 .setDescription("The reason for the strike")
                 .setRequired(true),
+        )
+        .addStringOption((o) =>
+            getStr(o, {
+                name: "rule",
+                description: "Which rule did they break?",
+                required: true,
+                choices: new Array(6).fill(0).map((_, i) => ({
+                    name: `Rule ${i + 1}`,
+                    value: `**[Rule:${i + 1}]: **`,
+                })),
+            }),
         ),
     defer: { silent: true },
     locked: {
@@ -37,40 +47,34 @@ export const addStrike = buildCommand<SlashCommand>({
         }
 
         const user = i.options.getUser("user", true);
-        const reason = i.options.getString("reason", true);
+        let reason = i.options.getString("reason", true);
+        const rule = i.options.getString("rule", true);
+        reason = `${rule} ${reason}`;
         const initiator = i.user;
         if (i.user.id !== devId && user.id === devId) {
             return r.edit(embedComment(`Respectfully, fuck off.`));
         }
-        const profile = await getProfileByUserId(user.id);
-        if (!profile) {
-            return r.edit(embedComment("Unable to find/create user profile."));
+        const data = await addStrike(user.id, i.user.id, reason);
+        if (!data.status) {
+            return r.edit(embedComment(data.message));
         }
-
-        const updatedStrikes = (profile.strikes || 0) + 1;
-        const fineAmount = updatedStrikes * 200;
-        await updateUserProfile(user.id, { strikes: updatedStrikes });
-
-        await removeBalance(
-            user.id,
-            fineAmount,
-            false,
-            `Fine for strike ${updatedStrikes} issued by staff. Reason: ${reason}`,
-        );
-
-        const dmEmbed = new EmbedBuilder()
-            .setColor(0xff5856)
-            .setTitle("`🔥` You have received a strike!")
-            .setDescription(
-                `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${
-                    customEmoji.a.z_coins
-                } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
-            )
-            .setFooter({
-                text: `⚠️ You will be banned permanently at 5 Strikes`,
-            });
-
-        await user.send({ embeds: [dmEmbed] }).catch(noop);
+        await user
+            .send({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(0xff5856)
+                        .setTitle("`🔥` You have received a strike!")
+                        .setDescription(
+                            `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${getAmount(
+                                data.fine,
+                            )}`,
+                        )
+                        .setFooter({
+                            text: `⚠️ You will be banned permanently at 5 Strikes`,
+                        }),
+                ],
+            })
+            .catch(console.log);
 
         await logs.strikes({
             embeds: [
@@ -80,9 +84,11 @@ export const addStrike = buildCommand<SlashCommand>({
                     .setDescription(
                         `**User:** ${user.tag} (${
                             user.id
-                        })\n**Total Strikes:** ${updatedStrikes}\n**Reason:** ${reason}\n**Fine:** ${
-                            customEmoji.a.z_coins
-                        } \`${formatNumber(fineAmount)} ${texts.c.u}\``,
+                        })\n**Total Strikes:** ${
+                            data.data.strike.length
+                        }\n**Reason:** ${reason}\n**Fine:** ${getAmount(
+                            data.fine,
+                        )}`,
                     )
                     .setFooter({
                         text: `Issued by: ${initiator.username} (${initiator.id})`,
@@ -94,9 +100,10 @@ export const addStrike = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `${user.toString()} has been given a strike and fined ${
-                    customEmoji.a.z_coins
-                } \`${formatNumber(fineAmount)} ${texts.c.u}\`.`,
+                `${user.toString()} has been given a strike and fined ${getAmount(
+                    data.fine,
+                )}`,
+                "Green",
             ),
         );
     },
