@@ -13,7 +13,7 @@ import { misc, type MiscName } from "../../utils/rpgitems/misc";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 const baitOptions = [
-    { name: "Fruit Paste Bait", weight: 3 },
+    { name: "Fruit Paste Bait", weight: 10 },
     { name: "Redrot Bait", weight: 1 },
     { name: "Sugardew Bait", weight: 1 },
 ];
