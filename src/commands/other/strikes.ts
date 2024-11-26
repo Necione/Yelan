@@ -10,7 +10,6 @@ import {
     embedComment,
     formatNumber,
     is,
-    noop,
     proper,
     time,
 } from "@elara-services/utils";
@@ -38,7 +37,7 @@ export const strikes = buildCommand<SlashCommand>({
         .addStringOption((o) =>
             getStr(o, {
                 name: "id",
-                description: `[ADMIN]: A strike ID to view/remove from the user.`,
+                description: `[ADMIN]: A strike ID Sto view/remove from the user.`,
                 required: false,
             }),
         )
@@ -52,7 +51,7 @@ export const strikes = buildCommand<SlashCommand>({
     defer: { silent: false },
     async execute(i, r) {
         if (!i.inCachedGuild()) {
-            return;
+            return r.edit(embedComment(`No cached server found?`));
         }
         let user = i.user;
         const u = i.options.getUser("user", false);
@@ -79,6 +78,9 @@ export const strikes = buildCommand<SlashCommand>({
         if (!is.array(p.strike)) {
             p.strike = [];
             await updateUserProfile(p.userId, { strike: { set: [] } });
+        }
+        if (!is.array(p.strike)) {
+            return r.edit(embedComment(`${user.toString()} has **0** strikes`));
         }
         if (i.member.roles.cache.hasAny(...roles.main)) {
             if (is.string(id)) {
@@ -147,6 +149,6 @@ export const strikes = buildCommand<SlashCommand>({
                 ],
             });
         }
-        return pager.run(i, i.user).catch(noop);
+        return pager.run(i, i.user).catch(console.log);
     },
 });
