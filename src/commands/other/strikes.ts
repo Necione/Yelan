@@ -93,9 +93,11 @@ export const strikes = buildCommand<SlashCommand>({
                 if (remove === true) {
                     const d = await removeStrike(p.userId, f.id);
                     return r.edit(
-                        d.status
-                            ? `Strike (${f.id}) has been removed.`
-                            : d.message,
+                        embedComment(
+                            d.status
+                                ? `Strike (${f.id}) has been removed.`
+                                : d.message,
+                        ),
                     );
                 }
                 return r.edit(
