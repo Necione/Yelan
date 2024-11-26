@@ -12,6 +12,24 @@ import { drops, type DropName } from "../../utils/rpgitems/drops";
 import { misc, type MiscName } from "../../utils/rpgitems/misc";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
+const baitOptions = [
+    { name: "Fruit Paste Bait", weight: 3 },
+    { name: "Redrot Bait", weight: 1 },
+    { name: "Sugardew Bait", weight: 1 },
+];
+
+function getRandomBait(options: { name: string; weight: number }[]): string {
+    const totalWeight = options.reduce((sum, option) => sum + option.weight, 0);
+    let random = Math.random() * totalWeight;
+    for (const option of options) {
+        if (random < option.weight) {
+            return option.name;
+        }
+        random -= option.weight;
+    }
+    return options[options.length - 1].name;
+}
+
 export const diffuse = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("diffuse")
@@ -147,15 +165,18 @@ export const diffuse = buildCommand<SlashCommand>({
 
         if (itemName in misc) {
             const baitAmount = amountToDiffuse;
+
+            const selectedBait = getRandomBait(baitOptions);
+
             const existingBait = stats.inventory.find(
-                (c) => c.item === "Fruit Paste Bait",
+                (c) => c.item === selectedBait,
             );
 
             if (existingBait) {
                 existingBait.amount += baitAmount;
             } else {
                 stats.inventory.push({
-                    item: "Fruit Paste Bait",
+                    item: selectedBait,
                     amount: baitAmount,
                     metadata: null,
                 });
@@ -174,7 +195,7 @@ export const diffuse = buildCommand<SlashCommand>({
 
             return r.edit(
                 embedComment(
-                    `You diffused \`${amountToDiffuse}x\` **${itemName}** and received \`${baitAmount}x\` **Fruit Paste Bait**!`,
+                    `You diffused \`${amountToDiffuse}x\` **${itemName}** and received \`${baitAmount}x\` **${selectedBait}**!`,
                     "Green",
                 ),
             );

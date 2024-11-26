@@ -30,7 +30,18 @@ export const fishCommand = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("fish")
         .setDescription("[RPG] Go fishing to catch fish.")
-        .setDMPermission(false),
+        .setDMPermission(false)
+        .addStringOption((option) =>
+            option
+                .setName("bait")
+                .setDescription("Select your bait for fishing.")
+                .setRequired(true)
+                .addChoices(
+                    { name: "Fruit Paste Bait", value: "Fruit Paste Bait" },
+                    { name: "Redrot Bait", value: "Redrot Bait" },
+                    { name: "Sugardew Bait", value: "Sugardew Bait" },
+                ),
+        ),
     only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
     async execute(i, r) {
@@ -78,14 +89,19 @@ export const fishCommand = buildCommand<SlashCommand>({
             );
         }
 
+        // Get the bait choice from the command arguments
+        const baitChoice = i.options.getString("bait", true);
+
+        // Find the selected bait in the inventory
         const baitItem = stats.inventory.find(
-            (item) => item.item === "Fruit Paste Bait",
+            (item) => item.item === baitChoice,
         );
+
         if (!is.number(baitItem?.amount) || baitItem.amount < 1) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
-                    `You need \`1x\` **Fruit Paste Bait** to fish.\nDiffuse any **Misc** item to obtain some!`,
+                    `You need \`1x\` **${baitChoice}** to fish.\nDiffuse any **Misc** item to obtain some!`,
                 ),
             );
         }
@@ -104,6 +120,154 @@ export const fishCommand = buildCommand<SlashCommand>({
         if (!fishCooldown.status) {
             locked.del(i.user.id);
             return r.edit(embedComment(fishCooldown.message));
+        }
+
+        let fishToCatch = 1;
+        let requiresReel = true;
+
+        if (baitChoice === "Redrot Bait") {
+            fishToCatch = 2;
+        } else if (baitChoice === "Sugardew Bait") {
+            fishToCatch = 1;
+            requiresReel = false;
+        }
+
+        if (!requiresReel) {
+            const availableFish = fishList.filter(
+                (fish) =>
+                    fish.fishingLevel <= stats.fishingLevel &&
+                    fish.rods.some((rod) => equippedWeapon.name.includes(rod)),
+            );
+
+            if (!is.array(availableFish) || availableFish.length === 0) {
+                locked.del(i.user.id);
+                return r.edit(
+                    embedComment(
+                        "No fish are available for your fishing level or with your current rod.",
+                    ),
+                );
+            }
+
+            const caughtFish = [];
+            for (let j = 0; j < fishToCatch; j++) {
+                const selectedFish = selectFish(availableFish);
+                const fishLength = selectFishLength();
+
+                caughtFish.push({ selectedFish, fishLength });
+            }
+
+            let totalLevelUps = 0;
+            let latestRequiredFishesForNextLevel = 0;
+
+            for (const fish of caughtFish) {
+                const { selectedFish, fishLength } = fish;
+
+                const newLongestFish =
+                    fishLength > stats.longestFish
+                        ? fishLength
+                        : stats.longestFish;
+
+                const isLegendary =
+                    selectedFish.rarity.toLowerCase() === "legendary";
+
+                const newLifetimeFishCaught =
+                    (stats.lifetimeFishCaught || 0) + 1;
+                const newLegendariesCaught = isLegendary
+                    ? (stats.legendariesCaught || 0) + 1
+                    : stats.legendariesCaught || 0;
+
+                const newFishItem = {
+                    item: selectedFish.name,
+                    amount: 1,
+                    metadata: {
+                        length: fishLength,
+                        star: null,
+                    },
+                };
+                stats.inventory.push(newFishItem);
+
+                const newTimesFished = stats.timesFished + 1;
+                const newTimesFishedForLevel =
+                    (stats.timesFishedForLevel || 0) + 1;
+
+                const { levelUp, requiredFishesForNextLevel } =
+                    calculateFishingLevel(
+                        stats.fishingLevel,
+                        newTimesFishedForLevel,
+                    );
+
+                latestRequiredFishesForNextLevel = requiredFishesForNextLevel;
+
+                if (levelUp) {
+                    totalLevelUps += 1;
+                }
+
+                const updateData: any = {
+                    timesFished: newTimesFished,
+                    timesFishedForLevel: newTimesFishedForLevel,
+                    longestFish: newLongestFish,
+                    lifetimeFishCaught: newLifetimeFishCaught,
+                };
+
+                if (isLegendary) {
+                    updateData.legendariesCaught = newLegendariesCaught;
+                }
+
+                if (levelUp) {
+                    updateData.fishingLevel = stats.fishingLevel + 1;
+                    updateData.timesFishedForLevel = 0;
+                }
+
+                await updateUserStats(i.user.id, updateData);
+
+                stats.fishingLevel =
+                    updateData.fishingLevel || stats.fishingLevel;
+                stats.timesFishedForLevel =
+                    updateData.timesFishedForLevel || stats.timesFishedForLevel;
+                stats.longestFish = updateData.longestFish || stats.longestFish;
+                stats.lifetimeFishCaught =
+                    updateData.lifetimeFishCaught || stats.lifetimeFishCaught;
+                if (isLegendary) {
+                    stats.legendariesCaught =
+                        updateData.legendariesCaught || stats.legendariesCaught;
+                }
+            }
+
+            const caughtEmbed = new EmbedBuilder()
+                .setTitle(`You caught ${fishToCatch} fish!`)
+                .setColor("Aqua");
+
+            caughtFish.forEach((fish, index) => {
+                const { selectedFish, fishLength } = fish;
+                caughtEmbed.addFields({
+                    name: `Fish ${index + 1}`,
+                    value:
+                        `\`${selectedFish.rarity}\` **${selectedFish.name}**\n` +
+                        `\`📏\` Length: **${fishLength} cm**`,
+                });
+            });
+
+            if (totalLevelUps > 0) {
+                for (let l = 0; l < totalLevelUps; l++) {
+                    caughtEmbed.addFields({
+                        name: "Fishing Level Up!",
+                        value: `\`🌟\` Congratulations! You reached Fishing Level ${
+                            stats.fishingLevel + 1
+                        }!`,
+                    });
+                }
+            } else {
+                caughtEmbed.addFields({
+                    name: "Fishing Progress",
+                    value: `\`🎣\` Fishing Level: ${stats.fishingLevel} (${stats.timesFishedForLevel}/${latestRequiredFishesForNextLevel} fish caught)`,
+                });
+            }
+
+            await r.edit({ embeds: [caughtEmbed], components: [] }).catch(noop);
+
+            await cooldowns.set(user, "fish", get.hrs(1));
+            locked.del(i.user.id);
+            return;
         }
 
         const embed = new EmbedBuilder()
@@ -128,7 +292,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 fish.rods.some((rod) => equippedWeapon.name.includes(rod)),
         );
 
-        if (!is.array(availableFish)) {
+        if (!is.array(availableFish) || availableFish.length === 0) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
@@ -146,6 +310,13 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         let reelsCompleted = 0;
         let fishEscaped = false;
+
+        const totalFishToCatch = baitChoice === "Redrot Bait" ? 2 : 1;
+
+        const caughtFishDetails = [];
+
+        let totalLevelUps = 0;
+        let latestRequiredFishesForNextLevel = 0;
 
         while (reelsCompleted < requiredReels && !fishEscaped) {
             const reelInButton = new ButtonBuilder()
@@ -254,79 +425,113 @@ export const fishCommand = buildCommand<SlashCommand>({
 
             return;
         } else {
-            const fishLength = selectFishLength();
+            for (let f = 0; f < totalFishToCatch; f++) {
+                const fishLength = selectFishLength();
 
-            const newLongestFish =
-                fishLength > stats.longestFish ? fishLength : stats.longestFish;
+                const newLongestFish =
+                    fishLength > stats.longestFish
+                        ? fishLength
+                        : stats.longestFish;
 
-            const isLegendary =
-                selectedFish.rarity.toLowerCase() === "legendary";
+                const isLegendary =
+                    selectedFish.rarity.toLowerCase() === "legendary";
 
-            const newLifetimeFishCaught = (stats.lifetimeFishCaught || 0) + 1;
-            const newLegendariesCaught = isLegendary
-                ? (stats.legendariesCaught || 0) + 1
-                : stats.legendariesCaught || 0;
+                const newLifetimeFishCaught =
+                    (stats.lifetimeFishCaught || 0) + 1;
+                const newLegendariesCaught = isLegendary
+                    ? (stats.legendariesCaught || 0) + 1
+                    : stats.legendariesCaught || 0;
 
-            const newFishItem = {
-                item: selectedFish.name,
-                amount: 1,
-                metadata: {
-                    length: fishLength,
-                    star: null,
-                },
-            };
-            stats.inventory.push(newFishItem);
+                const newFishItem = {
+                    item: selectedFish.name,
+                    amount: 1,
+                    metadata: {
+                        length: fishLength,
+                        star: null,
+                    },
+                };
+                stats.inventory.push(newFishItem);
 
-            await updateUserStats(i.user.id, {
-                inventory: { set: stats.inventory },
-            });
+                const newTimesFished = stats.timesFished + 1;
+                const newTimesFishedForLevel =
+                    (stats.timesFishedForLevel || 0) + 1;
 
-            const newTimesFished = stats.timesFished + 1;
-            const newTimesFishedForLevel = (stats.timesFishedForLevel || 0) + 1;
+                const { levelUp, requiredFishesForNextLevel } =
+                    calculateFishingLevel(
+                        stats.fishingLevel,
+                        newTimesFishedForLevel,
+                    );
 
-            const { levelUp, requiredFishesForNextLevel } =
-                calculateFishingLevel(
-                    stats.fishingLevel,
-                    newTimesFishedForLevel,
-                );
+                latestRequiredFishesForNextLevel = requiredFishesForNextLevel;
 
-            const updateData: any = {
-                timesFished: newTimesFished,
-                timesFishedForLevel: newTimesFishedForLevel,
-                longestFish: newLongestFish,
-                lifetimeFishCaught: newLifetimeFishCaught,
-            };
+                if (levelUp) {
+                    totalLevelUps += 1;
+                }
 
-            if (isLegendary) {
-                updateData.legendariesCaught = newLegendariesCaught;
+                const updateData: any = {
+                    timesFished: newTimesFished,
+                    timesFishedForLevel: newTimesFishedForLevel,
+                    longestFish: newLongestFish,
+                    lifetimeFishCaught: newLifetimeFishCaught,
+                };
+
+                if (isLegendary) {
+                    updateData.legendariesCaught = newLegendariesCaught;
+                }
+
+                if (levelUp) {
+                    updateData.fishingLevel = stats.fishingLevel + 1;
+                    updateData.timesFishedForLevel = 0;
+                }
+
+                await updateUserStats(i.user.id, updateData);
+
+                stats.fishingLevel =
+                    updateData.fishingLevel || stats.fishingLevel;
+                stats.timesFishedForLevel =
+                    updateData.timesFishedForLevel || stats.timesFishedForLevel;
+                stats.longestFish = updateData.longestFish || stats.longestFish;
+                stats.lifetimeFishCaught =
+                    updateData.lifetimeFishCaught || stats.lifetimeFishCaught;
+                if (isLegendary) {
+                    stats.legendariesCaught =
+                        updateData.legendariesCaught || stats.legendariesCaught;
+                }
+
+                caughtFishDetails.push({
+                    selectedFish,
+                    fishLength,
+                    levelUp,
+                });
             }
-
-            if (levelUp) {
-                updateData.fishingLevel = stats.fishingLevel + 1;
-                updateData.timesFishedForLevel = 0;
-            }
-
-            await updateUserStats(i.user.id, updateData);
 
             const caughtEmbed = new EmbedBuilder()
-                .setTitle("You caught a fish!")
-                .setDescription(
-                    `You caught a ${selectedFish.rarity} ${selectedFish.emoji} **${selectedFish.name}**!\n` +
-                        `\`📏\` Length: **${fishLength} cm**`,
-                )
+                .setTitle(`You caught ${totalFishToCatch} fish!`)
                 .setColor("Aqua");
 
-            if (levelUp) {
+            caughtFishDetails.forEach((fish, index) => {
+                const { selectedFish, fishLength } = fish;
                 caughtEmbed.addFields({
-                    name: "Fishing Level Up!",
-                    value: `\`🌟\` Congratulations! You reached Fishing Level ${
-                        stats.fishingLevel + 1
-                    }!`,
+                    name: `Fish ${index + 1}`,
+                    value:
+                        `\`${selectedFish.rarity}\` **${selectedFish.name}**\n` +
+                        `\`📏\` Length: **${fishLength} cm**`,
                 });
+            });
+
+            if (totalLevelUps > 0) {
+                for (let l = 0; l < totalLevelUps; l++) {
+                    caughtEmbed.addFields({
+                        name: "Fishing Level Up!",
+                        value: `\`🌟\` Congratulations! You reached Fishing Level ${
+                            stats.fishingLevel + 1
+                        }!`,
+                    });
+                }
             } else {
                 caughtEmbed.addFields({
                     name: "Fishing Progress",
-                    value: `\`🎣\` Fishing Level: ${stats.fishingLevel} (${newTimesFishedForLevel}/${requiredFishesForNextLevel} fish caught)`,
+                    value: `\`🎣\` Fishing Level: ${stats.fishingLevel} (${stats.timesFishedForLevel}/${latestRequiredFishesForNextLevel} fish caught)`,
                 });
             }
 
