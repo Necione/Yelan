@@ -1,4 +1,8 @@
-import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
+import {
+    buildCommand,
+    getStr,
+    type SlashCommand,
+} from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { devId, roles } from "../../config";
@@ -21,6 +25,17 @@ export const addstrike = buildCommand<SlashCommand>({
                 .setName("reason")
                 .setDescription("The reason for the strike")
                 .setRequired(true),
+        )
+        .addStringOption((o) =>
+            getStr(o, {
+                name: "rule",
+                description: "Which rule did they break?",
+                required: true,
+                choices: new Array(6).fill(0).map((_, i) => ({
+                    name: `Rule ${i + 1}`,
+                    value: `**[Rule:${i + 1}]: **`,
+                })),
+            }),
         ),
     defer: { silent: true },
     locked: {
@@ -32,7 +47,9 @@ export const addstrike = buildCommand<SlashCommand>({
         }
 
         const user = i.options.getUser("user", true);
-        const reason = i.options.getString("reason", true);
+        let reason = i.options.getString("reason", true);
+        const rule = i.options.getString("rule", true);
+        reason = `${rule} ${reason}`;
         const initiator = i.user;
         if (i.user.id !== devId && user.id === devId) {
             return r.edit(embedComment(`Respectfully, fuck off.`));
