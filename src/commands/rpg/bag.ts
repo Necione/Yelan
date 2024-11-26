@@ -10,6 +10,7 @@ import {
     type ArtifactType,
     getArtifactType,
 } from "../../utils/rpgitems/artifacts";
+import { bait } from "../../utils/rpgitems/baits";
 import { drops } from "../../utils/rpgitems/drops";
 import { fish } from "../../utils/rpgitems/fish";
 import { food } from "../../utils/rpgitems/food";
@@ -41,6 +42,7 @@ export const bag = buildCommand<SlashCommand>({
                     { name: "Misc", value: "Misc" },
                     { name: "Food", value: "Food" },
                     { name: "Fish", value: "Fish" },
+                    { name: "Baits", value: "Baits" },
                 ),
         )
         .addStringOption((option) =>
@@ -111,6 +113,9 @@ export const bag = buildCommand<SlashCommand>({
                 break;
             case "Fish":
                 filteredItems = items.filter((item) => item.item in fish);
+                break;
+            case "Baits":
+                filteredItems = items.filter((item) => item.item in bait);
                 break;
             case "All":
             default:

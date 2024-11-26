@@ -17,6 +17,7 @@ export type MonsterState = {
     displaced: boolean;
     vanishedUsed: boolean;
     stunned?: boolean;
+    poisoned?: boolean;
 };
 
 export function getDeathThreshold(stats: UserStats): number {
@@ -96,6 +97,20 @@ export async function playerAttack(
                 break;
             }
 
+            case "Poison": {
+                if (!monsterState.poisoned) {
+                    monsterState.poisoned = true;
+                    messages.push(
+                        `\`💚\` Poison spell casted! The ${monster.name} is poisoned and will lose 10% of its HP each turn.`,
+                    );
+                } else {
+                    messages.push(
+                        `\`💚\` Poison spell casted again! The ${monster.name} is already poisoned.`,
+                    );
+                }
+                break;
+            }
+
             default:
                 messages.push(
                     `\`❓\` The spell "${spellName}" was found but has no effect.`,
@@ -133,6 +148,18 @@ export async function playerAttack(
         messages.push(
             `\`💢\` Wrath skill activated! You deal 150% more damage.`,
         );
+    }
+
+    if (monsterState.poisoned) {
+        const poisonDamage = Math.floor(0.2 * monster.currentHp);
+        currentMonsterHp = Math.max(currentMonsterHp - poisonDamage, 0);
+        messages.push(
+            `\`💚\` Poisoned! The ${monster.name} loses \`${poisonDamage} HP\` due to poison.`,
+        );
+
+        if (currentMonsterHp === 0) {
+            monsterState.poisoned = false;
+        }
     }
 
     const hasVigor = skills.has(stats, "Vigor");

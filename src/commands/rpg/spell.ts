@@ -7,8 +7,9 @@ import {
     syncStats,
     updateUserStats,
 } from "../../services";
+import { calculateMasteryLevel } from "../../utils/masteryHelper";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
-import { spells, type Spell } from "../../utils/spells";
+import { getAvailableSpells, spells, type Spell } from "../../utils/spells";
 
 export const spell = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -19,47 +20,102 @@ export const spell = buildCommand<SlashCommand>({
                 .setName("cast")
                 .setDescription("The spell you want to cast")
                 .setRequired(false)
-                .addChoices(
-                    ...Object.keys(spells).map((spellName) => ({
-                        name: spellName,
-                        value: spellName,
-                    })),
-                ),
+                .setAutocomplete(true),
         )
         .setDMPermission(false),
     defer: { silent: false },
+    async autocomplete(i) {
+        try {
+            const userId = i.user.id;
+            const input = i.options.getString("cast", false) ?? "";
+
+            let stats = await getUserStats(userId);
+            if (!stats) {
+                return i
+                    .respond([{ name: "No stats found.", value: "n/a" }])
+                    .catch(() => {});
+            }
+
+            stats = await syncStats(userId);
+            if (!stats) {
+                return i
+                    .respond([{ name: "Failed to sync stats.", value: "n/a" }])
+                    .catch(() => {});
+            }
+
+            const catalystMasteryPoints = stats.masteryCatalyst || 0;
+
+            const availableSpells = getAvailableSpells(catalystMasteryPoints);
+
+            const filteredSpells = availableSpells.filter((spell) =>
+                spell.spellName.toLowerCase().includes(input.toLowerCase()),
+            );
+
+            const choices = filteredSpells.slice(0, 25).map((spell) => ({
+                name: spell.spellName,
+                value: spell.spellName,
+            }));
+
+            if (choices.length === 0) {
+                return i
+                    .respond([
+                        { name: "No matching spells found.", value: "n/a" },
+                    ])
+                    .catch(() => {});
+            }
+
+            return i.respond(choices).catch(() => {});
+        } catch (error) {
+            console.error("Error in spell autocomplete:", error);
+            return i
+                .respond([{ name: "Error fetching spells.", value: "n/a" }])
+                .catch(() => {});
+        }
+    },
     async execute(i, r) {
         try {
             const spellName = i.options.getString("cast", false);
 
-            const userProfile = await getProfileByUserId(i.user.id);
-            if (!userProfile) {
-                return r.edit(
-                    embedComment(
-                        "No profile found for your user. Please set up your profile.",
-                    ),
-                );
-            }
-
-            let stats = await getUserStats(i.user.id);
-            if (!stats) {
-                return r.edit(
-                    embedComment(
-                        `No stats found for you, please set up your profile.`,
-                    ),
-                );
-            }
-
-            stats = await syncStats(i.user.id);
-            if (!stats) {
-                return r.edit(
-                    embedComment(
-                        `Failed to sync your stats. Please try again later.`,
-                    ),
-                );
-            }
-
             if (spellName) {
+                const userId = i.user.id;
+
+                const userProfile = await getProfileByUserId(userId);
+                if (!userProfile) {
+                    return r.edit(
+                        embedComment(
+                            "No profile found for your user. Please set up your profile.",
+                        ),
+                    );
+                }
+
+                let stats = await getUserStats(userId);
+                if (!stats) {
+                    return r.edit(
+                        embedComment(
+                            `No stats found for you, please set up your profile.`,
+                        ),
+                    );
+                }
+
+                stats = await syncStats(userId);
+                if (!stats) {
+                    return r.edit(
+                        embedComment(
+                            `Failed to sync your stats. Please try again later.`,
+                        ),
+                    );
+                }
+
+                const catalystMasteryPoints = stats.masteryCatalyst || 0;
+                const catalystMastery = calculateMasteryLevel(
+                    catalystMasteryPoints,
+                );
+                const numericMasteryLevel = catalystMastery.numericLevel;
+
+                const availableSpells = getAvailableSpells(
+                    catalystMasteryPoints,
+                );
+
                 const spell: Spell | undefined = spells[spellName];
                 if (!spell) {
                     const invalidSpellEmbed = new EmbedBuilder()
@@ -68,6 +124,21 @@ export const spell = buildCommand<SlashCommand>({
                         .setDescription(`Spell "${spellName}" does not exist.`);
 
                     return r.edit({ embeds: [invalidSpellEmbed] });
+                }
+
+                const isSpellAvailable = availableSpells.some(
+                    (availableSpell) => availableSpell.spellName === spellName,
+                );
+
+                if (!isSpellAvailable) {
+                    const insufficientMasteryEmbed = new EmbedBuilder()
+                        .setColor("Red")
+                        .setTitle("Mastery Level Too Low")
+                        .setDescription(
+                            `You need **Catalyst Mastery Level ${spell.requiredMasteryLevel}** to cast "${spellName}".\n\n- **Your Level**: ${numericMasteryLevel}`,
+                        );
+
+                    return r.edit({ embeds: [insufficientMasteryEmbed] });
                 }
 
                 if (stats.equippedWeapon) {
@@ -120,7 +191,7 @@ export const spell = buildCommand<SlashCommand>({
                 stats.mana -= spell.cost;
                 stats.castQueue.push(spellName);
 
-                await updateUserStats(i.user.id, {
+                await updateUserStats(userId, {
                     mana: stats.mana,
                     castQueue: stats.castQueue,
                 });
@@ -135,7 +206,53 @@ export const spell = buildCommand<SlashCommand>({
 
                 return r.edit({ embeds: [spellCastEmbed] });
             } else {
-                const availableSpells = Object.values(spells)
+                const userId = i.user.id;
+
+                const userProfile = await getProfileByUserId(userId);
+                if (!userProfile) {
+                    return r.edit(
+                        embedComment(
+                            "No profile found for your user. Please set up your profile.",
+                        ),
+                    );
+                }
+
+                let stats = await getUserStats(userId);
+                if (!stats) {
+                    return r.edit(
+                        embedComment(
+                            `No stats found for you, please set up your profile.`,
+                        ),
+                    );
+                }
+
+                stats = await syncStats(userId);
+                if (!stats) {
+                    return r.edit(
+                        embedComment(
+                            `Failed to sync your stats. Please try again later.`,
+                        ),
+                    );
+                }
+
+                const catalystMasteryPoints = stats.masteryCatalyst || 0;
+
+                const availableSpells = getAvailableSpells(
+                    catalystMasteryPoints,
+                );
+
+                if (availableSpells.length === 0) {
+                    const noSpellsEmbed = new EmbedBuilder()
+                        .setColor("Yellow")
+                        .setTitle("No Available Spells")
+                        .setDescription(
+                            `You currently have no spells available. Increase your mastery level to unlock new spells.`,
+                        );
+
+                    return r.edit({ embeds: [noSpellsEmbed] });
+                }
+
+                const spellsList = availableSpells
                     .map(
                         (spell) =>
                             `**${spell.spellName}** - ${spell.description} \`(${spell.cost} Mana)\``,
@@ -156,7 +273,7 @@ export const spell = buildCommand<SlashCommand>({
                     .setColor("Blue")
                     .setTitle(`${i.user.username}'s Spells`)
                     .setDescription(
-                        `**Available Spells:**\n${availableSpells}\n\n**Current Cast Queue:**\n${castQueueDisplay}\n\n${additionalDescription}`,
+                        `**Available Spells:**\n${spellsList}\n\n**Current Cast Queue:**\n${castQueueDisplay}\n\n${additionalDescription}`,
                     );
 
                 return r.edit({ embeds: [availableSpellsEmbed] });
