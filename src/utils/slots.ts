@@ -1,5 +1,5 @@
 import { randomNumber } from "@elara-services/packages";
-import { formatNumber } from "@elara-services/utils";
+import { formatNumber, make } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder } from "discord.js";
 import { addSlotsPrizePool, getSlots } from "../services";
@@ -10,7 +10,7 @@ const transpose = <T>(array: T[][]) => {
     );
 };
 
-const wins: { emoji: SlotItemType; multiplier: number }[] = [
+const wins = make.array<{ emoji: SlotItemType; multiplier: number }>([
     { emoji: ":heart:", multiplier: 5 },
     { emoji: ":gem:", multiplier: 5 },
     { emoji: ":bell:", multiplier: 4 },
@@ -19,7 +19,7 @@ const wins: { emoji: SlotItemType; multiplier: number }[] = [
     { emoji: ":tangerine:", multiplier: 3 },
     { emoji: ":lemon:", multiplier: 2 },
     { emoji: ":grapes:", multiplier: 2 },
-];
+]);
 
 const slotStrip = [
     customEmoji.a.seven,

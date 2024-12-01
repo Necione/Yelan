@@ -1,6 +1,7 @@
+import { make } from "@elara-services/utils";
 import { type AbyssMonster } from "../hunt";
 
-export const abyssFloor4Monsters: AbyssMonster[] = [
+export const abyssFloor4Monsters = make.array<AbyssMonster>([
     {
         name: "Anemo Samachurl",
         minHp: 90,
@@ -27,6 +28,6 @@ export const abyssFloor4Monsters: AbyssMonster[] = [
         defValue: 5,
         quantity: 2,
     },
-];
+]);
 
 export const abyssFloor4Drops = [{ item: "Wanderer's Advice", amount: 2 }];

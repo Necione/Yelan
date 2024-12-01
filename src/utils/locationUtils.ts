@@ -1,10 +1,7 @@
 import { locationGroupWeights } from "./locationGroupWeights";
 import { type MonsterGroup } from "./monsterHelper";
 
-export function getCommonLocationsForGroup(
-    group: MonsterGroup,
-    topN: number = 3,
-): string[] {
+export function getCommonLocationsForGroup(group: MonsterGroup, topN = 3) {
     const locationsWithWeights = Object.entries(locationGroupWeights).reduce<
         { location: string; weight: number }[]
     >((acc, [location, groups]) => {

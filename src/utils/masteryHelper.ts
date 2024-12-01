@@ -1,4 +1,4 @@
-export function toRoman(num: number): string {
+export function toRoman(num: number) {
     const lookup: { [key: number]: string } = {
         1: "I",
         2: "II",

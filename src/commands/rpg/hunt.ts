@@ -17,10 +17,6 @@ export const hunt = buildCommand<SlashCommand>({
     async execute(i, r) {
         locked.set(i.user);
 
-        if (!i.deferred) {
-            return;
-        }
-
         const message = await i.fetchReply().catch(noop);
         if (!message) {
             locked.del(i.user.id);
@@ -29,15 +25,15 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
-        const userWallet = await getProfileByUserId(i.user.id);
-        if (!userWallet) {
+        const p = await getProfileByUserId(i.user.id);
+        if (!p) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment("Unable to find/create your user profile."),
             );
         }
 
-        const cc = cooldowns.get(userWallet, "hunt");
+        const cc = cooldowns.get(p, "hunt");
         if (!cc.status) {
             locked.del(i.user.id);
             return r.edit(embedComment(cc.message));
@@ -99,8 +95,8 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
-        await updateUserStats(i.user.id, { isHunting: true });
-        await handleHunt(i, message, stats, userWallet);
+        await updateUserStats(i.user.id, { isHunting: { set: true } });
+        await handleHunt(i, message, stats, p);
 
         locked.del(i.user.id);
     },

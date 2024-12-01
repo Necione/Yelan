@@ -1,4 +1,4 @@
-import { noop } from "@elara-services/utils";
+import { make, noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { calculateMasteryLevel } from "../utils/masteryHelper";
@@ -84,13 +84,13 @@ export async function syncStats(userId: string) {
         totalStats.healEffectiveness || 0;
     }
 
-    const artifactTypes: ArtifactType[] = [
+    const artifactTypes = make.array<ArtifactType>([
         "Flower",
         "Plume",
         "Sands",
         "Goblet",
         "Circlet",
-    ];
+    ]);
 
     const equippedArtifacts: { [slot in ArtifactType]?: ArtifactName } = {};
 

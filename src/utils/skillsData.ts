@@ -1,3 +1,4 @@
+import { make } from "@elara-services/utils";
 import { type UserStats } from "@prisma/client";
 
 export type SkillName =
@@ -38,7 +39,7 @@ export interface Skill {
     };
 }
 
-export const skills: Skill[] = [
+export const skills = make.array<Skill>([
     {
         name: "Vigilance",
         levels: [
@@ -508,7 +509,7 @@ export const skills: Skill[] = [
             ],
         },
     },
-];
+]);
 
 export const skillsMap: Record<SkillName, Skill> = skills.reduce(
     (map, skill) => {

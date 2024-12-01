@@ -1,3 +1,4 @@
+import { make } from "@elara-services/utils";
 import { formatChange } from "./hunt";
 import type {
     ArtifactName,
@@ -10,7 +11,7 @@ export function calculateStatChanges(
     beforeStats: any,
     afterStats: any,
 ): string[] {
-    const updatedStats: string[] = [];
+    const updatedStats = make.array<string>();
 
     const statsToCheck = [
         { key: "attackPower", label: "⚔️ Attack Power" },
@@ -52,7 +53,7 @@ export function getSetBonusMessages(
     afterStats: any,
     action: "activated" | "deactivated",
 ): string[] {
-    const messages: string[] = [];
+    const messages = make.array<string>();
     const beforeSets = getActivatedSets(beforeStats);
     const afterSets = getActivatedSets(afterStats);
 
@@ -91,13 +92,13 @@ export function getSetBonusMessages(
 }
 
 function getActivatedSets(stats: any): { [setName: string]: number } {
-    const artifactTypes: ArtifactType[] = [
+    const artifactTypes = make.array<ArtifactType>([
         "Flower",
         "Plume",
         "Sands",
         "Goblet",
         "Circlet",
-    ];
+    ]);
     const setCounts: { [setName: string]: number } = {};
 
     for (const type of artifactTypes) {
@@ -119,7 +120,7 @@ function describeSetBonus(setName: string, bonusType: "2pc" | "4pc"): string {
         return "";
     }
     const bonuses = setBonuses[bonusType];
-    const descriptions: string[] = [];
+    const descriptions = make.array<string>();
     for (const [key, value] of Object.entries(bonuses)) {
         switch (key) {
             case "attackPowerPercentage":

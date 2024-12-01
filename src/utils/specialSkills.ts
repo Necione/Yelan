@@ -1,3 +1,5 @@
+import { make } from "@elara-services/utils";
+
 export type SpecialSkillName =
     | "Parry"
     | "Backstep"
@@ -18,7 +20,7 @@ export interface SpecialSkill {
     description: string;
 }
 
-export const specialSkills: SpecialSkill[] = [
+export const specialSkills = make.array<SpecialSkill>([
     {
         skillName: "Parry",
         emoji: "⚔️",
@@ -82,4 +84,4 @@ export const specialSkills: SpecialSkill[] = [
         emoji: "🔮",
         description: "Know what monsters will be in your next hunt.",
     },
-];
+]);

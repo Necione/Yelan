@@ -1,13 +1,14 @@
+import { make } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 
 const r = `${customEmoji.a.z_coins} \`%AMOUNT% ${texts.c.u}\``;
 
-export const workMessages: {
+export const workMessages = make.array<{
     message: string;
     image: string;
     title: string;
     footer: string;
-}[] = [
+}>([
     {
         message: `You went out hunting for Hilichurls and earned ${r}.`,
         image: "https://i.imgur.com/jLt0v7v.png",
@@ -56,4 +57,4 @@ export const workMessages: {
         title: "He's a real glutton deep down huh.",
         footer: "Liyue | 001",
     },
-];
+]);

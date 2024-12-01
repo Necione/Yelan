@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, getKeys, is, noop } from "@elara-services/utils";
+import { embedComment, getKeys, is, make, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, syncStats, updateUserStats } from "../../services";
 import {
@@ -29,10 +29,24 @@ export const equip = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
     async autocomplete(i) {
-        const list = [...getKeys(weapons), ...getKeys(artifacts)].map((c) => ({
+        let list = [...getKeys(weapons), ...getKeys(artifacts)].map((c) => ({
             name: String(c),
             value: c,
         }));
+        const stats = await getUserStats(i.user.id);
+        if (!stats || !is.array(stats.inventory)) {
+            return i
+                .respond([
+                    {
+                        name: "You have nothing in your inventory",
+                        value: "n/a",
+                    },
+                ])
+                .catch(noop);
+        }
+        list = list.filter((r) =>
+            stats.inventory.find((cc) => cc.item === r.name),
+        );
         const item = i.options.getString("item", false) ?? "";
         if (!item) {
             return i.respond(list.slice(0, 25)).catch(noop);
@@ -49,6 +63,9 @@ export const equip = buildCommand<SlashCommand>({
     },
     async execute(i, r) {
         const itemName = i.options.getString("item", true);
+        if (itemName === "n/a") {
+            return r.edit(embedComment(`You provided an invalid item name.`));
+        }
         let stats = await getUserStats(i.user.id);
 
         if (!stats) {
@@ -63,7 +80,7 @@ export const equip = buildCommand<SlashCommand>({
             return r.edit(embedComment("You cannot equip while hunting!"));
         }
 
-        const updatedStats: string[] = [];
+        const updatedStats = make.array<string>();
         const beforeStats = { ...stats };
 
         if (weapons[itemName as WeaponName]) {
@@ -87,7 +104,7 @@ export const equip = buildCommand<SlashCommand>({
             }
 
             await updateUserStats(i.user.id, {
-                equippedWeapon: weaponName,
+                equippedWeapon: { set: weaponName },
             });
 
             stats = await syncStats(i.user.id);
@@ -141,7 +158,7 @@ export const equip = buildCommand<SlashCommand>({
             }
 
             await updateUserStats(i.user.id, {
-                [equippedField]: artifactName,
+                [equippedField]: { set: artifactName },
             });
 
             stats = await syncStats(i.user.id);

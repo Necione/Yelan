@@ -1,3 +1,5 @@
+import { make } from "@elara-services/utils";
+
 export interface Recipe {
     name: string;
     requiredItems: { item: string; amount: number }[];
@@ -5,7 +7,7 @@ export interface Recipe {
     cookTime: number;
 }
 
-export const recipes: Recipe[] = [
+export const recipes = make.array<Recipe>([
     {
         name: "Chicken-Mushroom Skewer",
         requiredItems: [
@@ -110,4 +112,4 @@ export const recipes: Recipe[] = [
         result: { item: "Fish and Chips", amount: 1 },
         cookTime: 60000,
     },
-];
+]);

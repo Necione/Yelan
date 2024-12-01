@@ -50,16 +50,16 @@ export const rename = buildCommand<SlashCommand>({
                 embedComment("An error occurred while renaming the channel."),
             );
         }
-        await logs.misc({
-            embeds: embedComment(
+        await logs.misc(
+            embedComment(
                 `${i.user.toString()} (${
                     i.user.id
                 }) has renamed ${i.channel.toString()} (\`${
                     i.channelId
                 }\`)\nBefore: \`\`\`txt\n${before}\`\`\`\nAfter:\n\`\`\`txt\n${newName}\`\`\``,
                 "Orange",
-            ).embeds,
-        });
+            ),
+        );
 
         return r.edit(embedComment(`Channel renamed to ${newName}.`, "Green"));
     },

@@ -1,4 +1,5 @@
 import { randomNumber } from "@elara-services/packages";
+import { make } from "@elara-services/utils";
 import { getRandomValue } from "./hunt";
 import { type ArtifactName, artifacts } from "./rpgitems/artifacts";
 import { type DropName, drops } from "./rpgitems/drops";
@@ -19,15 +20,15 @@ type ChestRarity = {
     weight: number;
 };
 
-const rarities: ChestRarity[] = [
+const rarities = make.array<ChestRarity>([
     { rarity: "Common", multiplier: 1, weight: 50 },
     { rarity: "Exquisite", multiplier: 2, weight: 25 },
     { rarity: "Precious", multiplier: 3, weight: 15 },
     { rarity: "Luxurious", multiplier: 4, weight: 8 },
     { rarity: "Remarkable", multiplier: 5, weight: 2 },
-];
+]);
 
-const chestLoot: LootItem[] = [
+const chestLoot = make.array<LootItem>([
     ...Object.keys(drops).map((drop) => ({
         name: drop as DropName,
         minAmount: drops[drop as DropName].minAmount || 1,
@@ -49,7 +50,7 @@ const chestLoot: LootItem[] = [
         minWorldLevel: artifacts[artifact as ArtifactName].minWorldLevel,
         chestChance: artifacts[artifact as ArtifactName].chestChance,
     })),
-];
+]);
 
 function selectChestRarity(): ChestRarity {
     const totalWeight = rarities.reduce(
@@ -67,7 +68,7 @@ function selectChestRarity(): ChestRarity {
     return rarities[0];
 }
 
-function isWeapon(name: string): boolean {
+function isWeapon(name: string) {
     return name in weapons;
 }
 
@@ -79,10 +80,10 @@ export function generateChestLoot(worldLevel: number) {
         4,
     );
 
-    const loot: {
+    const loot = make.array<{
         item: DropName | WeaponName | ArtifactName;
         amount: number;
-    }[] = [];
+    }>();
 
     let totalUniqueItems = 0;
     let hasWeapon = false;
@@ -157,18 +158,18 @@ type MaterialItem = {
     dropChance: number;
 };
 
-const materialLoot: MaterialItem[] = [
+const materialLoot = make.array<MaterialItem>([
     ...Object.keys(misc).map((item) => ({
         name: item as MiscName,
         minAmount: misc[item as MiscName].minAmount || 1,
         maxAmount: misc[item as MiscName].maxAmount || 1,
         dropChance: misc[item as MiscName].dropChance || 100,
     })),
-];
+]);
 
 export function generateRawMaterials() {
     const uniqueMaterialsCount = getRandomValue(2, 3);
-    const materials: { item: MiscName; amount: number }[] = [];
+    const materials = make.array<{ item: MiscName; amount: number }>();
 
     const availableLoot = [...materialLoot];
 
@@ -188,9 +189,7 @@ export function generateRawMaterials() {
         }
     }
 
-    return {
-        materials,
-    };
+    return { materials };
 }
 
 type RandomDrop = {
@@ -200,15 +199,10 @@ type RandomDrop = {
 
 export function getRandomDrop(): RandomDrop {
     const dropNames = Object.keys(drops) as DropName[];
-    const randomDropName =
-        dropNames[
-            randomNumber({ min: 0, max: dropNames.length - 1, integer: true })
-        ];
-
-    const quantity = randomNumber({ min: 2, max: 6, integer: true });
-
     return {
-        name: randomDropName,
-        quantity,
+        name: dropNames[
+            randomNumber({ min: 0, max: dropNames.length - 1, integer: true })
+        ],
+        quantity: randomNumber({ min: 2, max: 6, integer: true }),
     };
 }

@@ -1,4 +1,4 @@
-import { log } from "@elara-services/utils";
+import { is, log, make } from "@elara-services/utils";
 import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import { locationGroupWeights } from "./locationGroupWeights";
@@ -39,10 +39,10 @@ export interface MonsterInstance extends Monster {
     maxDamage: number;
 }
 
-export const monsters: Monster[] = [];
+export const monsters = make.array<Monster>();
 export let monstersLoaded = false;
 
-async function loadMonsters(dir: string): Promise<void> {
+async function loadMonsters(dir: string) {
     const files = readdirSync(dir);
 
     for (const file of files) {
@@ -65,14 +65,14 @@ async function loadMonsters(dir: string): Promise<void> {
 
 const monstersDir = resolve(__dirname, "./monsters");
 
-export async function initializeMonsters(): Promise<void> {
+export async function initializeMonsters() {
     if (!monstersLoaded) {
         await loadMonsters(monstersDir);
         monstersLoaded = true;
     }
 }
 
-export function getRandomValue(min: number, max: number): number {
+export function getRandomValue(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -83,15 +83,15 @@ export function calculateDrop(
         maxAmount: number;
         chance: number;
     }[],
-): { item: string; amount: number }[] {
-    const droppedItems: { item: string; amount: number }[] = [];
+) {
+    const droppedItems = make.array<{ item: string; amount: number }>();
 
-    drops.forEach((drop) => {
+    for (const drop of drops) {
         if (Math.random() * 100 < drop.chance) {
             const amount = getRandomValue(drop.minAmount, drop.maxAmount);
             droppedItems.push({ item: drop.item, amount });
         }
-    });
+    }
 
     return droppedItems;
 }
@@ -122,13 +122,13 @@ export async function getRandomMonster(
             worldLevel >= monster.minWorldLevel && monster.group !== "Boss",
     );
 
-    if (availableMonsters.length === 0) {
+    if (!is.array(availableMonsters)) {
         return null;
     }
 
-    const uniqueGroups = [
+    const uniqueGroups = make.array<MonsterGroup>([
         ...new Set(availableMonsters.map((monster) => monster.group)),
-    ] as MonsterGroup[];
+    ]);
 
     const groupWeightsForLocation =
         locationGroupWeights[location] || locationGroupWeights["Default"] || {};
@@ -166,7 +166,7 @@ export async function getRandomMonster(
         (monster) => monster.group === selectedGroup,
     );
 
-    if (monstersInGroup.length === 0) {
+    if (!is.array(monstersInGroup)) {
         return null;
     }
 
@@ -274,10 +274,10 @@ export interface AbyssMonster {
     quantity: number;
 }
 
-const abyssMonsters: AbyssMonster[] = [];
+const abyssMonsters = make.array<AbyssMonster>();
 let abyssMonstersLoaded = false;
 
-async function loadAbyssMonsters(dir: string): Promise<void> {
+async function loadAbyssMonsters(dir: string) {
     const files = readdirSync(dir);
 
     for (const file of files) {
@@ -306,9 +306,8 @@ async function loadAbyssMonsters(dir: string): Promise<void> {
 }
 
 const abyssMonstersDir = resolve(__dirname, "./abyss");
-const abyssDropsDir = resolve(__dirname, "./abyss");
 
-export async function initializeAbyssMonsters(): Promise<void> {
+export async function initializeAbyssMonsters() {
     if (!abyssMonstersLoaded) {
         await loadAbyssMonsters(abyssMonstersDir);
         abyssMonstersLoaded = true;
@@ -326,12 +325,12 @@ export async function getMonstersForAbyssFloor(
     const floorFile = resolve(abyssMonstersDir, `abyssFloor${abyssFloor}.js`);
 
     try {
-        const module = await import(floorFile);
+        const mod = await import(floorFile);
 
-        const monsters = module[`abyssFloor${abyssFloor}Monsters`];
+        const monsters = mod[`abyssFloor${abyssFloor}Monsters`];
 
         if (monsters) {
-            const expandedMonsters: AbyssMonster[] = [];
+            const expandedMonsters = make.array<AbyssMonster>();
 
             monsters.forEach((monster: AbyssMonster) => {
                 const quantity = monster.quantity || 1;
@@ -352,12 +351,12 @@ export async function getMonstersForAbyssFloor(
 export async function getDropsForAbyssFloor(
     abyssFloor: number,
 ): Promise<{ item: string; amount: number }[]> {
-    const floorFile = resolve(abyssDropsDir, `abyssFloor${abyssFloor}.js`);
+    const floorFile = resolve(abyssMonstersDir, `abyssFloor${abyssFloor}.js`);
 
     try {
-        const module = await import(floorFile);
-
-        const drops = module[`abyssFloor${abyssFloor}Drops`];
+        const drops = (await import(floorFile))?.[
+            `abyssFloor${abyssFloor}Drops`
+        ];
 
         if (drops) {
             return drops;

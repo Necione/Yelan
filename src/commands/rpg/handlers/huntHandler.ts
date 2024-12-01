@@ -78,7 +78,7 @@ export async function handleHunt(
                     : 3
                 : 3;
 
-    const monstersEncountered: Monster[] = [];
+    const monstersEncountered = make.array<Monster>();
 
     let currentPlayerHp = stats.hp;
 

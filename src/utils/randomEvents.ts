@@ -1,3 +1,4 @@
+import { make } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
 import { injuredManEvent } from "../utils/events/injuredManEvent";
@@ -10,12 +11,12 @@ export async function handleRandomEvent(
     stats: UserStats,
     userWallet: UserWallet,
 ) {
-    const events = [
+    const events = make.array([
         injuredManEvent,
         healingWellEvent,
         cliffFallEvent,
         secretCultEvent,
-    ];
+    ]);
 
     const randomIndex = Math.floor(Math.random() * events.length);
     const randomEvent = events[randomIndex];

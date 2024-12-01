@@ -44,7 +44,6 @@ export const spells: Record<string, Spell> = {
 export function getAvailableSpells(points: number): Spell[] {
     const mastery = calculateMasteryLevel(points);
     const currentLevel = mastery.numericLevel;
-
     return Object.values(spells).filter((spell) => {
         if (spell.requiredMasteryLevel) {
             return currentLevel >= spell.requiredMasteryLevel;
