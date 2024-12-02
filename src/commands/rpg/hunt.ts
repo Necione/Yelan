@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, sleep } from "@elara-services/utils";
+import { embedComment, get, noop, sleep } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
@@ -17,11 +17,7 @@ export const hunt = buildCommand<SlashCommand>({
     async execute(i, r) {
         locked.set(i.user);
 
-        const message = await r.edit(
-            embedComment(`Getting ready for the hunt!`, "Yellow"),
-        );
-
-        // const message = await i.fetchReply().catch(noop);
+        const message = await i.fetchReply().catch(noop);
         if (!message) {
             locked.del(i.user.id);
             return r.edit(
@@ -83,8 +79,7 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
-        const activeSkills = stats.activeSkills || [];
-        const activeSinSkills = activeSkills.filter((skill) =>
+        const activeSinSkills = (stats.activeSkills || []).filter((skill) =>
             sinSkills.includes(skill),
         );
 
@@ -98,6 +93,7 @@ export const hunt = buildCommand<SlashCommand>({
                 ),
             );
         }
+        // TODO: Make a generalized function to all of this, it only needs message, user etc.
 
         await updateUserStats(i.user.id, { isHunting: { set: true } });
         await r.edit(embedComment(`The hunt will begin shortly...`, "Yellow"));

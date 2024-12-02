@@ -1,3 +1,4 @@
+import { is } from "@elara-services/utils";
 import type { Prisma, UserStats } from "@prisma/client";
 import { skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
@@ -27,6 +28,22 @@ export function getDeathThreshold(stats: UserStats): number {
         return -500;
     }
     return 0;
+}
+
+export function has(
+    names: string[] | string,
+    monster: Monster,
+    isGroup?: boolean,
+) {
+    if (is.string(names)) {
+        names = [names];
+    }
+    if (isGroup) {
+        return names.some(
+            (c) => monster.group === c || monster.group.includes(c),
+        );
+    }
+    return names.some((c) => monster.name === c || monster.name.includes(c));
 }
 
 export async function playerAttack(
@@ -186,7 +203,7 @@ export async function playerAttack(
     let critChance = stats.critChance || 0;
     const critValue = stats.critValue || 1;
 
-    const isNobushi = ["Nobushi"].includes(monster.group);
+    const isNobushi = has("Nobushi", monster, true);
 
     if (isNobushi) {
         critChance = 0;
@@ -271,7 +288,7 @@ export async function playerAttack(
     }
 
     if (
-        monster.group === "Machine" &&
+        has("Machine", monster, true) &&
         currentMonsterHp <= 0 &&
         !monsterState.shieldUsed
     ) {
@@ -416,10 +433,7 @@ export async function monsterAttack(
         );
     }
 
-    const inc = (names: string[]) =>
-        names.some((c) => monster.name.includes(c));
-
-    if (inc(["Pyro", "Flames"])) {
+    if (has(["Pyro", "Flames"], monster)) {
         const burnDamage = Math.ceil(
             stats.maxHP * (0.03 + 0.01 * Math.floor(stats.worldLevel / 2)),
         );
@@ -430,7 +444,7 @@ export async function monsterAttack(
         );
     }
 
-    if (inc(["Cryo", "Frost"]) && Math.random() < 0.5) {
+    if (has(["Cryo", "Frost"], monster) && Math.random() < 0.5) {
         const crippleDamage = Math.ceil(
             stats.maxHP * (0.05 + 0.01 * Math.floor(stats.worldLevel / 2)),
         );
@@ -515,11 +529,11 @@ export function applyAttackModifiers(
 } {
     const hasBackstab = skills.has(stats, "Backstab");
 
-    const isHumanOrFatui = [
-        MonsterGroup.Human,
-        MonsterGroup.Fatui,
-        MonsterGroup.Nobushi,
-    ].includes(monster.group);
+    const isHumanOrFatui = has(
+        [MonsterGroup.Human, MonsterGroup.Fatui, MonsterGroup.Nobushi],
+        monster,
+        true,
+    );
 
     if (hasBackstab && isHumanOrFatui) {
         attackPower *= 1.5;
@@ -545,7 +559,7 @@ export function applyAttackModifiers(
         const effectiveGroups: MonsterGroup[] =
             weaponAdvantages[weaponType] || [];
 
-        if (effectiveGroups.includes(monster.group)) {
+        if (has(effectiveGroups, monster, true)) {
             attackPower *= 1.1;
             messages.push(
                 `\`⚔️\` **${weaponType}** advantage! You deal 110% more DMG to **${monster.group}**.`,
@@ -554,8 +568,9 @@ export function applyAttackModifiers(
 
         const masteryField = `mastery${weaponType}` as keyof UserStats;
         const masteryPointsRaw = stats[masteryField];
-        const masteryPoints =
-            typeof masteryPointsRaw === "number" ? masteryPointsRaw : 0;
+        const masteryPoints = is.number(masteryPointsRaw)
+            ? masteryPointsRaw
+            : 0;
 
         const { numericLevel } = calculateMasteryLevel(masteryPoints);
 
@@ -626,7 +641,7 @@ export function checkMonsterDefenses(
     let monsterDefended = false;
     let damageReduced = 0;
 
-    if (monster.name.includes("Agent") && !monsterState.vanishedUsed) {
+    if (has("Agent", monster) && !monsterState.vanishedUsed) {
         attackMissed = true;
         monsterState.vanishedUsed = true;
         messages.push(
@@ -634,8 +649,7 @@ export function checkMonsterDefenses(
         );
     }
 
-    const isLawachurlOrElectro =
-        monster.name.includes("Lawachurl") || monster.name.includes("Electro");
+    const isLawachurlOrElectro = has(["Lawachurl", "Electro"], monster);
     const stunChance = Math.random() < 0.25;
 
     if (isLawachurlOrElectro && stunChance) {
@@ -645,7 +659,7 @@ export function checkMonsterDefenses(
         attackMissed = true;
     }
 
-    const isAnemo = monster.name.includes("Anemo");
+    const isAnemo = has("Anemo", monster);
     const dodgeChance = Math.random() < 0.25;
 
     if (isAnemo && dodgeChance) {
@@ -655,7 +669,7 @@ export function checkMonsterDefenses(
         attackMissed = true;
     }
 
-    const isBoss = ["Boss"].includes(monster.group);
+    const isBoss = has("Boss", monster, true);
     const bossDodgeChance = Math.random() < 0.2;
 
     if (isBoss && bossDodgeChance) {
@@ -665,7 +679,7 @@ export function checkMonsterDefenses(
         attackMissed = true;
     }
 
-    const isFatui = ["Fatui"].includes(monster.group);
+    const isFatui = has(["Fatui"], monster, true);
     const displacementChance = Math.random() < 0.25;
     if (isFatui && displacementChance) {
         monsterState.displaced = true;
