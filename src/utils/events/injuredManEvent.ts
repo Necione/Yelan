@@ -1,15 +1,13 @@
 import {
     addButtonRow,
     awaitComponent,
-    embedComment,
     get,
-    getInteractionResponder,
     make,
+    noop,
 } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
-import type { ChatInputCommandInteraction } from "discord.js";
-import { ButtonStyle, EmbedBuilder } from "discord.js";
+import { ButtonStyle, EmbedBuilder, type Message } from "discord.js";
 import { addItemToInventory, removeBalance } from "../../services";
 
 const items = make.array<{ item: string; amount: number }>([
@@ -24,11 +22,10 @@ const items = make.array<{ item: string; amount: number }>([
 const randomItem = items[Math.floor(Math.random() * items.length)];
 
 export async function injuredManEvent(
-    i: ChatInputCommandInteraction,
+    message: Message,
     stats: UserStats,
     userWallet: UserWallet,
 ) {
-    const r = getInteractionResponder(i);
     const ids = {
         help: "event_help",
         ignore: "event_ignore",
@@ -40,77 +37,93 @@ export async function injuredManEvent(
         )
         .setColor("Yellow");
 
-    const message = await r.edit({
-        embeds: [embed],
-        components: [
-            addButtonRow([
-                { id: ids.help, label: "Help", style: ButtonStyle.Success },
-                { id: ids.ignore, label: "Ignore", style: ButtonStyle.Danger },
-            ]),
-        ],
-    });
+    await message
+        .edit({
+            embeds: [embed],
+            components: [
+                addButtonRow([
+                    { id: ids.help, label: "Help", style: ButtonStyle.Success },
+                    {
+                        id: ids.ignore,
+                        label: "Ignore",
+                        style: ButtonStyle.Danger,
+                    },
+                ]),
+            ],
+        })
+        .catch(noop);
 
-    if (!message) {
-        return r.edit(
-            embedComment(`Unable to fetch the original components message.`),
-        );
-    }
     const c = await awaitComponent(message, {
         filter: (ii) => ii.customId.startsWith("event_"),
-        users: [{ allow: true, id: i.user.id }],
+        users: [{ allow: true, id: stats.userId }],
         time: get.secs(10),
     });
     if (!c) {
-        return r.edit({
-            embeds: [
-                embed.setDescription(
-                    "The man waits for a while but seeing no response, he continues on his way.",
-                ),
-            ],
-            components: [],
-        });
+        return message
+            .edit({
+                embeds: [
+                    embed.setDescription(
+                        "The man waits for a while but seeing no response, he continues on his way.",
+                    ),
+                ],
+                components: [],
+            })
+            .catch(noop);
     }
     if (c.customId !== ids.help) {
-        return r.edit({
-            embeds: [
-                embed.setDescription(
-                    "You chose to ignore the man and continue on your way.",
-                ),
-            ],
-            components: [],
-        });
+        return message
+            .edit({
+                embeds: [
+                    embed.setDescription(
+                        "You chose to ignore the man and continue on your way.",
+                    ),
+                ],
+                components: [],
+            })
+            .catch(noop);
     }
     const coinAmount = 50;
     if (userWallet.balance < coinAmount) {
-        return r.edit({
-            embeds: [
-                embed.setDescription(
-                    `You don't have enough ${customEmoji.a.z_coins} to help the man.`,
-                ),
-            ],
-            components: [],
-        });
+        return message
+            .edit({
+                embeds: [
+                    embed.setDescription(
+                        `You don't have enough ${customEmoji.a.z_coins} to help the man.`,
+                    ),
+                ],
+                components: [],
+            })
+            .catch(noop);
     }
 
-    await removeBalance(i.user.id, coinAmount, false, "Donated to injured man");
+    await removeBalance(
+        stats.userId,
+        coinAmount,
+        false,
+        "Donated to injured man",
+    );
 
     if (Math.random() < 0.5) {
-        await addItemToInventory(i.user.id, [randomItem]);
-        return r.edit({
+        await addItemToInventory(stats.userId, [randomItem]);
+        return message
+            .edit({
+                embeds: [
+                    embed.setDescription(
+                        `You gave the man \`100 Coins\`. The man thanks you and gives you a \`${randomItem.item}\` as a token of his appreciation.`,
+                    ),
+                ],
+                components: [],
+            })
+            .catch(noop);
+    }
+    return message
+        .edit({
             embeds: [
                 embed.setDescription(
-                    `You gave the man \`100 Coins\`. The man thanks you and gives you a \`${randomItem.item}\` as a token of his appreciation.`,
+                    "You gave the man `100 Coins`. The man thanks you and continues on his way.",
                 ),
             ],
             components: [],
-        });
-    }
-    return r.edit({
-        embeds: [
-            embed.setDescription(
-                "You gave the man `100 Coins`. The man thanks you and continues on his way.",
-            ),
-        ],
-        components: [],
-    });
+        })
+        .catch(noop);
 }

@@ -1,4 +1,4 @@
-import type { UserStats } from "@prisma/client";
+import type { Prisma, UserStats } from "@prisma/client";
 import { skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
 import {
@@ -120,15 +120,15 @@ export async function playerAttack(
 
         stats.castQueue.shift();
 
-        const updateData: Partial<UserStats> = {
-            castQueue: stats.castQueue,
+        const updateData: Prisma.UserStatsUpdateInput = {
+            castQueue: { set: stats.castQueue },
         };
 
         if (spellName === "Heal") {
-            updateData.hp = currentPlayerHp;
+            updateData.hp = { set: currentPlayerHp };
         }
         if (spellName === "Fury") {
-            updateData.attackPower = stats.attackPower;
+            updateData.attackPower = { set: stats.attackPower };
         }
 
         await updateUserStats(stats.userId, updateData);
@@ -416,7 +416,10 @@ export async function monsterAttack(
         );
     }
 
-    if (monster.name.includes("Pyro") || monster.name.includes("Flames")) {
+    const inc = (names: string[]) =>
+        names.some((c) => monster.name.includes(c));
+
+    if (inc(["Pyro", "Flames"])) {
         const burnDamage = Math.ceil(
             stats.maxHP * (0.03 + 0.01 * Math.floor(stats.worldLevel / 2)),
         );
@@ -427,10 +430,7 @@ export async function monsterAttack(
         );
     }
 
-    if (
-        (monster.name.includes("Cryo") || monster.name.includes("Frost")) &&
-        Math.random() < 0.5
-    ) {
+    if (inc(["Cryo", "Frost"]) && Math.random() < 0.5) {
         const crippleDamage = Math.ceil(
             stats.maxHP * (0.05 + 0.01 * Math.floor(stats.worldLevel / 2)),
         );
@@ -475,7 +475,7 @@ export async function monsterAttack(
     }
 
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP);
-    await updateUserStats(stats.userId, { hp: currentPlayerHp });
+    await updateUserStats(stats.userId, { hp: { set: currentPlayerHp } });
 
     let critText = "";
     if (
@@ -515,7 +515,7 @@ export function applyAttackModifiers(
 } {
     const hasBackstab = skills.has(stats, "Backstab");
 
-    const isHumanOrFatui: boolean = [
+    const isHumanOrFatui = [
         MonsterGroup.Human,
         MonsterGroup.Fatui,
         MonsterGroup.Nobushi,

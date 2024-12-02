@@ -1,3 +1,4 @@
+import { limits } from "..";
 import { MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
@@ -43,7 +44,7 @@ export default {
     baseHp: 14,
     baseAtk: 5,
     getStatsForWorldLevel(worldLevel: number) {
-        if (worldLevel < 1 || worldLevel > 30) {
+        if (!limits.worlds.check(worldLevel)) {
             return null;
         }
 

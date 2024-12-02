@@ -1,6 +1,6 @@
 import { get, noop } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
-import type { ChatInputCommandInteraction, ThreadChannel } from "discord.js";
+import type { Message, ThreadChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { skills } from "../../../plugins/other/utils";
 import {
@@ -16,11 +16,12 @@ import {
     getAvailableDirections,
     getCurrentMap,
 } from "../abyssHelpers/directionHelper";
+import type { AnyInteraction } from "./huntHandler";
 
 const maxWorldLevel = 30;
 
 export async function handleVictory(
-    i: ChatInputCommandInteraction,
+    message: Message,
     thread: ThreadChannel,
     stats: UserStats,
     monstersEncountered: Monster[],
@@ -70,7 +71,7 @@ export async function handleVictory(
         const drops = calculateDrop(monster.drops);
         if (Array.isArray(drops)) {
             dropsCollected = dropsCollected.concat(drops);
-            await addItemToInventory(i.user.id, drops);
+            await addItemToInventory(stats.userId, drops);
         }
     }
 
@@ -102,7 +103,7 @@ export async function handleVictory(
         );
     }
 
-    await updateUserStats(i.user.id, {
+    await updateUserStats(stats.userId, {
         exp: newExp,
         worldLevel: stats.worldLevel,
     });
@@ -177,7 +178,7 @@ export async function handleVictory(
         }
     }
 
-    await updateUserStats(i.user.id, {
+    await updateUserStats(stats.userId, {
         hp: currentPlayerHp,
         ...(manaFieldAdded && { mana: stats.mana }),
         activeEffects: stats.activeEffects,
@@ -203,11 +204,11 @@ export async function handleVictory(
             `You defeated the monsters but succumbed to poisoning afterwards...`,
         );
 
-        await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+        await message.edit({ embeds: [finalEmbed] }).catch(noop);
 
         await thread.edit({ archived: true, locked: true }).catch(noop);
 
-        await updateUserStats(i.user.id, {
+        await updateUserStats(stats.userId, {
             hp: 0,
             isHunting: false,
         });
@@ -221,7 +222,7 @@ export async function handleVictory(
         const coinsEarned = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
 
         await addBalance(
-            i.user.id,
+            stats.userId,
             coinsEarned,
             true,
             `Earned from the Scrounge skill`,
@@ -247,9 +248,9 @@ export async function handleVictory(
         });
     }
 
-    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+    await message.edit({ embeds: [finalEmbed] }).catch(noop);
 
-    await updateUserStats(i.user.id, { isHunting: false });
+    await updateUserStats(stats.userId, { isHunting: false });
     await thread.edit({ archived: true, locked: true }).catch(noop);
 
     const insomniaSkill = getUserSkillLevelData(stats, "Insomnia");
@@ -261,7 +262,7 @@ export async function handleVictory(
 }
 
 export async function handleAbyssVictory(
-    i: ChatInputCommandInteraction,
+    i: AnyInteraction,
     thread: ThreadChannel,
     stats: UserStats,
     monstersEncountered: Monster[],
@@ -356,7 +357,7 @@ export async function handleAbyssVictory(
     await thread.edit({ archived: true, locked: true }).catch(noop);
 }
 export async function handleDefeat(
-    i: ChatInputCommandInteraction,
+    message: Message,
     thread: ThreadChannel,
     stats: UserStats,
     monster: Monster,
@@ -370,12 +371,12 @@ export async function handleDefeat(
             `Oh no :( You were defeated by the **${monster.name}**...\n-# Use </downgrade:1282035993242767450> if this WL is too hard.`,
         );
 
-    await updateUserStats(i.user.id, {
+    await updateUserStats(stats.userId, {
         hp: Math.max(currentPlayerHp, 0),
         isHunting: false,
     });
 
-    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+    await message.edit({ embeds: [finalEmbed] }).catch(noop);
 
     const insomniaSkill = getUserSkillLevelData(stats, "Insomnia");
 
@@ -389,7 +390,7 @@ export async function handleDefeat(
 }
 
 export async function handleAbyssDefeat(
-    i: ChatInputCommandInteraction,
+    i: AnyInteraction,
     thread: ThreadChannel,
     monster: Monster,
     currentPlayerHp: number,

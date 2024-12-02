@@ -33,6 +33,7 @@ const choices = [
     "collectables",
     "badges",
     "rakeback",
+    "cooldowns",
 ];
 const ints = [
     "elo",
@@ -48,7 +49,7 @@ const ints = [
     "rankedUID",
     "starrail",
 ];
-const arrays = ["achievements", "collectables", "badges"];
+const arrays = ["achievements", "collectables", "badges", "cooldowns"];
 const texts = ["backgroundUrl"];
 
 export const reset = buildCommand({

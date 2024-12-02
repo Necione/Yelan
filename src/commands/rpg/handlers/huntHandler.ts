@@ -1,6 +1,14 @@
-import { embedComment, get, make, noop, sleep } from "@elara-services/utils";
+import {
+    embedComment,
+    get,
+    is,
+    make,
+    noop,
+    sleep,
+} from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type {
+    ButtonInteraction,
     ChatInputCommandInteraction,
     Message,
     PublicThreadChannel,
@@ -11,6 +19,7 @@ import { updateUserStats } from "../../../services";
 import {
     getEncounterDescription,
     getMonsterByName,
+    getMonstersByName,
     getRandomMonster,
     getRandomValue,
     initializeMonsters,
@@ -27,19 +36,27 @@ import {
 } from "./battleHandler";
 import { handleDefeat, handleVictory } from "./conditions";
 
+export type AnyInteraction = ButtonInteraction | ChatInputCommandInteraction;
+
 export async function handleHunt(
-    i: ChatInputCommandInteraction,
     r: Message,
     stats: UserStats,
     userWallet: UserWallet,
+    selectedMonstersByName?: string[],
 ) {
-    if (Math.random() < 0.1) {
-        await handleRandomEvent(i, stats, userWallet);
-        await updateUserStats(i.user.id, { isHunting: false });
-        return;
+    let selectedMonsters = make.array<Monster>();
+    if (is.array(selectedMonstersByName)) {
+        selectedMonsters = await getMonstersByName(selectedMonstersByName);
     }
-
-    await initializeMonsters();
+    if (!is.array(selectedMonsters)) {
+        // If there is no selected monsters then do this.
+        if (Math.random() < 0.1) {
+            await handleRandomEvent(r, stats, userWallet);
+            await updateUserStats(stats.userId, { isHunting: false });
+            return;
+        }
+        await initializeMonsters();
+    }
 
     const bossEncounters: { [key: number]: string } = {
         5: "Electro Hypostasis",
@@ -78,7 +95,9 @@ export async function handleHunt(
                     : 3
                 : 3;
 
-    const monstersEncountered = make.array<Monster>();
+    const monstersEncountered = is.array(selectedMonsters)
+        ? selectedMonsters
+        : make.array<Monster>();
 
     let currentPlayerHp = stats.hp;
 
@@ -108,44 +127,49 @@ export async function handleHunt(
     }
 
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
+    if (!is.array(selectedMonsters)) {
+        for (let encounter = 0; encounter < numberOfMonsters; encounter++) {
+            let monster: Monster | null;
 
-    for (let encounter = 0; encounter < numberOfMonsters; encounter++) {
-        let monster: Monster | null;
-
-        if (isBossEncounter) {
-            monster = await getMonsterByName(bossName);
-            if (!monster) {
-                throw new Error(`Monster not found: ${bossName}`);
+            if (isBossEncounter) {
+                monster = await getMonsterByName(bossName);
+                if (!monster) {
+                    throw new Error(`Monster not found: ${bossName}`);
+                }
+            } else {
+                monster = await getRandomMonster(
+                    stats.worldLevel,
+                    stats.location,
+                    {
+                        currentHp: stats.hp,
+                        attackPower: stats.attackPower,
+                        critChance: stats.critChance,
+                        critValue: stats.critValue,
+                        defChance: stats.defChance,
+                        defValue: stats.defValue,
+                        maxHp: stats.maxHP,
+                    },
+                );
             }
-        } else {
-            monster = await getRandomMonster(stats.worldLevel, stats.location, {
-                currentHp: stats.hp,
-                attackPower: stats.attackPower,
-                critChance: stats.critChance,
-                critValue: stats.critValue,
-                defChance: stats.defChance,
-                defValue: stats.defValue,
-                maxHp: stats.maxHP,
-            });
-        }
 
-        if (!monster) {
-            return;
-        }
+            if (!monster) {
+                return;
+            }
 
-        const mutationChance = stats.rebirths * 5;
-        const actualMutationChance = Math.min(mutationChance, 100);
-        const isMutated = Math.random() * 100 < actualMutationChance;
+            const mutationChance = stats.rebirths * 5;
+            const actualMutationChance = Math.min(mutationChance, 100);
+            const isMutated = Math.random() * 100 < actualMutationChance;
 
-        if (isMutated) {
-            monster.name = `Mutated ${monster.name}`;
-            monster.isMutated = true;
-        }
+            if (isMutated) {
+                monster.name = `Mutated ${monster.name}`;
+                monster.isMutated = true;
+            }
 
-        monstersEncountered.push(monster);
+            monstersEncountered.push(monster);
 
-        if (isBossEncounter) {
-            break;
+            if (isBossEncounter) {
+                break;
+            }
         }
     }
 
@@ -216,11 +240,7 @@ export async function handleHunt(
                 },
             );
 
-        await i
-            .editReply({
-                embeds: [battleEmbed],
-            })
-            .catch(noop);
+        await r.edit({ embeds: [battleEmbed] }).catch(noop);
 
         if (!thread) {
             thread =
@@ -229,13 +249,12 @@ export async function handleHunt(
                         name: `Battle with ${monster.name}`,
                         autoArchiveDuration: 60,
                     })
-                    .catch(noop)) || undefined;
+                    .catch(noop)) ?? undefined;
 
             if (!thread) {
-                await i
-                    .editReply(embedComment(`Unable to create the thread.`))
+                return r
+                    .edit(embedComment(`Unable to create the thread.`))
                     .catch(noop);
-                return;
             }
         } else {
             await sendToChannel(thread.id, {
@@ -344,7 +363,7 @@ export async function handleHunt(
                     },
                 ]);
 
-                await i.editReply({ embeds: [battleEmbed] }).catch(noop);
+                await r.edit({ embeds: [battleEmbed] }).catch(noop);
 
                 isPlayerTurn = false;
             } else {
@@ -393,7 +412,7 @@ export async function handleHunt(
                     },
                 ]);
 
-                await i.editReply({ embeds: [battleEmbed] }).catch(noop);
+                await r.edit({ embeds: [battleEmbed] }).catch(noop);
 
                 if (currentPlayerHp <= deathThreshold) {
                     break;
@@ -420,7 +439,7 @@ export async function handleHunt(
             } else {
                 if (thread) {
                     await handleVictory(
-                        i,
+                        r,
                         thread,
                         stats,
                         monstersEncountered,
@@ -439,7 +458,7 @@ export async function handleHunt(
         } else {
             if (thread) {
                 await handleDefeat(
-                    i,
+                    r,
                     thread,
                     stats,
                     monstersEncountered[currentMonsterIndex],

@@ -65,6 +65,11 @@ export const heal = buildCommand<SlashCommand>({
                 ),
             );
         }
+        if (stats.hp >= stats.maxHP) {
+            return r.edit(
+                embedComment(`You can't heal anymore, you're at the max HP.`),
+            );
+        }
 
         const maxHP = stats.maxHP;
         const baseHealPercentage = Math.random() * (0.75 - 0.25) + 0.25;

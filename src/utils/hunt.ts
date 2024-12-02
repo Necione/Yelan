@@ -418,6 +418,17 @@ export async function getMonsterByName(
     }
 }
 
+export async function getMonstersByName(names: string[]) {
+    const mons = make.array<Monster>();
+    for await (const n of names) {
+        const f = await getMonsterByName(n);
+        if (f) {
+            mons.push(f);
+        }
+    }
+    return mons;
+}
+
 export const weaponAdvantages: { [key in WeaponType]?: MonsterGroup[] } = {
     Sword: [MonsterGroup.Nobushi, MonsterGroup.Eremite],
     Polearm: [MonsterGroup.Slime, MonsterGroup.Hilichurl],

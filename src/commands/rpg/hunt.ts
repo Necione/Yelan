@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import { embedComment, get, sleep } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
@@ -17,7 +17,11 @@ export const hunt = buildCommand<SlashCommand>({
     async execute(i, r) {
         locked.set(i.user);
 
-        const message = await i.fetchReply().catch(noop);
+        const message = await r.edit(
+            embedComment(`Getting ready for the hunt!`, "Yellow"),
+        );
+
+        // const message = await i.fetchReply().catch(noop);
         if (!message) {
             locked.del(i.user.id);
             return r.edit(
@@ -96,7 +100,14 @@ export const hunt = buildCommand<SlashCommand>({
         }
 
         await updateUserStats(i.user.id, { isHunting: { set: true } });
-        await handleHunt(i, message, stats, p);
+        await r.edit(embedComment(`The hunt will begin shortly...`, "Yellow"));
+        await sleep(get.secs(1));
+        await handleHunt(message, stats, p, [
+            "Anemo Slime",
+            "Cryo Slime",
+            "Electro Slime",
+            "Cryo Cicin",
+        ]);
 
         locked.del(i.user.id);
     },
