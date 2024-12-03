@@ -44,7 +44,7 @@ export default {
     baseHp: 15,
     baseAtk: 6,
     getStatsForWorldLevel(worldLevel: number) {
-        if (!limits.worlds.check(worldLevel)) {
+        if (!limits.check(worldLevel)) {
             return null;
         }
 

@@ -26,7 +26,7 @@ export default {
     baseHp: 30,
     baseAtk: 8,
     getStatsForWorldLevel(worldLevel: number) {
-        if (!limits.worlds.check(worldLevel)) {
+        if (!limits.check(worldLevel)) {
             return null;
         }
         const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
