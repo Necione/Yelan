@@ -1,4 +1,5 @@
 import { make } from "@elara-services/utils";
+import type { UserStats } from "@prisma/client";
 import { formatChange } from "./hunt";
 import type {
     ArtifactName,
@@ -8,18 +9,29 @@ import type {
 import { artifacts, artifactSets } from "./rpgitems/artifacts";
 
 export function calculateStatChanges(
-    beforeStats: any,
-    afterStats: any,
+    beforeStats: UserStats,
+    afterStats: UserStats | null,
 ): string[] {
+    if (!afterStats) {
+        return [];
+    }
     const updatedStats = make.array<string>();
 
     const statsToCheck = [
-        { key: "attackPower", label: "⚔️ Attack Power" },
-        { key: "critChance", label: "🎯 Crit Rate", isPercentage: true },
-        { key: "critValue", label: "💥 Crit Value", isMultiplier: true },
-        { key: "maxHP", label: "❤️ Max HP" },
-        { key: "defChance", label: "🛡️ DEF Rate", isPercentage: true },
-        { key: "defValue", label: "🛡️ DEF Value" },
+        { key: "attackPower" as const, label: "⚔️ Attack Power" },
+        {
+            key: "critChance" as const,
+            label: "🎯 Crit Rate",
+            isPercentage: true,
+        },
+        {
+            key: "critValue" as const,
+            label: "💥 Crit Value",
+            isMultiplier: true,
+        },
+        { key: "maxHP" as const, label: "❤️ Max HP" },
+        { key: "defChance" as const, label: "🛡️ DEF Rate", isPercentage: true },
+        { key: "defValue" as const, label: "🛡️ DEF Value" },
     ];
 
     for (const stat of statsToCheck) {
@@ -29,7 +41,7 @@ export function calculateStatChanges(
 
         if (change !== 0) {
             let formattedChange = formatChange(change);
-            let totalValue = afterValue;
+            let totalValue: string | number = afterValue;
             if (stat.isPercentage) {
                 formattedChange += "%";
                 totalValue = totalValue.toFixed(2) + "%";
@@ -49,8 +61,8 @@ export function calculateStatChanges(
 }
 
 export function getSetBonusMessages(
-    beforeStats: any,
-    afterStats: any,
+    beforeStats: UserStats,
+    afterStats: UserStats | null,
     action: "activated" | "deactivated",
 ): string[] {
     const messages = make.array<string>();
@@ -91,7 +103,9 @@ export function getSetBonusMessages(
     return messages;
 }
 
-function getActivatedSets(stats: any): { [setName: string]: number } {
+function getActivatedSets(stats: UserStats | null): {
+    [setName: string]: number;
+} {
     const artifactTypes = make.array<ArtifactType>([
         "Flower",
         "Plume",
@@ -103,7 +117,7 @@ function getActivatedSets(stats: any): { [setName: string]: number } {
 
     for (const type of artifactTypes) {
         const field = `equipped${type}` as keyof typeof stats;
-        const artifactName = stats[field];
+        const artifactName = stats?.[field];
         if (artifactName && artifacts[artifactName as ArtifactName]) {
             const artifact = artifacts[artifactName as ArtifactName];
             const setName = artifact.artifactSet;

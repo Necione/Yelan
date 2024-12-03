@@ -1,5 +1,12 @@
 import { type PrefixCommand } from "@elara-services/botbuilder";
-import { addButtonRow, error, get, noop, sleep } from "@elara-services/utils";
+import {
+    addButtonRow,
+    error,
+    get,
+    make,
+    noop,
+    sleep,
+} from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import {
     ButtonStyle,
@@ -7,6 +14,7 @@ import {
     ComponentType,
     EmbedBuilder,
     type Message,
+    type MessageCollector,
     type ReadonlyCollection,
     type TextChannel,
 } from "discord.js";
@@ -26,8 +34,8 @@ const gameState = {
     floor: 1,
 };
 
-let originalMap: string[][];
-let activeCollectors: any[] = [];
+let originalMap = make.array<string[]>();
+let activeCollectors = make.array<MessageCollector>();
 
 function stopAllCollectors() {
     activeCollectors.forEach((collector) => {

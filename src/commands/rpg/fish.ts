@@ -19,7 +19,7 @@ import {
 } from "discord.js";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
-import { fishList } from "../../utils/rpgitems/fish";
+import { type FishData, fishList } from "../../utils/rpgitems/fish";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
 import {
     calculateFishingLevel,
@@ -316,7 +316,11 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         const totalFishToCatch = baitChoice === "Redrot Bait" ? 2 : 1;
 
-        const caughtFishDetails = make.array<any>();
+        const caughtFishDetails = make.array<{
+            selectedFish: FishData & { name: string };
+            fishLength: number;
+            levelUp: boolean;
+        }>();
 
         let totalLevelUps = 0;
         let latestRequiredFishesForNextLevel = 0;

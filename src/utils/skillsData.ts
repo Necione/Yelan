@@ -24,6 +24,7 @@ export type SkillName =
 export interface SkillLevel {
     level: number;
     description: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     levelData?: Record<string, any>;
 }
 

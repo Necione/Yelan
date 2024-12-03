@@ -109,9 +109,7 @@ export const equip = buildCommand<SlashCommand>({
 
             stats = await syncStats(i.user.id);
 
-            const afterStats = { ...stats };
-
-            const statChanges = calculateStatChanges(beforeStats, afterStats);
+            const statChanges = calculateStatChanges(beforeStats, stats);
             updatedStats.push(...statChanges);
 
             return r.edit(
@@ -163,14 +161,12 @@ export const equip = buildCommand<SlashCommand>({
 
             stats = await syncStats(i.user.id);
 
-            const afterStats = { ...stats };
-
-            const statChanges = calculateStatChanges(beforeStats, afterStats);
+            const statChanges = calculateStatChanges(beforeStats, stats);
             updatedStats.push(...statChanges);
 
             const setBonusMessages = getSetBonusMessages(
                 beforeStats,
-                afterStats,
+                stats,
                 "activated",
             );
             updatedStats.push(...setBonusMessages);

@@ -68,12 +68,10 @@ export const worship = buildCommand<SlashCommand>({
 
             const cooldownDuration = get.hrs(1);
 
-            const updateData: any = {
-                hp: newHp,
-                resonance: newResonance,
-            };
-
-            await updateUserStats(i.user.id, updateData);
+            await updateUserStats(i.user.id, {
+                hp: { set: newHp },
+                resonance: { set: newResonance },
+            });
 
             await cooldowns.set(userProfile, "worship", cooldownDuration);
 

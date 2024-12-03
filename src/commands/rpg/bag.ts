@@ -131,15 +131,23 @@ export const bag = buildCommand<SlashCommand>({
             );
         }
 
-        const groupedItemsMap = new Map<string, any>();
+        const groupedItemsMap = new Map<
+            string,
+            {
+                amount: number;
+                item: string;
+                metadata: { length: number | null; star: number | null } | null;
+            }
+        >();
 
         for (const item of filteredItems) {
             let key = item.item;
             if (item.metadata?.length) {
                 key += `|length:${item.metadata.length}`;
             }
-            if (groupedItemsMap.has(key)) {
-                groupedItemsMap.get(key).amount += item.amount;
+            const cc = groupedItemsMap.get(key);
+            if (cc) {
+                cc.amount += item.amount;
             } else {
                 groupedItemsMap.set(key, { ...item });
             }

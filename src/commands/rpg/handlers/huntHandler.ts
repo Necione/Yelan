@@ -1,6 +1,7 @@
 import {
     embedComment,
     get,
+    getMessageResponder,
     is,
     make,
     noop,
@@ -12,10 +13,16 @@ import type {
     ChatInputCommandInteraction,
     Message,
     PublicThreadChannel,
+    User,
 } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { sendToChannel, skills } from "../../../plugins/other/utils";
-import { updateUserStats } from "../../../services";
+import {
+    getProfileByUserId,
+    syncStats,
+    updateUserStats,
+} from "../../../services";
+import { cooldowns, locked } from "../../../utils";
 import {
     getEncounterDescription,
     getMonsterByName,
@@ -36,10 +43,12 @@ import {
 } from "./battleHandler";
 import { handleDefeat, handleVictory } from "./conditions";
 
+const sinSkills = ["Wrath", "Sloth", "Pride", "Greed"];
+
 export type AnyInteraction = ButtonInteraction | ChatInputCommandInteraction;
 
 export async function handleHunt(
-    r: Message,
+    message: Message,
     stats: UserStats,
     userWallet: UserWallet,
     selectedMonstersByName?: string[],
@@ -51,7 +60,7 @@ export async function handleHunt(
     if (!is.array(selectedMonsters)) {
         // If there is no selected monsters then do this.
         if (Math.random() < 0.1) {
-            await handleRandomEvent(r, stats, userWallet);
+            await handleRandomEvent(message, stats, userWallet);
             await updateUserStats(stats.userId, { isHunting: false });
             return;
         }
@@ -240,11 +249,11 @@ export async function handleHunt(
                 },
             );
 
-        await r.edit({ embeds: [battleEmbed] }).catch(noop);
+        await message.edit({ embeds: [battleEmbed] }).catch(noop);
 
         if (!thread) {
             thread =
-                (await r
+                (await message
                     .startThread({
                         name: `Battle with ${monster.name}`,
                         autoArchiveDuration: 60,
@@ -252,7 +261,7 @@ export async function handleHunt(
                     .catch(noop)) ?? undefined;
 
             if (!thread) {
-                return r
+                return message
                     .edit(embedComment(`Unable to create the thread.`))
                     .catch(noop);
             }
@@ -363,7 +372,7 @@ export async function handleHunt(
                     },
                 ]);
 
-                await r.edit({ embeds: [battleEmbed] }).catch(noop);
+                await message.edit({ embeds: [battleEmbed] }).catch(noop);
 
                 isPlayerTurn = false;
             } else {
@@ -412,7 +421,7 @@ export async function handleHunt(
                     },
                 ]);
 
-                await r.edit({ embeds: [battleEmbed] }).catch(noop);
+                await message.edit({ embeds: [battleEmbed] }).catch(noop);
 
                 if (currentPlayerHp <= deathThreshold) {
                     break;
@@ -439,7 +448,7 @@ export async function handleHunt(
             } else {
                 if (thread) {
                     await handleVictory(
-                        r,
+                        message,
                         thread,
                         stats,
                         monstersEncountered,
@@ -458,7 +467,7 @@ export async function handleHunt(
         } else {
             if (thread) {
                 await handleDefeat(
-                    r,
+                    message,
                     thread,
                     stats,
                     monstersEncountered[currentMonsterIndex],
@@ -470,4 +479,78 @@ export async function handleHunt(
     };
 
     await handleMonsterBattle();
+}
+
+export async function startHunt(
+    message: Message,
+    user: User,
+    monsters?: string[],
+) {
+    const r = getMessageResponder(message);
+    locked.set(user, "hunt");
+
+    const p = await getProfileByUserId(user.id);
+    if (!p) {
+        locked.del(user.id);
+        return r.edit(embedComment("Unable to find/create your user profile."));
+    }
+
+    const cc = cooldowns.get(p, "hunt");
+    if (!cc.status) {
+        locked.del(user.id);
+        return r.edit(embedComment(cc.message));
+    }
+
+    const stats = await syncStats(user.id);
+    if (!stats) {
+        locked.del(user.id);
+        return r.edit(
+            embedComment("No stats found for you, please set up your profile."),
+        );
+    }
+
+    if (stats.isTravelling) {
+        locked.del(user.id);
+        return r.edit(
+            embedComment("You cannot go on a hunt while you are travelling!"),
+        );
+    }
+
+    if (stats.isHunting) {
+        locked.del(user.id);
+        return r.edit(embedComment("You are already hunting!"));
+    }
+
+    if (stats.abyssMode) {
+        locked.del(user.id);
+        return r.edit(
+            embedComment("You cannot start a hunt while in The Spiral Abyss!"),
+        );
+    }
+
+    if (stats.hp <= 0) {
+        locked.del(user.id);
+        return r.edit(
+            embedComment("You don't have enough HP to go on a hunt :("),
+        );
+    }
+
+    const activeSinSkills = (stats.activeSkills || []).filter((skill) =>
+        sinSkills.includes(skill),
+    );
+
+    if (activeSinSkills.length > 1) {
+        locked.del(user.id);
+        return r.edit(
+            embedComment(
+                `You cannot go on a hunt while having multiple Sin skills active. Currently active Sin skills: **${activeSinSkills.join(
+                    ", ",
+                )}**. Please deactivate some Sin skills before hunting.`,
+            ),
+        );
+    }
+    await updateUserStats(user.id, { isHunting: { set: true } });
+    await handleHunt(message, stats, p, monsters);
+
+    locked.del(user.id);
 }
