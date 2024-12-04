@@ -452,7 +452,20 @@ export async function monsterAttack(
         );
     }
 
-    const reducedMonsterDamage = monsterDamage * damageReductionFactor;
+    let reducedMonsterDamage = monsterDamage * damageReductionFactor;
+
+    const hasParry = skills.has(stats, "Parry");
+    if (hasParry && Math.random() < 1) {
+        const parriedDamage = reducedMonsterDamage * 0.5;
+        reducedMonsterDamage *= 0.5;
+        monster.currentHp -= parriedDamage;
+        messages.push(
+            `\`🌵\` Parry skill activated! You parried 50% of the incoming damage (\`${parriedDamage.toFixed(
+                2,
+            )}\`), dealing it back to the ${monster.name}.`,
+        );
+    }
+
     currentPlayerHp -= reducedMonsterDamage;
 
     const deathThreshold = getDeathThreshold(stats);
@@ -745,7 +758,7 @@ function getEffectiveStats(stats: UserStats): {
 
     if (skills.has(stats, "Paladin")) {
         const temp = attackPower;
-        attackPower = defValue;
+        attackPower = defValue / 2;
         defValue = temp;
         paladinSwapped = true;
     }
