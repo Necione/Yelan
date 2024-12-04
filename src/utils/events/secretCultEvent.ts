@@ -30,7 +30,6 @@ export async function secretCultEvent(message: Message, stats: UserStats) {
             ],
         })
         .catch(noop);
-
     const c = await awaitComponent(message, {
         filter: (int) => int.customId.startsWith("event_"),
         users: [{ allow: true, id: stats.userId }],
