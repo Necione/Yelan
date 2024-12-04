@@ -143,7 +143,9 @@ export const learn = buildCommand<SlashCommand>({
                 inventory: {
                     set: stats.inventory,
                 },
-                skills: [...stats.skills, { name: skillName, level: 1 }],
+                skills: {
+                    set: [...stats.skills, { name: skillName, level: 1 }],
+                },
             }),
         ]);
 

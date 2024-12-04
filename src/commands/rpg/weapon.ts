@@ -1,4 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
+import { log, make } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
@@ -82,7 +83,7 @@ export const weapon = buildCommand<SlashCommand>({
 
             const fullWeaponName = equippedWeapon.name;
 
-            const weaponStats: string[] = [];
+            const weaponStats = make.array<string>();
             for (const [key, value] of Object.entries(equippedWeapon)) {
                 if (
                     [
@@ -182,7 +183,7 @@ export const weapon = buildCommand<SlashCommand>({
 
             return r.edit({ embeds: [embed] });
         } catch (error) {
-            console.error("Error executing /weapon command:", error);
+            log("Error executing /weapon command:", error);
 
             const errorEmbed = new EmbedBuilder()
                 .setColor("Red")

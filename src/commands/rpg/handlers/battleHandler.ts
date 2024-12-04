@@ -1,12 +1,8 @@
-import { is } from "@elara-services/utils";
+import { getRandomValue, is, make } from "@elara-services/utils";
 import type { Prisma, UserStats } from "@prisma/client";
 import { skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
-import {
-    getRandomValue,
-    weaponAdvantages,
-    type Monster,
-} from "../../../utils/hunt";
+import { weaponAdvantages, type Monster } from "../../../utils/hunt";
 import { masteryBenefits } from "../../../utils/masteryData";
 import { calculateMasteryLevel } from "../../../utils/masteryHelper";
 import { MonsterGroup } from "../../../utils/monsterHelper";
@@ -556,8 +552,9 @@ export function applyAttackModifiers(
         const equippedWeapon = weapons[equippedWeaponName];
         const weaponType = equippedWeapon.type as WeaponType;
 
-        const effectiveGroups: MonsterGroup[] =
-            weaponAdvantages[weaponType] || [];
+        const effectiveGroups = make.array<MonsterGroup>(
+            weaponAdvantages[weaponType] || [],
+        );
 
         if (has(effectiveGroups, monster, true)) {
             attackPower *= 1.1;

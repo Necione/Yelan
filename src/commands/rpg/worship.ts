@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get } from "@elara-services/utils";
+import { embedComment, get, log } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
@@ -86,7 +86,7 @@ export const worship = buildCommand<SlashCommand>({
 
             return r.edit({ embeds: [successEmbed] });
         } catch (error) {
-            console.error("Error executing /worship command:", error);
+            log("Error executing /worship command:", error);
             locked.del(i.user.id);
             return r.edit(
                 embedComment(

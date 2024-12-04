@@ -18,7 +18,7 @@ const baitOptions = [
     { name: "Sugardew Bait", weight: 1 },
 ];
 
-function getRandomBait(options: { name: string; weight: number }[]): string {
+function getRandomBait(options: { name: string; weight: number }[]) {
     const totalWeight = options.reduce((sum, option) => sum + option.weight, 0);
     let random = Math.random() * totalWeight;
     for (const option of options) {
@@ -152,7 +152,7 @@ export const diffuse = buildCommand<SlashCommand>({
 
             await updateUserStats(i.user.id, {
                 inventory: { set: stats.inventory },
-                alchemyProgress: newAlchemyProgress,
+                alchemyProgress: { set: newAlchemyProgress },
             });
 
             return r.edit(
@@ -213,14 +213,12 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
-        await Promise.all([
-            updateUserStats(i.user.id, {
-                inventory: {
-                    set: stats.inventory,
-                },
-                hp: newHp,
-            }),
-        ]);
+        await updateUserStats(i.user.id, {
+            inventory: {
+                set: stats.inventory,
+            },
+            hp: { set: newHp },
+        });
 
         return r.edit(
             embedComment(

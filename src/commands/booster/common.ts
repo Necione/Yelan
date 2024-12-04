@@ -1,15 +1,15 @@
-import { addButtonRow, get } from "@elara-services/utils";
+import { addButtonRow, get, make, time } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { ButtonStyle, Colors, EmbedBuilder } from "discord.js";
 import { boosterExpiryDuration } from "../../services/booster";
 import { getAmount } from "../../utils";
 
 export const duration = get.hrs(1);
-export const boosterPrices: {
+export const boosterPrices = make.array<{
     name: string;
     price: number;
     multiplier: number;
-}[] = [
+}>([
     {
         name: "1.5x Booster",
         price: 750,
@@ -25,7 +25,7 @@ export const boosterPrices: {
         price: 2000,
         multiplier: 2.5,
     },
-];
+]);
 
 export const baseEmbed = () =>
     new EmbedBuilder()
@@ -67,10 +67,10 @@ export const buyBoosterEmbed = (
             emoji: "🪙",
         },
     ]);
-    const from = `<t:${Math.round(
-        (expiredAt.getTime() - boosterExpiryDuration) / 1000,
-    )}:t>`;
-    const to = `<t:${Math.round(expiredAt.getTime() / 1000)}:t>`;
+    const from = time.short.time(
+        new Date(expiredAt.getTime() - boosterExpiryDuration),
+    );
+    const to = time.short.time(expiredAt);
 
     const tipString =
         totalTipReceived <= 0

@@ -1,4 +1,4 @@
-import { get } from "@elara-services/utils";
+import { get, make } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { Mutex, withTimeout } from "async-mutex";
 import { prisma } from "../prisma";
@@ -8,12 +8,12 @@ const MACHINES = {
     slots: "slots",
 };
 
-const defaultGamblingMachines: Prisma.GamblingMachineCreateInput[] = [
+const defaultGamblingMachines = make.array<Prisma.GamblingMachineCreateInput>([
     {
         name: MACHINES.slots,
         prizePool: 0,
     },
-];
+]);
 
 export async function initializeGamblingMachines() {
     for (const { name, prizePool } of defaultGamblingMachines) {

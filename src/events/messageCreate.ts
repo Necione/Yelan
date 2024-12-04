@@ -3,7 +3,6 @@ import { createEvent, handleMessageCommand } from "@elara-services/botbuilder";
 import { getFilesList } from "@elara-services/utils";
 import { Events, type Message } from "discord.js";
 import { handleUserToUID } from "../plugins/other/grader";
-import { onAchievemntSubmit } from "../plugins/other/onSubmit";
 import * as Commands from "../prefix-commands";
 
 export const messageCreate = createEvent({
@@ -13,7 +12,6 @@ export const messageCreate = createEvent({
             return;
         }
         handleUserToUID(message);
-        onAchievemntSubmit(message);
         if (message.client.prefix) {
             handleMessageCommand(
                 message,

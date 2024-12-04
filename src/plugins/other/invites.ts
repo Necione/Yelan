@@ -8,6 +8,7 @@ import {
     formatNumber,
     getInteractionResponder,
     is,
+    isOriginalInteractionUser,
     make,
     noop,
     time,
@@ -39,12 +40,7 @@ const conf = {
     rewards: make.array<{
         role: string;
         invites: number;
-    }>([
-        {
-            role: "1278919375377793055",
-            invites: 10,
-        },
-    ]),
+    }>(),
 };
 
 export async function handleInviteInteraction(i: ButtonInteraction) {
@@ -155,16 +151,10 @@ export async function handleInviteInteraction(i: ButtonInteraction) {
 }
 
 export function isOriginalMessageUser(i: Interaction) {
-    if (!("message" in i)) {
+    if (!i.isMessageComponent()) {
         return false;
     }
-    const original =
-        i.message?.interactionMetadata?.user.id ??
-        i.message?.interaction?.user.id;
-    if (!original) {
-        return false;
-    }
-    return original === i.user.id;
+    return isOriginalInteractionUser(i);
 }
 
 export function getComponents(
@@ -242,7 +232,7 @@ export async function generateInviteInfo(
     const { invited, total } = getInviteData(m);
     const rewards = make.array<string>();
     if (is.array(conf.rewards)) {
-        const add: Role[] = [];
+        const add = make.array<Role>();
         for (const r of conf.rewards.sort((a, b) => b.invites - a.invites)) {
             const role = guild.roles.resolve(r.role);
             const completed =

@@ -5,6 +5,7 @@ import {
     get,
     getInteractionResponder,
     is,
+    make,
     noop,
     time,
 } from "@elara-services/utils";
@@ -76,7 +77,7 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
             const s = [null, "null"].includes(search) ? null : search;
 
             const pager = getPaginatedMessage();
-            const pages: PaginatedMessagePage[] = [];
+            const pages = make.array<PaginatedMessagePage>();
             const collectable = await getCollectables(mainServerId);
             for (const c of p.collectables) {
                 if (is.string(s)) {
@@ -162,7 +163,9 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
                                         })
                                         .catch(noop);
                                     const collect = await context.interaction
-                                        .awaitModalSubmit({ time: 35000 })
+                                        .awaitModalSubmit({
+                                            time: get.secs(35),
+                                        })
                                         .catch(noop);
                                     if (!collect) {
                                         return;

@@ -1,9 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { addButtonRow, embedComment, get, noop } from "@elara-services/utils";
 import type { UserStats } from "@prisma/client";
 import {
-    ActionRowBuilder,
-    ButtonBuilder,
     ButtonStyle,
     ComponentType,
     EmbedBuilder,
@@ -56,20 +54,22 @@ export const rebirth = buildCommand<SlashCommand>({
             )
             .setFooter({ text: "You have 10 seconds to confirm or cancel." });
 
-        const confirmRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder()
-                .setCustomId("confirm_rebirth")
-                .setLabel("Confirm")
-                .setStyle(ButtonStyle.Success),
-            new ButtonBuilder()
-                .setCustomId("cancel_rebirth")
-                .setLabel("Cancel")
-                .setStyle(ButtonStyle.Danger),
-        );
-
         await r.edit({
             embeds: [confirmEmbed],
-            components: [confirmRow],
+            components: [
+                addButtonRow([
+                    {
+                        id: "confirm_rebirth",
+                        label: "Confirm",
+                        style: ButtonStyle.Success,
+                    },
+                    {
+                        id: "cancel_rebirth",
+                        label: "Cancel",
+                        style: ButtonStyle.Danger,
+                    },
+                ]),
+            ],
         });
 
         let totalSellPrice = 0;
@@ -96,42 +96,28 @@ export const rebirth = buildCommand<SlashCommand>({
 
         const confirmation = await i.channel
             .awaitMessageComponent({
-                time: 10000,
+                time: get.secs(10),
                 componentType: ComponentType.Button,
                 filter: (interaction) => interaction.user.id === i.user.id,
             })
-            .catch(() => null);
+            .catch(noop);
 
         if (!confirmation) {
-            const timeoutEmbed = embedComment(
-                "Rebirth request timed out.",
-                "Red",
-            );
-            return r.edit({
-                embeds: timeoutEmbed.embeds,
-                components: [],
-            });
+            return r.edit(embedComment("Rebirth request timed out."));
         }
 
         if (confirmation.customId === "confirm_rebirth") {
             await handleRebirth(i.user.id, stats, totalSellPrice);
-
-            const successEmbed = embedComment(
-                `Rebirth complete! All stats and items have been reset.\nAll items have been sold for ${getAmount(
-                    totalSellPrice,
-                )}`,
-                "Green",
+            await confirmation.update(
+                embedComment(
+                    `Rebirth complete! All stats and items have been reset.\nAll items have been sold for ${getAmount(
+                        totalSellPrice,
+                    )}`,
+                    "Green",
+                ),
             );
-            await confirmation.update({
-                embeds: successEmbed.embeds,
-                components: [],
-            });
         } else {
-            const cancelEmbed = embedComment("Rebirth canceled.", "Red");
-            await confirmation.update({
-                embeds: cancelEmbed.embeds,
-                components: [],
-            });
+            await confirmation.update(embedComment("Rebirth canceled."));
         }
     },
 });

@@ -137,8 +137,8 @@ export const downgrade = buildCommand<SlashCommand>({
         );
 
         await updateUserStats(i.user.id, {
-            worldLevel: selectedLevel,
-            exp: 0,
+            worldLevel: { set: selectedLevel },
+            exp: { set: 0 },
         });
 
         return r.edit(

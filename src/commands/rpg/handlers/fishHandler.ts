@@ -3,7 +3,7 @@ import type { FishData } from "../../../utils/rpgitems/fish";
 export function calculateFishingLevel(
     currentLevel: number,
     timesFishedForLevel: number,
-): { levelUp: boolean; requiredFishesForNextLevel: number } {
+) {
     let requiredFishes = 5 * Math.pow(1.2, currentLevel - 1);
     requiredFishes = Math.round(requiredFishes);
 
@@ -12,7 +12,7 @@ export function calculateFishingLevel(
     return { levelUp, requiredFishesForNextLevel: requiredFishes };
 }
 
-export function selectFishLength(): number {
+export function selectFishLength() {
     const fishLengths = [
         { length: 30, weight: 25 },
         { length: 60, weight: 20 },

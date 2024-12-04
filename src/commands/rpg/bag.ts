@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { chunk, embedComment } from "@elara-services/utils";
+import { chunk, embedComment, is, make } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/userStats";
@@ -23,6 +23,12 @@ const artifactTypeEmojis: { [key in ArtifactType]: string } = {
     Sands: "⏳",
     Goblet: "🍷",
     Circlet: "👑",
+};
+
+type GroupItem = {
+    amount: number;
+    item: string;
+    metadata: { length: number | null; star: number | null } | null;
 };
 
 export const bag = buildCommand<SlashCommand>({
@@ -58,10 +64,6 @@ export const bag = buildCommand<SlashCommand>({
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
-        if (!i.deferred) {
-            return;
-        }
-
         const p = await getProfileByUserId(i.user.id);
         if (!p) {
             return r.edit(
@@ -86,7 +88,7 @@ export const bag = buildCommand<SlashCommand>({
 
         const items = stats.inventory || [];
 
-        if (items.length === 0) {
+        if (!is.array(items)) {
             return r.edit(embedComment("Your inventory is empty."));
         }
 
@@ -123,7 +125,7 @@ export const bag = buildCommand<SlashCommand>({
                 break;
         }
 
-        if (filteredItems.length === 0) {
+        if (!is.array(filteredItems)) {
             return r.edit(
                 embedComment(
                     `No items found for the selected category: ${category}.`,
@@ -131,14 +133,7 @@ export const bag = buildCommand<SlashCommand>({
             );
         }
 
-        const groupedItemsMap = new Map<
-            string,
-            {
-                amount: number;
-                item: string;
-                metadata: { length: number | null; star: number | null } | null;
-            }
-        >();
+        const groupedItemsMap = make.map<string, GroupItem>();
 
         for (const item of filteredItems) {
             let key = item.item;

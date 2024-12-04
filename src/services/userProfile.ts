@@ -57,8 +57,8 @@ export async function updateRankedUID(userId: string, uid: number | null) {
         rankedRegion = parseInt(uid.toString().slice(0, 1));
     }
     await updateUserProfile(userId, {
-        rankedUID,
-        rankedRegion,
+        rankedUID: { set: rankedUID },
+        rankedRegion: { set: rankedRegion },
     });
 }
 

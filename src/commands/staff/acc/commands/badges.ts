@@ -76,7 +76,7 @@ export const badges = buildCommand<SubCommand>({
             sentMessage,
             {
                 custom_ids: [{ id: "select_badges" }],
-                users: [{ allow: true, id: i.user.id }],
+                only: { originalUser: true },
             },
         );
         if (!int) {

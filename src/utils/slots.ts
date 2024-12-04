@@ -218,30 +218,30 @@ export const embeds = {
             .setTitle("<a:JPslots:1184672918953803917> The Slots Machine")
             .setColor(Colors.Gold),
     description: (jackpot: number, lastWonBy: string) =>
-        embeds
-            .base()
-            .addFields({
+        embeds.base().addFields(
+            {
                 name: "✦ Current Jackpot",
                 value: `Winning Prize: ${getAmount(
                     jackpot,
                 )}\nLast won by: ${lastWonBy}`,
                 inline: false,
-            })
-            .addFields({
+            },
+            {
                 name: "✦ Possible Winnings",
                 value: generateWinningsDescription(firstHalfWins),
                 inline: true,
-            })
-            .addFields({
+            },
+            {
                 name: "\u200B",
                 value: generateWinningsDescription(secondHalfWins),
                 inline: true,
-            })
-            .addFields({
+            },
+            {
                 name: "✦ Other Possibilities",
                 value: ":cherries: - `1.0x` | `1.25x` | `1.5x`",
                 inline: false,
-            }),
+            },
+        ),
     tooPoor: (balance: number) =>
         embeds
             .base()

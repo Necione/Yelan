@@ -1,4 +1,5 @@
 import { buildCommand, type SubCommand } from "@elara-services/botbuilder";
+import { is, time } from "@elara-services/utils";
 import type { GlobalBooster } from "@prisma/client";
 import { getActiveCoinBoosters } from "../../../services/booster";
 import { baseEmbed } from "../common";
@@ -22,9 +23,9 @@ const boosterListEmbed = (boosters: GlobalBooster[]) => {
         }
         const isActive = numbering === 1;
         if (isActive) {
-            desc += `${numbering++}. <@${purchasedByUserId}> \`${multiplier}x\` expires ${`<t:${Math.floor(
-                expiredAt.getTime() / 1000,
-            )}:R> **ACTIVE**`}\n`;
+            desc += `${numbering++}. <@${purchasedByUserId}> \`${multiplier}x\` expires ${time.relative(
+                expiredAt,
+            )} **ACTIVE**\n`;
         } else {
             desc += `${numbering++}. <@${purchasedByUserId}> \`${multiplier}x\` *(queued)*\n`;
         }
@@ -44,7 +45,7 @@ export const list = buildCommand<SubCommand>({
     async execute(i, r) {
         const boosters = await getActiveCoinBoosters();
 
-        if (boosters.length <= 0) {
+        if (!is.array(boosters)) {
             return r.edit({
                 embeds: [noBoosterEmbed()],
             });

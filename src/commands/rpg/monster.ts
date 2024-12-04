@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import { embedComment, is, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { initializeMonsters, monsters, monstersLoaded } from "../../utils/hunt";
 import { getCommonLocationsForGroup } from "../../utils/locationUtils";
@@ -29,7 +29,7 @@ export const monster = buildCommand<SlashCommand>({
             name.toLowerCase().includes(searchTerm.toLowerCase()),
         );
 
-        if (filteredNames.length === 0) {
+        if (!is.array(filteredNames)) {
             return i
                 .respond([{ name: "No match found.", value: "n/a" }])
                 .catch(noop);
@@ -107,8 +107,6 @@ export const monster = buildCommand<SlashCommand>({
             )
             .setThumbnail(monster.image);
 
-        await r.edit({
-            embeds: [embed],
-        });
+        await r.edit({ embeds: [embed] });
     },
 });

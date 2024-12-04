@@ -2,6 +2,7 @@ import {
     embedComment,
     get,
     getMessageResponder,
+    getRandomValue,
     is,
     make,
     noop,
@@ -28,7 +29,6 @@ import {
     getMonsterByName,
     getMonstersByName,
     getRandomMonster,
-    getRandomValue,
     initializeMonsters,
     type Monster,
 } from "../../../utils/hunt";

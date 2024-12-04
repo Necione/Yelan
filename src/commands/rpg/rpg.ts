@@ -25,9 +25,6 @@ export const rpg = buildCommand<SlashCommand>({
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
-        if (!i.deferred) {
-            return;
-        }
         const p = await getProfileByUserId(i.user.id);
         if (!p) {
             return r.edit(
@@ -214,7 +211,7 @@ export const rpg = buildCommand<SlashCommand>({
     },
 });
 
-function getRebirthString(rebirths: number): string {
+function getRebirthString(rebirths: number) {
     const rebirthNames = [
         "☀️ FIRST REBIRTH",
         "🌑 SECOND REBIRTH",

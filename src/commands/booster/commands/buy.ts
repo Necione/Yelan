@@ -63,7 +63,7 @@ export const buy = buildCommand<SubCommand>({
         if (!i.inCachedGuild()) {
             return;
         }
-        const levelArg = i.options.get("level");
+        const levelArg = i.options.getString("level", true);
         // If user is not buying
         if (!levelArg) {
             return;
@@ -75,12 +75,10 @@ export const buy = buildCommand<SubCommand>({
             locked.del(i.user.id);
             return r.edit(userLockedData(userProfile.userId));
         }
-        const booster = boosterPrices.find((x) => x.name === levelArg.value);
+        const booster = boosterPrices.find((x) => x.name === levelArg);
         if (!booster) {
             locked.del(i.user.id);
-            return r.edit(
-                embedComment(`Cannot find booster: ${levelArg.value}`),
-            );
+            return r.edit(embedComment(`Cannot find booster: ${levelArg}`));
         }
         if (userProfile.balance < booster.price) {
             locked.del(i.user.id);

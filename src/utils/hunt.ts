@@ -1,4 +1,4 @@
-import { is, log, make } from "@elara-services/utils";
+import { getRandomValue, is, log, make } from "@elara-services/utils";
 import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import { locationGroupWeights } from "./locationGroupWeights";
@@ -72,10 +72,6 @@ export async function initializeMonsters() {
     }
 }
 
-export function getRandomValue(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 export function calculateDrop(
     drops: {
         item: string;
@@ -94,10 +90,6 @@ export function calculateDrop(
     }
 
     return droppedItems;
-}
-
-export function calculateExp(minExp: number, maxExp: number): number {
-    return getRandomValue(minExp, maxExp);
 }
 
 export async function getRandomMonster(
@@ -230,7 +222,7 @@ export async function getRandomMonster(
 
         return monsterInstance;
     } else {
-        console.error(
+        log(
             `Stats for world level ${worldLevel} not found for monster: ${selectedMonster.name}`,
         );
         return null;
@@ -386,7 +378,7 @@ export async function getMonsterByName(
     }
 
     if (typeof monster.getStatsForWorldLevel !== "function") {
-        console.error(
+        log(
             `getStatsForWorldLevel is not a function for monster: ${monster.name}`,
         );
         return null;
@@ -411,7 +403,7 @@ export async function getMonsterByName(
         );
         return monsterInstance;
     } else {
-        console.error(
+        log(
             `Stats for world level ${selectedWorldLevel} not found for monster: ${monster.name}`,
         );
         return null;

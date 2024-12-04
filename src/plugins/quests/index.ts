@@ -7,6 +7,7 @@ import {
     // getAverage,
     getNearest,
     is,
+    make,
     time,
 } from "@elara-services/utils";
 import {
@@ -64,7 +65,7 @@ export async function fetchData(
     //     dailyStats.length > 0
     //         ? getAverage(dailyStats.map((c) => c.messages || 0))
     //         : 0;
-    const description: string[] = [
+    const description = make.array<string>([
         `Each quest completed will give you + ${customEmoji.a.z_repute} **1 Reputation**`,
         `${customEmoji.a.z_info} Rewards from Quests bypass the ${texts.c.u} limits.`,
         // `${customEmoji.a.z_info} Total Messages: **${formatNumber(
@@ -76,7 +77,7 @@ export async function fetchData(
         // `${customEmoji.a.z_bell} Total Active Minutes: **${formatNumber(
         //     profile.active?.count ?? 0,
         // )}**\n`,
-    ];
+    ]);
     const embed = new EmbedBuilder()
         .setColor(0xc0f6fb)
         // .setTitle(

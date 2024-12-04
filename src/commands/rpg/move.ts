@@ -1,6 +1,13 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
-import { Message, SlashCommandBuilder } from "discord.js";
+import {
+    embedComment,
+    get,
+    log,
+    make,
+    noop,
+    sleep,
+} from "@elara-services/utils";
+import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
     getUserStats,
@@ -42,18 +49,14 @@ const ambienceMessages = [
     "Your footsteps echo unnaturally.",
 ];
 
-function getRandomAmbience(): string {
+function getRandomAmbience() {
     return ambienceMessages[
         Math.floor(Math.random() * ambienceMessages.length)
     ];
 }
 
-function getAvailableDirections(
-    x: number,
-    y: number,
-    map: string[][],
-): string[] {
-    const available: string[] = [];
+function getAvailableDirections(x: number, y: number, map: string[][]) {
+    const available = make.array<string>();
 
     for (const [direction, delta] of Object.entries(directions)) {
         const potentialX = x + delta.dx;
@@ -81,7 +84,7 @@ function getAvailableDirections(
     return available;
 }
 
-function getCurrentMap(floor: number): string[][] | null {
+function getCurrentMap(floor: number) {
     return floorMaps[floor] || null;
 }
 
@@ -107,11 +110,6 @@ export const move = buildCommand<SlashCommand>({
         locked.set(i.user);
 
         try {
-            if (!i.deferred) {
-                locked.del(i.user.id);
-                return;
-            }
-
             const direction = i.options
                 .getString("direction", true)
                 .toLowerCase();
@@ -183,19 +181,17 @@ export const move = buildCommand<SlashCommand>({
                 currentY = startingPosition.y;
 
                 await updateUserStats(i.user.id, {
-                    abyssCoordX: currentX,
-                    abyssCoordY: currentY,
-                    currentAbyssFloor: currentFloor,
+                    abyssCoordX: { set: currentX },
+                    abyssCoordY: { set: currentY },
+                    currentAbyssFloor: { set: currentFloor },
                 });
-                console.log(
-                    `Starting Position Set to: (${currentX}, ${currentY})`,
-                );
+                log(`Starting Position Set to: (${currentX}, ${currentY})`);
             }
 
             let newX = currentX;
             let newY = currentY;
 
-            console.log(
+            log(
                 `Current Position on Floor ${currentFloor}: (${currentX}, ${currentY})`,
             );
 
@@ -214,12 +210,10 @@ export const move = buildCommand<SlashCommand>({
                     break;
                 default:
                     locked.del(i.user.id);
-                    return i.editReply(
-                        embedComment("Invalid direction.", "Red"),
-                    );
+                    return r.edit(embedComment("Invalid direction.", "Red"));
             }
 
-            console.log(
+            log(
                 `Attempting to move ${direction} to: (${newX}, ${newY}) on Floor ${currentFloor}`,
             );
 
@@ -230,7 +224,7 @@ export const move = buildCommand<SlashCommand>({
                 newY >= currentMap.length
             ) {
                 locked.del(i.user.id);
-                return i.editReply(
+                return r.edit(
                     embedComment("You cannot move outside the map!", "Red"),
                 );
             }
@@ -238,13 +232,13 @@ export const move = buildCommand<SlashCommand>({
             const rowIndex = currentMap.length - 1 - newY;
             const cell = currentMap[rowIndex][newX].toLowerCase();
 
-            console.log(
+            log(
                 `Accessing Map Cell at rowIndex: ${rowIndex}, x: ${newX} with cell: '${cell}'`,
             );
 
             if (cell === "w") {
                 locked.del(i.user.id);
-                return i.editReply(
+                return r.edit(
                     embedComment(
                         "You hit a wall and cannot move in that direction.",
                         "Red",
@@ -254,7 +248,7 @@ export const move = buildCommand<SlashCommand>({
 
             if (cell === "d" && !stats.hasKey) {
                 locked.del(i.user.id);
-                return i.editReply(
+                return r.edit(
                     embedComment(
                         "There's a massive metal door in front of you... It's locked.",
                         "Red",
@@ -262,14 +256,13 @@ export const move = buildCommand<SlashCommand>({
                 );
             }
 
-            await i.editReply(
+            await r.edit(
                 embedComment(
                     "Travelling <a:loading:1184700865303552031>",
                     "Blue",
                 ),
             );
-
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await sleep(get.secs(1));
 
             let message = `Moved **${direction}** to position \`[${newX}, ${newY}]\` on Floor **${currentFloor}**.`;
 
@@ -285,7 +278,7 @@ export const move = buildCommand<SlashCommand>({
                 );
             } else if (cell === "k") {
                 if (!stats.hasKey) {
-                    await updateUserStats(i.user.id, { hasKey: true });
+                    await updateUserStats(i.user.id, { hasKey: { set: true } });
                     message += "\nYou found an old, rusted key.";
                 } else {
                     message += "\nYou've already collected this key.";
@@ -293,9 +286,9 @@ export const move = buildCommand<SlashCommand>({
             }
 
             await updateUserStats(i.user.id, {
-                abyssCoordX: newX,
-                abyssCoordY: newY,
-                currentAbyssFloor: currentFloor,
+                abyssCoordX: { set: newX },
+                abyssCoordY: { set: newY },
+                currentAbyssFloor: { set: currentFloor },
             });
 
             if (cell === "f") {
@@ -328,7 +321,7 @@ export const move = buildCommand<SlashCommand>({
                 if (previousFloor < 1) {
                     message +=
                         "\nYou're already on the surface floor. You cannot ascend further.";
-                    await i.editReply(embedComment(message, "Green"));
+                    await r.edit(embedComment(message, "Green"));
                     locked.del(i.user.id);
                     return;
                 }
@@ -386,14 +379,14 @@ export const move = buildCommand<SlashCommand>({
                     "\nError: Could not retrieve the map for the current floor.";
             }
 
-            await i.editReply(embedComment(message, "Green"));
+            await r.edit(embedComment(message, "Green"));
             locked.del(i.user.id);
 
-            const reply = await i.fetchReply();
+            const reply = await i.fetchReply().catch(noop);
 
-            if (!reply || !(reply instanceof Message)) {
+            if (!reply) {
                 locked.del(i.user.id);
-                return i.editReply(
+                return r.edit(
                     embedComment("Unable to fetch the reply message.", "Red"),
                 );
             }
@@ -403,12 +396,6 @@ export const move = buildCommand<SlashCommand>({
                 Math.random() < 0.5
             ) {
                 locked.set(i.user);
-
-                if (!i.deferred) {
-                    locked.del(i.user.id);
-                    return;
-                }
-
                 const battleMessage = await i.fetchReply().catch(noop);
                 if (!battleMessage) {
                     locked.del(i.user.id);
@@ -462,7 +449,7 @@ export const move = buildCommand<SlashCommand>({
                     );
                 }
 
-                await updateUserStats(i.user.id, { isHunting: true });
+                await updateUserStats(i.user.id, { isHunting: { set: true } });
 
                 await handleAbyssBattle(i, battleMessage, syncedStats);
 
@@ -478,16 +465,14 @@ export const move = buildCommand<SlashCommand>({
                 locked.del(i.user.id);
             }
         } catch (error) {
-            console.error("Error in /move command:", error);
+            log("Error in /move command:", error);
             locked.del(i.user.id);
-            await i
-                .editReply(
-                    embedComment(
-                        "An unexpected error occurred. Please try again later.",
-                        "Red",
-                    ),
-                )
-                .catch(noop);
+            await r.edit(
+                embedComment(
+                    "An unexpected error occurred. Please try again later.",
+                    "Red",
+                ),
+            );
         }
     },
 });

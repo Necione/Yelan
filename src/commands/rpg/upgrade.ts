@@ -34,7 +34,7 @@ export const upgrade = buildCommand<SlashCommand>({
                 0,
             );
             await updateUserStats(i.user.id, {
-                totalTokensUsed: stats.totalTokensUsed,
+                totalTokensUsed: { set: stats.totalTokensUsed },
             });
         }
 
@@ -87,7 +87,7 @@ export const upgrade = buildCommand<SlashCommand>({
                 0,
             );
             await updateUserStats(i.user.id, {
-                totalTokensUsed: stats.totalTokensUsed,
+                totalTokensUsed: { set: stats.totalTokensUsed },
             });
         }
 
@@ -139,7 +139,7 @@ export const upgrade = buildCommand<SlashCommand>({
                     data: { level: userSkill.level },
                 },
             },
-            totalTokensUsed: stats.totalTokensUsed,
+            totalTokensUsed: { set: stats.totalTokensUsed },
         });
 
         return r.edit(

@@ -1,6 +1,5 @@
 import { randomNumber } from "@elara-services/packages";
-import { make } from "@elara-services/utils";
-import { getRandomValue } from "./hunt";
+import { getRandomValue, make } from "@elara-services/utils";
 import { type ArtifactName, artifacts } from "./rpgitems/artifacts";
 import { type DropName, drops } from "./rpgitems/drops";
 import { type MiscName, misc } from "./rpgitems/misc";

@@ -1,5 +1,5 @@
-import type { SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
+import { embedComment, make } from "@elara-services/utils";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
@@ -42,8 +42,8 @@ const cardValues: Record<CardKey, number> = {
     A: 1,
 };
 
-const drawCard = (): CardKey => {
-    const cards: CardKey[] = [
+const drawCard = () => {
+    const cards = make.array<CardKey>([
         "2",
         "3",
         "4",
@@ -57,7 +57,7 @@ const drawCard = (): CardKey => {
         "Q",
         "K",
         "A",
-    ];
+    ]);
     return cards[Math.floor(Math.random() * cards.length)];
 };
 
@@ -67,7 +67,7 @@ const getHandValue = (cards: CardKey[]) => {
     return cards.map((c) => getCardValue(c)).reduce((a, b) => a + b, 0) % 10;
 };
 
-export const baccarat: SlashCommand = {
+export const baccarat = buildCommand<SlashCommand>({
     locked: {
         channels: [
             ...channels.gamblingcommands,
@@ -202,4 +202,4 @@ export const baccarat: SlashCommand = {
             components: [],
         });
     },
-};
+});

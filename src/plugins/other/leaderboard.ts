@@ -2,6 +2,7 @@ import {
     chunk,
     embedComment,
     formatNumber,
+    getInteractionResponder,
     is,
     noop,
 } from "@elara-services/utils";
@@ -58,6 +59,7 @@ export async function handleLeaderboard(
     if (!interaction.isRepliable()) {
         return;
     }
+    const r = getInteractionResponder(interaction);
     // Read the leaderboard data from files and filter out users with 0 or less
     const leaderboard = (
         await getAllUserProfiles({
@@ -78,33 +80,27 @@ export async function handleLeaderboard(
     if (searchUser) {
         const find = leaderboard.find((c) => c.id === searchUser.id);
         if (!find) {
-            return interaction
-                .editReply(
-                    embedComment(
-                        `Unable to find (${searchUser.toString()}) in the (${displayText}) leaderboard!`,
-                    ),
-                )
-                .catch(noop);
-        }
-        return interaction
-            .editReply(
+            return r.edit(
                 embedComment(
-                    `${displayEmoji} ${searchUser.toString()} (\`${
-                        searchUser.username
-                    }\`) is (#${formatNumber(
-                        leaderboard.map((c) => c.id).indexOf(searchUser.id) + 1,
-                    )}) in the **${displayText}** Leaderboard!`,
-                    "Aqua",
+                    `Unable to find (${searchUser.toString()}) in the (${displayText}) leaderboard!`,
                 ),
-            )
-            .catch(noop);
+            );
+        }
+        return r.edit(
+            embedComment(
+                `${displayEmoji} ${searchUser.toString()} (\`${
+                    searchUser.username
+                }\`) is (#${formatNumber(
+                    leaderboard.map((c) => c.id).indexOf(searchUser.id) + 1,
+                )}) in the **${displayText}** Leaderboard!`,
+                "Aqua",
+            ),
+        );
     }
     // Split the leaderboard into pages
     const pages = getLeaderboardPages(leaderboard, displayText);
     if (!pages.length) {
-        return interaction
-            .editReply(embedComment(`I found no one on the leaderboard!`))
-            .catch(noop);
+        return r.edit(embedComment(`I found no one on the leaderboard!`));
     }
 
     const pager = getPaginatedMessage();

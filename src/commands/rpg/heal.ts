@@ -85,7 +85,7 @@ export const heal = buildCommand<SlashCommand>({
         const newHp = Math.min(stats.hp + healAmount, maxHP);
 
         await Promise.all([
-            updateUserStats(i.user.id, { hp: newHp }),
+            updateUserStats(i.user.id, { hp: { set: newHp } }),
             removeBalance(
                 i.user.id,
                 healCost,

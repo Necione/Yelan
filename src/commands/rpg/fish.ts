@@ -3,6 +3,7 @@ import {
     awaitComponent,
     embedComment,
     get,
+    getRandomValue,
     is,
     make,
     noop,
@@ -306,7 +307,7 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         const selectedFish = selectFish(availableFish);
 
-        const requiredReels = getRandomInt(
+        const requiredReels = getRandomValue(
             selectedFish.minReels,
             selectedFish.maxReels,
         );
@@ -379,7 +380,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                     includes: true,
                 })),
                 time: get.secs(3),
-                users: [{ allow: true, id: i.user.id }],
+                only: { originalUser: true },
             });
             if (!c || !c.customId.startsWith("reel_in") || fishEscaped) {
                 fishEscaped = true;
@@ -526,7 +527,3 @@ export const fishCommand = buildCommand<SlashCommand>({
         }
     },
 });
-
-function getRandomInt(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}

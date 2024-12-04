@@ -46,7 +46,7 @@ export async function onInteraction(interaction: RepliableInteraction) {
                 );
             }
             await updateUserProfile(interaction.user.id, {
-                backgroundUrl: "",
+                backgroundUrl: { set: "" },
             });
             return responder.edit(
                 embedComment(
@@ -122,7 +122,7 @@ export async function onInteraction(interaction: RepliableInteraction) {
             }
 
             await updateUserProfile(interaction.user.id, {
-                backgroundUrl: url,
+                backgroundUrl: { set: url },
             });
 
             return responder.edit(

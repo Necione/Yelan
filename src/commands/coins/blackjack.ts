@@ -90,11 +90,8 @@ export const blackjack: SlashCommand = {
             });
             const insuranceInteraction = await awaitComponent(message, {
                 time: get.secs(30),
-                custom_ids: [
-                    { id: `blackjack|insurance` },
-                    { id: `blackjack|noinsurance` },
-                ],
-                users: [{ allow: true, id: interaction.user.id }],
+                filter: (i) => i.customId.startsWith("blackjack|"),
+                only: { originalUser: true },
             });
             if (!insuranceInteraction) {
                 locked.del(interaction.user.id);
@@ -145,8 +142,8 @@ export const blackjack: SlashCommand = {
         while (!gameEnded) {
             const buttonInteraction = await awaitComponent(message, {
                 time: get.secs(30),
-                custom_ids: [{ id: `blackjack|`, includes: true }],
-                users: [{ allow: true, id: interaction.user.id }],
+                filter: (i) => i.customId.startsWith("blackjack|"),
+                only: { originalUser: true },
             });
             if (!buttonInteraction) {
                 locked.del(interaction.user.id);

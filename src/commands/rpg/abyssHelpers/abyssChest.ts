@@ -69,7 +69,7 @@ export async function handleAbyssChest(
 
     stats.collectedChests.push(fullKey);
     await updateUserStats(i.user.id, {
-        collectedChests: stats.collectedChests,
+        collectedChests: { set: stats.collectedChests },
     });
 
     const lootDescription =

@@ -85,7 +85,7 @@ export const hide = buildCommand<SlashCommand>({
         }
         const c = await awaitComponent<StringSelectMenuInteraction>(m, {
             custom_ids: [{ id: "toggles" }],
-            users: [{ allow: true, id: i.user.id }],
+            only: { originalUser: true },
             time: get.secs(30),
         });
         if (!c) {

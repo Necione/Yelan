@@ -1,13 +1,11 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, get } from "@elara-services/utils";
 import {
     ActionRowBuilder,
     ComponentType,
     EmbedBuilder,
-    type Message,
     SlashCommandBuilder,
     StringSelectMenuBuilder,
-    type StringSelectMenuInteraction,
 } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 
@@ -124,20 +122,18 @@ export const alchemy = buildCommand<SlashCommand>({
                 .setMinValue(1),
         ),
     defer: { silent: false },
-
-    async execute(i) {
+    async execute(i, r) {
         const action = i.options.getString("action", false);
         const stat = i.options.getString("stat", false);
         const pointsToAssign = i.options.getInteger("points", false);
 
         const stats = await getUserStats(i.user.id);
         if (!stats) {
-            await i.editReply(
+            return r.edit(
                 embedComment(
                     "No stats found for you, please set up your profile.",
                 ),
             );
-            return;
         }
 
         const alchemyProgress = stats.alchemyProgress;
@@ -171,7 +167,7 @@ export const alchemy = buildCommand<SlashCommand>({
                     selectMenu,
                 );
 
-            const message = (await i.editReply({
+            const message = await r.edit({
                 embeds: [
                     new EmbedBuilder()
                         .setTitle("Choose Your Archon")
@@ -181,60 +177,62 @@ export const alchemy = buildCommand<SlashCommand>({
                         .setColor(0x4b52bb),
                 ],
                 components: [row],
-            })) as Message;
+            });
+            if (!message) {
+                return r.edit(
+                    embedComment(`Unable to fetch the original message`),
+                );
+            }
 
             const collector = message.createMessageComponentCollector({
                 componentType: ComponentType.StringSelect,
-                time: 60000,
-                filter: (interaction: StringSelectMenuInteraction) =>
+                time: get.mins(1),
+                filter: (interaction) =>
                     interaction.user.id === i.user.id &&
                     interaction.customId === "deity_select",
             });
 
-            collector.on(
-                "collect",
-                async (interaction: StringSelectMenuInteraction) => {
-                    const chosenDeity = interaction.values[0];
+            collector.on("collect", async (interaction) => {
+                const chosenDeity = interaction.values[0];
 
-                    await updateUserStats(i.user.id, { deity: chosenDeity });
+                await updateUserStats(i.user.id, {
+                    deity: { set: chosenDeity },
+                });
 
-                    const disabledSelectMenu = new StringSelectMenuBuilder()
-                        .setCustomId("deity_select")
-                        .setPlaceholder("Archon Selected")
-                        .setDisabled(true)
-                        .addOptions(
-                            deityOptions.map((option) => ({
-                                label: option.label,
-                                value: option.value,
-                            })),
-                        );
+                const disabledSelectMenu = new StringSelectMenuBuilder()
+                    .setCustomId("deity_select")
+                    .setPlaceholder("Archon Selected")
+                    .setDisabled(true)
+                    .addOptions(
+                        deityOptions.map((option) => ({
+                            label: option.label,
+                            value: option.value,
+                        })),
+                    );
 
-                    const disabledRow =
-                        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-                            disabledSelectMenu,
-                        );
+                const disabledRow =
+                    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                        disabledSelectMenu,
+                    );
 
-                    await interaction.update({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setTitle("Archon Chosen")
-                                .setDescription(
-                                    `You have chosen to follow **${chosenDeity}**.`,
-                                )
-                                .setColor(0x4b52bb),
-                        ],
-                        components: [disabledRow],
-                    });
-                },
-            );
+                await interaction.update({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setTitle("Archon Chosen")
+                            .setDescription(
+                                `You have chosen to follow **${chosenDeity}**.`,
+                            )
+                            .setColor(0x4b52bb),
+                    ],
+                    components: [disabledRow],
+                });
+            });
 
-            collector.on("end", async (_collected, reason: string) => {
+            collector.on("end", async (_, reason: string) => {
                 if (reason === "time" && !stats.deity) {
-                    await message.edit({
-                        content: "You did not choose an Archon in time.",
-                        embeds: [],
-                        components: [],
-                    });
+                    await r.edit(
+                        embedComment("You did not choose an Archon in time."),
+                    );
                 }
             });
 
@@ -270,7 +268,7 @@ export const alchemy = buildCommand<SlashCommand>({
                       alchemyMax,
                   )}`;
 
-            await i.editReply({
+            return r.edit({
                 embeds: [
                     new EmbedBuilder()
                         .setTitle("Your Alchemy Profile")
@@ -295,19 +293,17 @@ export const alchemy = buildCommand<SlashCommand>({
                         ),
                 ],
             });
-            return;
         }
 
         const totalAssigned = stats.totalAssigned ?? 0;
 
         if (action === "allocate") {
             if (totalAssigned + pointsToAssign > alchemyProgress) {
-                await i.editReply(
+                return r.edit(
                     embedComment(
                         `You cannot assign more points than your alchemy progress allows.`,
                     ),
                 );
-                return;
             }
 
             let newAssignedAtk = stats.assignedAtk ?? 0;
@@ -330,28 +326,26 @@ export const alchemy = buildCommand<SlashCommand>({
                     newAssignedDefValue += pointsToAssign;
                     break;
                 default:
-                    await i.editReply(embedComment("Invalid stat chosen."));
-                    return;
+                    return r.edit(embedComment("Invalid stat chosen."));
             }
 
             newTotalAssigned += pointsToAssign;
 
             await updateUserStats(i.user.id, {
-                assignedAtk: newAssignedAtk,
-                assignedHp: newAssignedHp,
-                assignedCritValue: newAssignedCritValue,
-                assignedDefValue: newAssignedDefValue,
-                totalAssigned: newTotalAssigned,
+                assignedAtk: { set: newAssignedAtk },
+                assignedHp: { set: newAssignedHp },
+                assignedCritValue: { set: newAssignedCritValue },
+                assignedDefValue: { set: newAssignedDefValue },
+                totalAssigned: { set: newTotalAssigned },
             });
 
-            await i.editReply(
+            return r.edit(
                 embedComment(
                     `You have successfully assigned \`${pointsToAssign}\` points to ${stat}. \nYou have \`${
                         alchemyProgress - newTotalAssigned
                     }\` points remaining to assign.`,
                 ),
             );
-            return;
         }
 
         if (action === "deallocate") {
@@ -364,71 +358,65 @@ export const alchemy = buildCommand<SlashCommand>({
             switch (stat) {
                 case "ATK":
                     if (newAssignedAtk < pointsToAssign) {
-                        await i.editReply(
+                        return r.edit(
                             embedComment(
                                 "You cannot deallocate more points than you have assigned to ATK.",
                             ),
                         );
-                        return;
                     }
                     newAssignedAtk -= pointsToAssign;
                     break;
                 case "HP":
                     if (newAssignedHp < pointsToAssign) {
-                        await i.editReply(
+                        return r.edit(
                             embedComment(
                                 "You cannot deallocate more points than you have assigned to HP.",
                             ),
                         );
-                        return;
                     }
                     newAssignedHp -= pointsToAssign;
                     break;
                 case "Crit Value":
                     if (newAssignedCritValue < pointsToAssign) {
-                        await i.editReply(
+                        return r.edit(
                             embedComment(
                                 "You cannot deallocate more points than you have assigned to Crit Value.",
                             ),
                         );
-                        return;
                     }
                     newAssignedCritValue -= pointsToAssign;
                     break;
                 case "DEF Value":
                     if (newAssignedDefValue < pointsToAssign) {
-                        await i.editReply(
+                        return r.edit(
                             embedComment(
                                 "You cannot deallocate more points than you have assigned to DEF Value.",
                             ),
                         );
-                        return;
                     }
                     newAssignedDefValue -= pointsToAssign;
                     break;
                 default:
-                    await i.editReply(embedComment("Invalid stat chosen."));
-                    return;
+                    return r.edit(embedComment("Invalid stat chosen."));
             }
 
             newTotalAssigned -= pointsToAssign;
 
             await updateUserStats(i.user.id, {
-                assignedAtk: newAssignedAtk,
-                assignedHp: newAssignedHp,
-                assignedCritValue: newAssignedCritValue,
-                assignedDefValue: newAssignedDefValue,
-                totalAssigned: newTotalAssigned,
+                assignedAtk: { set: newAssignedAtk },
+                assignedHp: { set: newAssignedHp },
+                assignedCritValue: { set: newAssignedCritValue },
+                assignedDefValue: { set: newAssignedDefValue },
+                totalAssigned: { set: newTotalAssigned },
             });
 
-            await i.editReply(
+            return r.edit(
                 embedComment(
                     `You have successfully deallocated \`${pointsToAssign}\` points from ${stat}. \nYou now have \`${
                         alchemyProgress - newTotalAssigned
                     }\` points remaining to assign.`,
                 ),
             );
-            return;
         }
     },
 });

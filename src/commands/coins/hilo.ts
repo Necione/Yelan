@@ -93,7 +93,7 @@ export const hilo: SlashCommand = {
         });
         const i = await awaitComponent(message, {
             custom_ids: [{ id: `hilo|`, includes: true }],
-            users: [{ allow: true, id: interaction.user.id }],
+            only: { originalUser: true },
             time: get.secs(30),
         });
         if (!i) {

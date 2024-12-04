@@ -13,11 +13,6 @@ export const abyss = buildCommand<SlashCommand>({
     async execute(i, r) {
         locked.set(i.user);
 
-        if (!i.deferred) {
-            locked.del(i.user.id);
-            return;
-        }
-
         locked.del(i.user.id);
         return r.edit(embedComment("Abyss is not open yet."));
 
@@ -81,7 +76,7 @@ export const abyss = buildCommand<SlashCommand>({
         }
 
         await updateUserStats(i.user.id, {
-            abyssMode: newAbyssMode,
+            abyssMode: { set: newAbyssMode },
         });
 
         const status = newAbyssMode ? "enabled" : "disabled";

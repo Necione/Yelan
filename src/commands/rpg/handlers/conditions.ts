@@ -1,4 +1,4 @@
-import { get, noop } from "@elara-services/utils";
+import { get, getRandomValue, make, noop } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { Message, ThreadChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
@@ -9,7 +9,7 @@ import {
     updateUserStats,
 } from "../../../services";
 import { cooldowns, texts } from "../../../utils";
-import { calculateDrop, calculateExp, type Monster } from "../../../utils/hunt";
+import { calculateDrop, type Monster } from "../../../utils/hunt";
 import { weapons, type WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {
@@ -17,6 +17,11 @@ import {
     getCurrentMap,
 } from "../abyssHelpers/directionHelper";
 import type { AnyInteraction } from "./huntHandler";
+
+export type ItemDrop = {
+    item: string;
+    amount: number;
+};
 
 const maxWorldLevel = 30;
 
@@ -30,7 +35,7 @@ export async function handleVictory(
 ) {
     const finalEmbed = new EmbedBuilder();
     let totalExpGained = 0;
-    let dropsCollected: { item: string; amount: number }[] = [];
+    let dropsCollected = make.array<ItemDrop>();
 
     let skillsActivated = "";
     let effectsActivated = "";
@@ -65,7 +70,7 @@ export async function handleVictory(
     );
 
     for (const monster of monstersEncountered) {
-        const expGained = calculateExp(monster.minExp, monster.maxExp);
+        const expGained = getRandomValue(monster.minExp, monster.maxExp);
         totalExpGained += expGained;
 
         const drops = calculateDrop(monster.drops);
@@ -104,8 +109,8 @@ export async function handleVictory(
     }
 
     await updateUserStats(stats.userId, {
-        exp: newExp,
-        worldLevel: stats.worldLevel,
+        exp: { set: newExp },
+        worldLevel: { set: stats.worldLevel },
     });
 
     const monstersFought = monstersEncountered
@@ -179,15 +184,15 @@ export async function handleVictory(
     }
 
     await updateUserStats(stats.userId, {
-        hp: currentPlayerHp,
-        ...(manaFieldAdded && { mana: stats.mana }),
-        activeEffects: stats.activeEffects,
-        masterySword: stats.masterySword,
-        masteryClaymore: stats.masteryClaymore,
-        masteryBow: stats.masteryBow,
-        masteryPolearm: stats.masteryPolearm,
-        masteryCatalyst: stats.masteryCatalyst,
-        masteryRod: stats.masteryRod,
+        hp: { set: currentPlayerHp },
+        ...(manaFieldAdded && { mana: { set: stats.mana } }),
+        activeEffects: { set: stats.activeEffects },
+        masterySword: { set: stats.masterySword },
+        masteryClaymore: { set: stats.masteryClaymore },
+        masteryBow: { set: stats.masteryBow },
+        masteryPolearm: { set: stats.masteryPolearm },
+        masteryCatalyst: { set: stats.masteryCatalyst },
+        masteryRod: { set: stats.masteryRod },
     });
 
     if (effectsActivated) {
@@ -209,8 +214,8 @@ export async function handleVictory(
         await thread.edit({ archived: true, locked: true }).catch(noop);
 
         await updateUserStats(stats.userId, {
-            hp: 0,
-            isHunting: false,
+            hp: { set: 0 },
+            isHunting: { set: false },
         });
 
         return;
@@ -250,7 +255,7 @@ export async function handleVictory(
 
     await message.edit({ embeds: [finalEmbed] }).catch(noop);
 
-    await updateUserStats(stats.userId, { isHunting: false });
+    await updateUserStats(stats.userId, { isHunting: { set: false } });
     await thread.edit({ archived: true, locked: true }).catch(noop);
 
     const insomniaSkill = getUserSkillLevelData(stats, "Insomnia");
@@ -298,7 +303,7 @@ export async function handleAbyssVictory(
     }
 
     await updateUserStats(i.user.id, {
-        hp: currentPlayerHp,
+        hp: { set: currentPlayerHp },
     });
 
     if (skillsActivated) {
@@ -314,7 +319,7 @@ export async function handleAbyssVictory(
 
     const currentMap = getCurrentMap(currentFloor);
 
-    let availableDirections: string[] = [];
+    let availableDirections = make.array<string>();
 
     if (currentMap) {
         if (currentX !== null && currentY !== null) {
@@ -352,7 +357,7 @@ export async function handleAbyssVictory(
     }
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
-    await updateUserStats(i.user.id, { isHunting: false });
+    await updateUserStats(i.user.id, { isHunting: { set: false } });
 
     await thread.edit({ archived: true, locked: true }).catch(noop);
 }
@@ -372,8 +377,8 @@ export async function handleDefeat(
         );
 
     await updateUserStats(stats.userId, {
-        hp: Math.max(currentPlayerHp, 0),
-        isHunting: false,
+        hp: { set: Math.max(currentPlayerHp, 0) },
+        isHunting: { set: false },
     });
 
     await message.edit({ embeds: [finalEmbed] }).catch(noop);
@@ -403,8 +408,8 @@ export async function handleAbyssDefeat(
         );
 
     await updateUserStats(i.user.id, {
-        hp: Math.max(currentPlayerHp, 0),
-        isHunting: false,
+        hp: { set: Math.max(currentPlayerHp, 0) },
+        isHunting: { set: false },
     });
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
