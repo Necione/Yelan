@@ -1,8 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, getKeys, is, noop } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { embedComment, getKeys, is, make, noop } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
+import { getAmount } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
 import { misc, type MiscName } from "../../utils/rpgitems/misc";
@@ -74,7 +75,7 @@ export const sellall = buildCommand<SlashCommand>({
         return i.respond(items.slice(0, 25)).catch(noop);
     },
     async execute(i, r) {
-        const itemNames = [];
+        const itemNames = make.array<string>();
         for (let idx = 1; idx <= 5; idx++) {
             const itemName = i.options.getString(`item${idx}`, false);
             if (itemName && itemName !== "n/a") {
@@ -82,7 +83,7 @@ export const sellall = buildCommand<SlashCommand>({
             }
         }
 
-        if (itemNames.length === 0) {
+        if (!is.array(itemNames)) {
             return r.edit(
                 embedComment(`You didn't select any valid items to sell.`),
             );
@@ -102,14 +103,18 @@ export const sellall = buildCommand<SlashCommand>({
         }
 
         let totalSellPrice = 0;
-        const messages = [];
+        const messages = make.array<string>();
         const rebirthMultiplier =
             1 +
             Math.min(stats.rebirths, 3) * 0.2 +
             Math.max(0, stats.rebirths - 3) * 0.1;
         let totalRebirthBonus = 0;
 
-        const itemsSold = [];
+        const itemsSold = make.array<{
+            itemName: string;
+            amountToSell: number;
+            itemTotalSellPrice: number;
+        }>();
 
         for (const itemName of itemNames) {
             const itemData =
@@ -173,7 +178,7 @@ export const sellall = buildCommand<SlashCommand>({
             itemsSold.push({ itemName, amountToSell, itemTotalSellPrice });
         }
 
-        if (itemsSold.length === 0) {
+        if (!is.array(itemsSold)) {
             return r.edit(
                 embedComment(`No items were sold.\n${messages.join("\n")}`),
             );
@@ -201,7 +206,9 @@ export const sellall = buildCommand<SlashCommand>({
         let responseMessage = itemsSold
             .map(
                 (soldItem) =>
-                    `You sold \`${soldItem.amountToSell}x\` **${soldItem.itemName}** for ${customEmoji.a.z_coins} \`${soldItem.itemTotalSellPrice} ${texts.c.u}\``,
+                    `You sold \`${soldItem.amountToSell}x\` **${
+                        soldItem.itemName
+                    }** for ${getAmount(soldItem.itemTotalSellPrice)}`,
             )
             .join("\n");
 
@@ -211,7 +218,7 @@ export const sellall = buildCommand<SlashCommand>({
             } from ${stats.rebirths} Rebirth${stats.rebirths > 1 ? "s" : ""})`;
         }
 
-        if (messages.length > 0) {
+        if (is.array(messages)) {
             responseMessage += `\n${messages.join("\n")}`;
         }
 

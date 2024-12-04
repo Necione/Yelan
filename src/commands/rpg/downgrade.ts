@@ -1,6 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -14,6 +14,7 @@ import {
     removeBalance,
     updateUserStats,
 } from "../../services";
+import { getAmount } from "../../utils";
 
 export const downgrade = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -28,13 +29,11 @@ export const downgrade = buildCommand<SlashCommand>({
         const stats = await getUserStats(i.user.id);
 
         if (!stats) {
-            const embed = embedComment(
-                `No stats found for you, please set up your profile.`,
+            return r.edit(
+                embedComment(
+                    `No stats found for you, please set up your profile.`,
+                ),
             );
-            return r.edit({
-                embeds: embed.embeds,
-                components: embed.components,
-            });
         }
 
         const userProfile = await getProfileByUserId(i.user.id);
@@ -48,13 +47,11 @@ export const downgrade = buildCommand<SlashCommand>({
         }
 
         if (stats.worldLevel <= 1) {
-            const embed = embedComment(
-                `You are already at the lowest world level (1)! You cannot downgrade further.`,
+            return r.edit(
+                embedComment(
+                    `You are already at the lowest world level (1)! You cannot downgrade further.`,
+                ),
             );
-            return r.edit({
-                embeds: embed.embeds,
-                components: embed.components,
-            });
         }
 
         if (stats.worldLevel > stats.highestWL) {
@@ -65,27 +62,25 @@ export const downgrade = buildCommand<SlashCommand>({
         }
 
         if (userProfile.balance < 250) {
-            const embed = embedComment(
-                `You need **${customEmoji.a.z_coins} 250 ${texts.c.u}** to downgrade your world level.`,
-                "Red",
+            return r.edit(
+                embedComment(
+                    `You need **${getAmount(
+                        250,
+                    )}** to downgrade your world level.`,
+                    "Red",
+                ),
             );
-            return r.edit({
-                embeds: embed.embeds,
-                components: embed.components,
-            });
         }
 
         const minDowngradeLevel = Math.max(stats.highestWL - 2, 1);
 
         if (stats.worldLevel <= minDowngradeLevel) {
-            const embed = embedComment(
-                `You cannot downgrade lower than 2 levels below your highest world level (${stats.highestWL}).`,
-                "Red",
+            return r.edit(
+                embedComment(
+                    `You cannot downgrade lower than 2 levels below your highest world level (${stats.highestWL}).`,
+                    "Red",
+                ),
             );
-            return r.edit({
-                embeds: embed.embeds,
-                components: embed.components,
-            });
         }
 
         const downgradeLevels = [];
@@ -108,13 +103,15 @@ export const downgrade = buildCommand<SlashCommand>({
             ...buttons,
         );
 
-        const confirmationEmbed = embedComment(
-            `Select the world level you want to downgrade to. Downgrading costs **${customEmoji.a.z_coins} 250 ${texts.c.u}**.\nYour current world level is ${stats.worldLevel}.\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
-            "Yellow",
-        );
-
         await r.edit({
-            embeds: confirmationEmbed.embeds,
+            ...embedComment(
+                `Select the world level you want to downgrade to. Downgrading costs **${getAmount(
+                    250,
+                )}**.\nYour current world level is ${
+                    stats.worldLevel
+                }.\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
+                "Yellow",
+            ),
             components: [actionRow],
         });
 
@@ -127,14 +124,7 @@ export const downgrade = buildCommand<SlashCommand>({
             .catch(() => null);
 
         if (!confirmation) {
-            const timeoutEmbed = embedComment(
-                "Downgrade request timed out.",
-                "Red",
-            );
-            return r.edit({
-                embeds: timeoutEmbed.embeds,
-                components: [],
-            });
+            return r.edit(embedComment("Downgrade request timed out.", "Red"));
         }
 
         const selectedLevel = parseInt(confirmation.customId.split("_")[1], 10);
@@ -147,18 +137,17 @@ export const downgrade = buildCommand<SlashCommand>({
         );
 
         await updateUserStats(i.user.id, {
-            worldLevel: selectedLevel,
-            exp: 0,
+            worldLevel: { set: selectedLevel },
+            exp: { set: 0 },
         });
 
-        const successEmbed = embedComment(
-            `Your world level has been downgraded to ${selectedLevel}, your EXP has been reset to 0, and **${customEmoji.a.z_coins} 250 ${texts.c.u}** have been deducted from your wallet.`,
-            "Green",
+        return r.edit(
+            embedComment(
+                `Your world level has been downgraded to ${selectedLevel}, your EXP has been reset to 0, and **${getAmount(
+                    250,
+                )}** have been deducted from your wallet.`,
+                "Green",
+            ),
         );
-
-        return r.edit({
-            embeds: successEmbed.embeds,
-            components: [],
-        });
     },
 });

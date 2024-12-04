@@ -15,7 +15,6 @@ import {
     type XOR,
     type getInteractionResponders,
 } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
 import type { Pet } from "@prisma/client";
 import type { PaginatedMessageAction } from "@sapphire/discord.js-utilities";
 import {
@@ -37,7 +36,7 @@ import {
     removeBalance,
     updatePets,
 } from "../../services";
-import { getPaginatedMessage, logs } from "../../utils";
+import { getAmount, getPaginatedMessage, logs } from "../../utils";
 
 export type PetTypes = "common" | "epic" | "legendary" | "mythic";
 export const prices: Record<Pets | string, Record<PetTypes, number>> = {};
@@ -496,15 +495,15 @@ export async function handleInteractions(interaction: Interaction) {
         }
         if (d.balance < 10) {
             return await send(
-                embedComment(
-                    `You need ${customEmoji.a.z_coins} \`10 ${texts.c.u}\` to rename`,
-                ),
+                embedComment(`You need ${getAmount(10)} to rename`),
             );
         }
         const confirm = await getConfirmPrompt(
             interaction,
             user,
-            `Are you 100% sure you want to rename your pet for ${customEmoji.a.z_coins} \`10 ${texts.c.u}\`?`,
+            `Are you 100% sure you want to rename your pet for ${getAmount(
+                10,
+            )}?`,
             get.secs(10),
         );
         if (!confirm) {
@@ -581,12 +580,7 @@ export async function handleInteractions(interaction: Interaction) {
         ]);
 
         return await send(
-            embedComment(
-                `You fed your pet for ${customEmoji.a.z_coins} \`${formatNumber(
-                    amount,
-                )} ${texts.c.u}\``,
-                "Green",
-            ),
+            embedComment(`You fed your pet for ${getAmount(amount)}`, "Green"),
         );
     }
     if (action === "claim") {
@@ -621,9 +615,7 @@ export async function handleInteractions(interaction: Interaction) {
         ]);
         return await send(
             embedComment(
-                `You've claimed ${customEmoji.a.z_coins} \`${formatNumber(
-                    amount,
-                )} ${texts.c.u}\` from your pet!`,
+                `You've claimed ${getAmount(amount)} from your pet!`,
                 "Green",
             ),
         );
@@ -668,15 +660,15 @@ export async function handleInteractions(interaction: Interaction) {
         }
         if (d.balance < 100) {
             return await send(
-                embedComment(
-                    `You need ${customEmoji.a.z_coins} \`100 ${texts.c.u}\` to disown`,
-                ),
+                embedComment(`You need ${getAmount(100)} to disown`),
             );
         }
         const confirm = await getConfirmPrompt(
             interaction,
             user,
-            `Are you 100% sure you want to disown your pet for ${customEmoji.a.z_coins} \`100 ${texts.c.u}\`?`,
+            `Are you 100% sure you want to disown your pet for ${getAmount(
+                100,
+            )}?`,
             get.secs(10),
         );
         if (!confirm) {

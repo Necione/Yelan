@@ -1,4 +1,4 @@
-export const morseCodeMap: { [key: string]: string } = {
+export const morseCodeMap = {
     A: ".-",
     B: "-...",
     C: "-.-.",
@@ -27,7 +27,7 @@ export const morseCodeMap: { [key: string]: string } = {
     Z: "--..",
 };
 
-export const binaryCodeMap: { [key: string]: string } = {
+export const binaryCodeMap = {
     A: "01000001",
     B: "01000010",
     C: "01000011",

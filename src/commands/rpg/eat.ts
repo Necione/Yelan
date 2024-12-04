@@ -112,7 +112,7 @@ export const eat = buildCommand<SlashCommand>({
         }
 
         await updateUserStats(i.user.id, {
-            hp: newHp,
+            hp: { set: newHp },
             inventory: { set: stats.inventory },
         });
 

@@ -1,3 +1,4 @@
+import { make } from "@elara-services/utils";
 import { floor1Map } from "./floor1map";
 import { floor2Map } from "./floor2map";
 
@@ -18,7 +19,7 @@ export function getAvailableDirections(
     y: number,
     map: string[][],
 ): string[] {
-    const available: string[] = [];
+    const available = make.array<string>();
 
     for (const [direction, delta] of Object.entries(directions)) {
         const potentialX = x + delta.dx;
@@ -46,7 +47,7 @@ export function getAvailableDirections(
     return available;
 }
 
-export function getCurrentMap(floor: number): string[][] | null {
+export function getCurrentMap(floor: number) {
     return floorMaps[floor] || null;
 }
 
@@ -66,7 +67,7 @@ export function findPositionInMap(
     target: string,
     x?: number,
     y?: number,
-): { x: number; y: number } | null {
+) {
     for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
         const row = map[rowIndex];
         for (let col = 0; col < row.length; col++) {

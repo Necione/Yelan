@@ -1,10 +1,10 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import { embedComment, make, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
 
-const upgradeChains: Array<Array<DropName>> = [
+const upgradeChains = make.array<DropName[]>([
     ["Damaged Mask", "Stained Mask", "Ominous Mask"],
     ["Firm Arrowhead", "Sharp Arrowhead", "Weathered Arrowhead"],
     ["Slime Condensate", "Slime Secretions", "Slime Concentrate"],
@@ -28,7 +28,7 @@ const upgradeChains: Array<Array<DropName>> = [
     ["A Flower Yet to Bloom", "Treasured Flower", "Wanderer's Blooming Flower"],
     ["Faded Red Satin", "Trimmed Red Silk", "Rich Red Brocade"],
     ["Old Handguard", "Kageuchi Handguard", "Famed Handguard"],
-];
+]);
 
 export const craft = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

@@ -1,10 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, is } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { embedComment, is } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { devId, roles } from "../../config";
+import { isDev, roles } from "../../config";
 import { updateUserProfile } from "../../services";
-import { logs } from "../../utils";
+import { getAmount, logs } from "../../utils";
 
 export const coins = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -38,33 +37,33 @@ export const coins = buildCommand<SlashCommand>({
     },
     async execute(i, r) {
         const user = i.options.getUser("user", true);
-        if (i.user.id !== devId && user.id === devId) {
-            return r.edit(embedComment(`Respectfully, fuck off.`));
-        }
         const amount = i.options.getInteger("amount", true);
         const type = (i.options.getString("type", false) || "increment") as
             | "increment"
             | "decrement";
-        const str = `${customEmoji.a.z_coins} \`${formatNumber(amount)} ${
-            texts.c.u
-        }\``;
+        const str = getAmount(amount);
         if (user.bot) {
             return r.edit(embedComment(`Bots don't have a user profile.`));
-        }
-        if (i.user.id === user.id) {
-            return r.edit(
-                embedComment(`You can't give/remove coins from yourself.`),
-            );
         }
         if (!is.number(amount)) {
             return r.edit(embedComment(`You provided an invalid amount.`));
         }
-        await logs.action(
-            user.id,
-            amount,
-            type === "increment" ? "add" : "remove",
-            `Via /coins by \`@${i.user.username}\` (${i.user.id})`,
-        );
+        if (!isDev(i.user.id)) {
+            if (isDev(user.id)) {
+                return r.edit(embedComment(`Respectfully, fuck off.`));
+            }
+            if (i.user.id === user.id) {
+                return r.edit(
+                    embedComment(`You can't give/remove coins from yourself.`),
+                );
+            }
+            await logs.action(
+                user.id,
+                amount,
+                type === "increment" ? "add" : "remove",
+                `Via /coins by \`@${i.user.username}\` (${i.user.id})`,
+            );
+        }
         await updateUserProfile(user.id, {
             balance: {
                 [type]: amount,

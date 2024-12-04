@@ -1,3 +1,4 @@
+import { limits } from "..";
 import { MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
@@ -25,10 +26,9 @@ export default {
     baseHp: 30,
     baseAtk: 8,
     getStatsForWorldLevel(worldLevel: number) {
-        if (worldLevel < 1 || worldLevel > 30) {
+        if (!limits.check(worldLevel)) {
             return null;
         }
-
         const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
         const newBaseHp = this.baseHp * hpScaleMultiplier;
         const minHp = Math.ceil(newBaseHp * 0.9);

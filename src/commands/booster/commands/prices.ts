@@ -1,6 +1,5 @@
 import { buildCommand, type SubCommand } from "@elara-services/botbuilder";
-import { formatNumber } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { getAmount } from "../../../utils";
 import { baseEmbed, boosterPrices } from "../common";
 
 export const prices = buildCommand<SubCommand>({
@@ -14,11 +13,11 @@ export const prices = buildCommand<SubCommand>({
                         .sort((a, b) => b.price - a.price)
                         .map(
                             (price) =>
-                                `- \`${price.multiplier} Booster\`\n - Price: ${
-                                    customEmoji.a.z_coins
-                                } \`${formatNumber(price.price)} ${
-                                    texts.c.u
-                                }\``,
+                                `- \`${
+                                    price.multiplier
+                                } Booster\`\n - Price: ${getAmount(
+                                    price.price,
+                                )}`,
                         )
                         .join("\n"),
                 ),

@@ -118,12 +118,7 @@ export const shoot = buildCommand<SlashCommand>({
                         includes: true,
                     },
                 ],
-                users: [
-                    {
-                        allow: true,
-                        id: i.user.id,
-                    },
-                ],
+                only: { originalUser: true },
                 time: get.mins(1),
             });
             if (!c) {

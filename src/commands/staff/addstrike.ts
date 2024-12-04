@@ -5,7 +5,7 @@ import {
 } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { devId, roles } from "../../config";
+import { isDev, roles } from "../../config";
 import { addStrike } from "../../services";
 import { getAmount, logs } from "../../utils";
 
@@ -51,7 +51,7 @@ export const addstrike = buildCommand<SlashCommand>({
         const rule = i.options.getString("rule", true);
         reason = `${rule} ${reason}`;
         const initiator = i.user;
-        if (i.user.id !== devId && user.id === devId) {
+        if (!isDev(i.user.id) && isDev(user.id)) {
             return r.edit(embedComment(`Respectfully, fuck off.`));
         }
         const data = await addStrike(user.id, i.user.id, reason);

@@ -1,12 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, is, log, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import {
-    getProfileByUserId,
-    getUserStats,
-    syncStats,
-    updateUserStats,
-} from "../../services";
+import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { calculateMasteryLevel } from "../../utils/masteryHelper";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 import { getAvailableSpells, spells, type Spell } from "../../utils/spells";
@@ -29,18 +24,16 @@ export const spell = buildCommand<SlashCommand>({
             const userId = i.user.id;
             const input = i.options.getString("cast", false) ?? "";
 
-            let stats = await getUserStats(userId);
+            const stats = await syncStats(userId);
             if (!stats) {
                 return i
                     .respond([{ name: "No stats found.", value: "n/a" }])
-                    .catch(() => {});
+                    .catch(noop);
             }
-
-            stats = await syncStats(userId);
             if (!stats) {
                 return i
                     .respond([{ name: "Failed to sync stats.", value: "n/a" }])
-                    .catch(() => {});
+                    .catch(noop);
             }
 
             const catalystMasteryPoints = stats.masteryCatalyst || 0;
@@ -56,20 +49,20 @@ export const spell = buildCommand<SlashCommand>({
                 value: spell.spellName,
             }));
 
-            if (choices.length === 0) {
+            if (!is.array(choices)) {
                 return i
                     .respond([
                         { name: "No matching spells found.", value: "n/a" },
                     ])
-                    .catch(() => {});
+                    .catch(noop);
             }
 
-            return i.respond(choices).catch(() => {});
+            return i.respond(choices).catch(noop);
         } catch (error) {
-            console.error("Error in spell autocomplete:", error);
+            log("Error in spell autocomplete:", error);
             return i
                 .respond([{ name: "Error fetching spells.", value: "n/a" }])
-                .catch(() => {});
+                .catch(noop);
         }
     },
     async execute(i, r) {
@@ -88,20 +81,11 @@ export const spell = buildCommand<SlashCommand>({
                     );
                 }
 
-                let stats = await getUserStats(userId);
+                const stats = await syncStats(userId);
                 if (!stats) {
                     return r.edit(
                         embedComment(
                             `No stats found for you, please set up your profile.`,
-                        ),
-                    );
-                }
-
-                stats = await syncStats(userId);
-                if (!stats) {
-                    return r.edit(
-                        embedComment(
-                            `Failed to sync your stats. Please try again later.`,
                         ),
                     );
                 }
@@ -192,8 +176,8 @@ export const spell = buildCommand<SlashCommand>({
                 stats.castQueue.push(spellName);
 
                 await updateUserStats(userId, {
-                    mana: stats.mana,
-                    castQueue: stats.castQueue,
+                    mana: { set: stats.mana },
+                    castQueue: { set: stats.castQueue },
                 });
 
                 const spellCastEmbed = new EmbedBuilder()
@@ -206,9 +190,7 @@ export const spell = buildCommand<SlashCommand>({
 
                 return r.edit({ embeds: [spellCastEmbed] });
             } else {
-                const userId = i.user.id;
-
-                const userProfile = await getProfileByUserId(userId);
+                const userProfile = await getProfileByUserId(i.user.id);
                 if (!userProfile) {
                     return r.edit(
                         embedComment(
@@ -217,20 +199,11 @@ export const spell = buildCommand<SlashCommand>({
                     );
                 }
 
-                let stats = await getUserStats(userId);
+                const stats = await syncStats(i.user.id);
                 if (!stats) {
                     return r.edit(
                         embedComment(
                             `No stats found for you, please set up your profile.`,
-                        ),
-                    );
-                }
-
-                stats = await syncStats(userId);
-                if (!stats) {
-                    return r.edit(
-                        embedComment(
-                            `Failed to sync your stats. Please try again later.`,
                         ),
                     );
                 }
@@ -241,7 +214,7 @@ export const spell = buildCommand<SlashCommand>({
                     catalystMasteryPoints,
                 );
 
-                if (availableSpells.length === 0) {
+                if (!is.array(availableSpells)) {
                     const noSpellsEmbed = new EmbedBuilder()
                         .setColor("Yellow")
                         .setTitle("No Available Spells")
@@ -279,7 +252,7 @@ export const spell = buildCommand<SlashCommand>({
                 return r.edit({ embeds: [availableSpellsEmbed] });
             }
         } catch (error) {
-            console.error("Error executing /spell command:", error);
+            log("Error executing /spell command:", error);
 
             const errorEmbed = new EmbedBuilder()
                 .setColor("Red")

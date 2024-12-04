@@ -1,11 +1,15 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { randomNumber } from "@elara-services/packages";
-import { embedComment, noop } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
-import type { ButtonInteraction } from "discord.js";
 import {
-    ActionRowBuilder,
-    ButtonBuilder,
+    addButtonRow,
+    embedComment,
+    get,
+    is,
+    log,
+    noop,
+} from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
+import {
     ButtonStyle,
     ComponentType,
     EmbedBuilder,
@@ -18,6 +22,7 @@ import {
     removeBalance,
     updateUserStats,
 } from "../../services";
+import { getAmount } from "../../utils";
 import { getRandomDrop } from "../../utils/chest";
 
 type UserRequest = {
@@ -44,7 +49,7 @@ export const requests = buildCommand<SlashCommand>({
         const userId = i.user.id;
         const stats = await getUserStats(userId);
 
-        if (!stats || !stats.requests || stats.requests.length === 0) {
+        if (!stats || !is.array(stats?.requests || [])) {
             return i
                 .respond([{ name: "No requests available.", value: "n/a" }])
                 .catch(noop);
@@ -60,7 +65,7 @@ export const requests = buildCommand<SlashCommand>({
                 value: req.id,
             }));
 
-        if (choices.length === 0) {
+        if (!is.array(choices)) {
             return i
                 .respond([{ name: "No matching requests.", value: "n/a" }])
                 .catch(noop);
@@ -75,29 +80,25 @@ export const requests = buildCommand<SlashCommand>({
             const stats = await getUserStats(userId);
 
             if (!stats) {
-                await r.edit(
+                return r.edit(
                     embedComment(
                         "No stats found for you. Please set up your profile.",
-                        "Red",
                     ),
                 );
-                return;
             }
 
             const userProfile = await getProfileByUserId(userId);
 
             if (!userProfile) {
-                await r.edit(
+                return r.edit(
                     embedComment(
                         "No profile found for your user. Please set up your profile.",
-                        "Red",
                     ),
                 );
-                return;
             }
 
             if (!requestId) {
-                if (!stats.requests || stats.requests.length === 0) {
+                if (!is.array(stats.requests)) {
                     const newRequests = generateRandomRequests(
                         3,
                         stats.requests,
@@ -108,14 +109,13 @@ export const requests = buildCommand<SlashCommand>({
                     stats.requests = newRequests;
                 }
 
-                if (!stats.requests || stats.requests.length === 0) {
-                    await r.edit(
+                if (!is.array(stats.requests)) {
+                    return r.edit(
                         embedComment(
-                            "ℹNo requests available at the moment.",
+                            "No requests available at the moment.",
                             "Yellow",
                         ),
                     );
-                    return;
                 }
 
                 const embed = new EmbedBuilder()
@@ -131,95 +131,98 @@ export const requests = buildCommand<SlashCommand>({
                 stats.requests.forEach((req) => {
                     embed.addFields({
                         name: `Request ID: ${req.id}`,
-                        value: `>>> **Item:** \`${req.quantity}x\` ${req.item}\n**Reward:** ${customEmoji.a.z_coins} \`${req.reward}\` ${texts.c.u}`,
+                        value: `>>> **Item:** \`${req.quantity}x\` ${
+                            req.item
+                        }\n**Reward:** ${getAmount(req.reward)}`,
                     });
                 });
 
-                const refreshButton = new ButtonBuilder()
-                    .setCustomId("refresh_requests")
-                    .setLabel("Refresh Requests (500 Coins)")
-                    .setStyle(ButtonStyle.Primary);
-
-                const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-                    refreshButton,
-                );
-
                 await r.edit({
                     embeds: [embed.toJSON()],
-                    components: [row],
+                    components: [
+                        addButtonRow({
+                            id: "refresh_requests",
+                            label: "Refresh Requests (500 Coins)",
+                            style: ButtonStyle.Primary,
+                        }),
+                    ],
                 });
 
-                const message = await i.fetchReply();
+                const message = await i.fetchReply().catch(noop);
+                if (!message) {
+                    return r.edit(
+                        embedComment(`Unable to fetch the original message.`),
+                    );
+                }
 
                 const collector = message.createMessageComponentCollector({
                     componentType: ComponentType.Button,
-                    time: 60000,
+                    time: get.mins(1),
                 });
 
-                collector.on(
-                    "collect",
-                    async (interaction: ButtonInteraction) => {
-                        if (interaction.customId === "refresh_requests") {
-                            if (interaction.user.id !== userId) {
-                                await interaction.reply({
-                                    content:
-                                        "You cannot interact with this button.",
-                                    ephemeral: true,
-                                });
-                                return;
-                            }
-
-                            const userBalance = userProfile.balance || 0;
-
-                            if (userBalance < 500) {
-                                await interaction.reply({
-                                    content: `You don't have enough coins to refresh requests. You need ${customEmoji.a.z_coins} \`500\` Coins.`,
-                                    ephemeral: true,
-                                });
-                                return;
-                            }
-
-                            const newRequests = generateRandomRequests(3);
-
-                            await Promise.all([
-                                updateUserStats(userId, {
-                                    requests: { set: newRequests },
-                                }),
-                                removeBalance(
-                                    userId,
-                                    500,
-                                    true,
-                                    `Spent 500 coins to refresh requests.`,
-                                ),
-                            ]);
-
-                            embed.setFields([]);
-
-                            newRequests.forEach((req) => {
-                                embed.addFields({
-                                    name: `Request ID: ${req.id}`,
-                                    value: `>>> **Item:** \`${req.quantity}x\` ${req.item}\n**Reward:** ${customEmoji.a.z_coins} \`${req.reward}\` ${texts.c.u}`,
-                                });
-                            });
-
-                            await interaction.update({
-                                embeds: [embed],
-                                components: [row],
+                collector.on("collect", async (interaction) => {
+                    if (interaction.customId === "refresh_requests") {
+                        if (interaction.user.id !== userId) {
+                            return interaction.reply({
+                                content:
+                                    "You cannot interact with this button.",
+                                ephemeral: true,
                             });
                         }
-                    },
-                );
+
+                        const userBalance = userProfile.balance || 0;
+
+                        if (userBalance < 500) {
+                            return interaction
+                                .reply({
+                                    content: `You don't have enough ${
+                                        texts.c.l
+                                    } to refresh requests. You need ${getAmount(
+                                        500,
+                                    )}`,
+                                    ephemeral: true,
+                                })
+                                .catch(noop);
+                        }
+
+                        const newRequests = generateRandomRequests(3);
+
+                        await Promise.all([
+                            updateUserStats(userId, {
+                                requests: { set: newRequests },
+                            }),
+                            removeBalance(
+                                userId,
+                                500,
+                                true,
+                                `Spent 500 coins to refresh requests.`,
+                            ),
+                        ]);
+
+                        embed.setFields([]);
+
+                        newRequests.forEach((req) => {
+                            embed.addFields({
+                                name: `Request ID: ${req.id}`,
+                                value: `>>> **Item:** \`${req.quantity}x\` ${
+                                    req.item
+                                }\n**Reward:** ${getAmount(req.reward)}`,
+                            });
+                        });
+
+                        await interaction.update({ embeds: [embed] });
+                    }
+                });
 
                 collector.on("end", async () => {
                     await r.edit({ components: [] }).catch(noop);
                 });
             } else {
                 const requestIndex = stats.requests.findIndex(
-                    (req: UserRequest) => req.id === requestId,
+                    (req) => req.id === requestId,
                 );
                 if (requestIndex === -1) {
-                    await r.edit(embedComment("Invalid request ID.", "Red"));
-                    return;
+                    return r.edit(embedComment("Invalid request ID."));
                 }
 
                 const request = stats.requests[requestIndex];
@@ -227,13 +230,11 @@ export const requests = buildCommand<SlashCommand>({
                     (item) => item.item === request.item,
                 );
                 if (!item || item.amount < request.quantity) {
-                    await r.edit(
+                    return r.edit(
                         embedComment(
                             `You don't have enough \`${request.item}\` to complete this request.`,
-                            "Red",
                         ),
                     );
-                    return;
                 }
 
                 item.amount -= request.quantity;
@@ -255,8 +256,9 @@ export const requests = buildCommand<SlashCommand>({
                     updateUserStats(userId, {
                         inventory: { set: stats.inventory },
                         requests: { set: updatedRequests },
-                        lifetimeRequestsCompleted:
-                            stats.lifetimeRequestsCompleted,
+                        lifetimeRequestsCompleted: {
+                            set: stats.lifetimeRequestsCompleted,
+                        },
                     }),
                     addBalance(
                         userId,
@@ -269,18 +271,15 @@ export const requests = buildCommand<SlashCommand>({
                 const embed = new EmbedBuilder()
                     .setTitle("`✅` Request Completed!")
                     .setColor("Green")
-                    .setDescription(
-                        `You received ${customEmoji.a.z_coins} \`${coinReward} ${texts.c.u}\`!`,
-                    );
+                    .setDescription(`You received ${getAmount(coinReward)}!`);
 
                 await r.edit({ embeds: [embed.toJSON()] });
             }
         } catch (error) {
-            console.error("Error executing /requests command:", error);
+            log("Error executing /requests command:", error);
             await r.edit(
                 embedComment(
                     "An error occurred while processing your request. Please try again later.",
-                    "Red",
                 ),
             );
         }

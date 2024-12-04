@@ -6,7 +6,7 @@ import {
     getKeys,
 } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
-import { devId, roles } from "../../../../config";
+import { isDev, roles } from "../../../../config";
 import {
     getProfileByUserId,
     updateUserProfile,
@@ -33,6 +33,7 @@ const choices = [
     "collectables",
     "badges",
     "rakeback",
+    "cooldowns",
 ];
 const ints = [
     "elo",
@@ -48,7 +49,7 @@ const ints = [
     "rankedUID",
     "starrail",
 ];
-const arrays = ["achievements", "collectables", "badges"];
+const arrays = ["achievements", "collectables", "badges", "cooldowns"];
 const texts = ["backgroundUrl"];
 
 export const reset = buildCommand({
@@ -72,7 +73,7 @@ export const reset = buildCommand({
             return;
         }
         const user = i.options.getUser("user", true);
-        if (i.user.id !== devId && user.id === devId) {
+        if (!isDev(i.user.id) && isDev(user.id)) {
             return r.edit(embedComment(`Respectfully, fuck off.`));
         }
         const type = i.options.getString("type", true);

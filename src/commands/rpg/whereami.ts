@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import { embedComment, log } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { locked } from "../../utils";
@@ -21,11 +21,6 @@ export const whereami = buildCommand<SlashCommand>({
         locked.set(i.user);
 
         try {
-            if (!i.deferred) {
-                locked.del(i.user.id);
-                return;
-            }
-
             const stats = await getUserStats(i.user.id);
             if (!stats) {
                 locked.del(i.user.id);
@@ -86,16 +81,14 @@ export const whereami = buildCommand<SlashCommand>({
                 currentY = startingPosition.y;
 
                 await updateUserStats(i.user.id, {
-                    abyssCoordX: currentX,
-                    abyssCoordY: currentY,
-                    currentAbyssFloor: currentFloor,
+                    abyssCoordX: { set: currentX },
+                    abyssCoordY: { set: currentY },
+                    currentAbyssFloor: { set: currentFloor },
                 });
-                console.log(
-                    `Starting Position Set to: (${currentX}, ${currentY})`,
-                );
+                log(`Starting Position Set to: (${currentX}, ${currentY})`);
             }
 
-            console.log(
+            log(
                 `Current Position on Floor ${currentFloor}: (${currentX}, ${currentY})`,
             );
 
@@ -114,20 +107,17 @@ export const whereami = buildCommand<SlashCommand>({
                 message += `\nThere are no available directions to move from here.`;
             }
 
-            await i.editReply(embedComment(message, "Blue"));
+            await r.edit(embedComment(message, "Blue"));
 
             locked.del(i.user.id);
         } catch (error) {
-            console.error("Error in /whereami command:", error);
+            log("Error in /whereami command:", error);
             locked.del(i.user.id);
-            await i
-                .editReply(
-                    embedComment(
-                        "An unexpected error occurred. Please try again later.",
-                        "Red",
-                    ),
-                )
-                .catch(noop);
+            await r.edit(
+                embedComment(
+                    "An unexpected error occurred. Please try again later.",
+                ),
+            );
         }
     },
 });
@@ -137,7 +127,7 @@ function findPositionInMap(
     target: string,
     x?: number,
     y?: number,
-): { x: number; y: number } | null {
+) {
     for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
         const row = map[rowIndex];
         for (let col = 0; col < row.length; col++) {

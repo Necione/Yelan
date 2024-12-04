@@ -1,6 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
-import { type UserStats } from "@prisma/client";
+import { embedComment, is, make } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { masteryBenefits } from "../../utils/masteryData";
@@ -51,7 +50,7 @@ export const masteriesCommand = buildCommand<SlashCommand>({
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
-        const stats = (await getUserStats(i.user.id)) as UserStats | null;
+        const stats = await getUserStats(i.user.id);
 
         if (!stats) {
             return r.edit(
@@ -74,7 +73,7 @@ export const masteriesCommand = buildCommand<SlashCommand>({
             const masteryLevelObj = calculateMasteryLevel(masteryPoints);
             const { numericLevel } = masteryLevelObj;
 
-            const unlockedSkills: SpecialSkillName[] = [];
+            const unlockedSkills = make.array<SpecialSkillName>();
             for (let lvl = 1; lvl <= numericLevel; lvl++) {
                 const benefit = benefits[lvl];
                 if (
@@ -92,7 +91,7 @@ export const masteriesCommand = buildCommand<SlashCommand>({
                 }
             }
 
-            if (unlockedSkills.length > 0) {
+            if (is.array(unlockedSkills)) {
                 await updateUserStats(i.user.id, {
                     unlockedSpecialSkills: {
                         push: unlockedSkills,
@@ -118,7 +117,7 @@ export const masteriesCommand = buildCommand<SlashCommand>({
                 .setTitle(`${type} Mastery Benefits`)
                 .setDescription(benefitsList);
 
-            if (unlockedSkills.length > 0) {
+            if (is.array(unlockedSkills)) {
                 embed.addFields({
                     name: "Newly Unlocked Skills",
                     value: unlockedSkills
@@ -160,6 +159,6 @@ export const masteriesCommand = buildCommand<SlashCommand>({
             )
             .addFields({ name: "Mastery Levels", value: masteryList });
 
-        await i.editReply({ embeds: [embed] });
+        await r.edit({ embeds: [embed] });
     },
 });

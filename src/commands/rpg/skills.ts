@@ -5,7 +5,7 @@ import { getUserStats } from "../../services";
 import { getUserSkillLevelData, skills } from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
-function getMaxActiveSkills(alchemyProgress: number): number {
+function getMaxActiveSkills(alchemyProgress: number) {
     if (alchemyProgress >= 360) {
         return 7;
     } else if (alchemyProgress >= 100) {
@@ -15,7 +15,7 @@ function getMaxActiveSkills(alchemyProgress: number): number {
     }
 }
 
-const getSkillEmoji = (skillName: string): string => {
+const getSkillEmoji = (skillName: string) => {
     const skill = skills.find((s) => s.name === skillName);
     return skill ? skill.emoji : "";
 };
@@ -191,6 +191,6 @@ export const skillsCommand = buildCommand<SlashCommand>({
                 },
             );
 
-        await i.editReply({ embeds: [embed] });
+        return r.edit({ embeds: [embed] });
     },
 });

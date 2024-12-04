@@ -1,19 +1,18 @@
-import { embedComment } from "@elara-services/utils";
+import { embedComment, make } from "@elara-services/utils";
 import type { UserStats } from "@prisma/client";
-import type {
-    ChatInputCommandInteraction,
-    Message,
-    TextChannel,
-} from "discord.js";
+import type { ChatInputCommandInteraction } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { updateUserStats } from "../../../services";
 
 export async function handleTrap(
     i: ChatInputCommandInteraction,
     stats: UserStats,
-): Promise<void> {
+) {
+    if (!i.channel || !("createMessageCollector" in i.channel)) {
+        return;
+    }
     const numberOfDigits = Math.floor(Math.random() * 2) + 4;
-    const numbers: number[] = [];
+    const numbers = make.array<number>();
     for (let j = 0; j < numberOfDigits; j++) {
         numbers.push(Math.floor(Math.random() * 90) + 10);
     }
@@ -31,10 +30,8 @@ export async function handleTrap(
         );
 
     await i.followUp({ embeds: [trapEmbed] });
-
-    const filter = (m: Message) => m.author.id === i.user.id;
-    const collector = (i.channel as TextChannel)?.createMessageCollector({
-        filter,
+    const collector = i.channel.createMessageCollector({
+        filter: (m) => m.author.id === i.user.id,
         time: 10000,
         max: 1,
     });
@@ -49,7 +46,7 @@ export async function handleTrap(
         return;
     }
 
-    collector.on("collect", async (m: Message) => {
+    collector.on("collect", async (m) => {
         const playerInput = m.content.trim();
 
         const playerNumbers = playerInput
@@ -98,7 +95,7 @@ export async function handleTrap(
     });
 
     collector.on("end", async (collected) => {
-        if (collected.size === 0) {
+        if (!collected.size) {
             await i.followUp(
                 embedComment(
                     "You failed to respond in time. The trap activates!",
@@ -113,7 +110,7 @@ export async function handleTrap(
 async function applyTrapDamage(
     i: ChatInputCommandInteraction,
     stats: UserStats,
-): Promise<void> {
+) {
     const newHP = Math.max(stats.hp - 50, 0);
     await updateUserStats(i.user.id, { hp: newHP });
 

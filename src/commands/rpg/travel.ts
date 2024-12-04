@@ -1,14 +1,11 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { sleep } from "@elara-services/utils";
+import { embedComment, get, is, noop, sleep } from "@elara-services/utils";
 import {
     ActionRowBuilder,
     ButtonBuilder,
-    type ButtonInteraction,
     ButtonStyle,
-    type Collection,
     ComponentType,
     EmbedBuilder,
-    type Message,
     SlashCommandBuilder,
 } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
@@ -118,7 +115,9 @@ export const travel = buildCommand<SlashCommand>({
         let currentLocation = stats.location as LocationName;
         if (!locations[currentLocation]) {
             currentLocation = "Liyue Harbor";
-            await updateUserStats(i.user.id, { location: currentLocation });
+            await updateUserStats(i.user.id, {
+                location: { set: currentLocation },
+            });
         }
 
         const currentCoords = locations[currentLocation];
@@ -181,7 +180,7 @@ export const travel = buildCommand<SlashCommand>({
 
         travelOptions = Array.from(new Set(travelOptions));
 
-        if (travelOptions.length === 0) {
+        if (!is.array(travelOptions)) {
             return r.edit({
                 embeds: [
                     new EmbedBuilder().setDescription(
@@ -208,32 +207,35 @@ export const travel = buildCommand<SlashCommand>({
             ...buttons,
         );
 
-        await r.edit({ embeds: [embed], components: [actionRow] });
-        const message = (await i.fetchReply()) as Message;
+        const message = await r.edit({
+            embeds: [embed],
+            components: [actionRow],
+        });
+        if (!message) {
+            return r.edit(
+                embedComment(`Unable to fetch the original message.`),
+            );
+        }
 
         const collector = message.createMessageComponentCollector({
+            filter: (ii) => ii.user.id === i.user.id,
             componentType: ComponentType.Button,
-            time: 60000,
+            time: get.mins(1),
         });
 
-        collector.on("collect", async (interaction: ButtonInteraction) => {
-            if (interaction.user.id !== i.user.id) {
-                return interaction.reply({
-                    content: "This button is not for you!",
-                    ephemeral: true,
-                });
-            }
-
+        collector.on("collect", async (interaction) => {
             const selectedLocation = interaction.customId.replace(
                 "travel_",
                 "",
             ) as LocationName;
 
             if (!locations[selectedLocation]) {
-                return interaction.reply({
-                    content: "Invalid location selected.",
-                    ephemeral: true,
-                });
+                return interaction
+                    .reply({
+                        content: "Invalid location selected.",
+                        ephemeral: true,
+                    })
+                    .catch(noop);
             }
 
             const targetRegion = locations[selectedLocation].region;
@@ -242,11 +244,13 @@ export const travel = buildCommand<SlashCommand>({
                 stats.worldLevel < 20 &&
                 currentLocation !== "Ritou"
             ) {
-                return interaction.reply({
-                    content:
-                        "You need to be world level 20 or higher to travel to Inazuma.",
-                    ephemeral: true,
-                });
+                return interaction
+                    .reply({
+                        content:
+                            "You need to be world level 20 or higher to travel to Inazuma.",
+                        ephemeral: true,
+                    })
+                    .catch(noop);
             }
 
             collector.stop();
@@ -260,50 +264,40 @@ export const travel = buildCommand<SlashCommand>({
             const arrivalTimestamp =
                 Math.round(Date.now() / 1000) + Math.round(travelTime);
 
-            await updateUserStats(i.user.id, { isTravelling: true });
+            await updateUserStats(i.user.id, { isTravelling: { set: true } });
 
             const emoji = locationEmojis[selectedLocation];
 
-            await interaction.update({
-                content: null,
-                embeds: [
-                    new EmbedBuilder().setDescription(
+            await interaction
+                .update(
+                    embedComment(
                         `You are travelling to ${emoji} **${selectedLocation}**.\nYou will arrive <t:${arrivalTimestamp}:R>!`,
+                        "Orange",
                     ),
-                ],
-                components: [],
-            });
+                )
+                .catch(noop);
 
             await sleep(travelTime * 1000);
 
             await updateUserStats(i.user.id, {
-                location: selectedLocation,
-                isTravelling: false,
+                location: { set: selectedLocation },
+                isTravelling: { set: false },
             });
 
-            await i.followUp({
-                embeds: [
-                    new EmbedBuilder().setDescription(
+            await i
+                .followUp(
+                    embedComment(
                         `You have arrived at ${emoji} **${selectedLocation}**!`,
+                        "Green",
                     ),
-                ],
-            });
+                )
+                .catch(noop);
         });
 
-        collector.on(
-            "end",
-            async (collected: Collection<string, ButtonInteraction>) => {
-                if (collected.size === 0) {
-                    const disabledButtons = buttons.map((button) =>
-                        button.setDisabled(true),
-                    );
-                    const disabledActionRow =
-                        new ActionRowBuilder<ButtonBuilder>().addComponents(
-                            ...disabledButtons,
-                        );
-                    await message.edit({ components: [disabledActionRow] });
-                }
-            },
-        );
+        collector.on("end", async (collected) => {
+            if (!collected.size) {
+                await r.edit({ components: [] });
+            }
+        });
     },
 });

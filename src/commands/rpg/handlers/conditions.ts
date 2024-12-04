@@ -1,6 +1,6 @@
-import { get, noop } from "@elara-services/utils";
+import { get, getRandomValue, make, noop } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
-import type { ChatInputCommandInteraction, ThreadChannel } from "discord.js";
+import type { Message, ThreadChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { skills } from "../../../plugins/other/utils";
 import {
@@ -9,18 +9,24 @@ import {
     updateUserStats,
 } from "../../../services";
 import { cooldowns, texts } from "../../../utils";
-import { calculateDrop, calculateExp, type Monster } from "../../../utils/hunt";
+import { calculateDrop, type Monster } from "../../../utils/hunt";
 import { weapons, type WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {
     getAvailableDirections,
     getCurrentMap,
 } from "../abyssHelpers/directionHelper";
+import type { AnyInteraction } from "./huntHandler";
+
+export type ItemDrop = {
+    item: string;
+    amount: number;
+};
 
 const maxWorldLevel = 30;
 
 export async function handleVictory(
-    i: ChatInputCommandInteraction,
+    message: Message,
     thread: ThreadChannel,
     stats: UserStats,
     monstersEncountered: Monster[],
@@ -29,7 +35,7 @@ export async function handleVictory(
 ) {
     const finalEmbed = new EmbedBuilder();
     let totalExpGained = 0;
-    let dropsCollected: { item: string; amount: number }[] = [];
+    let dropsCollected = make.array<ItemDrop>();
 
     let skillsActivated = "";
     let effectsActivated = "";
@@ -64,13 +70,13 @@ export async function handleVictory(
     );
 
     for (const monster of monstersEncountered) {
-        const expGained = calculateExp(monster.minExp, monster.maxExp);
+        const expGained = getRandomValue(monster.minExp, monster.maxExp);
         totalExpGained += expGained;
 
         const drops = calculateDrop(monster.drops);
         if (Array.isArray(drops)) {
             dropsCollected = dropsCollected.concat(drops);
-            await addItemToInventory(i.user.id, drops);
+            await addItemToInventory(stats.userId, drops);
         }
     }
 
@@ -102,9 +108,9 @@ export async function handleVictory(
         );
     }
 
-    await updateUserStats(i.user.id, {
-        exp: newExp,
-        worldLevel: stats.worldLevel,
+    await updateUserStats(stats.userId, {
+        exp: { set: newExp },
+        worldLevel: { set: stats.worldLevel },
     });
 
     const monstersFought = monstersEncountered
@@ -177,16 +183,16 @@ export async function handleVictory(
         }
     }
 
-    await updateUserStats(i.user.id, {
-        hp: currentPlayerHp,
-        ...(manaFieldAdded && { mana: stats.mana }),
-        activeEffects: stats.activeEffects,
-        masterySword: stats.masterySword,
-        masteryClaymore: stats.masteryClaymore,
-        masteryBow: stats.masteryBow,
-        masteryPolearm: stats.masteryPolearm,
-        masteryCatalyst: stats.masteryCatalyst,
-        masteryRod: stats.masteryRod,
+    await updateUserStats(stats.userId, {
+        hp: { set: currentPlayerHp },
+        ...(manaFieldAdded && { mana: { set: stats.mana } }),
+        activeEffects: { set: stats.activeEffects },
+        masterySword: { set: stats.masterySword },
+        masteryClaymore: { set: stats.masteryClaymore },
+        masteryBow: { set: stats.masteryBow },
+        masteryPolearm: { set: stats.masteryPolearm },
+        masteryCatalyst: { set: stats.masteryCatalyst },
+        masteryRod: { set: stats.masteryRod },
     });
 
     if (effectsActivated) {
@@ -203,13 +209,13 @@ export async function handleVictory(
             `You defeated the monsters but succumbed to poisoning afterwards...`,
         );
 
-        await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+        await message.edit({ embeds: [finalEmbed] }).catch(noop);
 
         await thread.edit({ archived: true, locked: true }).catch(noop);
 
-        await updateUserStats(i.user.id, {
-            hp: 0,
-            isHunting: false,
+        await updateUserStats(stats.userId, {
+            hp: { set: 0 },
+            isHunting: { set: false },
         });
 
         return;
@@ -221,7 +227,7 @@ export async function handleVictory(
         const coinsEarned = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
 
         await addBalance(
-            i.user.id,
+            stats.userId,
             coinsEarned,
             true,
             `Earned from the Scrounge skill`,
@@ -247,9 +253,9 @@ export async function handleVictory(
         });
     }
 
-    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+    await message.edit({ embeds: [finalEmbed] }).catch(noop);
 
-    await updateUserStats(i.user.id, { isHunting: false });
+    await updateUserStats(stats.userId, { isHunting: { set: false } });
     await thread.edit({ archived: true, locked: true }).catch(noop);
 
     const insomniaSkill = getUserSkillLevelData(stats, "Insomnia");
@@ -261,7 +267,7 @@ export async function handleVictory(
 }
 
 export async function handleAbyssVictory(
-    i: ChatInputCommandInteraction,
+    i: AnyInteraction,
     thread: ThreadChannel,
     stats: UserStats,
     monstersEncountered: Monster[],
@@ -297,7 +303,7 @@ export async function handleAbyssVictory(
     }
 
     await updateUserStats(i.user.id, {
-        hp: currentPlayerHp,
+        hp: { set: currentPlayerHp },
     });
 
     if (skillsActivated) {
@@ -313,7 +319,7 @@ export async function handleAbyssVictory(
 
     const currentMap = getCurrentMap(currentFloor);
 
-    let availableDirections: string[] = [];
+    let availableDirections = make.array<string>();
 
     if (currentMap) {
         if (currentX !== null && currentY !== null) {
@@ -351,12 +357,12 @@ export async function handleAbyssVictory(
     }
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);
-    await updateUserStats(i.user.id, { isHunting: false });
+    await updateUserStats(i.user.id, { isHunting: { set: false } });
 
     await thread.edit({ archived: true, locked: true }).catch(noop);
 }
 export async function handleDefeat(
-    i: ChatInputCommandInteraction,
+    message: Message,
     thread: ThreadChannel,
     stats: UserStats,
     monster: Monster,
@@ -370,12 +376,12 @@ export async function handleDefeat(
             `Oh no :( You were defeated by the **${monster.name}**...\n-# Use </downgrade:1282035993242767450> if this WL is too hard.`,
         );
 
-    await updateUserStats(i.user.id, {
-        hp: Math.max(currentPlayerHp, 0),
-        isHunting: false,
+    await updateUserStats(stats.userId, {
+        hp: { set: Math.max(currentPlayerHp, 0) },
+        isHunting: { set: false },
     });
 
-    await i.editReply({ embeds: [finalEmbed] }).catch(noop);
+    await message.edit({ embeds: [finalEmbed] }).catch(noop);
 
     const insomniaSkill = getUserSkillLevelData(stats, "Insomnia");
 
@@ -389,7 +395,7 @@ export async function handleDefeat(
 }
 
 export async function handleAbyssDefeat(
-    i: ChatInputCommandInteraction,
+    i: AnyInteraction,
     thread: ThreadChannel,
     monster: Monster,
     currentPlayerHp: number,
@@ -402,8 +408,8 @@ export async function handleAbyssDefeat(
         );
 
     await updateUserStats(i.user.id, {
-        hp: Math.max(currentPlayerHp, 0),
-        isHunting: false,
+        hp: { set: Math.max(currentPlayerHp, 0) },
+        isHunting: { set: false },
     });
 
     await i.editReply({ embeds: [finalEmbed] }).catch(noop);

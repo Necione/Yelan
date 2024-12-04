@@ -1,4 +1,3 @@
-import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
 import {
@@ -6,6 +5,7 @@ import {
     addItemToInventory,
     updateUserStats,
 } from "../../../services";
+import { getAmount } from "../../../utils";
 import { generateChestLoot } from "../../../utils/chest";
 
 export async function handleAbyssChest(
@@ -69,7 +69,7 @@ export async function handleAbyssChest(
 
     stats.collectedChests.push(fullKey);
     await updateUserStats(i.user.id, {
-        collectedChests: stats.collectedChests,
+        collectedChests: { set: stats.collectedChests },
     });
 
     const lootDescription =
@@ -81,7 +81,9 @@ export async function handleAbyssChest(
 
     const resultMessage =
         chestLoot.coins > 0
-            ? `<a:z_reward:1091219256395452517> You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!\nIt contained ${customEmoji.a.z_coins} \`${chestLoot.coins}\``
+            ? `<a:z_reward:1091219256395452517> You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!\nIt contained ${getAmount(
+                  chestLoot.coins,
+              )}\``
             : `<a:z_reward:1091219256395452517> You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!`;
 
     return chestLoot.loot.length > 0

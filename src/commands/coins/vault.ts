@@ -3,7 +3,7 @@ import { embedComment, formatNumber, get, is } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, updateUserProfile } from "../../services";
-import { cooldowns, logs } from "../../utils";
+import { cooldowns, getAmount, logs } from "../../utils";
 
 export const vault: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -85,11 +85,9 @@ export const vault: SlashCommand = {
             });
             return responder.edit(
                 embedComment(
-                    `You successfully deposited ${
-                        customEmoji.a.z_coins
-                    } \`${formatNumber(amount)} ${
-                        texts.c.u
-                    }\` into your vault.`,
+                    `You successfully deposited ${getAmount(
+                        amount,
+                    )} into your vault.`,
                     0x57f288,
                 ),
             );
@@ -126,11 +124,9 @@ export const vault: SlashCommand = {
 
             return responder.edit(
                 embedComment(
-                    `You successfully withdrew ${
-                        customEmoji.a.z_coins
-                    } \`${formatNumber(amount)} ${
-                        texts.c.u
-                    }\` from your vault.`,
+                    `You successfully withdrew ${getAmount(
+                        amount,
+                    )} from your vault.`,
                     0x57f288,
                 ),
             );

@@ -1,17 +1,26 @@
 import { type PrefixCommand } from "@elara-services/botbuilder";
-import { addButtonRow, error, get, noop, sleep } from "@elara-services/utils";
-import { customEmoji } from "@liyueharbor/econ";
+import {
+    addButtonRow,
+    discord,
+    error,
+    get,
+    make,
+    noop,
+    sleep,
+} from "@elara-services/utils";
 import {
     ButtonStyle,
+    ChannelType,
     Colors,
     ComponentType,
     EmbedBuilder,
     type Message,
-    type ReadonlyCollection,
+    type MessageCollector,
     type TextChannel,
 } from "discord.js";
-import { channels } from "../../config";
+import { channels, roles } from "../../config";
 import { addBalance } from "../../services";
+import { getAmount } from "../../utils";
 import { binaryCodeMap, morseCodeMap } from "./heistHelpers/codeMap";
 
 const heistState = {
@@ -26,8 +35,8 @@ const gameState = {
     floor: 1,
 };
 
-let originalMap: string[][];
-let activeCollectors: any[] = [];
+let originalMap = make.array<string[]>();
+let activeCollectors = make.array<MessageCollector>();
 
 function stopAllCollectors() {
     activeCollectors.forEach((collector) => {
@@ -67,7 +76,7 @@ function generateMaps(
     regenerate = false,
     currentGameMap?: string[][],
 ): string[][] {
-    let gameMap: string[][];
+    let gameMap = make.array<string[]>();
 
     const mapSize = 4 + gameState.floor;
 
@@ -217,7 +226,7 @@ function moveVanguard(
 
 function generateCode(isMorse: boolean) {
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const codes = [];
+    const codes = make.array<string>();
     let translation = "";
 
     for (let i = 0; i < 3; i++) {
@@ -225,22 +234,24 @@ function generateCode(isMorse: boolean) {
             Math.floor(Math.random() * letters.length),
         );
         if (isMorse) {
-            codes.push(morseCodeMap[letter]);
+            codes.push(morseCodeMap[letter as keyof typeof morseCodeMap]);
         } else {
-            codes.push(binaryCodeMap[letter]);
+            codes.push(binaryCodeMap[letter as keyof typeof binaryCodeMap]);
         }
         translation += letter;
     }
 
-    const code = isMorse ? codes.join(" / ") : codes.join(" - ");
-    return { code, translation };
+    return {
+        code: isMorse ? codes.join(" / ") : codes.join(" - "),
+        translation,
+    };
 }
 
 async function handleAttack(
     heistChannel: TextChannel,
     participants: Map<string, string>,
     onComplete: () => Promise<void>,
-): Promise<void> {
+) {
     const gunnerId = Array.from(participants.entries()).find(
         ([, role]) => role === "Gunner",
     )?.[0];
@@ -275,17 +286,16 @@ async function handleAttack(
         .setColor(Colors.Red)
         .setTitle("Guards in Sight!")
         .setDescription(
-            `${gunnerMention}, shoot by saying the following __numbers as words__: \`${randomNumberString}\``,
+            `Shoot by saying the following __numbers as words__: \`${randomNumberString}\``,
         );
 
-    await heistChannel.send({ embeds: [challengeEmbed] }).catch(noop);
-
-    const filter = (m: { author: { id: string }; content: string }) =>
-        m.author.id === gunnerId;
+    await heistChannel
+        .send({ content: gunnerMention, embeds: [challengeEmbed] })
+        .catch(noop);
 
     try {
         const collector = heistChannel.createMessageCollector({
-            filter,
+            filter: (m) => m.author.id === gunnerId,
             max: 1,
             time: get.secs(15),
         });
@@ -311,27 +321,22 @@ async function handleAttack(
             }
         });
 
-        collector.on(
-            "end",
-            async (collected: ReadonlyCollection<string, Message<boolean>>) => {
-                activeCollectors = activeCollectors.filter(
-                    (c) => c !== collector,
-                );
+        collector.on("end", async (collected) => {
+            activeCollectors = activeCollectors.filter((c) => c !== collector);
 
-                if (!collected.size && gameState.isActive) {
-                    gameState.isActive = false;
-                    stopAllCollectors();
-                    await heistChannel
-                        .send(
-                            `${gunnerMention}, you failed to respond in time and were killed!`,
-                        )
-                        .catch(noop);
-                    await handleHeistFailure(heistChannel, participants);
-                }
+            if (!collected.size && gameState.isActive) {
+                gameState.isActive = false;
+                stopAllCollectors();
+                await heistChannel
+                    .send(
+                        `${gunnerMention}, you failed to respond in time and were killed!`,
+                    )
+                    .catch(noop);
+                await handleHeistFailure(heistChannel, participants);
+            }
 
-                await onComplete();
-            },
-        );
+            await onComplete();
+        });
     } catch (error) {
         gameState.isActive = false;
         stopAllCollectors();
@@ -339,7 +344,7 @@ async function handleAttack(
             .send(
                 `${gunnerMention}, you failed to respond in time and were killed!`,
             )
-            .catch(() => null);
+            .catch(noop);
         await handleHeistFailure(heistChannel, participants);
     }
 }
@@ -348,7 +353,7 @@ async function handleTrapDisarm(
     heistChannel: TextChannel,
     participants: Map<string, string>,
     onComplete: () => Promise<void>,
-): Promise<void> {
+) {
     const trapperId = Array.from(participants.entries()).find(
         ([, role]) => role === "Trapper",
     )?.[0];
@@ -386,30 +391,31 @@ async function handleTrapDisarm(
         .setColor(Colors.Orange)
         .setTitle("Trap in Sight!")
         .setDescription(
-            `${trapperMention}, disarm the trap by solving this problem:\n\`${problemString}\``,
+            `Disarm the trap by solving this problem:\n\`${problemString}\``,
         );
 
-    await heistChannel.send({ embeds: [challengeEmbed] }).catch(() => null);
-
-    const filter = (m: { author: { id: string }; content: string }) =>
-        m.author.id === trapperId && parseInt(m.content.trim()) === answer;
+    await heistChannel
+        .send({ content: trapperMention, embeds: [challengeEmbed] })
+        .catch(noop);
 
     try {
         const collector = heistChannel.createMessageCollector({
-            filter,
+            filter: (m) =>
+                m.author.id === trapperId &&
+                parseInt(m.content.trim()) === answer,
             max: 1,
             time: get.secs(15),
         });
 
         activeCollectors.push(collector);
 
-        collector.on("collect", async (collected: Message) => {
+        collector.on("collect", async (collected) => {
             if (parseInt(collected.content.trim()) === answer) {
                 await heistChannel
                     .send(
                         `${trapperMention}, you successfully disarmed the trap!`,
                     )
-                    .catch(() => null);
+                    .catch(noop);
                 await onComplete();
             } else {
                 gameState.isActive = false;
@@ -418,39 +424,34 @@ async function handleTrapDisarm(
                     .send(
                         `${trapperMention}, you gave the wrong answer and triggered the trap!`,
                     )
-                    .catch(() => null);
+                    .catch(noop);
                 await handleHeistFailure(heistChannel, participants);
                 await onComplete();
             }
         });
 
-        collector.on(
-            "end",
-            async (collected: ReadonlyCollection<string, Message<boolean>>) => {
-                activeCollectors = activeCollectors.filter(
-                    (c) => c !== collector,
-                );
+        collector.on("end", async (collected) => {
+            activeCollectors = activeCollectors.filter((c) => c !== collector);
 
-                if (!collected.size && gameState.isActive) {
-                    gameState.isActive = false;
-                    stopAllCollectors();
-                    heistChannel
-                        .send(
-                            `${trapperMention}, you failed to disarm the trap in time!`,
-                        )
-                        .catch(() => null);
-                    await handleHeistFailure(heistChannel, participants);
-                }
+            if (!collected.size && gameState.isActive) {
+                gameState.isActive = false;
+                stopAllCollectors();
+                heistChannel
+                    .send(
+                        `${trapperMention}, you failed to disarm the trap in time!`,
+                    )
+                    .catch(noop);
+                await handleHeistFailure(heistChannel, participants);
+            }
 
-                await onComplete();
-            },
-        );
+            await onComplete();
+        });
     } catch (error) {
         gameState.isActive = false;
         stopAllCollectors();
         await heistChannel
             .send(`${trapperMention}, you failed to disarm the trap in time!`)
-            .catch(() => null);
+            .catch(noop);
     }
 }
 
@@ -458,7 +459,7 @@ async function handleScoutChallenge(
     heistChannel: TextChannel,
     participants: Map<string, string>,
     onComplete: () => Promise<void>,
-): Promise<void> {
+) {
     const scoutId = Array.from(participants.entries()).find(
         ([, role]) => role === "Scout",
     )?.[0];
@@ -490,28 +491,27 @@ async function handleScoutChallenge(
         .setColor(Colors.Blue)
         .setTitle("Cameras from Behind!")
         .setDescription(
-            `${scoutMention}, arrange these numbers from\n${
+            `Arrange these numbers from\n${
                 ascending
                     ? "**smallest to greatest**"
                     : "**greatest to smallest**"
             }: \`${shuffledNumbers.join(", ")}\``,
         );
 
-    await heistChannel.send({ embeds: [challengeEmbed] }).catch(() => null);
-
-    const filter = (m: { author: { id: string }; content: string }) =>
-        m.author.id === scoutId;
+    await heistChannel
+        .send({ content: `${scoutMention}`, embeds: [challengeEmbed] })
+        .catch(noop);
 
     try {
         const collector = heistChannel.createMessageCollector({
-            filter,
+            filter: (m) => m.author.id === scoutId,
             max: 1,
             time: get.secs(15),
         });
 
         activeCollectors.push(collector);
 
-        collector.on("collect", async (collected: Message) => {
+        collector.on("collect", async (collected) => {
             if (
                 collected.content.trim().replace(/,/g, " ") ===
                 sortedNumbersStringNoCommas
@@ -520,7 +520,7 @@ async function handleScoutChallenge(
                     .send(
                         `${scoutMention}, you successfully removed the camera!`,
                     )
-                    .catch(() => null);
+                    .catch(noop);
                 await onComplete();
             } else {
                 gameState.isActive = false;
@@ -529,33 +529,28 @@ async function handleScoutChallenge(
                     .send(
                         `\`💀\` ${scoutMention}, you failed to arrange the numbers correctly and were caught!`,
                     )
-                    .catch(() => null);
+                    .catch(noop);
                 await onComplete();
                 await handleHeistFailure(heistChannel, participants);
             }
         });
 
-        collector.on(
-            "end",
-            async (collected: ReadonlyCollection<string, Message<boolean>>) => {
-                activeCollectors = activeCollectors.filter(
-                    (c) => c !== collector,
-                );
+        collector.on("end", async (collected) => {
+            activeCollectors = activeCollectors.filter((c) => c !== collector);
 
-                if (!collected.size && gameState.isActive) {
-                    gameState.isActive = false;
-                    stopAllCollectors();
-                    await heistChannel
-                        .send(
-                            `${scoutMention}, you failed to respond in time and were caught!`,
-                        )
-                        .catch(() => null);
-                    await handleHeistFailure(heistChannel, participants);
-                }
+            if (!collected.size && gameState.isActive) {
+                gameState.isActive = false;
+                stopAllCollectors();
+                await heistChannel
+                    .send(
+                        `${scoutMention}, you failed to respond in time and were caught!`,
+                    )
+                    .catch(noop);
+                await handleHeistFailure(heistChannel, participants);
+            }
 
-                await onComplete();
-            },
-        );
+            await onComplete();
+        });
     } catch (error) {
         gameState.isActive = false;
         stopAllCollectors();
@@ -563,7 +558,7 @@ async function handleScoutChallenge(
             .send(
                 `${scoutMention}, you failed to respond on time and got detected!`,
             )
-            .catch(() => null);
+            .catch(noop);
         await handleHeistFailure(heistChannel, participants);
     }
 }
@@ -575,7 +570,7 @@ async function handleVaultEncounter(
     gameMap: string[][], // pass gameMap as a parameter
     position: { x: number; y: number }, // pass the vanguard's current position
     onComplete: () => Promise<void>,
-): Promise<void> {
+) {
     const vanguardId = Array.from(participants.entries()).find(
         ([, role]) => role === "Vanguard",
     )?.[0];
@@ -590,7 +585,7 @@ async function handleVaultEncounter(
     if (heistState.vaultsStolen >= gameState.floor) {
         await heistChannel
             .send("This vault has already been looted.")
-            .catch(() => null);
+            .catch(noop);
         onComplete();
         return;
     }
@@ -607,11 +602,11 @@ async function handleVaultEncounter(
             `${vanguardMention}, decipher this ${challengeType} to steal:\n\`${code}\`\n\nSend your response in all caps, no space, one message.`,
         );
 
-    await heistChannel.send({ embeds: [vaultEmbed] }).catch(() => null);
+    await heistChannel.send({ embeds: [vaultEmbed] }).catch(noop);
 
     try {
         const collector = heistChannel.createMessageCollector({
-            filter: (m: { author: { id: string }; content: string }) =>
+            filter: (m) =>
                 m.author.id === vanguardId &&
                 m.content.trim().toUpperCase() === translation,
             max: 1,
@@ -625,38 +620,33 @@ async function handleVaultEncounter(
                 .send(
                     `${vanguardMention}, you successfully stole from the vault!`,
                 )
-                .catch(() => null);
+                .catch(noop);
             heistState.vaultsStolen++;
 
             onComplete();
         });
 
-        collector.on(
-            "end",
-            async (collected: ReadonlyCollection<string, Message<boolean>>) => {
-                activeCollectors = activeCollectors.filter(
-                    (c) => c !== collector,
-                );
+        collector.on("end", async (collected) => {
+            activeCollectors = activeCollectors.filter((c) => c !== collector);
 
-                if (!collected.size && gameState.isActive) {
-                    gameState.isActive = false;
-                    stopAllCollectors();
-                    heistChannel
-                        .send(
-                            `${vanguardMention}, you failed to decipher the code in time!`,
-                        )
-                        .catch(() => null);
-                }
+            if (!collected.size && gameState.isActive) {
+                gameState.isActive = false;
+                stopAllCollectors();
+                heistChannel
+                    .send(
+                        `${vanguardMention}, you failed to decipher the code in time!`,
+                    )
+                    .catch(noop);
+            }
 
-                onComplete();
-            },
-        );
+            onComplete();
+        });
     } catch (error) {
         gameState.isActive = false;
         stopAllCollectors();
         await heistChannel
             .send(`${vanguardMention}, you failed to respond in time!`)
-            .catch(() => null);
+            .catch(noop);
         onComplete();
     }
 }
@@ -665,15 +655,35 @@ export const heist: PrefixCommand = {
     enabled: true,
     name: "heist",
     locked: {
-        users: [
-            "288450828837322764", // SUPERCHIEFYT
-            "476812566530883604", // Kurasad
-            "525171507324911637", // Neci
-            "664601516220350494", // Hythen
-        ],
+        roles: roles.main,
     },
     execute: async (message, responder) => {
         await responder.delete();
+        const id =
+            message.mentions.channels.find(
+                (c) => c.type === ChannelType.GuildText,
+            )?.id ?? "1302379209859141674";
+        const heistChannel = await discord.channel<TextChannel>(
+            message.client,
+            id,
+            message.guild,
+            {
+                cache: true,
+            },
+        );
+        if (!heistChannel || !heistChannel.isTextBased()) {
+            return responder.send(`Unable to find the heist channel.`);
+        }
+        const targetChannel = await discord.channel<TextChannel>(
+            message.client,
+            channels.heist,
+            message.guild,
+            { cache: true },
+        );
+        if (!targetChannel || !targetChannel.isTextBased()) {
+            return responder.send("Unable to find the target channel.");
+        }
+
         gameState.isActive = true;
         gameState.vanguardMoveInProgress = false;
         gameState.vanguardMoveHandled = false;
@@ -690,31 +700,26 @@ export const heist: PrefixCommand = {
         }
 
         const totalPrize = heistState.maxVaults * 100 * 4;
-        const targetChannel = message.client.channels.resolve(
-            channels.heist,
-        ) as TextChannel;
-        if (!targetChannel || !targetChannel.isTextBased()) {
-            return responder.send("Unable to find the target channel.");
-        }
 
         const warningEmbed = new EmbedBuilder()
             .setTitle("`🚨` Heist Starting Soon")
             .setDescription("Get ready! A heist will start in a few moments.")
             .setColor(Colors.Gold);
-        await targetChannel.send({ embeds: [warningEmbed] }).catch(() => null);
+        await targetChannel.send({ embeds: [warningEmbed] }).catch(noop);
         await sleep(get.secs(5));
         const roles = ["Vanguard", "Scout", "Gunner", "Trapper"];
-
-        const participants = new Map<string, string>();
+        const participants = make.map<string, string>();
 
         const embedDescription = () =>
-            `Press the button below to join the heist!\n\nTotal Robbale: ${customEmoji.a.z_coins} \`${totalPrize} Coins\`\n\n` +
+            `Press the button below to join the heist!\n\nTotal Robbale: ${getAmount(
+                totalPrize,
+            )}\n\n` +
             `${Array.from(participants.entries())
                 .map(([userId, role]) => `<@${userId}> as ${role}`)
                 .join("\n")}`;
 
         const embed = new EmbedBuilder()
-            .setTitle("`🚨` A Heist is Starting")
+            .setTitle("`🚨` A Heist is starting!")
             .setDescription(embedDescription())
             .setColor(Colors.Gold);
 
@@ -729,7 +734,7 @@ export const heist: PrefixCommand = {
                     }),
                 ],
             })
-            .catch(() => null);
+            .catch(noop);
         if (!sentMessage) {
             return;
         }
@@ -747,11 +752,9 @@ export const heist: PrefixCommand = {
                         content: "The heist is already full!",
                         ephemeral: true,
                     })
-                    .catch(() => null);
+                    .catch(noop);
             }
-
-            const userId = interaction.user.id;
-            if (participants.has(userId)) {
+            if (participants.has(interaction.user.id)) {
                 return void interaction
                     .reply({
                         content: "You are already in the heist!",
@@ -768,7 +771,7 @@ export const heist: PrefixCommand = {
                     Math.floor(Math.random() * availableRoles.length)
                 ];
 
-            participants.set(userId, assignedRole);
+            participants.set(interaction.user.id, assignedRole);
             await interaction
                 .reply({
                     content: `You have joined the heist as a ${assignedRole}!`,
@@ -787,14 +790,9 @@ export const heist: PrefixCommand = {
             if (participants.size === roles.length) {
                 await targetChannel
                     .send(
-                        "All roles are filled. Let the Heist Begin!\nPlease head to <#1302379209859141674> to play/spectate!",
+                        `All roles are filled. Let the Heist Begin!\nPlease head to ${heistChannel.toString()} to play/spectate!`,
                     )
                     .catch(noop);
-
-                const heistChannel = (await message.client.channels.fetch(
-                    "1302379209859141674",
-                )) as TextChannel;
-
                 for (const userId of participants.keys()) {
                     await heistChannel.permissionOverwrites
                         .create(userId, {
@@ -973,7 +971,7 @@ export const heist: PrefixCommand = {
                             gameState.vanguardMoveHandled = false;
                         });
 
-                        moveCollector.on("end", async (collected, reason) => {
+                        moveCollector.on("end", async (_, reason) => {
                             if (reason === "time" && gameState.isActive) {
                                 await handleHeistFailure(
                                     heistChannel,
@@ -1005,9 +1003,9 @@ export const heist: PrefixCommand = {
                                 .send(
                                     `The heist was successful! Total vaults stolen: ${
                                         heistState.vaultsStolen
-                                    }\nTotal coins earned: ${
-                                        customEmoji.a.z_coins
-                                    } \`${totalCoinsEarned * 4} Coins\``,
+                                    }\nTotal coins earned: ${getAmount(
+                                        totalCoinsEarned * 4,
+                                    )}`,
                                 )
                                 .catch(noop);
 

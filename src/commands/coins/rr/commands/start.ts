@@ -1,9 +1,8 @@
 import { buildCommand, type SubCommand } from "@elara-services/botbuilder";
 import { embedComment, get } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder } from "discord.js";
 import { addBalance, removeBalance } from "../../../../services";
-import { locked, mutableGlobals } from "../../../../utils";
+import { getAmount, locked, mutableGlobals } from "../../../../utils";
 
 export const start = buildCommand<SubCommand>({
     subCommand: (b) => b.setName(`start`).setDescription(`Start the game`),
@@ -98,7 +97,9 @@ export const start = buildCommand<SubCommand>({
                 const embed = new EmbedBuilder()
                     .setTitle("Game Over")
                     .setDescription(
-                        `The game has ended! <@${winner}> has won and earned ${customEmoji.a.z_coins} \`${reward} ${texts.c.u}\`!`,
+                        `The game has ended! <@${winner}> has won and earned ${getAmount(
+                            reward,
+                        )}!`,
                     );
                 await r.send({ embeds: [embed] });
                 locked.del(allUsers);
@@ -108,7 +109,9 @@ export const start = buildCommand<SubCommand>({
                 const embed = new EmbedBuilder()
                     .setTitle("`💥` Elimination")
                     .setDescription(
-                        `<@${eliminatedPlayer}> was shot and lost ${customEmoji.a.z_coins} \`100 ${texts.c.u}\`.`,
+                        `<@${eliminatedPlayer}> was shot and lost ${getAmount(
+                            100,
+                        )}.`,
                     );
                 await r.send({ embeds: [embed] });
             }

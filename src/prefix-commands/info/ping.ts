@@ -8,11 +8,10 @@ export const ping: PrefixCommand = {
     async execute(_, r) {
         const d = Date.now();
         const msg = await r.loading();
-        if (!msg) {
-            return;
-        }
         return msg
-            .edit(embedComment(`🏓 Pong! \`${Date.now() - d}ms\``, Colors.Aqua))
+            ?.edit(
+                embedComment(`🏓 Pong! \`${Date.now() - d}ms\``, Colors.Aqua),
+            )
             .catch(noop);
     },
 };

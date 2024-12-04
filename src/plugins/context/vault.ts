@@ -2,8 +2,7 @@ import {
     buildCommand,
     type UserContextMenuCommand,
 } from "@elara-services/botbuilder";
-import { embedComment, formatNumber } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { embedComment } from "@elara-services/utils";
 import {
     ApplicationCommandType,
     Colors,
@@ -11,6 +10,7 @@ import {
     EmbedBuilder,
 } from "discord.js";
 import { getProfileByUserId } from "../../services";
+import { getAmount } from "../../utils";
 
 export const vault = buildCommand<UserContextMenuCommand>({
     command: new ContextMenuCommandBuilder()
@@ -44,15 +44,11 @@ export const vault = buildCommand<UserContextMenuCommand>({
                     .addFields(
                         {
                             name: `Balance`,
-                            value: `${customEmoji.a.z_coins} \`${formatNumber(
-                                db.balance,
-                            )} ${texts.c.u}\``,
+                            value: getAmount(db.balance),
                         },
                         {
                             name: `Vault`,
-                            value: `${customEmoji.a.z_coins} \`${formatNumber(
-                                db.vault,
-                            )} ${texts.c.u}\``,
+                            value: getAmount(db.vault),
                         },
                     ),
             ],

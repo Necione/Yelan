@@ -1,8 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats } from "../../services";
+import { getAmount } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
@@ -58,7 +58,11 @@ export const csv = buildCommand<SlashCommand>({
             .setColor("Blue")
             .setTitle(`${targetUser.username}'s Rebirth Sell Value`)
             .setDescription(
-                `If ${targetUser.username} were to rebirth, all items could be sold for ${customEmoji.a.z_coins} \`${totalSellPrice} ${texts.c.u}\``,
+                `If ${
+                    targetUser.username
+                } were to rebirth, all items could be sold for ${getAmount(
+                    totalSellPrice,
+                )}`,
             );
 
         return r.edit({

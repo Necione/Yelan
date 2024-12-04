@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, make, noop } from "@elara-services/utils";
+import type { Prisma } from "@prisma/client";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, syncStats, updateUserStats } from "../../services";
 import {
@@ -125,7 +126,7 @@ export const unequip = buildCommand<SlashCommand>({
         const beforeStats = { ...stats };
 
         if (itemName === "All") {
-            const updates: any = {};
+            const updates: Prisma.UserStatsUpdateInput = {};
             const unequippableItems = make.array<string>();
 
             if (stats.equippedWeapon) {
@@ -149,6 +150,7 @@ export const unequip = buildCommand<SlashCommand>({
             for (const type of artifactTypes) {
                 const field = `equipped${type}` as keyof typeof stats;
                 if (stats[field]) {
+                    // @ts-ignore
                     updates[field] = { set: null };
                 }
             }
@@ -189,14 +191,12 @@ export const unequip = buildCommand<SlashCommand>({
 
             stats = await syncStats(i.user.id);
 
-            const afterStats = { ...stats };
-
-            const statChanges = calculateStatChanges(beforeStats, afterStats);
+            const statChanges = calculateStatChanges(beforeStats, stats);
             updatedStats.push(...statChanges);
 
             const setBonusMessages = getSetBonusMessages(
                 beforeStats,
-                afterStats,
+                stats,
                 "deactivated",
             );
             updatedStats.push(...setBonusMessages);
@@ -226,9 +226,7 @@ export const unequip = buildCommand<SlashCommand>({
 
             stats = await syncStats(i.user.id);
 
-            const afterStats = { ...stats };
-
-            const statChanges = calculateStatChanges(beforeStats, afterStats);
+            const statChanges = calculateStatChanges(beforeStats, stats);
             updatedStats.push(...statChanges);
 
             return r.edit(
@@ -259,15 +257,12 @@ export const unequip = buildCommand<SlashCommand>({
             });
 
             stats = await syncStats(i.user.id);
-
-            const afterStats = { ...stats };
-
-            const statChanges = calculateStatChanges(beforeStats, afterStats);
+            const statChanges = calculateStatChanges(beforeStats, stats);
             updatedStats.push(...statChanges);
 
             const setBonusMessages = getSetBonusMessages(
                 beforeStats,
-                afterStats,
+                stats,
                 "deactivated",
             );
             updatedStats.push(...setBonusMessages);

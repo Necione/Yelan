@@ -1,8 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, noop } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
+import { getAmount } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
 import { fish, type FishName } from "../../utils/rpgitems/fish";
@@ -208,9 +209,7 @@ export const sell = buildCommand<SlashCommand>({
             embedComment(
                 `You sold \`${amountToSell}x\` **${itemName}${
                     item.metadata?.length ? ` (${item.metadata.length} cm)` : ""
-                }** for ${customEmoji.a.z_coins} \`${totalSellPrice} ${
-                    texts.c.u
-                }\`${rebirthBonusMessage}`,
+                }** for ${getAmount(totalSellPrice)} ${rebirthBonusMessage}`,
                 "Green",
             ),
         );

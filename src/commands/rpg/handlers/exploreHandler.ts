@@ -1,23 +1,15 @@
-import { embedComment, noop } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { addButtonRow, embedComment, get, noop } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import type { UserStats } from "@prisma/client";
-import type {
-    ButtonInteraction,
-    ChatInputCommandInteraction,
-} from "discord.js";
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ComponentType,
-    EmbedBuilder,
-} from "discord.js";
+import type { ChatInputCommandInteraction } from "discord.js";
+import { ButtonStyle, ComponentType, EmbedBuilder } from "discord.js";
 import {
     addBalance,
     addItemToInventory,
     removeBalance,
     updateUserStats,
 } from "../../../services";
+import { getAmount } from "../../../utils";
 import { generateChestLoot, generateRawMaterials } from "../../../utils/chest";
 
 export async function handleChest(
@@ -50,9 +42,9 @@ export async function handleChest(
                       .map((item) => `\`${item.amount}x\` ${item.item}`)
                       .join(", ")
                 : "No items";
-        return `**Chest ${index + 1}:**\n${customEmoji.a.z_coins} \`${
-            chest.coins
-        }\`${lootDescription ? `\nItems: ${lootDescription}` : ""}`;
+        return `**Chest ${index + 1}:**\n${getAmount(chest.coins)}${
+            lootDescription ? `\nItems: ${lootDescription}` : ""
+        }`;
     });
 
     const embed = new EmbedBuilder()
@@ -66,25 +58,28 @@ export async function handleChest(
         )
         .setColor("Green");
 
-    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder()
-            .setCustomId("chest_1")
-            .setLabel("Chest 1")
-            .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-            .setCustomId("chest_2")
-            .setLabel("Chest 2")
-            .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-            .setCustomId("chest_3")
-            .setLabel("Chest 3")
-            .setStyle(ButtonStyle.Primary),
-    );
-
     const message = await i
         .editReply({
             embeds: [embed],
-            components: [buttons],
+            components: [
+                addButtonRow([
+                    {
+                        id: "chest_1",
+                        label: "Chest 1",
+                        style: ButtonStyle.Primary,
+                    },
+                    {
+                        id: "chest_2",
+                        label: "Chest 2",
+                        style: ButtonStyle.Primary,
+                    },
+                    {
+                        id: "chest_3",
+                        label: "Chest 3",
+                        style: ButtonStyle.Primary,
+                    },
+                ]),
+            ],
         })
         .catch(noop);
 
@@ -92,19 +87,16 @@ export async function handleChest(
         return;
     }
 
-    const filter = (interaction: ButtonInteraction) =>
-        interaction.user.id === i.user.id;
-
     const collector = message.createMessageComponentCollector({
-        filter,
+        filter: (ii) => ii.user.id === i.user.id,
         componentType: ComponentType.Button,
-        time: 10_000,
+        time: get.secs(10),
         max: 1,
     });
 
     let collected = false;
 
-    collector.on("collect", async (interaction: ButtonInteraction) => {
+    collector.on("collect", async (interaction) => {
         collected = true;
         await interaction.deferUpdate().catch(noop);
 
@@ -131,14 +123,14 @@ export async function handleChest(
                 : "";
 
         const resultMessage = lootDescription
-            ? `You chose **Chest ${selectedChestIndex + 1}**!\n\nIt contained ${
-                  customEmoji.a.z_coins
-              } \`${
-                  selectedChest.coins
-              }\` and the following items:\n${lootDescription}`
-            : `You chose **Chest ${selectedChestIndex + 1}**!\n\nIt contained ${
-                  customEmoji.a.z_coins
-              } \`${selectedChest.coins}\`.`;
+            ? `You chose **Chest ${
+                  selectedChestIndex + 1
+              }**!\n\nIt contained ${getAmount(
+                  selectedChest.coins,
+              )} and the following items:\n${lootDescription}`
+            : `You chose **Chest ${
+                  selectedChestIndex + 1
+              }**!\n\nIt contained ${getAmount(selectedChest.coins)}.`;
 
         embed.setDescription(resultMessage);
         await i.editReply({ embeds: [embed], components: [] }).catch(noop);
@@ -208,7 +200,9 @@ async function handleTrap(i: ChatInputCommandInteraction, stats: UserStats) {
     await i
         .editReply(
             embedComment(
-                `You fell into a trap while exploring!\nYou lost ${customEmoji.a.z_coins} \`${coinLoss} ${texts.c.u}\` and took \`${trapDamage} HP\` damage.`,
+                `You fell into a trap while exploring!\nYou lost ${getAmount(
+                    coinLoss,
+                )} and took \`${trapDamage} HP\` damage.`,
                 "Red",
             ),
         )

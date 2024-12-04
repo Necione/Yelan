@@ -1,19 +1,13 @@
-import { noop } from "@elara-services/utils";
+import { addButtonRow, awaitComponent, get, noop } from "@elara-services/utils";
 import type { UserStats } from "@prisma/client";
-import type { ChatInputCommandInteraction } from "discord.js";
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ComponentType,
-    EmbedBuilder,
-} from "discord.js";
+import { ButtonStyle, EmbedBuilder, type Message } from "discord.js";
 import { updateUserStats } from "../../services";
 
-export async function healingWellEvent(
-    i: ChatInputCommandInteraction,
-    stats: UserStats,
-) {
+export async function healingWellEvent(message: Message, stats: UserStats) {
+    const ids = {
+        drink: "event_drink",
+        ignore: "event_ignore",
+    };
     const embed = new EmbedBuilder()
         .setTitle("You Discover a Healing Well!")
         .setDescription(
@@ -21,84 +15,58 @@ export async function healingWellEvent(
         )
         .setColor("Blue");
 
-    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder()
-            .setCustomId("event_drink")
-            .setLabel("Drink")
-            .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-            .setCustomId("event_ignore")
-            .setLabel("Ignore")
-            .setStyle(ButtonStyle.Danger),
-    );
+    await message.edit({
+        embeds: [embed],
+        components: [
+            addButtonRow([
+                { id: ids.drink, label: "Drink", style: ButtonStyle.Success },
+                { id: ids.ignore, label: "Ignore", style: ButtonStyle.Danger },
+            ]),
+        ],
+    });
+    const c = await awaitComponent(message, {
+        filter: (ii) => ii.customId.startsWith("event_"),
+        users: [{ allow: true, id: stats.userId }],
+        time: get.secs(10),
+    });
 
-    const message = await i
-        .editReply({
-            embeds: [embed],
-            components: [buttons],
-        })
-        .catch(noop);
-
-    if (!message) {
-        return;
+    if (!c) {
+        return message
+            .edit({
+                embeds: [
+                    embed.setDescription(
+                        "You hesitate for too long, and the well disappears as mysteriously as it appeared.",
+                    ),
+                ],
+                components: [],
+            })
+            .catch(noop);
+    }
+    if (c.customId !== ids.drink) {
+        return message
+            .edit({
+                embeds: [
+                    embed.setDescription(
+                        "You decide not to drink from the well and continue on your journey.",
+                    ),
+                ],
+                components: [],
+            })
+            .catch(noop);
     }
 
-    const filter = (interaction: any) => interaction.user.id === i.user.id;
+    const healAmount = stats.maxHP * 0.2;
+    const newHP = Math.min(stats.hp + healAmount, stats.maxHP);
+    await updateUserStats(stats.userId, { hp: { set: newHP } });
 
-    const collector = message.createMessageComponentCollector({
-        filter,
-        componentType: ComponentType.Button,
-        time: 10_000,
-        max: 1,
-    });
-
-    let collected = false;
-
-    collector.on("collect", async (interaction: any) => {
-        collected = true;
-        await interaction.deferUpdate().catch(noop);
-
-        if (interaction.customId === "event_ignore") {
-            await i
-                .editReply({
-                    embeds: [
-                        embed.setDescription(
-                            "You decide not to drink from the well and continue on your journey.",
-                        ),
-                    ],
-                    components: [],
-                })
-                .catch(noop);
-        } else if (interaction.customId === "event_drink") {
-            const healAmount = stats.maxHP * 0.2;
-            const newHP = Math.min(stats.hp + healAmount, stats.maxHP);
-            await updateUserStats(i.user.id, { hp: { set: newHP } });
-
-            await i
-                .editReply({
-                    embeds: [
-                        embed.setDescription(
-                            `You drink from the well and feel rejuvenated! You recover ❤️ \`${healAmount} HP\`.`,
-                        ),
-                    ],
-                    components: [],
-                })
-                .catch(noop);
-        }
-    });
-
-    collector.on("end", async () => {
-        if (!collected) {
-            await i
-                .editReply({
-                    embeds: [
-                        embed.setDescription(
-                            "You hesitate for too long, and the well disappears as mysteriously as it appeared.",
-                        ),
-                    ],
-                    components: [],
-                })
-                .catch(noop);
-        }
-    });
+    await message
+        .edit({
+            embeds: [
+                embed.setDescription(
+                    `You drink from the well and feel rejuvenated! You recover ❤️ \`${healAmount} HP\`.`,
+                ),
+            ],
+            components: [],
+        })
+        .catch(noop);
 }

@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get } from "@elara-services/utils";
+import { embedComment, get, log } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
@@ -68,12 +68,10 @@ export const worship = buildCommand<SlashCommand>({
 
             const cooldownDuration = get.hrs(1);
 
-            const updateData: any = {
-                hp: newHp,
-                resonance: newResonance,
-            };
-
-            await updateUserStats(i.user.id, updateData);
+            await updateUserStats(i.user.id, {
+                hp: { set: newHp },
+                resonance: { set: newResonance },
+            });
 
             await cooldowns.set(userProfile, "worship", cooldownDuration);
 
@@ -88,7 +86,7 @@ export const worship = buildCommand<SlashCommand>({
 
             return r.edit({ embeds: [successEmbed] });
         } catch (error) {
-            console.error("Error executing /worship command:", error);
+            log("Error executing /worship command:", error);
             locked.del(i.user.id);
             return r.edit(
                 embedComment(

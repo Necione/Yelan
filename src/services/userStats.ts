@@ -1,4 +1,4 @@
-import { noop } from "@elara-services/utils";
+import { is, make, noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma";
 import { calculateMasteryLevel } from "../utils/masteryHelper";
@@ -84,13 +84,13 @@ export async function syncStats(userId: string) {
         totalStats.healEffectiveness || 0;
     }
 
-    const artifactTypes: ArtifactType[] = [
+    const artifactTypes = make.array<ArtifactType>([
         "Flower",
         "Plume",
         "Sands",
         "Goblet",
         "Circlet",
-    ];
+    ]);
 
     const equippedArtifacts: { [slot in ArtifactType]?: ArtifactName } = {};
 
@@ -269,7 +269,7 @@ export const updateUserStats = async (
 function compareMetadata(
     metadataA: UserStatsMetaData | null | undefined,
     metadataB: UserStatsMetaData | null | undefined,
-): boolean {
+) {
     if (metadataA == null && metadataB == null) {
         return true;
     }
@@ -288,13 +288,13 @@ export const addItemToInventory = async (
         return null;
     }
 
-    let inventory: InventoryItem[] = stats.inventory as InventoryItem[];
+    let inventory = stats.inventory as InventoryItem[];
 
-    if (!Array.isArray(inventory)) {
+    if (!is.array(inventory)) {
         inventory = [];
     }
 
-    if (Array.isArray(items)) {
+    if (is.array(items)) {
         for (const i of items) {
             const existingItem = inventory.find(
                 (c) =>
@@ -328,9 +328,9 @@ export const removeItemFromInventory = async (
         return null;
     }
 
-    let inventory: InventoryItem[] = stats.inventory as InventoryItem[];
+    let inventory = stats.inventory as InventoryItem[];
 
-    if (!Array.isArray(inventory)) {
+    if (!is.array(inventory)) {
         inventory = [];
     }
 

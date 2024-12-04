@@ -1,4 +1,12 @@
-import { embedComment, get, make, noop, sleep } from "@elara-services/utils";
+import {
+    embedComment,
+    get,
+    getRandomValue,
+    is,
+    make,
+    noop,
+    sleep,
+} from "@elara-services/utils";
 import type { UserStats } from "@prisma/client";
 import type {
     ChatInputCommandInteraction,
@@ -10,7 +18,6 @@ import { sendToChannel, skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
 import {
     getMonsterByName,
-    getRandomValue,
     initializeMonsters,
     type Monster,
 } from "../../../utils/hunt";
@@ -25,7 +32,7 @@ export async function handleAbyssBattle(
 ) {
     await initializeMonsters();
 
-    let possibleMonsters: string[] = [];
+    let possibleMonsters = make.array<string>();
 
     switch (stats.currentAbyssFloor) {
         case 1:
@@ -39,7 +46,7 @@ export async function handleAbyssBattle(
             break;
     }
 
-    let monstersEncountered: Monster[] = [];
+    let monstersEncountered = make.array<Monster>();
 
     const selectedMonsterName =
         possibleMonsters[Math.floor(Math.random() * possibleMonsters.length)];
@@ -75,7 +82,9 @@ export async function handleAbyssBattle(
 
     let currentMonsterIndex = 0;
 
-    const handleMonsterBattle = async (thread?: PublicThreadChannel<false>) => {
+    const handleMonsterBattle = async (
+        thread?: PublicThreadChannel<false> | null,
+    ) => {
         const monster = monstersEncountered[currentMonsterIndex];
 
         const abyssWorldLevel = stats.currentAbyssFloor === 2 ? 15 : 10;
@@ -91,11 +100,7 @@ export async function handleAbyssBattle(
         const initialMonsterHp = currentMonsterHp;
         const initialPlayerHp = currentPlayerHp;
 
-        const createHealthBar = (
-            current: number,
-            max: number,
-            length: number = 20,
-        ): string => {
+        const createHealthBar = (current: number, max: number, length = 20) => {
             current = Math.max(0, Math.min(current, max));
             const filledLength = Math.round((current / max) * length);
             const emptyLength = Math.max(length - filledLength, 0);
@@ -121,20 +126,15 @@ export async function handleAbyssBattle(
                 },
             );
 
-        await i
-            .editReply({
-                embeds: [battleEmbed],
-            })
-            .catch(noop);
+        await i.editReply({ embeds: [battleEmbed] }).catch(noop);
 
         if (!thread) {
-            thread =
-                (await r
-                    .startThread({
-                        name: `Battle with ${monster.name}`,
-                        autoArchiveDuration: 60,
-                    })
-                    .catch(noop)) || undefined;
+            thread = await r
+                .startThread({
+                    name: `Battle with ${monster.name}`,
+                    autoArchiveDuration: 60,
+                })
+                .catch(noop);
 
             if (!thread) {
                 await i
@@ -149,20 +149,17 @@ export async function handleAbyssBattle(
         }
 
         let vigilanceUsed = false;
-
         let isPlayerTurn = false;
-
+        let isFirstTurn = true;
+        let turnNumber = 1;
         let monsterState = {
             displaced: false,
             vanishedUsed: false,
         };
 
-        let isFirstTurn = true;
-
         const hasCrystallize = skills.has(stats, "Crystallize");
         const hasFatigue = skills.has(stats, "Fatigue");
 
-        let turnNumber = 1;
         const startingMessages = make.array<string>();
         if (hasSloth) {
             startingMessages.push(
@@ -175,7 +172,7 @@ export async function handleAbyssBattle(
             );
         }
 
-        if (startingMessages.length > 0) {
+        if (is.array(startingMessages)) {
             if (thread) {
                 await sendToChannel(thread.id, {
                     content: `>>> ${startingMessages.join("\n")}`,
@@ -185,7 +182,7 @@ export async function handleAbyssBattle(
 
         while (currentPlayerHp > 0 && currentMonsterHp > 0) {
             if (isPlayerTurn) {
-                const playerMessages: string[] = [];
+                const playerMessages = make.array<string>();
 
                 const result = await playerAttack(
                     stats,
@@ -203,7 +200,7 @@ export async function handleAbyssBattle(
                 vigilanceUsed = result.vigilanceUsed;
                 monsterState = result.monsterState;
 
-                if (playerMessages.length > 0) {
+                if (is.array(playerMessages)) {
                     if (thread) {
                         await sendToChannel(thread.id, {
                             content: `>>> ${playerMessages.join("\n")}`,
@@ -254,7 +251,7 @@ export async function handleAbyssBattle(
                     currentPlayerHp = updatedPlayerHp;
                 }
 
-                if (monsterMessages.length > 0) {
+                if (is.array(monsterMessages)) {
                     if (thread) {
                         await sendToChannel(thread.id, {
                             content: `>>> ${monsterMessages.join("\n")}`,

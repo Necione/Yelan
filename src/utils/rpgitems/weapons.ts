@@ -1,3 +1,5 @@
+import { make } from "@elara-services/utils";
+
 export type WeaponType =
     | "Claymore"
     | "Bow"
@@ -885,7 +887,7 @@ const prefixes: {
     }),
 };
 
-export const weapons: { [key: string]: WeaponData } = {};
+export const weapons = make.object<{ [key: string]: WeaponData }>();
 
 for (const weaponName in baseWeapons) {
     const baseWeaponData = baseWeapons[weaponName];

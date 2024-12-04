@@ -1,30 +1,38 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import {
+    awaitComponent,
     embedComment,
     get,
+    getRandomValue,
     is,
+    make,
     noop,
     shuffle,
     sleep,
 } from "@elara-services/utils";
-import type { ButtonInteraction } from "discord.js";
+import type { Prisma } from "@prisma/client";
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    ComponentType,
     EmbedBuilder,
     SlashCommandBuilder,
 } from "discord.js";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
-import { fishList } from "../../utils/rpgitems/fish";
+import { type FishData, fishList } from "../../utils/rpgitems/fish";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
 import {
     calculateFishingLevel,
     selectFish,
     selectFishLength,
 } from "./handlers/fishHandler";
+
+const bait = make.array<string>([
+    "Fruit Paste Bait",
+    "Redrot Bait",
+    "Sugardew Bait",
+]);
 
 export const fishCommand = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -36,11 +44,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 .setName("bait")
                 .setDescription("Select your bait for fishing.")
                 .setRequired(true)
-                .addChoices(
-                    { name: "Fruit Paste Bait", value: "Fruit Paste Bait" },
-                    { name: "Redrot Bait", value: "Redrot Bait" },
-                    { name: "Sugardew Bait", value: "Sugardew Bait" },
-                ),
+                .addChoices(bait.map((c) => ({ name: c, value: c }))),
         ),
     only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
@@ -55,7 +59,7 @@ export const fishCommand = buildCommand<SlashCommand>({
             );
         }
 
-        const stats = await syncStats(i.user.id);
+        let stats = await syncStats(i.user.id);
         if (!stats) {
             locked.del(i.user.id);
             return r.edit(
@@ -73,7 +77,7 @@ export const fishCommand = buildCommand<SlashCommand>({
         }
 
         const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
-        if (!equippedWeapon || equippedWeapon.type !== "Rod") {
+        if (equippedWeapon?.type !== "Rod") {
             locked.del(i.user.id);
             return r.edit(
                 embedComment("You need to equip a fishing rod to fish!"),
@@ -97,7 +101,7 @@ export const fishCommand = buildCommand<SlashCommand>({
             (item) => item.item === baitChoice,
         );
 
-        if (!is.number(baitItem?.amount) || baitItem.amount < 1) {
+        if (!baitItem || !is.number(baitItem.amount)) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
@@ -112,9 +116,13 @@ export const fishCommand = buildCommand<SlashCommand>({
                 (item) => item.item !== baitItem.item,
             );
         }
-        await updateUserStats(i.user.id, {
+        stats = await updateUserStats(i.user.id, {
             inventory: { set: stats.inventory },
         });
+        if (!stats) {
+            locked.del(i.user.id);
+            return r.edit(embedComment(`Unable to update your stats.`));
+        }
 
         const fishCooldown = cooldowns.get(user, "fish");
         if (!fishCooldown.status) {
@@ -135,11 +143,12 @@ export const fishCommand = buildCommand<SlashCommand>({
         if (!requiresReel) {
             const availableFish = fishList.filter(
                 (fish) =>
+                    stats &&
                     fish.fishingLevel <= stats.fishingLevel &&
                     fish.rods.some((rod) => equippedWeapon.name.includes(rod)),
             );
 
-            if (!is.array(availableFish) || availableFish.length === 0) {
+            if (!is.array(availableFish)) {
                 locked.del(i.user.id);
                 return r.edit(
                     embedComment(
@@ -202,34 +211,28 @@ export const fishCommand = buildCommand<SlashCommand>({
                     totalLevelUps += 1;
                 }
 
-                const updateData: any = {
-                    timesFished: newTimesFished,
-                    timesFishedForLevel: newTimesFishedForLevel,
-                    longestFish: newLongestFish,
-                    lifetimeFishCaught: newLifetimeFishCaught,
+                const updateData: Prisma.UserStatsUpdateInput = {
+                    timesFished: { set: newTimesFished },
+                    timesFishedForLevel: { set: newTimesFishedForLevel },
+                    longestFish: { set: newLongestFish },
+                    lifetimeFishCaught: { set: newLifetimeFishCaught },
+                    inventory: { set: stats.inventory },
                 };
 
                 if (isLegendary) {
-                    updateData.legendariesCaught = newLegendariesCaught;
+                    updateData.legendariesCaught = {
+                        set: newLegendariesCaught,
+                    };
                 }
 
                 if (levelUp) {
-                    updateData.fishingLevel = stats.fishingLevel + 1;
-                    updateData.timesFishedForLevel = 0;
+                    updateData.fishingLevel = { increment: 1 };
+                    updateData.timesFishedForLevel = { set: 0 };
                 }
 
-                await updateUserStats(i.user.id, updateData);
-
-                stats.fishingLevel =
-                    updateData.fishingLevel || stats.fishingLevel;
-                stats.timesFishedForLevel =
-                    updateData.timesFishedForLevel || stats.timesFishedForLevel;
-                stats.longestFish = updateData.longestFish || stats.longestFish;
-                stats.lifetimeFishCaught =
-                    updateData.lifetimeFishCaught || stats.lifetimeFishCaught;
-                if (isLegendary) {
-                    stats.legendariesCaught =
-                        updateData.legendariesCaught || stats.legendariesCaught;
+                stats = await updateUserStats(i.user.id, updateData);
+                if (!stats) {
+                    return;
                 }
             }
 
@@ -288,11 +291,12 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         const availableFish = fishList.filter(
             (fish) =>
+                stats &&
                 fish.fishingLevel <= stats.fishingLevel &&
                 fish.rods.some((rod) => equippedWeapon.name.includes(rod)),
         );
 
-        if (!is.array(availableFish) || availableFish.length === 0) {
+        if (!is.array(availableFish)) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
@@ -303,7 +307,7 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         const selectedFish = selectFish(availableFish);
 
-        const requiredReels = getRandomInt(
+        const requiredReels = getRandomValue(
             selectedFish.minReels,
             selectedFish.maxReels,
         );
@@ -313,7 +317,11 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         const totalFishToCatch = baitChoice === "Redrot Bait" ? 2 : 1;
 
-        const caughtFishDetails = [];
+        const caughtFishDetails = make.array<{
+            selectedFish: FishData & { name: string };
+            fishLength: number;
+            levelUp: boolean;
+        }>();
 
         let totalLevelUps = 0;
         let latestRequiredFishesForNextLevel = 0;
@@ -331,14 +339,15 @@ export const fishCommand = buildCommand<SlashCommand>({
                 "Reel Out",
             ];
 
-            const fakeButtons = fakeButtonLabels.map((label, index) =>
-                new ButtonBuilder()
-                    .setCustomId(`fake_button_${index}_${reelsCompleted}`)
-                    .setLabel(label)
-                    .setStyle(ButtonStyle.Secondary),
-            );
-
-            const allButtons = [reelInButton, ...fakeButtons];
+            const allButtons = [
+                reelInButton,
+                ...fakeButtonLabels.map((label, index) =>
+                    new ButtonBuilder()
+                        .setCustomId(`fake_button_${index}_${reelsCompleted}`)
+                        .setLabel(label)
+                        .setStyle(ButtonStyle.Secondary),
+                ),
+            ];
             shuffle(allButtons);
 
             const actionRow =
@@ -365,44 +374,24 @@ export const fishCommand = buildCommand<SlashCommand>({
                 locked.del(i.user.id);
                 return;
             }
-
-            const collector = message.createMessageComponentCollector({
-                filter: (interaction) => interaction.user.id === i.user.id,
-                componentType: ComponentType.Button,
+            const c = await awaitComponent(message, {
+                custom_ids: ["reel_in", ...fakeButtonLabels].map((r) => ({
+                    id: r,
+                    includes: true,
+                })),
                 time: get.secs(3),
-                max: 1,
+                only: { originalUser: true },
             });
-
-            const buttonPressed = await new Promise<ButtonInteraction | null>(
-                (resolve) => {
-                    collector.on("collect", (interaction) => {
-                        resolve(interaction);
-                    });
-
-                    collector.on("end", (collected) => {
-                        if (collected.size === 0) {
-                            resolve(null);
-                        }
-                    });
-                },
-            );
-
-            if (
-                !buttonPressed ||
-                !buttonPressed.customId.startsWith("reel_in") ||
-                fishEscaped
-            ) {
+            if (!c || !c.customId.startsWith("reel_in") || fishEscaped) {
                 fishEscaped = true;
                 break;
             }
+            await c.deferUpdate().catch(noop);
 
             reelsCompleted++;
-
             if (reelsCompleted < requiredReels) {
-                await buttonPressed.deferUpdate().catch(noop);
                 continue;
             } else {
-                await buttonPressed.deferUpdate().catch(noop);
                 break;
             }
         }
@@ -468,36 +457,29 @@ export const fishCommand = buildCommand<SlashCommand>({
                     totalLevelUps += 1;
                 }
 
-                const updateData: any = {
-                    timesFished: newTimesFished,
-                    timesFishedForLevel: newTimesFishedForLevel,
-                    longestFish: newLongestFish,
-                    lifetimeFishCaught: newLifetimeFishCaught,
+                const updateData: Prisma.UserStatsUpdateInput = {
+                    timesFished: { set: newTimesFished },
+                    timesFishedForLevel: { set: newTimesFishedForLevel },
+                    longestFish: { set: newLongestFish },
+                    lifetimeFishCaught: { set: newLifetimeFishCaught },
+                    inventory: { set: stats.inventory },
                 };
 
                 if (isLegendary) {
-                    updateData.legendariesCaught = newLegendariesCaught;
+                    updateData.legendariesCaught = {
+                        set: newLegendariesCaught,
+                    };
                 }
 
                 if (levelUp) {
-                    updateData.fishingLevel = stats.fishingLevel + 1;
-                    updateData.timesFishedForLevel = 0;
+                    updateData.fishingLevel = { increment: 1 };
+                    updateData.timesFishedForLevel = { set: 0 };
                 }
 
-                await updateUserStats(i.user.id, updateData);
-
-                stats.fishingLevel =
-                    updateData.fishingLevel || stats.fishingLevel;
-                stats.timesFishedForLevel =
-                    updateData.timesFishedForLevel || stats.timesFishedForLevel;
-                stats.longestFish = updateData.longestFish || stats.longestFish;
-                stats.lifetimeFishCaught =
-                    updateData.lifetimeFishCaught || stats.lifetimeFishCaught;
-                if (isLegendary) {
-                    stats.legendariesCaught =
-                        updateData.legendariesCaught || stats.legendariesCaught;
+                stats = await updateUserStats(i.user.id, updateData);
+                if (!stats) {
+                    return;
                 }
-
                 caughtFishDetails.push({
                     selectedFish,
                     fishLength,
@@ -545,7 +527,3 @@ export const fishCommand = buildCommand<SlashCommand>({
         }
     },
 });
-
-function getRandomInt(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}

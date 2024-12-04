@@ -142,9 +142,7 @@ export function checkBelowBalance(
             embedComment(
                 `<@${p.userId}> is too poor to be gambling\n\n- <@${
                     p.userId
-                }>'s balance: ${customEmoji.a.z_coins} \`${formatNumber(
-                    p.balance,
-                )} ${texts.c.u}\``,
+                }>'s balance: ${getAmount(p.balance)}`,
             ),
         );
         return false;
@@ -362,11 +360,9 @@ export const logs = {
                     type === "add"
                         ? "<:plus:1103245217794117652>"
                         : "<:minus:1103245214082142288>"
-                } ${proper(type)} <@${userId}> (${userId}) ${
-                    customEmoji.a.z_coins
-                } \`${formatNumber(amount)} ${texts.c.u}\`${
-                    extra ? `\n- Reason: ${extra}` : ""
-                }`,
+                } ${proper(type)} <@${userId}> (${userId}) ${getAmount(
+                    amount,
+                )}${extra ? `\n- Reason: ${extra}` : ""}`,
                 allowed_mentions: {
                     parse: [],
                 },

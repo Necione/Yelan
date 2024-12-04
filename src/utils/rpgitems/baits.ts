@@ -1,9 +1,4 @@
-export interface Bait {
-    name: string;
-    description: string;
-}
-
-export const bait: Record<string, Bait> = {
+export const bait = {
     "Fruit Paste Bait": {
         name: "Fruit Paste Bait",
         description: "The basic bait. Pretty cool.",
@@ -17,5 +12,3 @@ export const bait: Record<string, Bait> = {
         description: "Instantly catch a fish.",
     },
 };
-
-export type BaitName = keyof typeof bait;

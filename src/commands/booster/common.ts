@@ -1,14 +1,15 @@
-import { addButtonRow, formatNumber, get } from "@elara-services/utils";
+import { addButtonRow, get, make, time } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { ButtonStyle, Colors, EmbedBuilder } from "discord.js";
 import { boosterExpiryDuration } from "../../services/booster";
+import { getAmount } from "../../utils";
 
 export const duration = get.hrs(1);
-export const boosterPrices: {
+export const boosterPrices = make.array<{
     name: string;
     price: number;
     multiplier: number;
-}[] = [
+}>([
     {
         name: "1.5x Booster",
         price: 750,
@@ -24,7 +25,7 @@ export const boosterPrices: {
         price: 2000,
         multiplier: 2.5,
     },
-];
+]);
 
 export const baseEmbed = () =>
     new EmbedBuilder()
@@ -34,7 +35,9 @@ export const baseEmbed = () =>
 
 export const insufficientBalanceEmbed = (userBalance: number, price: number) =>
     baseEmbed().setDescription(
-        `You do not have ${customEmoji.a.z_coins} \`${price} ${texts.c.u}\`\n\nBalance: ${customEmoji.a.z_coins} \`${userBalance} ${texts.c.u}\``,
+        `You do not have ${getAmount(price)}\n\nBalance: ${getAmount(
+            userBalance,
+        )}`,
     );
 
 export const boostersLimitExceeded = () =>
@@ -64,22 +67,22 @@ export const buyBoosterEmbed = (
             emoji: "🪙",
         },
     ]);
-    const from = `<t:${Math.round(
-        (expiredAt.getTime() - boosterExpiryDuration) / 1000,
-    )}:t>`;
-    const to = `<t:${Math.round(expiredAt.getTime() / 1000)}:t>`;
+    const from = time.short.time(
+        new Date(expiredAt.getTime() - boosterExpiryDuration),
+    );
+    const to = time.short.time(expiredAt);
 
     const tipString =
         totalTipReceived <= 0
             ? ""
-            : `\n\nTip collected: ${customEmoji.a.z_coins} \`${formatNumber(
-                  totalTipReceived,
-              )} ${texts.c.u}\``;
+            : `\n\nTip collected: ${getAmount(totalTipReceived)}`;
 
     const embed = baseEmbed().setDescription(
-        `<@${userId}> has bought everyone a \`${level}\` for ${customEmoji.a.z_coins} \`${price} ${texts.c.u}\`.
+        `<@${userId}> has bought everyone a \`${level}\` for ${getAmount(
+            price,
+        )}.
 Everyone will earn \`${multiplier}x\` ${texts.c.u} from ${from} - ${to}! 
-Press the button below to tip <@${userId}> 10 ${texts.c.u}. ${tipString}`,
+Press the button below to tip <@${userId}> ${getAmount(10)}. ${tipString}`,
     );
     return {
         embeds: [embed],

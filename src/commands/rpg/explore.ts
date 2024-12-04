@@ -27,11 +27,6 @@ export const explore = buildCommand<SlashCommand>({
     defer: { silent: false },
     async execute(i, r) {
         locked.set(i.user);
-
-        if (!i.deferred) {
-            return;
-        }
-
         const message = await i.fetchReply().catch(noop);
         if (!message) {
             locked.del(i.user.id);
@@ -100,7 +95,7 @@ export const explore = buildCommand<SlashCommand>({
         } else if (exploreType === "materials") {
             await handleMaterials(i, stats);
         } else {
-            await i.editReply(embedComment("Invalid exploration type."));
+            await r.edit(embedComment("Invalid exploration type."));
         }
 
         locked.del(i.user.id);

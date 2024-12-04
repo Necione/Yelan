@@ -1,4 +1,6 @@
-export const floor2Map: string[][] = [
+import { make } from "@elara-services/utils";
+
+export const floor2Map = make.array<string[]>([
     [
         "w",
         "w",
@@ -674,4 +676,4 @@ export const floor2Map: string[][] = [
         "w",
         "w",
     ],
-];
+]);

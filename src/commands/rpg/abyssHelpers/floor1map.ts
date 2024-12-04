@@ -1,4 +1,6 @@
-export const floor1Map: string[][] = [
+import { make } from "@elara-services/utils";
+
+export const floor1Map = make.array<string[]>([
     [
         "c",
         "x",
@@ -674,4 +676,4 @@ export const floor1Map: string[][] = [
         "x",
         "x",
     ],
-];
+]);

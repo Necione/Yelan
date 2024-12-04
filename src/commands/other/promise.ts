@@ -83,7 +83,7 @@ export const promise = buildCommand<SlashCommand>({
         });
         const co = await awaitComponent(message, {
             custom_ids: [{ id: `confirm-yes` }, { id: `confirm-cancel` }],
-            users: [{ allow: true, id: i.user.id }],
+            only: { originalUser: true },
             time: get.secs(10),
         });
 

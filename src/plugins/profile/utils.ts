@@ -52,7 +52,10 @@ export function profileHidden() {
     };
 }
 
-export const allowedDomains = ["https://i.imgur.com/"];
+export const allowedDomains = [
+    "https://i.imgur.com/",
+    "https://lh.elara.workers.dev/",
+];
 
 const cpro = {
     messages: 50_000,

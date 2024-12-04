@@ -5,6 +5,7 @@ import {
     get,
     getInteractionResponder,
     is,
+    make,
     noop,
     time,
 } from "@elara-services/utils";
@@ -31,7 +32,12 @@ import {
     updateUserProfile,
 } from "../../services";
 import { getCollectables } from "../../services/bot";
-import { getPaginatedMessage, logs, userLockedData } from "../../utils";
+import {
+    getAmount,
+    getPaginatedMessage,
+    logs,
+    userLockedData,
+} from "../../utils";
 import { isOriginalMessageUser } from "./invites";
 
 export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
@@ -71,7 +77,7 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
             const s = [null, "null"].includes(search) ? null : search;
 
             const pager = getPaginatedMessage();
-            const pages: PaginatedMessagePage[] = [];
+            const pages = make.array<PaginatedMessagePage>();
             const collectable = await getCollectables(mainServerId);
             for (const c of p.collectables) {
                 if (is.string(s)) {
@@ -157,7 +163,9 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
                                         })
                                         .catch(noop);
                                     const collect = await context.interaction
-                                        .awaitModalSubmit({ time: 35000 })
+                                        .awaitModalSubmit({
+                                            time: get.secs(35),
+                                        })
                                         .catch(noop);
                                     if (!collect) {
                                         return;
@@ -329,7 +337,7 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
                                 { name: "Name", value: name, inline: true },
                                 {
                                     name: `Amount`,
-                                    value: `${customEmoji.a.z_coins} \`${total} ${texts.c.u}\``,
+                                    value: getAmount(total),
                                     inline: true,
                                 },
                                 {
@@ -373,9 +381,7 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
                                     collectable?.items?.length || 0,
                                 )}\n- Duplicates: ${formatNumber(
                                     dupes,
-                                )}\n- Net Worth: ${
-                                    customEmoji.a.z_coins
-                                } \`${formatNumber(networth)} ${texts.c.u}\`${
+                                )}\n- Net Worth: ${getAmount(networth)}${
                                     is.string(s) ? `\n- Search: ${s}` : ""
                                 }`,
                             )

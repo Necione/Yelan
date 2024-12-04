@@ -14,7 +14,7 @@ import {
     time,
 } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { devId, roles } from "../../config";
+import { isDev, roles } from "../../config";
 import {
     getProfileByUserId,
     removeStrike,
@@ -63,7 +63,7 @@ export const strikes = buildCommand<SlashCommand>({
         ) {
             user = u;
         }
-        if (i.user.id !== devId && user.id === devId) {
+        if (!isDev(i.user.id) && isDev(user.id)) {
             return r.edit(embedComment(`Respectfully, fuck off.`));
         }
         const term = i.user.id === user.id ? "your" : "their";

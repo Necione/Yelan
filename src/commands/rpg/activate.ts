@@ -8,7 +8,7 @@ import { specialSkills } from "../../utils/specialSkills";
 const sinSkills = ["Wrath", "Sloth", "Pride", "Greed"];
 const mutuallyExclusiveSkills = ["Crystallize", "Fatigue"];
 
-function getMaxActiveSkills(alchemyProgress: number): number {
+function getMaxActiveSkills(alchemyProgress: number) {
     if (alchemyProgress >= 360) {
         return 7;
     } else if (alchemyProgress >= 100) {

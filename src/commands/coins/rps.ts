@@ -16,7 +16,13 @@ import {
     SlashCommandBuilder,
 } from "discord.js";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
-import { checkBelowBalance, checks, locked, userLockedData } from "../../utils";
+import {
+    checkBelowBalance,
+    checks,
+    getAmount,
+    locked,
+    userLockedData,
+} from "../../utils";
 
 const add = (label: string, emoji: string, extraId?: string) => ({
     id: `rps${extraId ? `:${extraId}` : ""}:${emoji}`,
@@ -120,9 +126,7 @@ export const rps: SlashCommand = {
             .setColor(Colors.Aqua)
             .addFields({
                 name: "\u200b",
-                value: `${customEmoji.a.z_coins} \`${formatNumber(amount)} ${
-                    texts.c.u
-                }\``,
+                value: `${getAmount(amount)}`,
             });
         const message = await responder.edit(
             getMainEmbed(

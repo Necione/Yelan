@@ -66,9 +66,9 @@ export async function handleFloorTransition(
     const { x: newX, y: newY } = startingPosition;
 
     await updateUserStats(i.user.id, {
-        currentAbyssFloor: newFloor,
-        abyssCoordX: newX,
-        abyssCoordY: newY,
+        currentAbyssFloor: { set: newFloor },
+        abyssCoordX: { set: newX },
+        abyssCoordY: { set: newY },
     });
 
     const transitionMessage =
