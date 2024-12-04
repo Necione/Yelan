@@ -236,10 +236,14 @@ export async function handleAbyssBattle(
             } else {
                 const monsterMessages = make.array<string>();
 
-                const updatedPlayerHp = await monsterAttack(
+                const {
+                    currentPlayerHp: updatedPlayerHp,
+                    currentMonsterHp: updatedMonsterHp,
+                } = await monsterAttack(
                     stats,
                     monster,
                     currentPlayerHp,
+                    currentMonsterHp,
                     monsterMessages,
                     turnNumber,
                     hasCrystallize,
@@ -247,9 +251,8 @@ export async function handleAbyssBattle(
                     monsterState,
                 );
 
-                if (updatedPlayerHp !== undefined) {
-                    currentPlayerHp = updatedPlayerHp;
-                }
+                currentPlayerHp = updatedPlayerHp;
+                currentMonsterHp = updatedMonsterHp;
 
                 if (is.array(monsterMessages)) {
                     if (thread) {

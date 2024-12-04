@@ -401,7 +401,8 @@ export const skills = make.array<Skill>([
         levels: [
             {
                 level: 1,
-                description: "Your DEF Value and ATK Value are swapped",
+                description:
+                    "Your ATK becomes 50% of your DEF Value, and your DEF Value becomes your ATK.",
             },
         ],
         emoji: "🛡️",

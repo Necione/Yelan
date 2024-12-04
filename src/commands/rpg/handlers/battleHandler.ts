@@ -305,18 +305,22 @@ export async function monsterAttack(
     stats: UserStats,
     monster: Monster,
     currentPlayerHp: number,
+    currentMonsterHp: number,
     messages: string[],
     turnNumber: number,
     hasCrystallize: boolean,
     hasFatigue: boolean,
     monsterState: MonsterState,
-): Promise<number> {
+): Promise<{
+    currentPlayerHp: number;
+    currentMonsterHp: number;
+}> {
     if (monsterState.stunned) {
         messages.push(
             `\`💫\` The ${monster.name} is stunned and couldn't attack this turn!`,
         );
         monsterState.stunned = false;
-        return currentPlayerHp;
+        return { currentPlayerHp, currentMonsterHp };
     }
 
     const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
@@ -452,7 +456,29 @@ export async function monsterAttack(
         );
     }
 
-    const reducedMonsterDamage = monsterDamage * damageReductionFactor;
+    let reducedMonsterDamage = monsterDamage * damageReductionFactor;
+
+    const hasBackstep = skills.has(stats, "Backstep", undefined, true);
+    const hasParry = skills.has(stats, "Parry", undefined, true);
+
+    if (hasBackstep && Math.random() < 0.25) {
+        messages.push(
+            `\`💨\` Backstep skill activated! You dodged the attack completely.`,
+        );
+        reducedMonsterDamage = 0;
+    } else {
+        if (hasParry && Math.random() < 0.2) {
+            const parriedDamage = reducedMonsterDamage * 0.5;
+            reducedMonsterDamage *= 0.5;
+            currentMonsterHp -= parriedDamage;
+            messages.push(
+                `\`🛡️\` Parry skill activated! You parried 50% of the incoming damage (\`${parriedDamage.toFixed(
+                    2,
+                )}\`), dealing it back to the ${monster.name}.`,
+            );
+        }
+    }
+
     currentPlayerHp -= reducedMonsterDamage;
 
     const deathThreshold = getDeathThreshold(stats);
@@ -510,7 +536,7 @@ export async function monsterAttack(
         )}\` damage to you${defendText}${critText}.`,
     );
 
-    return currentPlayerHp;
+    return { currentPlayerHp, currentMonsterHp };
 }
 
 export function applyAttackModifiers(
@@ -745,7 +771,7 @@ function getEffectiveStats(stats: UserStats): {
 
     if (skills.has(stats, "Paladin")) {
         const temp = attackPower;
-        attackPower = defValue;
+        attackPower = defValue / 2;
         defValue = temp;
         paladinSwapped = true;
     }
