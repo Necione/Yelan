@@ -458,8 +458,8 @@ export async function monsterAttack(
 
     let reducedMonsterDamage = monsterDamage * damageReductionFactor;
 
-    const hasBackstep = skills.has(stats, "Backstep", undefined, true);
-    const hasParry = skills.has(stats, "Parry", undefined, true);
+    const hasBackstep = skills.has(stats, "Backstep");
+    const hasParry = skills.has(stats, "Parry");
 
     if (hasBackstep && Math.random() < 0.25) {
         messages.push(

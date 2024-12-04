@@ -1,9 +1,12 @@
 import { noop } from "@elara-services/utils";
-import { type sendOptions, Webhook } from "@elara-services/webhooks";
+import { Webhook, type sendOptions } from "@elara-services/webhooks";
 import type { UserStats } from "@prisma/client";
 import client from "../../client";
 import type { SkillName } from "../../utils/skillsData";
-import type { SpecialSkillName } from "../../utils/specialSkills";
+import {
+    specialSkills,
+    type SpecialSkillName,
+} from "../../utils/specialSkills";
 let hook: Webhook;
 
 export async function sendToChannel(id: string, options: sendOptions) {
@@ -32,18 +35,15 @@ export const skills = {
         active = true,
         isSpecial = false,
     ) => {
-        if (isSpecial) {
-            return stats.unlockedSpecialSkills.includes(
-                name as SpecialSkillName,
-            );
-        } else {
-            if (active) {
-                return (
-                    stats.skills.some((c) => c.name === name) &&
-                    stats.activeSkills.includes(name as SkillName)
-                );
-            }
-            return stats.skills.some((c) => c.name === name);
+        if (specialSkills.find((c) => c.skillName === name) || isSpecial) {
+            return stats.unlockedSpecialSkills.includes(name);
         }
+        if (active) {
+            return (
+                stats.skills.some((c) => c.name === name) &&
+                stats.activeSkills.includes(name as SkillName)
+            );
+        }
+        return stats.skills.some((c) => c.name === name);
     },
 };
