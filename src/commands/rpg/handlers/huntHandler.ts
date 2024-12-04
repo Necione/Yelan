@@ -378,16 +378,17 @@ export async function handleHunt(
             } else {
                 const monsterMessages: string[] = [];
 
-                currentPlayerHp = await monsterAttack(
+                ({ currentPlayerHp, currentMonsterHp } = await monsterAttack(
                     stats,
                     monster,
                     currentPlayerHp,
+                    currentMonsterHp,
                     monsterMessages,
                     turnNumber,
                     hasCrystallize,
                     hasFatigue,
                     monsterState,
-                );
+                ));
 
                 if (monsterMessages.length > 0) {
                     if (thread) {

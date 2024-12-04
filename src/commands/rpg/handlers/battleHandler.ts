@@ -305,18 +305,22 @@ export async function monsterAttack(
     stats: UserStats,
     monster: Monster,
     currentPlayerHp: number,
+    currentMonsterHp: number,
     messages: string[],
     turnNumber: number,
     hasCrystallize: boolean,
     hasFatigue: boolean,
     monsterState: MonsterState,
-): Promise<number> {
+): Promise<{
+    currentPlayerHp: number;
+    currentMonsterHp: number;
+}> {
     if (monsterState.stunned) {
         messages.push(
             `\`💫\` The ${monster.name} is stunned and couldn't attack this turn!`,
         );
         monsterState.stunned = false;
-        return currentPlayerHp;
+        return { currentPlayerHp, currentMonsterHp };
     }
 
     const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
@@ -390,9 +394,8 @@ export async function monsterAttack(
             effectDescription = `\`🐌\` Fatigue increases the ${monster.name}'s damage by ${percentChange}%.`;
         } else {
             damageMultiplier = 1 + percentChange / 100;
-            effectDescription = `\`🐌\` Fatigue reduces the ${
-                monster.name
-            }'s damage by ${Math.abs(percentChange)}%.`;
+            effectDescription = `\`🐌\` Fatigue reduces the ${monster.name
+                }'s damage by ${Math.abs(percentChange)}%.`;
         }
 
         monsterDamage *= damageMultiplier;
@@ -454,16 +457,25 @@ export async function monsterAttack(
 
     let reducedMonsterDamage = monsterDamage * damageReductionFactor;
 
-    const hasParry = skills.has(stats, "Parry");
-    if (hasParry && Math.random() < 1) {
-        const parriedDamage = reducedMonsterDamage * 0.5;
-        reducedMonsterDamage *= 0.5;
-        monster.currentHp -= parriedDamage;
+    const hasBackstep = skills.has(stats, "Backstep", undefined, true);
+    const hasParry = skills.has(stats, "Parry", undefined, true);
+
+    if (hasBackstep && Math.random() < 0.25) {
         messages.push(
-            `\`🌵\` Parry skill activated! You parried 50% of the incoming damage (\`${parriedDamage.toFixed(
-                2,
-            )}\`), dealing it back to the ${monster.name}.`,
+            `\`💨\` Backstep skill activated! You dodged the attack completely.`,
         );
+        reducedMonsterDamage = 0;
+    } else {
+        if (hasParry && Math.random() < 0.2) {
+            const parriedDamage = reducedMonsterDamage * 0.5;
+            reducedMonsterDamage *= 0.5;
+            currentMonsterHp -= parriedDamage;
+            messages.push(
+                `\`🛡️\` Parry skill activated! You parried 50% of the incoming damage (\`${parriedDamage.toFixed(
+                    2,
+                )}\`), dealing it back to the ${monster.name}.`,
+            );
+        }
     }
 
     currentPlayerHp -= reducedMonsterDamage;
@@ -523,7 +535,7 @@ export async function monsterAttack(
         )}\` damage to you${defendText}${critText}.`,
     );
 
-    return currentPlayerHp;
+    return { currentPlayerHp, currentMonsterHp };
 }
 
 export function applyAttackModifiers(
