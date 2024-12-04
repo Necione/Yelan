@@ -394,8 +394,9 @@ export async function monsterAttack(
             effectDescription = `\`🐌\` Fatigue increases the ${monster.name}'s damage by ${percentChange}%.`;
         } else {
             damageMultiplier = 1 + percentChange / 100;
-            effectDescription = `\`🐌\` Fatigue reduces the ${monster.name
-                }'s damage by ${Math.abs(percentChange)}%.`;
+            effectDescription = `\`🐌\` Fatigue reduces the ${
+                monster.name
+            }'s damage by ${Math.abs(percentChange)}%.`;
         }
 
         monsterDamage *= damageMultiplier;

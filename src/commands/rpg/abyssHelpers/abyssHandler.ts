@@ -252,7 +252,7 @@ export async function handleAbyssBattle(
                 );
 
                 currentPlayerHp = updatedPlayerHp;
-                currentMonsterHp = updatedMonsterHp
+                currentMonsterHp = updatedMonsterHp;
 
                 if (is.array(monsterMessages)) {
                     if (thread) {
