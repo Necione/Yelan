@@ -1,6 +1,6 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { field, formatNumber } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { customEmoji } from "@liyueharbor/econ";
 import {
     EmbedBuilder,
     SlashCommandBuilder,
@@ -8,7 +8,12 @@ import {
 } from "discord.js";
 import { roles } from "../../config";
 import { getProfileByUserId } from "../../services";
-import { getRandomImage, percentage, userLockedData } from "../../utils";
+import {
+    getAmount,
+    getRandomImage,
+    percentage,
+    userLockedData,
+} from "../../utils";
 
 const highRollerRequirement = 1_000_000;
 
@@ -70,11 +75,9 @@ export const stats: SlashCommand = {
                 fields.push(
                     field(
                         `✦ High Roller`,
-                        `Need to wager ${
-                            customEmoji.a.z_coins
-                        } \`${formatNumber(highRollerRequirement)} ${
-                            texts.c.u
-                        }\` (**${getPercent.toFixed(0)}%** done)`,
+                        `Need to wager ${getAmount(
+                            highRollerRequirement,
+                        )} (**${getPercent.toFixed(0)}%** done)`,
                     ),
                 );
             }

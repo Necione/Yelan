@@ -4,7 +4,7 @@ import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { roles } from "../../config";
 import { addBalance } from "../../services";
-import { logs } from "../../utils";
+import { getAmount, logs } from "../../utils";
 
 export const payment = buildCommand<SlashCommand>({
     locked: {
@@ -59,18 +59,16 @@ export const payment = buildCommand<SlashCommand>({
             embedComment(
                 `### Payment\n- From: \`${i.user.username}\` (${
                     i.user.id
-                })\n- To: \`${user.username}\` (${user.id})\n- Amount: ${
-                    customEmoji.a.z_coins
-                } \`${formatNumber(amount)} ${texts.c.u}\`\n- For: ${reason}`,
+                })\n- To: \`${user.username}\` (${
+                    user.id
+                })\n- Amount: ${getAmount(amount)}\n- For: ${reason}`,
                 "Green",
             ),
         );
         const dmed = await user
             .send(
                 embedComment(
-                    `You were paid ${customEmoji.a.z_coins} \`${formatNumber(
-                        amount,
-                    )} ${texts.c.u}\` for:\n>>> ${reason}`,
+                    `You were paid ${getAmount(amount)} for:\n>>> ${reason}`,
                     "Green",
                 ),
             )

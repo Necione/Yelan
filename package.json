@@ -43,7 +43,7 @@
     "@elara-services/invite": "^1.0.3",
     "@elara-services/leveling": "^1.2.1",
     "@elara-services/packages": "^6.0.8",
-    "@elara-services/utils": "^2.1.7",
+    "@elara-services/utils": "^2.1.8",
     "@elara-services/webhooks": "^2.1.18",
     "@liyueharbor/econ": "^1.0.5",
     "@prisma/client": "5.7.1",

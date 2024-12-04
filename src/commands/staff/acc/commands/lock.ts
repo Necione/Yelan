@@ -6,7 +6,7 @@ import {
 } from "@elara-services/botbuilder";
 import { embedComment, is, noop, proper } from "@elara-services/utils";
 import { EmbedBuilder } from "discord.js";
-import { devId, roles } from "../../../../config";
+import { isDev, roles } from "../../../../config";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
 import { logs } from "../../../../utils";
 
@@ -30,7 +30,7 @@ export const lock = buildCommand({
             return;
         }
         const user = i.options.getUser("user", true);
-        if (i.user.id !== devId && user.id === devId) {
+        if (!isDev(i.user.id) && isDev(user.id)) {
             return r.edit(embedComment(`Respectfully, fuck off.`));
         }
         const reason =

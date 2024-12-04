@@ -31,7 +31,12 @@ import {
     updateUserProfile,
 } from "../../services";
 import { getCollectables } from "../../services/bot";
-import { getPaginatedMessage, logs, userLockedData } from "../../utils";
+import {
+    getAmount,
+    getPaginatedMessage,
+    logs,
+    userLockedData,
+} from "../../utils";
 import { isOriginalMessageUser } from "./invites";
 
 export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
@@ -329,7 +334,7 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
                                 { name: "Name", value: name, inline: true },
                                 {
                                     name: `Amount`,
-                                    value: `${customEmoji.a.z_coins} \`${total} ${texts.c.u}\``,
+                                    value: getAmount(total),
                                     inline: true,
                                 },
                                 {
@@ -373,9 +378,7 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
                                     collectable?.items?.length || 0,
                                 )}\n- Duplicates: ${formatNumber(
                                     dupes,
-                                )}\n- Net Worth: ${
-                                    customEmoji.a.z_coins
-                                } \`${formatNumber(networth)} ${texts.c.u}\`${
+                                )}\n- Net Worth: ${getAmount(networth)}${
                                     is.string(s) ? `\n- Search: ${s}` : ""
                                 }`,
                             )

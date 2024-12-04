@@ -1,6 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -14,6 +14,7 @@ import {
     removeBalance,
     updateUserStats,
 } from "../../services";
+import { getAmount } from "../../utils";
 
 export const downgrade = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -63,7 +64,9 @@ export const downgrade = buildCommand<SlashCommand>({
         if (userProfile.balance < 250) {
             return r.edit(
                 embedComment(
-                    `You need **${customEmoji.a.z_coins} 250 ${texts.c.u}** to downgrade your world level.`,
+                    `You need **${getAmount(
+                        250,
+                    )}** to downgrade your world level.`,
                     "Red",
                 ),
             );
@@ -102,7 +105,11 @@ export const downgrade = buildCommand<SlashCommand>({
 
         await r.edit({
             ...embedComment(
-                `Select the world level you want to downgrade to. Downgrading costs **${customEmoji.a.z_coins} 250 ${texts.c.u}**.\nYour current world level is ${stats.worldLevel}.\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
+                `Select the world level you want to downgrade to. Downgrading costs **${getAmount(
+                    250,
+                )}**.\nYour current world level is ${
+                    stats.worldLevel
+                }.\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
                 "Yellow",
             ),
             components: [actionRow],
@@ -136,7 +143,9 @@ export const downgrade = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `Your world level has been downgraded to ${selectedLevel}, your EXP has been reset to 0, and **${customEmoji.a.z_coins} 250 ${texts.c.u}** have been deducted from your wallet.`,
+                `Your world level has been downgraded to ${selectedLevel}, your EXP has been reset to 0, and **${getAmount(
+                    250,
+                )}** have been deducted from your wallet.`,
                 "Green",
             ),
         );

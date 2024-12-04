@@ -12,7 +12,7 @@ import {
 } from "@elara-services/utils";
 import type { UserWallet } from "@prisma/client";
 import { Colors, EmbedBuilder } from "discord.js";
-import { devId, roles } from "../../../../config";
+import { isDev, roles } from "../../../../config";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
 import { logs } from "../../../../utils";
 
@@ -62,7 +62,7 @@ export const edit = buildCommand({
             return;
         }
         const user = i.options.getUser("user", true);
-        if (i.user.id !== devId && user.id === devId) {
+        if (!isDev(i.user.id) && isDev(user.id)) {
             return r.edit(embedComment(`Respectfully, fuck off.`));
         }
         const type = i.options.getString("type", true) as ValidTypes;

@@ -1,6 +1,6 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, formatNumber, is, time } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { channels, economy } from "../../config";
 import {
@@ -12,6 +12,7 @@ import {
 import {
     checks,
     cooldowns,
+    getAmount,
     isInActiveTrade,
     locked,
     logs,
@@ -87,11 +88,9 @@ export const rakeback: SlashCommand = {
         locked.del(interaction.user.id);
         return responder.edit(
             embedComment(
-                `You've claimed your rakeback of ${
-                    customEmoji.a.z_coins
-                }\`${formatNumber(data.rakeback.amount)}\` ${
-                    texts.c.u
-                }!\nYou can claim your rakeback again ${time.countdown(
+                `You've claimed your rakeback of ${getAmount(
+                    data.rakeback.amount,
+                )}!\nYou can claim your rakeback again ${time.countdown(
                     economy.commands.rakeback.time,
                 )}`,
                 "Green",

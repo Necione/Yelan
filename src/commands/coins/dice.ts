@@ -1,12 +1,13 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, get, sleep } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { embedComment, get, sleep } from "@elara-services/utils";
+import { customEmoji } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
 import {
     addRakeback,
     checkBelowBalance,
     checks,
+    getAmount,
     locked,
     userLockedData,
 } from "../../utils";
@@ -176,9 +177,9 @@ export const dice: SlashCommand = {
         }
         await Promise.all(promises);
         e.setDescription(
-            `- Rolled: **${roll}**\n- You ${isWin ? "Won" : "Lost"} ${
-                customEmoji.a.z_coins
-            } \`${formatNumber(isWin ? winnings : betAmount)} ${texts.c.u}\``,
+            `- Rolled: **${roll}**\n- You ${isWin ? "Won" : "Lost"} ${getAmount(
+                isWin ? winnings : betAmount,
+            )}`,
         ).setFooter({
             text: `Roll ${
                 rollType.charAt(0).toUpperCase() + rollType.slice(1)

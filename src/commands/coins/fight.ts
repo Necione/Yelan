@@ -1,10 +1,4 @@
-import {
-    addButtonRow,
-    embedComment,
-    formatNumber,
-    get,
-    is,
-} from "@elara-services/utils";
+import { addButtonRow, embedComment, get, is } from "@elara-services/utils";
 import { type UserWallet } from "@prisma/client";
 import {
     ButtonStyle,
@@ -15,10 +9,16 @@ import {
 } from "discord.js";
 
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import { economy } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
-import { checks, locked, mutableGlobals, userLockedData } from "../../utils";
+import {
+    checks,
+    getAmount,
+    locked,
+    mutableGlobals,
+    userLockedData,
+} from "../../utils";
 
 /**
  * A adjustable chance of getting an accident
@@ -122,7 +122,7 @@ const embeds = {
             new EmbedBuilder()
                 .setTitle("Invalid amount")
                 .setDescription(
-                    `Bet limit has been capped at ${customEmoji.a.z_coins} \`${betLimit} ${texts.c.u}\``,
+                    `Bet limit has been capped at ${getAmount(betLimit)}`,
                 )
                 .setColor(Colors.Red),
         ),
@@ -135,9 +135,7 @@ const embeds = {
                         isOpponent ? "Your opponent" : "You"
                     } do not have enough ${texts.c.u} to fight
   
-Balance: ${customEmoji.a.z_coins} \`${formatNumber(user.balance)} ${
-                        texts.c.u
-                    }\``,
+Balance: ${getAmount(user.balance)}`,
                 )
                 .setColor(Colors.Red),
         ),
@@ -149,11 +147,11 @@ Balance: ${customEmoji.a.z_coins} \`${formatNumber(user.balance)} ${
         const embed = new EmbedBuilder()
             .setTitle("`👊` Fist Fight")
             .setColor(Colors.Orange)
-            .setDescription(`<@${requestorUserId}> has requested to fight you for ${
-            customEmoji.a.z_coins
-        } \`${formatNumber(amount)} ${texts.c.u}\`
-    
-Do you accept the fight?`);
+            .setDescription(
+                `<@${requestorUserId}> has requested to fight you for ${getAmount(
+                    amount,
+                )}\n\nDo you accept the fight?`,
+            );
         return {
             content: `<@${opponent.id}>`,
             embeds: [embed],
@@ -199,11 +197,12 @@ Do you accept the fight?`);
         embedOnlyReply(
             new EmbedBuilder()
                 .setTitle(`Oh no${loss < 0 ? "?" : "!"}`)
-                .setColor(Colors.Red).setDescription(`${msg}
-
-Both of you ${loss < 0 ? "won?" : "lost"} ${customEmoji.a.z_coins} \`${
-                loss < 0 ? -loss : loss
-            } ${texts.c.u}\``),
+                .setColor(Colors.Red)
+                .setDescription(
+                    `${msg}\n\nBoth of you ${
+                        loss < 0 ? "won?" : "lost"
+                    } ${getAmount(loss < 0 ? -loss : loss)}`,
+                ),
         ),
     FIGHT_ENDED: (
         winnerUser: UserWallet,
@@ -214,11 +213,9 @@ Both of you ${loss < 0 ? "won?" : "lost"} ${customEmoji.a.z_coins} \`${
             new EmbedBuilder()
                 .setTitle("`👊` Fight Ended")
                 .setDescription(
-                    `<@${winnerUser.userId}> has won ${
-                        customEmoji.a.z_coins
-                    } \`${formatNumber(winAmount)} ${texts.c.u}\` from <@${
-                        loserUser.userId
-                    }>`,
+                    `<@${winnerUser.userId}> has won ${getAmount(
+                        winAmount,
+                    )} from <@${loserUser.userId}>`,
                 )
                 .setColor(Colors.Green),
         ),

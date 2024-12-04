@@ -1,6 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
@@ -9,6 +9,7 @@ import {
     syncStats,
     updateUserStats,
 } from "../../services";
+import { getAmount } from "../../utils";
 
 export const heal = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -61,7 +62,9 @@ export const heal = buildCommand<SlashCommand>({
         if (userProfile.balance < healCost) {
             return r.edit(
                 embedComment(
-                    `You don't have enough ${customEmoji.a.z_coins} Coins to heal.\n- You need at least \`${healCost}\` ${texts.c.u}.`,
+                    `You don't have enough ${
+                        texts.c.u
+                    } to heal.\n- You need at least ${getAmount(healCost)}.`,
                 ),
             );
         }
@@ -93,7 +96,9 @@ export const heal = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `The Statue of The Seven took ${customEmoji.a.z_coins} \`${healCost} ${texts.c.u}\` and healed you for \`${healAmount} HP\`!\nYour current HP is \`${newHp}/${maxHP}\``,
+                `The Statue of The Seven took ${getAmount(
+                    healCost,
+                )} and healed you for \`${healAmount} HP\`!\nYour current HP is \`${newHp}/${maxHP}\``,
                 "Green",
             ),
         );

@@ -1,5 +1,5 @@
 import { embedComment, noop } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import type { UserStats } from "@prisma/client";
 import type {
     ButtonInteraction,
@@ -18,6 +18,7 @@ import {
     removeBalance,
     updateUserStats,
 } from "../../../services";
+import { getAmount } from "../../../utils";
 import { generateChestLoot, generateRawMaterials } from "../../../utils/chest";
 
 export async function handleChest(
@@ -50,9 +51,9 @@ export async function handleChest(
                       .map((item) => `\`${item.amount}x\` ${item.item}`)
                       .join(", ")
                 : "No items";
-        return `**Chest ${index + 1}:**\n${customEmoji.a.z_coins} \`${
-            chest.coins
-        }\`${lootDescription ? `\nItems: ${lootDescription}` : ""}`;
+        return `**Chest ${index + 1}:**\n${getAmount(chest.coins)}${
+            lootDescription ? `\nItems: ${lootDescription}` : ""
+        }`;
     });
 
     const embed = new EmbedBuilder()
@@ -131,14 +132,14 @@ export async function handleChest(
                 : "";
 
         const resultMessage = lootDescription
-            ? `You chose **Chest ${selectedChestIndex + 1}**!\n\nIt contained ${
-                  customEmoji.a.z_coins
-              } \`${
-                  selectedChest.coins
-              }\` and the following items:\n${lootDescription}`
-            : `You chose **Chest ${selectedChestIndex + 1}**!\n\nIt contained ${
-                  customEmoji.a.z_coins
-              } \`${selectedChest.coins}\`.`;
+            ? `You chose **Chest ${
+                  selectedChestIndex + 1
+              }**!\n\nIt contained ${getAmount(
+                  selectedChest.coins,
+              )} and the following items:\n${lootDescription}`
+            : `You chose **Chest ${
+                  selectedChestIndex + 1
+              }**!\n\nIt contained ${getAmount(selectedChest.coins)}.`;
 
         embed.setDescription(resultMessage);
         await i.editReply({ embeds: [embed], components: [] }).catch(noop);
@@ -208,7 +209,9 @@ async function handleTrap(i: ChatInputCommandInteraction, stats: UserStats) {
     await i
         .editReply(
             embedComment(
-                `You fell into a trap while exploring!\nYou lost ${customEmoji.a.z_coins} \`${coinLoss} ${texts.c.u}\` and took \`${trapDamage} HP\` damage.`,
+                `You fell into a trap while exploring!\nYou lost ${getAmount(
+                    coinLoss,
+                )} and took \`${trapDamage} HP\` damage.`,
                 "Red",
             ),
         )

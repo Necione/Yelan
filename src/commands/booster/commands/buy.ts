@@ -8,7 +8,7 @@ import {
     is,
     noop,
 } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import {
     ActionRowBuilder,
     GuildScheduledEventEntityType,
@@ -30,7 +30,7 @@ import {
     boosterExpiryDuration,
     getActiveCoinBoosters,
 } from "../../../services/booster";
-import { getTax, locked, userLockedData } from "../../../utils";
+import { getAmount, getTax, locked, userLockedData } from "../../../utils";
 import {
     boosterPrices,
     boostersLimitExceeded,
@@ -119,9 +119,9 @@ export const buy = buildCommand<SubCommand>({
             ),
             r.edit(
                 embedComment(
-                    `✔ Successfully bought the ${booster.name} for ${
-                        customEmoji.a.z_coins
-                    } \`${formatNumber(booster.price)} ${texts.c.u}\``,
+                    `✔ Successfully bought the ${booster.name} for ${getAmount(
+                        booster.price,
+                    )}`,
                     "Green",
                 ),
             ),
@@ -253,9 +253,7 @@ export const buy = buildCommand<SubCommand>({
 
             await responder.edit(
                 embedComment(
-                    `You tipped <@${i.user.id}> for ${
-                        customEmoji.a.z_coins
-                    } \`${formatNumber(amount)} ${texts.c.u}\``,
+                    `You tipped <@${i.user.id}> for ${getAmount(amount)}`,
                     "Green",
                 ),
             );

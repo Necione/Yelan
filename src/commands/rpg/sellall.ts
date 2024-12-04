@@ -1,8 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, getKeys, is, noop } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
+import { getAmount } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
 import { misc, type MiscName } from "../../utils/rpgitems/misc";
@@ -201,7 +202,9 @@ export const sellall = buildCommand<SlashCommand>({
         let responseMessage = itemsSold
             .map(
                 (soldItem) =>
-                    `You sold \`${soldItem.amountToSell}x\` **${soldItem.itemName}** for ${customEmoji.a.z_coins} \`${soldItem.itemTotalSellPrice} ${texts.c.u}\``,
+                    `You sold \`${soldItem.amountToSell}x\` **${
+                        soldItem.itemName
+                    }** for ${getAmount(soldItem.itemTotalSellPrice)}`,
             )
             .join("\n");
 

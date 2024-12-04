@@ -1,6 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { addButtonRow, awaitComponent, get, noop } from "@elara-services/utils";
-import { customEmoji } from "@liyueharbor/econ";
 import {
     ButtonStyle,
     Colors,
@@ -8,7 +7,7 @@ import {
     SlashCommandBuilder,
 } from "discord.js";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
-import { checkBelowBalance, locked } from "../../utils";
+import { checkBelowBalance, getAmount, locked } from "../../utils";
 
 export const blackjack: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -102,7 +101,9 @@ export const blackjack: SlashCommand = {
                 const timeoutEmbed = new EmbedBuilder()
                     .setTitle("`🍀` Blackjack Result")
                     .setDescription(
-                        `You took too long to make a choice. You lost ${customEmoji.a.z_coins} \`${amount}\`.`,
+                        `You took too long to make a choice. You lost ${getAmount(
+                            amount,
+                        )}.`,
                     )
                     .setColor(Colors.Red);
 
@@ -152,7 +153,9 @@ export const blackjack: SlashCommand = {
                 const timeoutEmbed = new EmbedBuilder()
                     .setTitle("`🍀` Blackjack Result")
                     .setDescription(
-                        `You took too long to make a choice. You lost ${customEmoji.a.z_coins} \`${amount}\`.`,
+                        `You took too long to make a choice. You lost ${getAmount(
+                            amount,
+                        )}.`,
                     )
                     .setColor("#FF0000");
                 return responder.edit({
@@ -205,22 +208,30 @@ export const blackjack: SlashCommand = {
             dealerCards.length === 2 &&
             getHandValue(dealerCards).value === 21
         ) {
-            resultMessage = `Dealer got a blackjack! But you took insurance, so you get back your ${customEmoji.a.z_coins} \`${amount}\` bet.`;
+            resultMessage = `Dealer got a blackjack! But you took insurance, so you get back your ${getAmount(
+                amount,
+            )} bet.`;
             playerWon = true;
         }
 
         if (playerBusted) {
-            resultMessage = `You busted with ${playerTotal}. Dealer's hand: **${dealerHand}**.\nYou lost ${customEmoji.a.z_coins} \`${amount}\`.`;
+            resultMessage = `You busted with ${playerTotal}. Dealer's hand: **${dealerHand}**.\nYou lost ${getAmount(
+                amount,
+            )}.`;
         } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
             playerWon = true;
-            resultMessage = `You won against the dealer's \`${dealerTotal}\` with hand: **${dealerHand}**.\nYou earned ${
-                customEmoji.a.z_coins
-            } \`${Math.floor(amount * 1.5)}\`!`;
+            resultMessage = `You won against the dealer's \`${dealerTotal}\` with hand: **${dealerHand}**.\nYou earned ${getAmount(
+                Math.floor(amount * 1.5),
+            )}!`;
         } else if (playerTotal === dealerTotal) {
             playerWon = true;
-            resultMessage = `It's a push since the dealer drew \`${dealerTotal}\` with hand: **${dealerHand}**.\nYou get back your ${customEmoji.a.z_coins} \`${amount}\` bet.`;
+            resultMessage = `It's a push since the dealer drew \`${dealerTotal}\` with hand: **${dealerHand}**.\nYou get back your ${getAmount(
+                amount,
+            )} bet.`;
         } else {
-            resultMessage = `Dealer won with ${dealerTotal} and hand: **${dealerHand}**.\nYou lost ${customEmoji.a.z_coins} \`${amount}\`.`;
+            resultMessage = `Dealer won with ${dealerTotal} and hand: **${dealerHand}**.\nYou lost ${getAmount(
+                amount,
+            )}.`;
         }
 
         const resultEmbed = new EmbedBuilder()

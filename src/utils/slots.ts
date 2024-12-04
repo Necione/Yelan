@@ -2,6 +2,7 @@ import { randomNumber } from "@elara-services/packages";
 import { formatNumber, make } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { Colors, EmbedBuilder } from "discord.js";
+import { getAmount } from ".";
 import { addSlotsPrizePool, getSlots } from "../services";
 
 const transpose = <T>(array: T[][]) => {
@@ -221,7 +222,9 @@ export const embeds = {
             .base()
             .addFields({
                 name: "✦ Current Jackpot",
-                value: `Winning Prize: ${customEmoji.a.z_coins} \`${jackpot} ${texts.c.u}\`\nLast won by: ${lastWonBy}`,
+                value: `Winning Prize: ${getAmount(
+                    jackpot,
+                )}\nLast won by: ${lastWonBy}`,
                 inline: false,
             })
             .addFields({
@@ -243,9 +246,9 @@ export const embeds = {
         embeds
             .base()
             .setDescription(
-                `You are too poor to be gambling :(\n\nYour balance: ${
-                    customEmoji.a.z_coins
-                } \`${formatNumber(balance)} ${texts.c.u}\``,
+                `You are too poor to be gambling :(\n\nYour balance: ${getAmount(
+                    balance,
+                )}`,
             ),
     play: (slotResult: string) =>
         embeds
@@ -276,9 +279,9 @@ export const embeds = {
                     value: renderSlotDisplay(slotResult.result.slotDisplay, 3),
                 })
                 .setDescription(
-                    `<@${userId}> won ${customEmoji.a.z_coins} \`${formatNumber(
+                    `<@${userId}> won ${getAmount(
                         slotResult.result.winAmount,
-                    )} ${texts.c.u}\`!`,
+                    )}!`,
                 );
         }
         if (slotResult.status === "jackpot") {
@@ -288,11 +291,9 @@ export const embeds = {
                     value: renderSlotDisplay(slotResult.result.slotDisplay, 3),
                 })
                 .setDescription(
-                    `<@${userId}> won the **jackpot** ! They have won ${
-                        customEmoji.a.z_coins
-                    } \`${formatNumber(slotResult.result.winAmount)} ${
-                        texts.c.u
-                    }\`!`,
+                    `<@${userId}> won the **jackpot** ! They have won ${getAmount(
+                        slotResult.result.winAmount,
+                    )}!`,
                 );
         }
         if (slotResult.status === "lose") {

@@ -1,10 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, is } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { embedComment, is } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { devId, roles } from "../../config";
+import { isDev, roles } from "../../config";
 import { updateUserProfile } from "../../services";
-import { logs } from "../../utils";
+import { getAmount, logs } from "../../utils";
 
 export const coins = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -38,14 +37,11 @@ export const coins = buildCommand<SlashCommand>({
     },
     async execute(i, r) {
         const user = i.options.getUser("user", true);
-        const isDev = (id: string) => id === devId;
         const amount = i.options.getInteger("amount", true);
         const type = (i.options.getString("type", false) || "increment") as
             | "increment"
             | "decrement";
-        const str = `${customEmoji.a.z_coins} \`${formatNumber(amount)} ${
-            texts.c.u
-        }\``;
+        const str = getAmount(amount);
         if (user.bot) {
             return r.edit(embedComment(`Bots don't have a user profile.`));
         }

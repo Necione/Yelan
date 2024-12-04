@@ -7,11 +7,17 @@ import {
     sleep,
     time,
 } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { economy, roles } from "../../config";
 import { getProfileByUserId } from "../../services";
-import { cooldowns, locked, logs, userLockedData } from "../../utils";
+import {
+    cooldowns,
+    getAmount,
+    locked,
+    logs,
+    userLockedData,
+} from "../../utils";
 
 export const claim: SlashCommand = {
     locked: { roles: [economy.boost.role, roles.highRoller, ...roles.main] },
@@ -109,9 +115,9 @@ export const claim: SlashCommand = {
         ]);
         await responder.edit(
             embedComment(
-                `You've claimed ${customEmoji.a.z_coins} \`${formatNumber(
+                `You've claimed ${getAmount(
                     amount,
-                )}\` ${texts.c.u}, you can claim more ${time.countdown(
+                )}, you can claim more ${time.countdown(
                     economy.boost.claim.time,
                 )}!`,
                 "Green",

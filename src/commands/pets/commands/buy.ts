@@ -1,14 +1,12 @@
 import { buildCommand, type SubCommand } from "@elara-services/botbuilder";
 import {
     embedComment,
-    formatNumber,
     generate,
     get,
     getConfirmPrompt,
     is,
     proper,
 } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
 import {
     checkName,
     getPetLimit,
@@ -24,7 +22,7 @@ import {
     removeBalance,
     updatePets,
 } from "../../../services";
-import { locked } from "../../../utils";
+import { getAmount, locked } from "../../../utils";
 
 export const buy = buildCommand<SubCommand>({
     subCommand: (b) =>
@@ -92,9 +90,7 @@ export const buy = buildCommand<SubCommand>({
             i.user,
             `Are you sure you want to buy this ${proper(rarity)} (${proper(
                 animal,
-            )}) for ${customEmoji.a.z_coins} \`${formatNumber(amount)} ${
-                texts.c.u
-            }\`?`,
+            )}) for ${getAmount(amount)}?`,
             get.secs(15),
         );
         if (!confirm) {

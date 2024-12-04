@@ -6,11 +6,10 @@ import {
     get,
     noop,
 } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
 import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { getProfileByUserId, handleBets, removeBalance } from "../../services";
-import { checkBelowBalance, checks, locked } from "../../utils";
+import { checkBelowBalance, checks, getAmount, locked } from "../../utils";
 
 export const hilo: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -65,7 +64,9 @@ export const hilo: SlashCommand = {
             .setColor("#FF9141")
             .setThumbnail("https://file.coffee/u/JbA-bjCCma7O45G-9ANSX.png")
             .setDescription(
-                `Your bet is ${customEmoji.a.z_coins} \`${amount} ${texts.c.u}\`\nA is the lowest, and K is the highest.\nThe card is: **${currentCard}**.\n\nWill the next card be higher or lower?`,
+                `Your bet is ${getAmount(
+                    amount,
+                )}\nA is the lowest, and K is the highest.\nThe card is: **${currentCard}**.\n\nWill the next card be higher or lower?`,
             );
 
         const row = addButtonRow([
@@ -101,7 +102,9 @@ export const hilo: SlashCommand = {
                 .setTitle("Hi-Lo Result")
                 .setThumbnail("https://file.coffee/u/JbA-bjCCma7O45G-9ANSX.png")
                 .setDescription(
-                    `You took too long to make a choice. You lost ${customEmoji.a.z_coins} \`${amount} ${texts.c.u}\`.`,
+                    `You took too long to make a choice. You lost ${getAmount(
+                        amount,
+                    )}.`,
                 )
                 .setColor("#FF0000");
 
@@ -136,10 +139,10 @@ export const hilo: SlashCommand = {
             .setDescription(
                 `**Original Card:** ${currentCard}\n**Your Choice:** \`${userChoice}\`\n**Next Card:** ${nextCard}\n\n${
                     isCorrect
-                        ? `You won and earned ${
-                              customEmoji.a.z_coins
-                          } \`${Math.floor(amount * 1.25)} ${texts.c.u}\`!`
-                        : `You lost ${customEmoji.a.z_coins} \`${amount} ${texts.c.u}\`.`
+                        ? `You won and earned ${getAmount(
+                              Math.floor(amount * 1.25),
+                          )}!`
+                        : `You lost ${getAmount(amount)}.`
                 }`,
             )
             .setColor(isCorrect ? "#00FF00" : "#FF0000");

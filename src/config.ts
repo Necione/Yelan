@@ -1,4 +1,4 @@
-import { get, getClientIdFromToken } from "@elara-services/utils";
+import { get, getClientIdFromToken, is } from "@elara-services/utils";
 
 const boostRoleId = "1073408957080674376";
 
@@ -127,7 +127,6 @@ export const channels = {
 
 export const roles = {
     admin: "1073408549075570779",
-    flashRole: "1188707025790701668",
     levels: [
         "1073123463725854720",
         "1073124202921594982",
@@ -167,3 +166,6 @@ export const roles = {
 };
 roles.main.push(roles.admin, roles.devs); // This inserts the 'admin' role ID for the main server.
 export const devId = "288450828837322764";
+export function isDev(id: string) {
+    return is.array(devId) ? devId.includes(id) : devId === id;
+}

@@ -1,9 +1,14 @@
 import { buildCommand, type SubCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { embedComment } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import { EmbedBuilder } from "discord.js";
 import { getProfileByUserId } from "../../../../services";
-import { locked, mutableGlobals, userLockedData } from "../../../../utils";
+import {
+    getAmount,
+    locked,
+    mutableGlobals,
+    userLockedData,
+} from "../../../../utils";
 import { images } from "../../../../utils/images";
 
 export const join = buildCommand<SubCommand>({
@@ -63,9 +68,9 @@ export const join = buildCommand<SubCommand>({
             .setTitle(`You have joined the next Russian Roulette game!`)
             .setThumbnail(images.commands.rr.join)
             .setDescription(
-                `Players in the game: ${rrPlayersList}\nCurrent Reward: ${
-                    customEmoji.a.z_coins
-                } \`${formatNumber(mutableGlobals.rr.reward)} ${texts.c.u}\``,
+                `Players in the game: ${rrPlayersList}\nCurrent Reward: ${getAmount(
+                    mutableGlobals.rr.reward,
+                )}`,
             );
         locked.del(i.user.id);
         return r.edit({ embeds: [embed] });

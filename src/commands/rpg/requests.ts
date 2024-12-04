@@ -1,7 +1,7 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { randomNumber } from "@elara-services/packages";
 import { embedComment, noop } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { texts } from "@liyueharbor/econ";
 import type { ButtonInteraction } from "discord.js";
 import {
     ActionRowBuilder,
@@ -18,6 +18,7 @@ import {
     removeBalance,
     updateUserStats,
 } from "../../services";
+import { getAmount } from "../../utils";
 import { getRandomDrop } from "../../utils/chest";
 
 type UserRequest = {
@@ -131,7 +132,9 @@ export const requests = buildCommand<SlashCommand>({
                 stats.requests.forEach((req) => {
                     embed.addFields({
                         name: `Request ID: ${req.id}`,
-                        value: `>>> **Item:** \`${req.quantity}x\` ${req.item}\n**Reward:** ${customEmoji.a.z_coins} \`${req.reward}\` ${texts.c.u}`,
+                        value: `>>> **Item:** \`${req.quantity}x\` ${
+                            req.item
+                        }\n**Reward:** ${getAmount(req.reward)}`,
                     });
                 });
 
@@ -173,7 +176,11 @@ export const requests = buildCommand<SlashCommand>({
 
                             if (userBalance < 500) {
                                 await interaction.reply({
-                                    content: `You don't have enough coins to refresh requests. You need ${customEmoji.a.z_coins} \`500\` Coins.`,
+                                    content: `You don't have enough ${
+                                        texts.c.l
+                                    } to refresh requests. You need ${getAmount(
+                                        500,
+                                    )}`,
                                     ephemeral: true,
                                 });
                                 return;
@@ -198,7 +205,11 @@ export const requests = buildCommand<SlashCommand>({
                             newRequests.forEach((req) => {
                                 embed.addFields({
                                     name: `Request ID: ${req.id}`,
-                                    value: `>>> **Item:** \`${req.quantity}x\` ${req.item}\n**Reward:** ${customEmoji.a.z_coins} \`${req.reward}\` ${texts.c.u}`,
+                                    value: `>>> **Item:** \`${
+                                        req.quantity
+                                    }x\` ${req.item}\n**Reward:** ${getAmount(
+                                        req.reward,
+                                    )}`,
                                 });
                             });
 
@@ -269,9 +280,7 @@ export const requests = buildCommand<SlashCommand>({
                 const embed = new EmbedBuilder()
                     .setTitle("`✅` Request Completed!")
                     .setColor("Green")
-                    .setDescription(
-                        `You received ${customEmoji.a.z_coins} \`${coinReward} ${texts.c.u}\`!`,
-                    );
+                    .setDescription(`You received ${getAmount(coinReward)}!`);
 
                 await r.edit({ embeds: [embed.toJSON()] });
             }

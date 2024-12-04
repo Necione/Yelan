@@ -1,10 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, is, noop } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { embedComment, is, noop } from "@elara-services/utils";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { devId, roles } from "../../config";
+import { isDev, roles } from "../../config";
 import { removeBalance } from "../../services";
-import { logs } from "../../utils";
+import { getAmount, logs } from "../../utils";
 
 export const fine = buildCommand<SlashCommand>({
     locked: {
@@ -51,7 +50,7 @@ export const fine = buildCommand<SlashCommand>({
         if (user.bot) {
             return r.edit(embedComment(`Bots don't have a user profile.`));
         }
-        if (i.user.id !== devId && user.id === devId) {
+        if (!isDev(i.user.id) && isDev(user.id)) {
             return r.edit(embedComment(`Respectfully, fuck off.`));
         }
         if (user.id === i.user.id) {
@@ -70,11 +69,9 @@ export const fine = buildCommand<SlashCommand>({
             await user
                 .send(
                     embedComment(
-                        `You've been fined for ${
-                            customEmoji.a.z_coins
-                        } \`${formatNumber(amount)} ${
-                            texts.c.u
-                        }\`\n- Reason: ${reason}`,
+                        `You've been fined for ${getAmount(
+                            amount,
+                        )}\n- Reason: ${reason}`,
                         Colors.Red,
                     ),
                 )
@@ -97,9 +94,7 @@ export const fine = buildCommand<SlashCommand>({
                     .addFields([
                         {
                             name: `Amount`,
-                            value: `${customEmoji.a.z_coins} \`${formatNumber(
-                                amount,
-                            )} ${texts.c.u}\``,
+                            value: getAmount(amount),
                         },
                         {
                             name: "Reason",
@@ -111,9 +106,7 @@ export const fine = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `✅ Fined ${user.toString()} for ${
-                    customEmoji.a.z_coins
-                } \`${formatNumber(amount)} ${texts.c.u}\``,
+                `✅ Fined ${user.toString()} for ${getAmount(amount)}`,
                 "Green",
             ),
         );
