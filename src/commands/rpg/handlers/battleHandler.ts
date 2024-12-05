@@ -311,6 +311,7 @@ export async function monsterAttack(
     hasCrystallize: boolean,
     hasFatigue: boolean,
     monsterState: MonsterState,
+    startHP: number,
 ): Promise<{
     currentPlayerHp: number;
     currentMonsterHp: number;
@@ -497,13 +498,17 @@ export async function monsterAttack(
         const leechTriggered = Math.random() < triggerChance;
 
         if (leechTriggered) {
-            const healAmount = Math.ceil(
+            let healAmount = Math.ceil(
                 monsterStats.maxHp * lifestealPercentage,
             );
             currentPlayerHp = Math.min(
                 currentPlayerHp + healAmount,
                 stats.maxHP,
             );
+            if (startHP > currentPlayerHp) {
+                healAmount = Math.floor(currentPlayerHp - startHP); // TODO: Idk figure this one out, my head hurts.
+                currentPlayerHp = startHP;
+            }
             messages.push(
                 `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}.`,
             );

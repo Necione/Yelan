@@ -135,6 +135,7 @@ export async function handleHunt(
     }
 
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
+    const startHP = parseInt(`${currentPlayerHp}`);
     if (!is.array(selectedMonsters)) {
         for (let encounter = 0; encounter < numberOfMonsters; encounter++) {
             let monster: Monster | null;
@@ -311,7 +312,7 @@ export async function handleHunt(
             );
         }
 
-        if (startingMessages.length > 0) {
+        if (is.array(startingMessages)) {
             if (thread) {
                 await sendToChannel(thread.id, {
                     content: `>>> ${startingMessages.join("\n")}`,
@@ -321,7 +322,7 @@ export async function handleHunt(
 
         while (currentPlayerHp > deathThreshold && currentMonsterHp > 0) {
             if (isPlayerTurn) {
-                const playerMessages: string[] = [];
+                const playerMessages = make.array<string>();
 
                 const result = await playerAttack(
                     stats,
@@ -339,7 +340,7 @@ export async function handleHunt(
                 vigilanceUsed = result.vigilanceUsed;
                 monsterState = result.monsterState;
 
-                if (playerMessages.length > 0) {
+                if (is.array(playerMessages)) {
                     if (thread) {
                         await sendToChannel(thread.id, {
                             content: `>>> ${playerMessages.join("\n")}`,
@@ -375,7 +376,7 @@ export async function handleHunt(
 
                 isPlayerTurn = false;
             } else {
-                const monsterMessages: string[] = [];
+                const monsterMessages = make.array<string>();
 
                 ({ currentPlayerHp, currentMonsterHp } = await monsterAttack(
                     stats,
@@ -387,9 +388,10 @@ export async function handleHunt(
                     hasCrystallize,
                     hasFatigue,
                     monsterState,
+                    startHP,
                 ));
 
-                if (monsterMessages.length > 0) {
+                if (is.array(monsterMessages)) {
                     if (thread) {
                         await sendToChannel(thread.id, {
                             content: `>>> ${monsterMessages.join("\n")}`,
@@ -432,7 +434,7 @@ export async function handleHunt(
             await sleep(get.secs(1));
 
             stats.hp = currentPlayerHp;
-            await updateUserStats(stats.userId, { hp: stats.hp });
+            await updateUserStats(stats.userId, { hp: { set: stats.hp } });
 
             if (isFirstTurn) {
                 isFirstTurn = false;
