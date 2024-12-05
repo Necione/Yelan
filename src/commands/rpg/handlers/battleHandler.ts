@@ -505,7 +505,7 @@ export async function monsterAttack(
                 currentPlayerHp + healAmount,
                 stats.maxHP,
             );
-            if (startHP > currentPlayerHp) {
+            if (currentPlayerHp > startHP) {
                 healAmount = Math.floor(currentPlayerHp - startHP); // TODO: Idk figure this one out, my head hurts.
                 currentPlayerHp = startHP;
             }
