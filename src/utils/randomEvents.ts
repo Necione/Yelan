@@ -1,29 +1,21 @@
-import { make } from "@elara-services/utils";
+import { getRandom, make } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { Message } from "discord.js";
-import { injuredManEvent } from "../utils/events/injuredManEvent";
-import { cliffFallEvent } from "./events/cliffFallEvent";
-import { healingWellEvent } from "./events/healingWellEvent";
-import { merchantEvent } from "./events/merchantEvent";
-import { secretCultEvent } from "./events/secretCultEvent";
-// import { thiefEvent } from "./events/theifEvent";
+import * as ev from "./events";
 
 export async function handleRandomEvent(
     message: Message,
     stats: UserStats,
     userWallet: UserWallet,
 ) {
-    const events = make.array([
-        injuredManEvent,
-        healingWellEvent,
-        cliffFallEvent,
-        secretCultEvent,
-        // thiefEvent,
-        merchantEvent,
-    ]);
-
-    const randomIndex = Math.floor(Math.random() * events.length);
-    const randomEvent = events[randomIndex];
-
-    await randomEvent(message, stats, userWallet);
+    await getRandom(
+        make.array([
+            ev.injuredManEvent,
+            ev.healingWellEvent,
+            ev.cliffFallEvent,
+            ev.secretCultEvent,
+            ev.thiefEvent,
+            ev.merchantEvent,
+        ]),
+    )(message, stats, userWallet);
 }

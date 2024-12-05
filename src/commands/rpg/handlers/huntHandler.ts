@@ -209,7 +209,7 @@ export async function handleHunt(
             current: number,
             max: number,
             deathThreshold: number,
-            length: number = 20,
+            length = 20,
         ): string => {
             const minHP = deathThreshold;
             const cappedCurrent = Math.min(Math.max(current, minHP), max);
@@ -218,6 +218,10 @@ export async function handleHunt(
             const emptyLength = Math.max(length - filledLength, 0);
 
             const bar = "█".repeat(filledLength) + "░".repeat(emptyLength);
+            if (current <= 0) {
+                // If the 'current' health is below 0 then just display 0 instead of `-XXX`
+                current = 0;
+            }
             return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
         };
 
