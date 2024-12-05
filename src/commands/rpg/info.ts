@@ -13,10 +13,7 @@ import { getCommonLocationsForGroup } from "../../utils/locationUtils";
 import { MonsterGroup } from "../../utils/monsterHelper";
 import type { WeaponType } from "../../utils/rpgitems/weapons";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
-import {
-    getUserSkillLevelData,
-    skills
-} from "../../utils/skillsData";
+import { getUserSkillLevelData, skills } from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
 export const info = buildCommand<SlashCommand>({
@@ -132,7 +129,9 @@ export const info = buildCommand<SlashCommand>({
             }
 
             const skill =
-                skills.find((s) => s.name.toLowerCase() === name.toLowerCase()) ||
+                skills.find(
+                    (s) => s.name.toLowerCase() === name.toLowerCase(),
+                ) ||
                 specialSkills.find(
                     (s) => s.skillName.toLowerCase() === name.toLowerCase(),
                 );
@@ -379,7 +378,24 @@ export const info = buildCommand<SlashCommand>({
                 });
             }
 
-            if (fullWeaponName && fullWeaponName.includes("Wolf's Gravestone")) {
+            if (fullWeaponName && fullWeaponName.includes("Elegy for the End")) {
+                embed.addFields({
+                    name: "Special Effect",
+                    value: "Be immune to all debuffs, heal 5% of your Max HP per turn.",
+                });
+            }
+
+            if (fullWeaponName && fullWeaponName.includes("Calamity Queller")) {
+                embed.addFields({
+                    name: "Special Effect",
+                    value: "Monsters can no longer defend.",
+                });
+            }
+
+            if (
+                fullWeaponName &&
+                fullWeaponName.includes("Wolf's Gravestone")
+            ) {
                 embed.addFields({
                     name: "Special Effect",
                     value: "Deal 50% more damage per 1000 HP the monster has.",
