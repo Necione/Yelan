@@ -7,6 +7,7 @@ import { getUserSkillLevelData } from "../../utils/skillsData";
 import { handleChest, handleMaterials } from "./handlers/exploreHandler";
 
 export const explore = buildCommand<SlashCommand>({
+    enabled: false,
     command: new SlashCommandBuilder()
         .setName("explore")
         .setDescription(

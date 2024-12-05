@@ -1,8 +1,16 @@
-import { addButtonRow, embedComment, get, noop } from "@elara-services/utils";
+import {
+    addButtonRow,
+    awaitComponent,
+    embedComment,
+    get,
+    is,
+    make,
+    noop,
+} from "@elara-services/utils";
 import { texts } from "@liyueharbor/econ";
 import type { UserStats } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
-import { ButtonStyle, ComponentType, EmbedBuilder } from "discord.js";
+import { ButtonStyle, EmbedBuilder } from "discord.js";
 import {
     addBalance,
     addItemToInventory,
@@ -11,6 +19,9 @@ import {
 } from "../../../services";
 import { getAmount } from "../../../utils";
 import { generateChestLoot, generateRawMaterials } from "../../../utils/chest";
+import type { ArtifactName } from "../../../utils/rpgitems/artifacts";
+import type { DropName } from "../../../utils/rpgitems/drops";
+import type { WeaponName } from "../../../utils/rpgitems/weapons";
 
 export async function handleChest(
     i: ChatInputCommandInteraction,
@@ -23,17 +34,20 @@ export async function handleChest(
         return;
     }
 
-    const chestPromises = [];
+    let chestLoots = make.array<{
+        rarity: string;
+        coins: number;
+        loot: { item: DropName | WeaponName | ArtifactName; amount: number }[];
+    }>();
     for (let j = 0; j < 3; j++) {
-        chestPromises.push(generateChestLoot(stats.worldLevel));
+        chestLoots.push(generateChestLoot(stats.worldLevel));
     }
-
-    const chestLoots = await Promise.all(chestPromises);
 
     const rarity = chestLoots[0].rarity;
-    for (let j = 1; j < chestLoots.length; j++) {
-        chestLoots[j].rarity = rarity;
-    }
+    chestLoots = chestLoots.map((c) => {
+        c.rarity = rarity;
+        return c;
+    });
 
     const chestDescriptions = chestLoots.map((chest, index) => {
         const lootDescription =
@@ -86,64 +100,67 @@ export async function handleChest(
     if (!message) {
         return;
     }
-
-    const collector = message.createMessageComponentCollector({
-        filter: (ii) => ii.user.id === i.user.id,
-        componentType: ComponentType.Button,
+    const c = await awaitComponent(message, {
+        only: { originalUser: true },
         time: get.secs(10),
-        max: 1,
+        custom_ids: [{ id: "chest_", includes: true }],
     });
+    if (!c) {
+        return i
+            .editReply({
+                embeds: [
+                    embed.setDescription(
+                        `You got distracted and lost the opportunity to claim a chest.`,
+                    ),
+                ],
+                components: [],
+            })
+            .catch(noop);
+    }
 
-    let collected = false;
+    await c.deferUpdate().catch(noop);
 
-    collector.on("collect", async (interaction) => {
-        collected = true;
-        await interaction.deferUpdate().catch(noop);
+    const selectedChestIndex = parseInt(c.customId.split("_")[1]) - 1;
+    const selectedChest = chestLoots[selectedChestIndex];
 
-        const selectedChestIndex =
-            parseInt(interaction.customId.split("_")[1]) - 1;
-        const selectedChest = chestLoots[selectedChestIndex];
+    await addBalance(
+        i.user.id,
+        selectedChest.coins,
+        false,
+        `Found a ${rarity} Treasure Chest`,
+    );
 
-        await addBalance(
-            i.user.id,
-            selectedChest.coins,
-            false,
-            `Found a ${rarity} Treasure Chest`,
-        );
+    if (is.array(selectedChest.loot)) {
+        await addItemToInventory(i.user.id, selectedChest.loot);
+    }
 
-        if (selectedChest.loot.length > 0) {
-            await addItemToInventory(i.user.id, selectedChest.loot);
-        }
+    const lootDescription =
+        selectedChest.loot.length > 0
+            ? selectedChest.loot
+                  .map((item) => `\`${item.amount}x\` ${item.item}`)
+                  .join(", ")
+            : "";
 
-        const lootDescription =
-            selectedChest.loot.length > 0
-                ? selectedChest.loot
-                      .map((item) => `\`${item.amount}x\` ${item.item}`)
-                      .join(", ")
-                : "";
-
-        const resultMessage = lootDescription
-            ? `You chose **Chest ${
-                  selectedChestIndex + 1
-              }**!\n\nIt contained ${getAmount(
-                  selectedChest.coins,
-              )} and the following items:\n${lootDescription}`
-            : `You chose **Chest ${
-                  selectedChestIndex + 1
-              }**!\n\nIt contained ${getAmount(selectedChest.coins)}.`;
-
-        embed.setDescription(resultMessage);
-        await i.editReply({ embeds: [embed], components: [] }).catch(noop);
-    });
-
-    collector.on("end", async () => {
-        if (!collected) {
-            embed.setDescription(
-                `You got distracted and lost the opportunity to claim a chest.`,
-            );
-            await i.editReply({ embeds: [embed], components: [] }).catch(noop);
-        }
-    });
+    await i
+        .editReply({
+            embeds: [
+                embed.setDescription(
+                    lootDescription
+                        ? `You chose **Chest ${
+                              selectedChestIndex + 1
+                          }**!\n\nIt contained ${getAmount(
+                              selectedChest.coins,
+                          )} and the following items:\n${lootDescription}`
+                        : `You chose **Chest ${
+                              selectedChestIndex + 1
+                          }**!\n\nIt contained ${getAmount(
+                              selectedChest.coins,
+                          )}.`,
+                ),
+            ],
+            components: [],
+        })
+        .catch(noop);
 }
 
 export async function handleMaterials(
@@ -159,7 +176,7 @@ export async function handleMaterials(
 
     const { materials } = generateRawMaterials();
 
-    if (materials.length > 0) {
+    if (is.array(materials)) {
         await addItemToInventory(
             i.user.id,
             materials.map((material) => ({

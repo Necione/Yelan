@@ -45,7 +45,7 @@ export async function handleAbyssChest(
         return `You have already collected the chest here!`;
     }
 
-    const chestLoot = await generateChestLoot(stats.worldLevel);
+    const chestLoot = generateChestLoot(stats.worldLevel);
 
     if (Math.random() < 0.01) {
         chestLoot.loot.push({ item: "Engulfing Lightning", amount: 1 });
