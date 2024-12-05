@@ -385,7 +385,7 @@ export const info = buildCommand<SlashCommand>({
                 });
             }
 
-            if (fullWeaponName && fullWeaponName.includes("Calamity Quell­er")) {
+            if (fullWeaponName && fullWeaponName.includes("Calamity Queller")) {
                 embed.addFields({
                     name: "Special Effect",
                     value: "Monsters can no longer defend.",
