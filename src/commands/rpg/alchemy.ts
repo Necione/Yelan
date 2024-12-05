@@ -143,13 +143,13 @@ export const alchemy = buildCommand<SlashCommand>({
 
         if (isAscended && !stats.deity) {
             const deityOptions = [
-                { label: "Barbatos", value: "Barbatos" },
-                { label: "Rex Lapis", value: "Rex Lapis" },
-                { label: "Focalors", value: "Focalors" },
-                { label: "The Tsaritsa", value: "The Tsaritsa" },
-                { label: "Raiden Shogun", value: "Raiden Shogun" },
-                { label: "Murata", value: "Murata" },
-                { label: "Kusanali", value: "Kusanali" },
+                { label: "Venti", value: "Venti" },
+                { label: "Zhongli", value: "Zhongli" },
+                { label: "Furina", value: "Furina" },
+                { label: "Tsaritsa", value: "Tsaritsa" },
+                { label: "Raiden", value: "Raiden" },
+                { label: "Nahida", value: "Nahida" },
+                { label: "Mavuika", value: "Mavuika" },
             ];
 
             const selectMenu = new StringSelectMenuBuilder()
