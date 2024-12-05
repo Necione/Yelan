@@ -1,8 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import { embedComment } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats } from "../../services";
-import { getUserSkillLevelData, skills } from "../../utils/skillsData";
+import { skills } from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
 function getMaxActiveSkills(alchemyProgress: number) {
@@ -26,35 +26,9 @@ export const skillsCommand = buildCommand<SlashCommand>({
         .setDescription(
             "[RPG] Displays your skills or details about a specific skill.",
         )
-        .addStringOption((option) =>
-            option
-                .setName("skill")
-                .setDescription("The skill you want to view")
-                .setRequired(false)
-                .setAutocomplete(true),
-        )
         .setDMPermission(false),
     defer: { silent: false },
-    async autocomplete(i) {
-        const searchTerm = i.options.getFocused()?.toLowerCase() || "";
 
-        const allOptions = [
-            ...skills.map((skill) => ({
-                name: `${skill.name}`,
-                value: skill.name,
-            })),
-            ...specialSkills.map((special) => ({
-                name: `${special.skillName}`,
-                value: special.skillName,
-            })),
-        ];
-
-        const filteredOptions = allOptions.filter((option) =>
-            option.name.toLowerCase().includes(searchTerm),
-        );
-
-        return i.respond(filteredOptions.slice(0, 25)).catch(noop);
-    },
     async execute(i, r) {
         const stats = await getUserStats(i.user.id);
 
@@ -64,64 +38,6 @@ export const skillsCommand = buildCommand<SlashCommand>({
                     `No stats found for you, please set up your profile.`,
                 ),
             );
-        }
-
-        const skillName = i.options.getString("skill");
-
-        if (skillName) {
-            const skill =
-                skills.find((s) => s.name === skillName) ||
-                specialSkills.find((s) => s.skillName === skillName);
-
-            if (!skill) {
-                return r.edit(
-                    embedComment(`The skill "${skillName}" does not exist.`),
-                );
-            }
-
-            if ("levels" in skill) {
-                const userSkillLevelData = getUserSkillLevelData(
-                    stats,
-                    skillName,
-                );
-
-                const userSkillLevel = userSkillLevelData
-                    ? userSkillLevelData.level
-                    : 0;
-
-                const embed = new EmbedBuilder()
-                    .setColor("Aqua")
-                    .setTitle(`\`${skill.emoji}\` ${skill.name} Skill Details`)
-                    .setDescription(
-                        skill.levels
-                            .map((level) => {
-                                const isCurrentLevel =
-                                    level.level === userSkillLevel;
-                                const levelHeader = isCurrentLevel
-                                    ? `**Level ${level.level}:** (Current)`
-                                    : `**Level ${level.level}:**`;
-                                return `> ${levelHeader}\n${level.description}`;
-                            })
-                            .join("\n\n"),
-                    )
-                    .setFooter({
-                        text: `Use /learn to learn or upgrade this skill.`,
-                    });
-
-                return r.edit({ embeds: [embed] });
-            } else {
-                const embed = new EmbedBuilder()
-                    .setColor("Gold")
-                    .setTitle(
-                        `\`${skill.emoji}\` ${skill.skillName} Special Skill`,
-                    )
-                    .setDescription(skill.description)
-                    .setFooter({
-                        text: "Special skills are unlocked through mastery levels.",
-                    });
-
-                return r.edit({ embeds: [embed] });
-            }
         }
 
         const learnedSkills = stats.skills || [];

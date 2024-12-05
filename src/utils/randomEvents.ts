@@ -4,6 +4,7 @@ import type { Message } from "discord.js";
 import { injuredManEvent } from "../utils/events/injuredManEvent";
 import { cliffFallEvent } from "./events/cliffFallEvent";
 import { healingWellEvent } from "./events/healingWellEvent";
+import { merchantEvent } from "./events/merchantEvent";
 import { secretCultEvent } from "./events/secretCultEvent";
 import { thiefEvent } from "./events/theifEvent";
 
@@ -18,6 +19,7 @@ export async function handleRandomEvent(
         cliffFallEvent,
         secretCultEvent,
         thiefEvent,
+        merchantEvent,
     ]);
 
     const randomIndex = Math.floor(Math.random() * events.length);

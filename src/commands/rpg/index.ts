@@ -14,9 +14,9 @@ export * from "./explore";
 export * from "./fish";
 export * from "./heal";
 export * from "./hunt";
+export * from "./info";
 export * from "./learn";
 export * from "./masteries";
-export * from "./monster";
 export * from "./move";
 export * from "./rebirth";
 export * from "./requests";
@@ -28,6 +28,6 @@ export * from "./spell";
 export * from "./travel";
 export * from "./unequip";
 export * from "./upgrade";
-export * from "./weapon";
 export * from "./whereami";
 export * from "./worship";
+
