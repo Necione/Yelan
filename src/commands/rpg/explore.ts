@@ -1,13 +1,12 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, get, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { getProfileByUserId, syncStats } from "../../services";
+import { getProfileByUserId, getUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { getUserSkillLevelData } from "../../utils/skillsData";
 import { handleChest, handleMaterials } from "./handlers/exploreHandler";
 
 export const explore = buildCommand<SlashCommand>({
-    enabled: false,
     command: new SlashCommandBuilder()
         .setName("explore")
         .setDescription(
@@ -24,7 +23,6 @@ export const explore = buildCommand<SlashCommand>({
                     { name: "Materials", value: "materials" },
                 ),
         ),
-    only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
     async execute(i, r) {
         locked.set(i.user);
@@ -50,7 +48,7 @@ export const explore = buildCommand<SlashCommand>({
             return r.edit(embedComment(cc.message));
         }
 
-        const stats = await syncStats(i.user.id);
+        const stats = await getUserStats(i.user.id);
 
         if (!stats) {
             locked.del(i.user.id);
