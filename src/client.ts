@@ -2,13 +2,13 @@ import "dotenv/config";
 
 import { loadEvents } from "@elara-services/botbuilder";
 import { EnkaVerificationClient } from "@elara-services/enka/dist/verification";
+import type { InviteClient } from "@elara-services/invite";
 import { getFilesList, log, times } from "@elara-services/utils";
 import { ActivityType, Client, IntentsBitField, Options } from "discord.js";
 import moment from "moment-timezone";
 import * as events from "./events";
 import { checkIfDeploy } from "./scripts/checks";
 import { getProfileByUserId, updateRankedUID } from "./services";
-import type { InviteClient } from "@elara-services/invite";
 if (process.env.timeZone) {
     moment.tz.setDefault(process.env.timeZone);
     times.timeZone = process.env.timeZone;
@@ -53,6 +53,7 @@ class BotClient extends Client {
         if (!checkIfDeploy()) {
             this.enka = new EnkaVerificationClient(this);
             this.rest.on("rateLimited", log);
+            this.on("debug", log);
             this.enka.onVerificationFinish(async (data, user) => {
                 const r = await getProfileByUserId(user.id);
                 if (!r) {
