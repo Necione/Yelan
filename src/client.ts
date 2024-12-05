@@ -52,16 +52,6 @@ class BotClient extends Client {
         });
         if (!checkIfDeploy()) {
             this.enka = new EnkaVerificationClient(this);
-            this.rest.on("rateLimited", log);
-            this.on("raw", (data) => {
-                if (!data?.t || !data.d) {
-                    return;
-                }
-                if (["presence", "guild_create", "message_update", "guild_member_update", "message_create"].some((c) => data.t.toLowerCase().includes(c))) {
-                    return;
-                }
-                log(data);
-            });
             this.enka.onVerificationFinish(async (data, user) => {
                 const r = await getProfileByUserId(user.id);
                 if (!r) {
