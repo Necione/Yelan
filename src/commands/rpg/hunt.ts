@@ -12,7 +12,7 @@ export const hunt = buildCommand<SlashCommand>({
     defer: { silent: false },
     async execute(i, r) {
         const message = await r.edit(
-            embedComment(`⚔️ The hunt is about to begin ⚔️`, "Orange"),
+            embedComment(`\`⚔️\` You continue your adventure...`, "Orange"),
         );
         if (!message) {
             return r.edit(

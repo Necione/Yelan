@@ -5,6 +5,7 @@ import { injuredManEvent } from "../utils/events/injuredManEvent";
 import { cliffFallEvent } from "./events/cliffFallEvent";
 import { healingWellEvent } from "./events/healingWellEvent";
 import { secretCultEvent } from "./events/secretCultEvent";
+import { thiefEvent } from "./events/theifEvent";
 
 export async function handleRandomEvent(
     message: Message,
@@ -16,6 +17,7 @@ export async function handleRandomEvent(
         healingWellEvent,
         cliffFallEvent,
         secretCultEvent,
+        thiefEvent,
     ]);
 
     const randomIndex = Math.floor(Math.random() * events.length);

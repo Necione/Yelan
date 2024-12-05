@@ -58,10 +58,9 @@ export async function handleHunt(
         selectedMonsters = await getMonstersByName(selectedMonstersByName);
     }
     if (!is.array(selectedMonsters)) {
-        // If there is no selected monsters then do this.
-        if (Math.random() < 0.1) {
-            await handleRandomEvent(message, stats, userWallet);
+        if (Math.random() < 0.2) {
             await updateUserStats(stats.userId, { isHunting: false });
+            await handleRandomEvent(message, stats, userWallet);
             return;
         }
         await initializeMonsters();
