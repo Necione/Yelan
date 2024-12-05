@@ -805,8 +805,8 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Memory_of_Dust:1303985604060643359>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/memory_of_dust.png",
     },
-    "Ca­lam­i­ty Quell­er": {
-        name: "Ca­lam­i­ty Quell­er",
+    "Calamity Quell­er": {
+        name: "Calamity Quell­er",
         type: "Polearm",
         sellPrice: 100,
         attackPower: 75,
