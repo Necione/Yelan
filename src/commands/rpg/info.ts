@@ -13,10 +13,7 @@ import { getCommonLocationsForGroup } from "../../utils/locationUtils";
 import { MonsterGroup } from "../../utils/monsterHelper";
 import type { WeaponType } from "../../utils/rpgitems/weapons";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
-import {
-    getUserSkillLevelData,
-    skills
-} from "../../utils/skillsData";
+import { getUserSkillLevelData, skills } from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
 export const info = buildCommand<SlashCommand>({
@@ -48,8 +45,9 @@ export const info = buildCommand<SlashCommand>({
         .setDMPermission(false),
     defer: { silent: false },
     async autocomplete(i) {
-        const type = i.options.getString("type", true);
-        const searchTerm = i.options.getFocused()?.toLowerCase() || "";
+        const type = i.options.getString("type", false) ?? "";
+        const searchTerm =
+            i.options.getString("name", false)?.toLowerCase() || "";
 
         if (type === "skill") {
             const allOptions = [
@@ -132,7 +130,9 @@ export const info = buildCommand<SlashCommand>({
             }
 
             const skill =
-                skills.find((s) => s.name.toLowerCase() === name.toLowerCase()) ||
+                skills.find(
+                    (s) => s.name.toLowerCase() === name.toLowerCase(),
+                ) ||
                 specialSkills.find(
                     (s) => s.skillName.toLowerCase() === name.toLowerCase(),
                 );
@@ -379,7 +379,10 @@ export const info = buildCommand<SlashCommand>({
                 });
             }
 
-            if (fullWeaponName && fullWeaponName.includes("Wolf's Gravestone")) {
+            if (
+                fullWeaponName &&
+                fullWeaponName.includes("Wolf's Gravestone")
+            ) {
                 embed.addFields({
                     name: "Special Effect",
                     value: "Deal 50% more damage per 1000 HP the monster has.",
