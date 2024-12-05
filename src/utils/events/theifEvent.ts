@@ -5,10 +5,7 @@ import { ButtonStyle, EmbedBuilder, type Message } from "discord.js";
 import { startHunt } from "../../commands/rpg/handlers/huntHandler";
 import { removeBalance } from "../../services";
 
-export async function thiefEvent(
-    message: Message,
-    stats: UserStats,
-) {
+export async function thiefEvent(message: Message, stats: UserStats) {
     const ids = {
         catch: "event_catch",
         ignore: "event_ignore",
