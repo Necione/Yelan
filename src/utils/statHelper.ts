@@ -29,8 +29,8 @@ export function getAtkScaleMultiplier(worldLevel: number) {
         total += x;
         if (level % 5 === 0) {
             total += z;
-            x += 0.2;
-            z += 1;
+            x += 0.1;
+            z += 0.25;
         }
     }
     return total;
