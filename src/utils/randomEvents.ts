@@ -6,7 +6,7 @@ import { cliffFallEvent } from "./events/cliffFallEvent";
 import { healingWellEvent } from "./events/healingWellEvent";
 import { merchantEvent } from "./events/merchantEvent";
 import { secretCultEvent } from "./events/secretCultEvent";
-import { thiefEvent } from "./events/theifEvent";
+// import { thiefEvent } from "./events/theifEvent";
 
 export async function handleRandomEvent(
     message: Message,
@@ -18,7 +18,7 @@ export async function handleRandomEvent(
         healingWellEvent,
         cliffFallEvent,
         secretCultEvent,
-        thiefEvent,
+        // thiefEvent,
         merchantEvent,
     ]);
 
