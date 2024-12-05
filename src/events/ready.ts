@@ -10,6 +10,15 @@ export const ready = createEvent({
     name: Events.ClientReady,
     async execute(client: Client<true>) {
         client.invites = new InviteClient(client, { type: "memory" });
+        setInterval(() => {
+            log(
+                `[MEMORY]: ${(
+                    process.memoryUsage().heapUsed /
+                    1024 /
+                    1024
+                ).toFixed(2)}MB`,
+            );
+        }, get.mins(1));
         await Promise.all([
             updateInvitesCache(client.invites, true),
             loadAllFonts(),

@@ -52,6 +52,7 @@ class BotClient extends Client {
         });
         if (!checkIfDeploy()) {
             this.enka = new EnkaVerificationClient(this);
+            this.rest.on("rateLimited", log);
             this.enka.onVerificationFinish(async (data, user) => {
                 const r = await getProfileByUserId(user.id);
                 if (!r) {
