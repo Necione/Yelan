@@ -79,7 +79,7 @@ export async function handleAbyssBattle(
     }
 
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
-
+    const startHP = parseInt(`${currentPlayerHp}`);
     let currentMonsterIndex = 0;
 
     const handleMonsterBattle = async (
@@ -249,6 +249,7 @@ export async function handleAbyssBattle(
                     hasCrystallize,
                     hasFatigue,
                     monsterState,
+                    startHP,
                 );
 
                 currentPlayerHp = updatedPlayerHp;
