@@ -2,7 +2,7 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, make } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
-import { syncStats } from "../../services/userStats";
+import { syncStats } from "../../services/rpgSync/userStats";
 import { cooldowns } from "../../utils";
 import { formatChange } from "../../utils/hunt";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";

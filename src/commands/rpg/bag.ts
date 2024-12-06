@@ -2,7 +2,7 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { chunk, embedComment, is, make } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
-import { syncStats } from "../../services/userStats";
+import { syncStats } from "../../services/rpgSync/userStats";
 import { getPaginatedMessage } from "../../utils";
 import {
     type ArtifactName,

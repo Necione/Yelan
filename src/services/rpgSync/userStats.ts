@@ -1,18 +1,18 @@
 import { is, make, noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
-import { prisma } from "../prisma";
-import { calculateMasteryLevel } from "../utils/masteryHelper";
+import { prisma } from "../../prisma";
+import { calculateMasteryLevel } from "../../utils/masteryHelper";
 import type {
     ArtifactSetName,
     ArtifactType,
-} from "../utils/rpgitems/artifacts";
+} from "../../utils/rpgitems/artifacts";
 import {
     artifacts,
     artifactSets,
     getArtifactSetBonuses,
     type ArtifactName,
-} from "../utils/rpgitems/artifacts";
-import { weapons, type WeaponName } from "../utils/rpgitems/weapons";
+} from "../../utils/rpgitems/artifacts";
+import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 interface InventoryItem {
     item: string;

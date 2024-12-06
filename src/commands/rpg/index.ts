@@ -10,7 +10,6 @@ export * from "./diffuse";
 export * from "./downgrade";
 export * from "./eat";
 export * from "./equip";
-export * from "./explore";
 export * from "./fish";
 export * from "./heal";
 export * from "./hunt";

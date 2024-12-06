@@ -2,7 +2,7 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, make, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, getUserStats } from "../../services";
-import { syncStats } from "../../services/userStats";
+import { syncStats } from "../../services/sync/userStats";
 import {
     initializeMonsters,
     monsters,

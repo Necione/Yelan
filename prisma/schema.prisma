@@ -182,6 +182,39 @@ type Roles {
   role String
 }
 
+model UserCharacter {
+    id                 String    @id @map("_id") @default(auto()) @db.ObjectId
+    userId             String
+    name               String
+    nickname           String?
+    hp                 Int
+    maxHP              Int
+    baseAttack         Float
+    attackPower        Float
+    critChance         Float
+    critValue          Float
+    defChance          Float
+    defValue           Float
+    expedition         Boolean
+    expeditionStart    DateTime?
+    equippedWeapon     String?
+    equippedFlower     String?
+    equippedPlume      String?
+    equippedSands      String?
+    equippedGoblet     String?
+    equippedCirclet    String?
+    level              Int       @default(1)
+    rebirths           Int       @default(0)
+    assignedAtk        Float     @default(0)
+    assignedHp         Float     @default(0)
+    assignedCritValue  Float     @default(0)
+    assignedDefValue   Float     @default(0)
+    masteryCatalyst    Int       @default(0)
+    healEffectiveness  Float     @default(0)
+    maxMana            Int       @default(20)
+    @@index([userId])
+}
+
 model UserStats {
   id                        String         @id @default(auto()) @map("_id") @db.ObjectId
   userId                    String         @unique
