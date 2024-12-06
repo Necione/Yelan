@@ -931,7 +931,7 @@ export const artifacts = {
         chestChance: 0,
     },
     "Golden Bird's Shedding": {
-        type: "Flower",
+        type: "Plume",
         artifactSet: "Golden Troupe",
         sellPrice: 0,
         attackPower: 50,
@@ -944,7 +944,7 @@ export const artifacts = {
         chestChance: 0,
     },
     "Golden Era's Prelude": {
-        type: "Flower",
+        type: "Sands",
         artifactSet: "Golden Troupe",
         sellPrice: 0,
         attackPower: 35,
@@ -957,7 +957,7 @@ export const artifacts = {
         chestChance: 0,
     },
     "Golden Night's Bustle": {
-        type: "Flower",
+        type: "Goblet",
         artifactSet: "Golden Troupe",
         sellPrice: 0,
         attackPower: 50,
@@ -970,7 +970,7 @@ export const artifacts = {
         chestChance: 0,
     },
     "Golden Troupe's Reward": {
-        type: "Flower",
+        type: "Circlet",
         artifactSet: "Golden Troupe",
         sellPrice: 0,
         attackPower: 40,
