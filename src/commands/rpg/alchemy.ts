@@ -57,7 +57,7 @@ function getAlchemyRankWithEmoji(progress: number): string {
 const createAlchemyBar = (
     current: number,
     max: number,
-    length: number = 20,
+    length = 20,
 ): string => {
     const { name: rankName, rankIndex } = getAlchemyRank(current);
     const rankMin = alchemyRanks[rankIndex].min;

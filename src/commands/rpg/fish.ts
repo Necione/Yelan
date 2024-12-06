@@ -9,6 +9,7 @@ import {
     noop,
     shuffle,
     sleep,
+    snowflakes,
 } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import {
@@ -184,16 +185,25 @@ export const fishCommand = buildCommand<SlashCommand>({
                 const newLegendariesCaught = isLegendary
                     ? (stats.legendariesCaught || 0) + 1
                     : stats.legendariesCaught || 0;
-
-                const newFishItem = {
-                    item: selectedFish.name,
-                    amount: 1,
-                    metadata: {
-                        length: fishLength,
-                        star: null,
-                    },
-                };
-                stats.inventory.push(newFishItem);
+                const f = stats.inventory.find(
+                    (c) =>
+                        c.item === selectedFish.name &&
+                        c.metadata &&
+                        c.metadata.length === fishLength,
+                );
+                if (f) {
+                    f.amount++;
+                } else {
+                    stats.inventory.push({
+                        id: snowflakes.generate(),
+                        item: selectedFish.name,
+                        amount: 1,
+                        metadata: {
+                            length: fishLength,
+                            star: null,
+                        },
+                    });
+                }
 
                 const newTimesFished = stats.timesFished + 1;
                 const newTimesFishedForLevel =
@@ -430,16 +440,25 @@ export const fishCommand = buildCommand<SlashCommand>({
                 const newLegendariesCaught = isLegendary
                     ? (stats.legendariesCaught || 0) + 1
                     : stats.legendariesCaught || 0;
-
-                const newFishItem = {
-                    item: selectedFish.name,
-                    amount: 1,
-                    metadata: {
-                        length: fishLength,
-                        star: null,
-                    },
-                };
-                stats.inventory.push(newFishItem);
+                const f = stats.inventory.find(
+                    (c) =>
+                        c.item === selectedFish.name &&
+                        c.metadata &&
+                        c.metadata.length === fishLength,
+                );
+                if (f) {
+                    f.amount++;
+                } else {
+                    stats.inventory.push({
+                        id: snowflakes.generate(),
+                        item: selectedFish.name,
+                        amount: 1,
+                        metadata: {
+                            length: fishLength,
+                            star: null,
+                        },
+                    });
+                }
 
                 const newTimesFished = stats.timesFished + 1;
                 const newTimesFishedForLevel =

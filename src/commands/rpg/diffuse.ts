@@ -1,5 +1,11 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, getKeys, is, noop } from "@elara-services/utils";
+import {
+    embedComment,
+    getKeys,
+    is,
+    noop,
+    snowflakes,
+} from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
@@ -176,6 +182,7 @@ export const diffuse = buildCommand<SlashCommand>({
                 existingBait.amount += baitAmount;
             } else {
                 stats.inventory.push({
+                    id: snowflakes.generate(),
                     item: selectedBait,
                     amount: baitAmount,
                     metadata: null,

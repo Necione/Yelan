@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, noop } from "@elara-services/utils";
+import { embedComment, is, make, noop } from "@elara-services/utils";
 import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
 import { addBalance, getUserStats, updateUserStats } from "../../services";
@@ -32,24 +32,43 @@ export const sell = buildCommand<SlashCommand>({
     defer: { silent: false },
     async autocomplete(i) {
         const stats = await getUserStats(i.user.id);
-        if (!stats) {
+        if (!stats || !is.array(stats.inventory)) {
             return i
                 .respond([{ name: "No items found.", value: "n/a" }])
                 .catch(noop);
         }
 
-        const inventoryItems = stats.inventory;
+        // const inventoryItems = stats.inventory;
+        const items = make.map<
+            string,
+            { id: string; name: string; amount: number; length: number }
+        >();
 
-        const options = inventoryItems.map((invItem, index) => {
-            let displayName = invItem.item;
-            if (invItem.metadata?.length) {
-                displayName += ` (${invItem.metadata.length} cm)`;
+        for (const c of stats.inventory) {
+            const f = items.get(c.id);
+            if (!f) {
+                items.set(c.id, {
+                    id: c.id,
+                    name: c.item,
+                    amount: c.amount,
+                    length: c.metadata?.length || 0,
+                });
             }
-            return {
-                name: displayName,
-                value: String(index),
-            };
-        });
+        }
+        if (!items.size) {
+            return i
+                .respond([{ name: "No items found.", value: "n/a" }])
+                .catch(noop);
+        }
+
+        const options = [...items.values()]
+            .sort((a, b) => b.amount - a.amount)
+            .map((c) => ({
+                name: `${c.amount}x | ${c.name}${
+                    c.length ? ` (${c.length} cm)` : ""
+                }`,
+                value: c.id,
+            }));
 
         const focusedValue = i.options.getFocused()?.toLowerCase() || "";
 
@@ -60,20 +79,15 @@ export const sell = buildCommand<SlashCommand>({
         return i.respond(filteredOptions.slice(0, 25)).catch(noop);
     },
     async execute(i, r) {
-        const itemIndexStr = i.options.getString("item", true);
+        const id = i.options.getString("item", true);
         const amountToSell = i.options.getInteger("amount", true);
 
         if (amountToSell <= 0) {
             return r.edit(embedComment(`Something went wrong...`));
         }
 
-        if (itemIndexStr === "n/a") {
+        if (id === "n/a") {
             return r.edit(embedComment(`You didn't select a valid item.`));
-        }
-
-        const itemIndex = parseInt(itemIndexStr, 10);
-        if (isNaN(itemIndex)) {
-            return r.edit(embedComment(`Invalid item selection.`));
         }
 
         const stats = await getUserStats(i.user.id);
@@ -88,10 +102,12 @@ export const sell = buildCommand<SlashCommand>({
         if (stats.isHunting) {
             return r.edit(embedComment("You cannot sell while hunting!"));
         }
+        if (!is.array(stats.inventory)) {
+            stats.inventory = [];
+        }
 
-        const inventoryItems = stats.inventory || [];
+        const item = stats.inventory.find((c) => c.id === id);
 
-        const item = inventoryItems[itemIndex];
         if (!item) {
             return r.edit(
                 embedComment(
@@ -179,13 +195,13 @@ export const sell = buildCommand<SlashCommand>({
 
         item.amount -= amountToSell;
         if (item.amount <= 0) {
-            inventoryItems.splice(itemIndex, 1);
+            stats.inventory = stats.inventory.filter((c) => c.id !== item.id);
         }
 
         await Promise.all([
             updateUserStats(i.user.id, {
                 inventory: {
-                    set: inventoryItems,
+                    set: stats.inventory,
                 },
             }),
             addBalance(

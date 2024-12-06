@@ -272,6 +272,7 @@ type UserEffect {
 }
 
 type UserStatsInv {
+  id       String             @default("")
   item     String             @default("")
   amount   Int                @default(0)
   metadata UserStatsMetaData?

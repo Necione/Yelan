@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import { embedComment, noop, snowflakes } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { recipes } from "../../utils/recipes";
@@ -69,6 +69,7 @@ export const cook = buildCommand<SlashCommand>({
                                 recipe.result.amount * cookingItem.amount;
                         } else {
                             stats.inventory.push({
+                                id: snowflakes.generate(),
                                 item: recipe.result.item,
                                 amount:
                                     recipe.result.amount * cookingItem.amount,
