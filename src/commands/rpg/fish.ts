@@ -9,6 +9,7 @@ import {
     noop,
     shuffle,
     sleep,
+    snowflakes,
 } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import {
@@ -185,15 +186,15 @@ export const fishCommand = buildCommand<SlashCommand>({
                     ? (stats.legendariesCaught || 0) + 1
                     : stats.legendariesCaught || 0;
 
-                const newFishItem = {
+                stats.inventory.push({
+                    id: snowflakes.generate(),
                     item: selectedFish.name,
                     amount: 1,
                     metadata: {
                         length: fishLength,
                         star: null,
                     },
-                };
-                stats.inventory.push(newFishItem);
+                });
 
                 const newTimesFished = stats.timesFished + 1;
                 const newTimesFishedForLevel =
@@ -254,9 +255,8 @@ export const fishCommand = buildCommand<SlashCommand>({
                 for (let l = 0; l < totalLevelUps; l++) {
                     caughtEmbed.addFields({
                         name: "Fishing Level Up!",
-                        value: `\`🌟\` Congratulations! You reached Fishing Level ${
-                            stats.fishingLevel + 1
-                        }!`,
+                        value: `\`🌟\` Congratulations! You reached Fishing Level ${stats.fishingLevel + 1
+                            }!`,
                     });
                 }
             } else {
@@ -431,15 +431,15 @@ export const fishCommand = buildCommand<SlashCommand>({
                     ? (stats.legendariesCaught || 0) + 1
                     : stats.legendariesCaught || 0;
 
-                const newFishItem = {
+                stats.inventory.push({
+                    id: snowflakes.generate(),
                     item: selectedFish.name,
                     amount: 1,
                     metadata: {
                         length: fishLength,
                         star: null,
                     },
-                };
-                stats.inventory.push(newFishItem);
+                });
 
                 const newTimesFished = stats.timesFished + 1;
                 const newTimesFishedForLevel =
@@ -505,9 +505,8 @@ export const fishCommand = buildCommand<SlashCommand>({
                 for (let l = 0; l < totalLevelUps; l++) {
                     caughtEmbed.addFields({
                         name: "Fishing Level Up!",
-                        value: `\`🌟\` Congratulations! You reached Fishing Level ${
-                            stats.fishingLevel + 1
-                        }!`,
+                        value: `\`🌟\` Congratulations! You reached Fishing Level ${stats.fishingLevel + 1
+                            }!`,
                     });
                 }
             } else {

@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, make, noop } from "@elara-services/utils";
+import { embedComment, make, noop, snowflakes } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
@@ -152,6 +152,7 @@ export const craft = buildCommand<SlashCommand>({
             existingTargetItem.amount += amountToCraft;
         } else {
             stats.inventory.push({
+                id: snowflakes.generate(),
                 item: craftOption,
                 amount: amountToCraft,
                 metadata: null,
