@@ -50,11 +50,9 @@ export const sell = buildCommand<SlashCommand>({
                 items.set(c.id, {
                     id: c.id,
                     name: c.item,
-                    amount: 1,
+                    amount: c.amount,
                     length: c.metadata?.length || 0,
                 });
-            } else {
-                f.amount++;
             }
         }
         if (!items.size) {
@@ -63,12 +61,14 @@ export const sell = buildCommand<SlashCommand>({
                 .catch(noop);
         }
 
-        const options = [...items.values()].map((c) => ({
-            name: `${c.amount}x | ${c.name}${
-                c.length ? ` (${c.length} cm)` : ""
-            }`,
-            value: c.id,
-        }));
+        const options = [...items.values()]
+            .sort((a, b) => b.amount - a.amount)
+            .map((c) => ({
+                name: `${c.amount}x | ${c.name}${
+                    c.length ? ` (${c.length} cm)` : ""
+                }`,
+                value: c.id,
+            }));
 
         const focusedValue = i.options.getFocused()?.toLowerCase() || "";
 
