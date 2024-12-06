@@ -185,16 +185,25 @@ export const fishCommand = buildCommand<SlashCommand>({
                 const newLegendariesCaught = isLegendary
                     ? (stats.legendariesCaught || 0) + 1
                     : stats.legendariesCaught || 0;
-
-                stats.inventory.push({
-                    id: snowflakes.generate(),
-                    item: selectedFish.name,
-                    amount: 1,
-                    metadata: {
-                        length: fishLength,
-                        star: null,
-                    },
-                });
+                const f = stats.inventory.find(
+                    (c) =>
+                        c.item === selectedFish.name &&
+                        c.metadata &&
+                        c.metadata.length === fishLength,
+                );
+                if (f) {
+                    f.amount++;
+                } else {
+                    stats.inventory.push({
+                        id: snowflakes.generate(),
+                        item: selectedFish.name,
+                        amount: 1,
+                        metadata: {
+                            length: fishLength,
+                            star: null,
+                        },
+                    });
+                }
 
                 const newTimesFished = stats.timesFished + 1;
                 const newTimesFishedForLevel =
@@ -255,8 +264,9 @@ export const fishCommand = buildCommand<SlashCommand>({
                 for (let l = 0; l < totalLevelUps; l++) {
                     caughtEmbed.addFields({
                         name: "Fishing Level Up!",
-                        value: `\`🌟\` Congratulations! You reached Fishing Level ${stats.fishingLevel + 1
-                            }!`,
+                        value: `\`🌟\` Congratulations! You reached Fishing Level ${
+                            stats.fishingLevel + 1
+                        }!`,
                     });
                 }
             } else {
@@ -430,16 +440,25 @@ export const fishCommand = buildCommand<SlashCommand>({
                 const newLegendariesCaught = isLegendary
                     ? (stats.legendariesCaught || 0) + 1
                     : stats.legendariesCaught || 0;
-
-                stats.inventory.push({
-                    id: snowflakes.generate(),
-                    item: selectedFish.name,
-                    amount: 1,
-                    metadata: {
-                        length: fishLength,
-                        star: null,
-                    },
-                });
+                const f = stats.inventory.find(
+                    (c) =>
+                        c.item === selectedFish.name &&
+                        c.metadata &&
+                        c.metadata.length === fishLength,
+                );
+                if (f) {
+                    f.amount++;
+                } else {
+                    stats.inventory.push({
+                        id: snowflakes.generate(),
+                        item: selectedFish.name,
+                        amount: 1,
+                        metadata: {
+                            length: fishLength,
+                            star: null,
+                        },
+                    });
+                }
 
                 const newTimesFished = stats.timesFished + 1;
                 const newTimesFishedForLevel =
@@ -505,8 +524,9 @@ export const fishCommand = buildCommand<SlashCommand>({
                 for (let l = 0; l < totalLevelUps; l++) {
                     caughtEmbed.addFields({
                         name: "Fishing Level Up!",
-                        value: `\`🌟\` Congratulations! You reached Fishing Level ${stats.fishingLevel + 1
-                            }!`,
+                        value: `\`🌟\` Congratulations! You reached Fishing Level ${
+                            stats.fishingLevel + 1
+                        }!`,
                     });
                 }
             } else {

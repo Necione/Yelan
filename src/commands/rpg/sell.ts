@@ -39,15 +39,22 @@ export const sell = buildCommand<SlashCommand>({
         }
 
         // const inventoryItems = stats.inventory;
-        const items = make.map<string, { id: string, name: string, amount: number, length: number }>();
+        const items = make.map<
+            string,
+            { id: string; name: string; amount: number; length: number }
+        >();
 
         for (const c of stats.inventory) {
-            const id = `${c.item}${c.metadata?.length ? `|${c.metadata.length}` : ""}`;
-            const f = items.get(id);
-            if (f) {
-                f.amount++;
+            const f = items.get(c.id);
+            if (!f) {
+                items.set(c.id, {
+                    id: c.id,
+                    name: c.item,
+                    amount: 1,
+                    length: c.metadata?.length || 0,
+                });
             } else {
-                items.set(id, { id, name: c.item, amount: 1, length: c.metadata?.length || 0 });
+                f.amount++;
             }
         }
         if (!items.size) {
@@ -56,18 +63,10 @@ export const sell = buildCommand<SlashCommand>({
                 .catch(noop);
         }
 
-        // const options = inventoryItems.map((invItem, index) => {
-        //     let displayName = invItem.item;
-        //     if (invItem.metadata?.length) {
-        //         displayName += ` (${invItem.metadata.length} cm)`;
-        //     }
-        //     return {
-        //         name: displayName,
-        //         value: String(index),
-        //     };
-        // });
         const options = [...items.values()].map((c) => ({
-            name: `${c.amount}x | ${c.name}${c.length ? ` (${c.length} cm)` : ""}`,
+            name: `${c.amount}x | ${c.name}${
+                c.length ? ` (${c.length} cm)` : ""
+            }`,
             value: c.id,
         }));
 
@@ -80,23 +79,16 @@ export const sell = buildCommand<SlashCommand>({
         return i.respond(filteredOptions.slice(0, 25)).catch(noop);
     },
     async execute(i, r) {
-        const it = i.options.getString("item", true);
+        const id = i.options.getString("item", true);
         const amountToSell = i.options.getInteger("amount", true);
 
         if (amountToSell <= 0) {
             return r.edit(embedComment(`Something went wrong...`));
         }
 
-        if (it === "n/a") {
+        if (id === "n/a") {
             return r.edit(embedComment(`You didn't select a valid item.`));
         }
-        const [ name ] = it.split("|");
-        const length = parseInt(it.split("|")[1] || "");
-
-        // const itemIndex = parseInt(itemIndexStr, 10);
-        // if (isNaN(itemIndex)) {
-        //     return r.edit(embedComment(`Invalid item selection.`));
-        // }
 
         const stats = await getUserStats(i.user.id);
         if (!stats) {
@@ -110,13 +102,11 @@ export const sell = buildCommand<SlashCommand>({
         if (stats.isHunting) {
             return r.edit(embedComment("You cannot sell while hunting!"));
         }
-
-        let inventoryItems = stats.inventory || [];
-        
-        let item = inventoryItems.find((c) => c.item === name);
-        if (is.number(length)) {
-            item = inventoryItems.find((c) => c.item === name && c.metadata?.length === length);
+        if (!is.array(stats.inventory)) {
+            stats.inventory = [];
         }
+
+        const item = stats.inventory.find((c) => c.id === id);
 
         if (!item) {
             return r.edit(
@@ -205,48 +195,36 @@ export const sell = buildCommand<SlashCommand>({
 
         item.amount -= amountToSell;
         if (item.amount <= 0) {
-            if (is.number(length)) {
-                inventoryItems = inventoryItems.filter((c) => {
-                    if (item) {
-                        if (c.item !== item.item) {
-                            return true;
-                        }
-                        if (c.metadata && is.number(c.metadata.length) && is.number(length) && c.metadata.length === length) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
-                inventoryItems = inventoryItems.filter((c) => item && c.item !== item.item && (c.metadata?.length || 0) !== (item.metadata?.length || 0));
-            } else {
-                inventoryItems = inventoryItems.filter((c) => item && c.item !== item.item);
-            }
+            stats.inventory = stats.inventory.filter((c) => c.id !== item.id);
         }
 
         await Promise.all([
             updateUserStats(i.user.id, {
                 inventory: {
-                    set: inventoryItems,
+                    set: stats.inventory,
                 },
             }),
             addBalance(
                 i.user.id,
                 totalSellPrice,
                 true,
-                `Sold ${amountToSell}x ${itemName}${item.metadata?.length ? ` (${item.metadata.length} cm)` : ""
+                `Sold ${amountToSell}x ${itemName}${
+                    item.metadata?.length ? ` (${item.metadata.length} cm)` : ""
                 }`,
             ),
         ]);
 
         const rebirthBonusMessage =
             stats.rebirths > 0
-                ? `\n-# (+${Math.round(rebirthBonus)} ${texts.c.u} from ${stats.rebirths
-                } Rebirth${stats.rebirths > 1 ? "s" : ""})`
+                ? `\n-# (+${Math.round(rebirthBonus)} ${texts.c.u} from ${
+                      stats.rebirths
+                  } Rebirth${stats.rebirths > 1 ? "s" : ""})`
                 : "";
 
         return r.edit(
             embedComment(
-                `You sold \`${amountToSell}x\` **${itemName}${item.metadata?.length ? ` (${item.metadata.length} cm)` : ""
+                `You sold \`${amountToSell}x\` **${itemName}${
+                    item.metadata?.length ? ` (${item.metadata.length} cm)` : ""
                 }** for ${getAmount(totalSellPrice)} ${rebirthBonusMessage}`,
                 "Green",
             ),

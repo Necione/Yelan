@@ -1,5 +1,11 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, getKeys, is, noop, snowflakes } from "@elara-services/utils";
+import {
+    embedComment,
+    getKeys,
+    is,
+    noop,
+    snowflakes,
+} from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
