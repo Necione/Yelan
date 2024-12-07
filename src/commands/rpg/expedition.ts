@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, is, make, noop } from "@elara-services/utils";
+import { embedComment, is, make, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     addBalance,
@@ -14,9 +14,9 @@ import { locationEmojis, locations } from "./travel";
 type LocationName = keyof typeof locations;
 
 const expeditionTimes = {
-    Explore: get.mins(10),
-    Normal: get.mins(20),
-    Scavenge: get.mins(30),
+    Explore: 10 * 60,
+    Normal: 20 * 60,
+    Scavenge: 30 * 60,
 } as const;
 
 const expeditionItemsCount = {
