@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, noop } from "@elara-services/utils";
+import { embedComment, is, make, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     addBalance,
@@ -14,9 +14,9 @@ import { locationEmojis, locations } from "./travel";
 type LocationName = keyof typeof locations;
 
 const expeditionTimes = {
-    Explore: get.mins(10),
-    Normal: get.mins(20),
-    Scavenge: get.mins(30),
+    Explore: 10 * 60,
+    Normal: 20 * 60,
+    Scavenge: 30 * 60,
 } as const;
 
 const expeditionItemsCount = {
@@ -68,7 +68,7 @@ export const expedition = buildCommand<SlashCommand>({
 
         if (optionName === "character") {
             const characters = await getUserCharacters(i.user.id);
-            if (!characters || characters.length === 0) {
+            if (!is.array(characters)) {
                 return i
                     .respond([{ name: "No characters found.", value: "n/a" }])
                     .catch(noop);
@@ -87,7 +87,7 @@ export const expedition = buildCommand<SlashCommand>({
                 }))
                 .slice(0, 25);
 
-            if (filtered.length === 0) {
+            if (!is.array(filtered)) {
                 return i
                     .respond([{ name: "No match found.", value: "n/a" }])
                     .catch(noop);
@@ -114,12 +114,12 @@ export const expedition = buildCommand<SlashCommand>({
         }
 
         const characters = await getUserCharacters(i.user.id);
-        if (!characters || characters.length === 0) {
+        if (!is.array(characters)) {
             return r.edit(embedComment("You have no characters."));
         }
 
         if (!characterName && !locationName && !expeditionType) {
-            const expeditionEmbeds: EmbedBuilder[] = [];
+            const expeditionEmbeds = make.array<EmbedBuilder>();
 
             for (const character of characters) {
                 if (character.expedition) {
@@ -235,7 +235,7 @@ export const expedition = buildCommand<SlashCommand>({
                 }
             }
 
-            if (expeditionEmbeds.length === 0) {
+            if (!is.array(expeditionEmbeds)) {
                 return r.edit(
                     embedComment("No characters or expeditions found."),
                 );

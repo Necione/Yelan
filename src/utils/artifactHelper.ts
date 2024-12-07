@@ -159,16 +159,17 @@ export function getSetBonusMessages(
     return messages;
 }
 
+const artifactTypes = make.array<ArtifactType>([
+    "Flower",
+    "Plume",
+    "Sands",
+    "Goblet",
+    "Circlet",
+]);
+
 function getActivatedSets(stats: UserStats | null): {
     [setName: string]: number;
 } {
-    const artifactTypes = make.array<ArtifactType>([
-        "Flower",
-        "Plume",
-        "Sands",
-        "Goblet",
-        "Circlet",
-    ]);
     const setCounts: { [setName: string]: number } = {};
 
     for (const type of artifactTypes) {
@@ -331,13 +332,6 @@ export function getCharacterSetBonusMessages(
 function getActivatedSetsForCharacter(stats: UserCharacter | null): {
     [setName: string]: number;
 } {
-    const artifactTypes = [
-        "Flower",
-        "Plume",
-        "Sands",
-        "Goblet",
-        "Circlet",
-    ] as const;
     const setCounts: { [setName: string]: number } = {};
 
     for (const type of artifactTypes) {

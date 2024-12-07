@@ -1,3 +1,4 @@
+import { make } from "@elara-services/utils";
 import type { Prisma, UserCharacter } from "@prisma/client";
 import { prisma } from "../../prisma";
 import { calculateSetBonuses } from "../../utils/artifactHelper";
@@ -93,13 +94,13 @@ export async function syncCharacter(
         totalStats.maxHP += weapon.additionalHP || 0;
     }
 
-    const artifactTypes: ArtifactType[] = [
+    const artifactTypes = make.array<ArtifactType>([
         "Flower",
         "Plume",
         "Sands",
         "Goblet",
         "Circlet",
-    ];
+    ]);
 
     const equippedArtifacts: { [slot in ArtifactType]?: ArtifactName } = {};
 

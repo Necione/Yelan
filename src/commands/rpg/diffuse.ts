@@ -202,7 +202,7 @@ export const diffuse = buildCommand<SlashCommand>({
             const updatedInventory = stats.inventory
                 .map((c) => {
                     if (c.item === itemName) {
-                        return { ...c, amount: c.amount - amountToDiffuse };
+                        c.amount = Math.floor(c.amount - amountToDiffuse);
                     }
                     return c;
                 })
@@ -244,7 +244,7 @@ export const diffuse = buildCommand<SlashCommand>({
             const updatedInventory = stats.inventory
                 .map((c) => {
                     if (c.item === itemName) {
-                        return { ...c, amount: c.amount - amountToDiffuse };
+                        c.amount = Math.floor(c.amount - amountToDiffuse);
                     }
                     return c;
                 })
@@ -270,7 +270,7 @@ export const diffuse = buildCommand<SlashCommand>({
         const updatedInventory = stats.inventory
             .map((c) => {
                 if (c.item === itemName) {
-                    return { ...c, amount: c.amount - amountToDiffuse };
+                    c.amount = Math.floor(c.amount - amountToDiffuse);
                 }
                 return c;
             })

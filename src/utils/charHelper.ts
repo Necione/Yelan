@@ -1,3 +1,5 @@
+import { getRandom, is } from "@elara-services/utils";
+import { cdn } from "@liyueharbor/econ";
 import type { UserCharacter } from "@prisma/client";
 
 export interface CharsData {
@@ -12,11 +14,11 @@ export const chars: { [key: string]: CharsData } = {
         baseATK: 5,
         baseHP: 100,
         thumbnails: [
-            "https://lh.elara.workers.dev/rpg/chars/amber1.png",
-            "https://lh.elara.workers.dev/rpg/chars/amber2.png",
-            "https://lh.elara.workers.dev/rpg/chars/amber3.png",
-            "https://lh.elara.workers.dev/rpg/chars/amber4.png",
-            "https://lh.elara.workers.dev/rpg/chars/amber5.png",
+            cdn("/rpg/chars/amber1.png"),
+            cdn("/rpg/chars/amber2.png"),
+            cdn("/rpg/chars/amber3.png"),
+            cdn("/rpg/chars/amber4.png"),
+            cdn("/rpg/chars/amber5.png"),
         ],
     },
     Kaeya: {
@@ -24,11 +26,11 @@ export const chars: { [key: string]: CharsData } = {
         baseATK: 10,
         baseHP: 100,
         thumbnails: [
-            "https://lh.elara.workers.dev/rpg/chars/kaeya1.png",
-            "https://lh.elara.workers.dev/rpg/chars/kaeya1.png",
-            "https://lh.elara.workers.dev/rpg/chars/kaeya3.png",
-            "https://lh.elara.workers.dev/rpg/chars/kaeya4.png",
-            "https://lh.elara.workers.dev/rpg/chars/kaeya5.png",
+            cdn("/rpg/chars/kaeya1.png"),
+            cdn("/rpg/chars/kaeya1.png"),
+            cdn("/rpg/chars/kaeya3.png"),
+            cdn("/rpg/chars/kaeya4.png"),
+            cdn("/rpg/chars/kaeya5.png"),
         ],
     },
 };
@@ -40,13 +42,10 @@ export const charsList: (CharsData & { name: string })[] = Object.entries(
 
 export function getRandomThumbnail(charName: keyof typeof chars): string {
     const characterData = chars[charName];
-    if (characterData.thumbnails && characterData.thumbnails.length > 0) {
-        const randomIndex = Math.floor(
-            Math.random() * characterData.thumbnails.length,
-        );
-        return characterData.thumbnails[randomIndex];
+    if (is.array(characterData.thumbnails)) {
+        return getRandom(characterData.thumbnails);
     }
-    return "https://lh.elara.workers.dev/rpg/chars/weird.png";
+    return cdn(`/rpg/chars/weird.png`);
 }
 
 export function getCharacterDisplayName(character: UserCharacter): string {

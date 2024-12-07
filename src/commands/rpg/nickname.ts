@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import { embedComment, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserCharacters, updateUserCharacter } from "../../services";
 
@@ -24,7 +24,7 @@ export const nickname = buildCommand<SlashCommand>({
     defer: { silent: false },
     async autocomplete(i) {
         const characters = await getUserCharacters(i.user.id);
-        if (!characters || characters.length === 0) {
+        if (!is.array(characters)) {
             return i
                 .respond([{ name: "No characters found.", value: "n/a" }])
                 .catch(noop);
@@ -44,7 +44,7 @@ export const nickname = buildCommand<SlashCommand>({
                 value: c.name,
             }));
 
-        if (filtered.length === 0) {
+        if (!is.array(filtered)) {
             return i
                 .respond([{ name: "No characters found.", value: "n/a" }])
                 .catch(noop);

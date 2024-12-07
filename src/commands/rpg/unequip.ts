@@ -22,6 +22,14 @@ import {
     type ArtifactName,
 } from "../../utils/rpgitems/artifacts";
 
+const artifactTypes = make.array<ArtifactType>([
+    "Flower",
+    "Plume",
+    "Sands",
+    "Goblet",
+    "Circlet",
+]);
+
 export const unequip = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("unequip")
@@ -63,7 +71,7 @@ export const unequip = buildCommand<SlashCommand>({
                 c.name.toLowerCase().includes(input),
             );
 
-            if (filtered.length === 0) {
+            if (!is.array(filtered)) {
                 return i
                     .respond([{ name: "No match found.", value: "n/a" }])
                     .catch(noop);
@@ -103,14 +111,6 @@ export const unequip = buildCommand<SlashCommand>({
                     });
                 }
 
-                const artifactTypes = make.array<ArtifactType>([
-                    "Flower",
-                    "Plume",
-                    "Sands",
-                    "Goblet",
-                    "Circlet",
-                ]);
-
                 for (const type of artifactTypes) {
                     const field = `equipped${type}` as keyof typeof stats;
                     const itemName = stats[field];
@@ -129,7 +129,7 @@ export const unequip = buildCommand<SlashCommand>({
                     );
                 }
 
-                if (!is.array(items) || items.length === 0) {
+                if (!is.array(items)) {
                     return i
                         .respond([{ name: "No match found.", value: "n/a" }])
                         .catch(noop);
@@ -166,14 +166,6 @@ export const unequip = buildCommand<SlashCommand>({
                     });
                 }
 
-                const artifactTypes = make.array<ArtifactType>([
-                    "Flower",
-                    "Plume",
-                    "Sands",
-                    "Goblet",
-                    "Circlet",
-                ]);
-
                 for (const type of artifactTypes) {
                     const field = `equipped${type}` as keyof typeof character;
                     const itemName = character[field];
@@ -192,7 +184,7 @@ export const unequip = buildCommand<SlashCommand>({
                     );
                 }
 
-                if (!is.array(items) || items.length === 0) {
+                if (!is.array(items)) {
                     return i
                         .respond([{ name: "No match found.", value: "n/a" }])
                         .catch(noop);
@@ -243,13 +235,6 @@ export const unequip = buildCommand<SlashCommand>({
                     updates.equippedWeapon = null;
                 }
 
-                const artifactTypes = [
-                    "Flower",
-                    "Plume",
-                    "Sands",
-                    "Goblet",
-                    "Circlet",
-                ] as const;
                 for (const type of artifactTypes) {
                     const field = `equipped${type}` as keyof typeof stats;
                     if (stats[field]) {
@@ -392,14 +377,6 @@ export const unequip = buildCommand<SlashCommand>({
                 if (character.equippedWeapon) {
                     updates.equippedWeapon = null;
                 }
-
-                const artifactTypes = [
-                    "Flower",
-                    "Plume",
-                    "Sands",
-                    "Goblet",
-                    "Circlet",
-                ] as const;
                 for (const type of artifactTypes) {
                     const field = `equipped${type}` as keyof typeof character;
                     if (character[field]) {

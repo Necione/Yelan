@@ -258,13 +258,13 @@ export const rpg = buildCommand<SlashCommand>({
         }
 
         let characters = await getUserCharacters(i.user.id);
-        if (!characters || characters.length === 0) {
+        if (!is.array(characters)) {
             await createDefaultCharacterForUser(i.user.id, "Amber");
             characters = await getUserCharacters(i.user.id);
         }
 
         const syncedCharacters = [];
-        for (const character of characters) {
+        for await (const character of characters) {
             const updatedChar = await syncCharacter(character.id);
             if (updatedChar) {
                 syncedCharacters.push(updatedChar);
@@ -273,7 +273,7 @@ export const rpg = buildCommand<SlashCommand>({
             }
         }
 
-        if (Array.isArray(characters) && characters.length > 0) {
+        if (is.array(characters)) {
             for (const character of syncedCharacters) {
                 const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
                 const equippedItems = make.array<string>();
@@ -369,7 +369,7 @@ export const rpg = buildCommand<SlashCommand>({
                                 : ""),
                     );
 
-                if (equippedItems.length > 0) {
+                if (is.array(equippedItems)) {
                     charEmbed.addFields({
                         name: "Equipped Items",
                         value: equippedItems.join("\n"),
