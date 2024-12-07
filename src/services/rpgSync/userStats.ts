@@ -9,7 +9,7 @@ import type {
 import {
     artifacts,
     artifactSets,
-    type ArtifactName
+    type ArtifactName,
 } from "../../utils/rpgitems/artifacts";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 

@@ -1,14 +1,14 @@
-import { make, noop } from "@elara-services/utils";
-import { Prisma, UserCharacter } from "@prisma/client";
+import type { Prisma, UserCharacter } from "@prisma/client";
 import { prisma } from "../../prisma";
 import { calculateSetBonuses } from "../../utils/artifactHelper";
 import { chars, type CharsName } from "../../utils/charHelper";
-import {
-    type ArtifactName,
-    artifacts,
-    type ArtifactType
+import type {
+    ArtifactName,
+    ArtifactType,
 } from "../../utils/rpgitems/artifacts";
-import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
+import { artifacts } from "../../utils/rpgitems/artifacts";
+import type { WeaponName } from "../../utils/rpgitems/weapons";
+import { weapons } from "../../utils/rpgitems/weapons";
 
 interface CharacterStats {
     critChance: number;
@@ -25,13 +25,12 @@ export async function getCharacterById(
     characterId: string,
 ): Promise<UserCharacter | null> {
     try {
-        const character = await prisma.userCharacter.findUnique({
+        return await prisma.userCharacter.findUnique({
             where: { id: characterId },
         });
-        return character;
     } catch (error) {
         console.error(
-            `Error fetching character with ID ${characterId}:`,
+            `Error fetching character with ID "${characterId}":`,
             error,
         );
         return null;
@@ -94,18 +93,18 @@ export async function syncCharacter(
         totalStats.maxHP += weapon.additionalHP || 0;
     }
 
-    const artifactTypes = make.array<ArtifactType>([
+    const artifactTypes: ArtifactType[] = [
         "Flower",
         "Plume",
         "Sands",
         "Goblet",
         "Circlet",
-    ]);
+    ];
 
     const equippedArtifacts: { [slot in ArtifactType]?: ArtifactName } = {};
 
     for (const type of artifactTypes) {
-        const field = `equipped${type}` as keyof typeof character;
+        const field = `equipped${type}` as keyof UserCharacter;
         if (character[field] && artifacts[character[field] as ArtifactName]) {
             const artifactName = character[field] as ArtifactName;
             equippedArtifacts[type] = artifactName;
@@ -165,21 +164,7 @@ export async function syncCharacter(
     }
 
     if (needsUpdate) {
-        const updatedCharacter = await updateUserCharacter(
-            characterId,
-            updateData,
-        );
-        if (updatedCharacter) {
-            console.log(
-                `Character "${updatedCharacter.name}" (ID: ${updatedCharacter.id}) synchronized successfully.`,
-            );
-            return updatedCharacter;
-        } else {
-            console.error(
-                `Failed to update character with ID "${characterId}".`,
-            );
-            return character;
-        }
+        return await updateUserCharacter(characterId, updateData);
     }
 
     return character;
@@ -188,29 +173,32 @@ export async function syncCharacter(
 export async function getUserCharacters(
     userId: string,
 ): Promise<UserCharacter[]> {
-    return await prisma.userCharacter
-        .findMany({
+    try {
+        return await prisma.userCharacter.findMany({
             where: { userId },
-        })
-        .catch((error) => {
-            console.error(
-                `Error fetching characters for user ${userId}:`,
-                error,
-            );
-            return [];
         });
+    } catch (error) {
+        console.error(`Error fetching characters for user "${userId}":`, error);
+        return [];
+    }
 }
 
-async function updateUserCharacter(
+export async function updateUserCharacter(
     characterId: string,
     data: Prisma.UserCharacterUpdateInput,
-) {
-    return await prisma.userCharacter
-        .update({
+): Promise<UserCharacter | null> {
+    try {
+        return await prisma.userCharacter.update({
             where: { id: characterId },
             data,
-        })
-        .catch(noop);
+        });
+    } catch (error) {
+        console.error(
+            `Error updating character with ID "${characterId}":`,
+            error,
+        );
+        return null;
+    }
 }
 
 function applySetBonuses(
@@ -261,7 +249,7 @@ export async function createDefaultCharacterForUser(
     }
 
     try {
-        const newCharacter = await prisma.userCharacter.create({
+        return await prisma.userCharacter.create({
             data: {
                 userId,
                 name: characterName,
@@ -285,10 +273,9 @@ export async function createDefaultCharacterForUser(
                 expedition: false,
             },
         });
-        return newCharacter;
     } catch (error) {
         console.error(
-            `Error creating default character for user ${userId}:`,
+            `Error creating default character for user "${userId}":`,
             error,
         );
         return null;

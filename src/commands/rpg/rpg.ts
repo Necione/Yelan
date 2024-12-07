@@ -334,13 +334,15 @@ export const rpg = buildCommand<SlashCommand>({
                 const baseName = character.name as CharsName;
                 let chosenThumbnail = i.user.displayAvatarURL();
                 if (
-                    chars[baseName]?.thumbnails?.length > 0
+                    chars[baseName]?.thumbnails &&
+                    chars[baseName].thumbnails.length > 0
                 ) {
-                    const possibleThumbs = chars[baseName]?.thumbnails ?? [];
-                    chosenThumbnail = possibleThumbs[
-                        Math.floor(Math.random() * possibleThumbs.length)
-                    ];
-                }                
+                    const possibleThumbs = chars[baseName].thumbnails;
+                    chosenThumbnail =
+                        possibleThumbs[
+                            Math.floor(Math.random() * possibleThumbs.length)
+                        ];
+                }
 
                 const charEmbed = new EmbedBuilder()
                     .setColor(embedColor)

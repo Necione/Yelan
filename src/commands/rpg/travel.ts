@@ -32,7 +32,7 @@ type LocationXY = {
     region: RegionName;
 };
 
-const locations: Record<LocationName, LocationXY> = {
+export const locations: Record<LocationName, LocationXY> = {
     "Liyue Harbor": { x: 15, y: 4, region: "Liyue" },
     "Qingxu Pool": { x: 7, y: 2, region: "Liyue" },
     "Lingju Pass": { x: 8, y: 4, region: "Liyue" },
@@ -46,7 +46,7 @@ const locations: Record<LocationName, LocationXY> = {
     Ritou: { x: 45, y: -20, region: "Inazuma" },
 };
 
-const locationEmojis: Record<LocationName, string> = {
+export const locationEmojis: Record<LocationName, string> = {
     "Liyue Harbor": "⛵",
     "Qingxu Pool": "🏞️",
     "Lingju Pass": "🌉",

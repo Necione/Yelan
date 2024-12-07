@@ -183,36 +183,39 @@ type Roles {
 }
 
 model UserCharacter {
-  id                String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String
-  name              String
-  nickname          String?
-  hp                Int        @default(0)
-  maxHP             Int        @default(0)
-  baseAttack        Float      @default(0)
-  attackPower       Float      @default(0)
-  critChance        Float      @default(0)
-  critValue         Float      @default(0)
-  defChance         Float      @default(0)
-  defValue          Float      @default(0)
-  expedition        Boolean
-  expeditionStart   DateTime?
-  equippedWeapon    String?
-  equippedFlower    String?
-  equippedPlume     String?
-  equippedSands     String?
-  equippedGoblet    String?
-  equippedCirclet   String?
-  level             Int        @default(1)
-  assignedAtk       Float      @default(0)
-  assignedHp        Float      @default(0)
-  assignedCritValue Float      @default(0)
-  assignedDefValue  Float      @default(0)
-  masteryCatalyst   Int        @default(0)
-  healEffectiveness Float      @default(0)
-  maxMana           Int        @default(20)
-  UserStats         UserStats? @relation(fields: [userStatsId], references: [id])
-  userStatsId       String?    @db.ObjectId
+  id                   String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String
+  name                 String
+  nickname             String?
+  hp                   Int        @default(0)
+  maxHP                Int        @default(0)
+  baseAttack           Float      @default(0)
+  attackPower          Float      @default(0)
+  critChance           Float      @default(0)
+  critValue            Float      @default(0)
+  defChance            Float      @default(0)
+  defValue             Float      @default(0)
+  expedition           Boolean
+  expeditionStart      DateTime?
+  expeditionType       String?
+  expeditionItemCount  Int?
+  expeditionLocation   String?
+  equippedWeapon       String?
+  equippedFlower       String?
+  equippedPlume        String?
+  equippedSands        String?
+  equippedGoblet       String?
+  equippedCirclet      String?
+  level                Int        @default(1)
+  assignedAtk          Float      @default(0)
+  assignedHp           Float      @default(0)
+  assignedCritValue    Float      @default(0)
+  assignedDefValue     Float      @default(0)
+  masteryCatalyst      Int        @default(0)
+  healEffectiveness    Float      @default(0)
+  maxMana              Int        @default(20)
+  UserStats            UserStats? @relation(fields: [userStatsId], references: [id])
+  userStatsId          String?    @db.ObjectId
 
   @@index([userId])
 }

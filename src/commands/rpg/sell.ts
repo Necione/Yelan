@@ -1,8 +1,14 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, make, noop } from "@elara-services/utils";
 import { texts } from "@liyueharbor/econ";
+import { UserCharacter, UserStats } from "@prisma/client";
 import { SlashCommandBuilder } from "discord.js";
-import { addBalance, getUserStats, updateUserStats } from "../../services";
+import {
+    addBalance,
+    getUserCharacters,
+    getUserStats,
+    updateUserStats,
+} from "../../services";
 import { getAmount } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
@@ -31,22 +37,21 @@ export const sell = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
     async autocomplete(i) {
-        const stats = await getUserStats(i.user.id);
+        const stats = (await getUserStats(i.user.id)) as UserStats | null;
         if (!stats || !is.array(stats.inventory)) {
             return i
                 .respond([{ name: "No items found.", value: "n/a" }])
                 .catch(noop);
         }
 
-        // const inventoryItems = stats.inventory;
         const items = make.map<
             string,
             { id: string; name: string; amount: number; length: number }
         >();
 
         for (const c of stats.inventory) {
-            const f = items.get(c.id);
-            if (!f) {
+            const existing = items.get(c.id);
+            if (!existing) {
                 items.set(c.id, {
                     id: c.id,
                     name: c.item,
@@ -55,6 +60,7 @@ export const sell = buildCommand<SlashCommand>({
                 });
             }
         }
+
         if (!items.size) {
             return i
                 .respond([{ name: "No items found.", value: "n/a" }])
@@ -83,14 +89,14 @@ export const sell = buildCommand<SlashCommand>({
         const amountToSell = i.options.getInteger("amount", true);
 
         if (amountToSell <= 0) {
-            return r.edit(embedComment(`Something went wrong...`));
+            return r.edit(embedComment(`Invalid amount specified.`));
         }
 
         if (id === "n/a") {
             return r.edit(embedComment(`You didn't select a valid item.`));
         }
 
-        const stats = await getUserStats(i.user.id);
+        const stats = (await getUserStats(i.user.id)) as UserStats | null;
         if (!stats) {
             return r.edit(
                 embedComment(
@@ -102,6 +108,7 @@ export const sell = buildCommand<SlashCommand>({
         if (stats.isHunting) {
             return r.edit(embedComment("You cannot sell while hunting!"));
         }
+
         if (!is.array(stats.inventory)) {
             stats.inventory = [];
         }
@@ -117,6 +124,37 @@ export const sell = buildCommand<SlashCommand>({
         }
 
         const itemName = item.item;
+
+        const characters = (await getUserCharacters(
+            i.user.id,
+        )) as UserCharacter[];
+
+        const isEquippedOnCharacter = characters.some((character) => {
+            if (
+                weapons[itemName as WeaponName] &&
+                character.equippedWeapon === itemName
+            ) {
+                return true;
+            }
+            if (artifacts[itemName as ArtifactName]) {
+                return (
+                    character.equippedFlower === itemName ||
+                    character.equippedPlume === itemName ||
+                    character.equippedSands === itemName ||
+                    character.equippedGoblet === itemName ||
+                    character.equippedCirclet === itemName
+                );
+            }
+            return false;
+        });
+
+        if (isEquippedOnCharacter) {
+            return r.edit(
+                embedComment(
+                    `You cannot sell "${itemName}" because it is currently equipped on one of your characters.`,
+                ),
+            );
+        }
 
         if (
             weapons[itemName as WeaponName] &&
@@ -193,15 +231,19 @@ export const sell = buildCommand<SlashCommand>({
 
         totalSellPrice = Math.round(totalSellPrice);
 
-        item.amount -= amountToSell;
-        if (item.amount <= 0) {
-            stats.inventory = stats.inventory.filter((c) => c.id !== item.id);
-        }
+        const updatedInventory = stats.inventory
+            .map((c) => {
+                if (c.id === id) {
+                    return { ...c, amount: c.amount - amountToSell };
+                }
+                return c;
+            })
+            .filter((c) => c.amount > 0);
 
         await Promise.all([
             updateUserStats(i.user.id, {
                 inventory: {
-                    set: stats.inventory,
+                    set: updatedInventory,
                 },
             }),
             addBalance(
@@ -225,7 +267,7 @@ export const sell = buildCommand<SlashCommand>({
             embedComment(
                 `You sold \`${amountToSell}x\` **${itemName}${
                     item.metadata?.length ? ` (${item.metadata.length} cm)` : ""
-                }** for ${getAmount(totalSellPrice)} ${rebirthBonusMessage}`,
+                }** for ${getAmount(totalSellPrice)}${rebirthBonusMessage}`,
                 "Green",
             ),
         );

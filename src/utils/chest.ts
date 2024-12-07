@@ -71,13 +71,18 @@ function isWeapon(name: string) {
     return name in weapons;
 }
 
-export function generateChestLoot(worldLevel: number) {
+export function generateChestLoot(
+    worldLevel: number,
+    maxUniqueItemsOverride?: number,
+) {
     const selectedRarity = selectChestRarity();
 
-    const maxUniqueItems = Math.min(
-        1 + rarities.findIndex((r) => r.rarity === selectedRarity.rarity),
-        4,
-    );
+    const maxUniqueItems =
+        maxUniqueItemsOverride ??
+        Math.min(
+            1 + rarities.findIndex((r) => r.rarity === selectedRarity.rarity),
+            4,
+        );
 
     const loot = make.array<{
         item: DropName | WeaponName | ArtifactName;
