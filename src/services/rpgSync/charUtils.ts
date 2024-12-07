@@ -264,6 +264,7 @@ export async function createDefaultCharacterForUser(
                 attackPower: characterData.baseATK,
                 baseAttack: characterData.baseATK,
                 maxHP: characterData.baseHP,
+                hp: characterData.baseHP,
                 critChance: 1,
                 defChance: 0,
                 critValue: 1,

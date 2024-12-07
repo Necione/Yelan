@@ -1,13 +1,19 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { addButtonRow, embedComment, get, noop } from "@elara-services/utils";
-import type { UserStats } from "@prisma/client";
+import type { UserCharacter, UserStats } from "@prisma/client";
 import {
     ButtonStyle,
     ComponentType,
     EmbedBuilder,
     SlashCommandBuilder,
 } from "discord.js";
-import { addBalance, getUserStats, updateUserStats } from "../../services";
+import {
+    addBalance,
+    getUserCharacters,
+    getUserStats,
+    updateUserCharacter,
+    updateUserStats,
+} from "../../services";
 import { getAmount } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
@@ -18,7 +24,8 @@ export const rebirth = buildCommand<SlashCommand>({
         .setName("rebirth")
         .setDescription(
             "[RPG] Rebirth your character. All stats and items will be reset.",
-        ),
+        )
+        .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
@@ -87,9 +94,7 @@ export const rebirth = buildCommand<SlashCommand>({
 
             if (itemData) {
                 const baseSellPrice = itemData.sellPrice * item.amount;
-
                 const itemSellPrice = baseSellPrice * rebirthMultiplier;
-
                 totalSellPrice += Math.round(itemSellPrice);
             }
         }
@@ -127,7 +132,7 @@ async function handleRebirth(
     stats: UserStats,
     totalSellPrice: number,
 ) {
-    const defaultStats = {
+    const defaultStats: Partial<UserStats> = {
         worldLevel: 1,
         exp: 0,
         attackPower: 5,
@@ -151,10 +156,36 @@ async function handleRebirth(
         rebirths: (stats.rebirths || 0) + 1,
     };
 
+    const characters = (await getUserCharacters(userId)) as UserCharacter[];
+
+    const defaultCharacterStats: Partial<UserCharacter> = {
+        level: 1,
+        attackPower: 5,
+        maxHP: 100,
+        hp: 100,
+        critChance: 0,
+        critValue: 1,
+        defChance: 0,
+        defValue: 0,
+        equippedWeapon: null,
+        equippedFlower: null,
+        equippedPlume: null,
+        equippedSands: null,
+        equippedGoblet: null,
+        equippedCirclet: null,
+    };
+
+    const characterUpdates = characters.map((character) => {
+        return updateUserCharacter(character.id, {
+            ...defaultCharacterStats,
+        });
+    });
+
     await Promise.all([
         updateUserStats(userId, {
             ...defaultStats,
         }),
         addBalance(userId, totalSellPrice, true, "Rebirth - sold all items"),
+        ...characterUpdates,
     ]);
 }
