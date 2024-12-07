@@ -16,7 +16,7 @@ type LocationName = keyof typeof locations;
 const expeditionTimes = {
     Explore: get.mins(10),
     Normal: get.mins(20),
-    Scavenge: get.mins(40),
+    Scavenge: get.mins(30),
 } as const;
 
 const expeditionItemsCount = {
