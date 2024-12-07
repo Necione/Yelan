@@ -4,7 +4,7 @@ export interface CharsData {
     baseName: string;
     baseATK: number;
     baseHP: number;
-    thumbnails?: string[];
+    thumbnails: string[];
 }
 export const chars: { [key: string]: CharsData } = {
     Amber: {
@@ -23,8 +23,16 @@ export const chars: { [key: string]: CharsData } = {
         baseName: "Kaeya",
         baseATK: 10,
         baseHP: 100,
+        thumbnails: [
+            "https://lh.elara.workers.dev/rpg/chars/kaeya1.png",
+            "https://lh.elara.workers.dev/rpg/chars/kaeya1.png",
+            "https://lh.elara.workers.dev/rpg/chars/kaeya3.png",
+            "https://lh.elara.workers.dev/rpg/chars/kaeya4.png",
+            "https://lh.elara.workers.dev/rpg/chars/kaeya5.png",
+        ],
     },
 };
+
 export type CharsName = keyof typeof chars;
 export const charsList: (CharsData & { name: string })[] = Object.entries(
     chars,

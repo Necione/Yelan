@@ -1,12 +1,12 @@
 import { make, noop } from "@elara-services/utils";
-import type { Prisma } from "@prisma/client";
+import { Prisma, UserCharacter } from "@prisma/client";
 import { prisma } from "../../prisma";
-import type { ArtifactType } from "../../utils/rpgitems/artifacts";
+import { calculateSetBonuses } from "../../utils/artifactHelper";
+import { chars, type CharsName } from "../../utils/charHelper";
 import {
     type ArtifactName,
     artifacts,
-    type ArtifactSetName,
-    getArtifactSetBonuses,
+    type ArtifactType
 } from "../../utils/rpgitems/artifacts";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
 
@@ -21,19 +21,48 @@ interface CharacterStats {
     maxMana: number;
 }
 
-export async function syncCharacter(characterId: string) {
-    const character = await getUserCharacters(characterId);
+export async function getCharacterById(
+    characterId: string,
+): Promise<UserCharacter | null> {
+    try {
+        const character = await prisma.userCharacter.findUnique({
+            where: { id: characterId },
+        });
+        return character;
+    } catch (error) {
+        console.error(
+            `Error fetching character with ID ${characterId}:`,
+            error,
+        );
+        return null;
+    }
+}
+
+export async function syncCharacter(
+    characterId: string,
+): Promise<UserCharacter | null> {
+    const character = await getCharacterById(characterId);
     if (!character) {
+        console.error(`Character with ID "${characterId}" not found.`);
         return null;
     }
 
-    const calculatedBaseAttack = 5 + (character.level - 1) * 0.5;
+    const baseData = chars[character.name as CharsName];
+    if (!baseData) {
+        console.error(`Base data for character "${character.name}" not found.`);
+        return character;
+    }
+
+    const PER_LEVEL_ATK_INCREASE = 0.5;
+    const PER_LEVEL_HP_INCREASE = 10;
+
+    const calculatedBaseAttack =
+        baseData.baseATK + (character.level - 1) * PER_LEVEL_ATK_INCREASE;
     const assignedAttackBonus = (character.assignedAtk || 0) * 0.25;
     const baseAttack = calculatedBaseAttack + assignedAttackBonus;
 
     const calculatedMaxHP =
-        100 + (character.level - 1) * 10 + (character.rebirths || 0) * 5;
-
+        baseData.baseHP + (character.level - 1) * PER_LEVEL_HP_INCREASE;
     const assignedHpBonus = (character.assignedHp || 0) * 2;
     const finalMaxHP = calculatedMaxHP + assignedHpBonus;
 
@@ -136,18 +165,40 @@ export async function syncCharacter(characterId: string) {
     }
 
     if (needsUpdate) {
-        return await updateUserCharacter(characterId, updateData);
+        const updatedCharacter = await updateUserCharacter(
+            characterId,
+            updateData,
+        );
+        if (updatedCharacter) {
+            console.log(
+                `Character "${updatedCharacter.name}" (ID: ${updatedCharacter.id}) synchronized successfully.`,
+            );
+            return updatedCharacter;
+        } else {
+            console.error(
+                `Failed to update character with ID "${characterId}".`,
+            );
+            return character;
+        }
     }
 
     return character;
 }
 
-async function getUserCharacters(characterId: string) {
+export async function getUserCharacters(
+    userId: string,
+): Promise<UserCharacter[]> {
     return await prisma.userCharacter
-        .findUnique({
-            where: { id: characterId },
+        .findMany({
+            where: { userId },
         })
-        .catch(noop);
+        .catch((error) => {
+            console.error(
+                `Error fetching characters for user ${userId}:`,
+                error,
+            );
+            return [];
+        });
 }
 
 async function updateUserCharacter(
@@ -199,54 +250,47 @@ function applySetBonuses(
     }
 }
 
-export function calculateSetBonuses(equippedArtifacts: {
-    [slot in ArtifactType]?: ArtifactName;
-}): {
-    attackPowerPercentage: number;
-    critChance: number;
-    critValuePercentage: number;
-    maxHPPercentage: number;
-    defChance: number;
-    defValuePercentage: number;
-    healEffectiveness: number;
-} {
-    const bonuses = {
-        attackPowerPercentage: 0,
-        critChance: 0,
-        critValuePercentage: 0,
-        maxHPPercentage: 0,
-        defChance: 0,
-        defValuePercentage: 0,
-        healEffectiveness: 0,
-    };
-
-    const setCounts: { [setName: string]: number } = {};
-
-    for (const artifactName of Object.values(equippedArtifacts)) {
-        const artifact = artifacts[artifactName];
-        if (artifact) {
-            const setName = artifact.artifactSet;
-            setCounts[setName] = (setCounts[setName] || 0) + 1;
-        }
+export async function createDefaultCharacterForUser(
+    userId: string,
+    characterName: string = "Amber",
+): Promise<UserCharacter | null> {
+    const characterData = chars[characterName];
+    if (!characterData) {
+        console.error(`Character data for "${characterName}" not found.`);
+        return null;
     }
 
-    for (const [setName, count] of Object.entries(setCounts)) {
-        const setBonuses = getArtifactSetBonuses(setName as ArtifactSetName);
-        if (setBonuses) {
-            if (count >= 2) {
-                const bonus2pc = setBonuses["2pc"];
-                for (const [key, value] of Object.entries(bonus2pc)) {
-                    bonuses[key as keyof typeof bonuses] += value as number;
-                }
-            }
-            if (count >= 4) {
-                const bonus4pc = setBonuses["4pc"];
-                for (const [key, value] of Object.entries(bonus4pc)) {
-                    bonuses[key as keyof typeof bonuses] += value as number;
-                }
-            }
-        }
+    try {
+        const newCharacter = await prisma.userCharacter.create({
+            data: {
+                userId,
+                name: characterName,
+                nickname: null,
+                level: 1,
+                equippedWeapon: null,
+                equippedFlower: null,
+                equippedPlume: null,
+                equippedSands: null,
+                equippedGoblet: null,
+                equippedCirclet: null,
+                attackPower: characterData.baseATK,
+                baseAttack: characterData.baseATK,
+                maxHP: characterData.baseHP,
+                critChance: 1,
+                defChance: 0,
+                critValue: 1,
+                defValue: 0,
+                healEffectiveness: 0,
+                maxMana: 20,
+                expedition: false,
+            },
+        });
+        return newCharacter;
+    } catch (error) {
+        console.error(
+            `Error creating default character for user ${userId}:`,
+            error,
+        );
+        return null;
     }
-
-    return bonuses;
 }
