@@ -66,7 +66,7 @@ export const equip = buildCommand<SlashCommand>({
                 c.name.toLowerCase().includes(input),
             );
 
-            if (filtered.length === 0) {
+            if (!is.array(filtered)) {
                 return i
                     .respond([{ name: "No match found.", value: "n/a" }])
                     .catch(noop);
@@ -370,6 +370,14 @@ export const equip = buildCommand<SlashCommand>({
     },
 });
 
+const artifactTypes = [
+    "Flower",
+    "Plume",
+    "Sands",
+    "Goblet",
+    "Circlet",
+] as const;
+
 async function getEquippedCount(userId: string, itemName: string) {
     const stats = await getUserStats(userId);
     let count = 0;
@@ -377,13 +385,6 @@ async function getEquippedCount(userId: string, itemName: string) {
         if (stats.equippedWeapon === itemName) {
             count++;
         }
-        const artifactTypes = [
-            "Flower",
-            "Plume",
-            "Sands",
-            "Goblet",
-            "Circlet",
-        ] as const;
         for (const type of artifactTypes) {
             const field = `equipped${type}` as keyof typeof stats;
             if (stats[field] === itemName) {
@@ -397,13 +398,6 @@ async function getEquippedCount(userId: string, itemName: string) {
         if (c.equippedWeapon === itemName) {
             count++;
         }
-        const artifactTypes = [
-            "Flower",
-            "Plume",
-            "Sands",
-            "Goblet",
-            "Circlet",
-        ] as const;
         for (const type of artifactTypes) {
             const field = `equipped${type}` as keyof typeof c;
             if (c[field] === itemName) {
