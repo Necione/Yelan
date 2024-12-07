@@ -1,4 +1,4 @@
-import { is, make, noop } from "@elara-services/utils";
+import { is, make, noop, snowflakes } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../../prisma";
 import { calculateMasteryLevel } from "../../utils/masteryHelper";
@@ -14,6 +14,7 @@ import {
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 interface InventoryItem {
+    id?: string;
     item: string;
     amount: number;
     metadata?: UserStatsMetaData | null;
@@ -301,10 +302,16 @@ export const addItemToInventory = async (
                     compareMetadata(c.metadata, i.metadata),
             );
             if (existingItem) {
+                if (!existingItem.id) {
+                    existingItem.id = snowflakes.generate();
+                }
                 existingItem.amount = Math.floor(
                     existingItem.amount + i.amount,
                 );
             } else {
+                if (!i.id) {
+                    i.id = snowflakes.generate();
+                }
                 inventory.push(i);
             }
         }
@@ -342,6 +349,9 @@ export const removeItemFromInventory = async (
     }
 
     const item = inventory[itemIndex];
+    if (!item.id) {
+        item.id = snowflakes.generate();
+    }
     item.amount = Math.floor(item.amount - amount);
     if (item.amount <= 0) {
         inventory.splice(itemIndex, 1);
