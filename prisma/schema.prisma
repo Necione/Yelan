@@ -182,72 +182,111 @@ type Roles {
   role String
 }
 
+model UserCharacter {
+  id                   String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String
+  name                 String
+  nickname             String?
+  hp                   Int        @default(0)
+  maxHP                Int        @default(0)
+  baseAttack           Float      @default(0)
+  attackPower          Float      @default(0)
+  critChance           Float      @default(0)
+  critValue            Float      @default(0)
+  defChance            Float      @default(0)
+  defValue             Float      @default(0)
+  expedition           Boolean
+  expeditionStart      DateTime?
+  expeditionType       String?
+  expeditionItemCount  Int?
+  expeditionLocation   String?
+  equippedWeapon       String?
+  equippedFlower       String?
+  equippedPlume        String?
+  equippedSands        String?
+  equippedGoblet       String?
+  equippedCirclet      String?
+  level                Int        @default(1)
+  assignedAtk          Float      @default(0)
+  assignedHp           Float      @default(0)
+  assignedCritValue    Float      @default(0)
+  assignedDefValue     Float      @default(0)
+  masteryCatalyst      Int        @default(0)
+  healEffectiveness    Float      @default(0)
+  maxMana              Int        @default(20)
+  UserStats            UserStats? @relation(fields: [userStatsId], references: [id])
+  userStatsId          String?    @db.ObjectId
+
+  @@index([userId])
+}
+
 model UserStats {
-  id                        String         @id @default(auto()) @map("_id") @db.ObjectId
-  userId                    String         @unique
-  rebirths                  Int            @default(0)
-  totalTokensUsed           Int            @default(0)
-  mana                      Int            @default(20)
-  maxMana                   Int            @default(20)
-  hp                        Int            @default(100)
-  maxHP                     Int            @default(100)
-  baseAttack                Float          @default(5)
-  attackPower               Float          @default(5)
-  critChance                Float          @default(0)
-  critValue                 Float          @default(0)
-  defChance                 Float          @default(0)
-  defValue                  Float          @default(0)
-  healEffectiveness         Float          @default(0)
+  id                        String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId                    String          @unique
+  rebirths                  Int             @default(0)
+  totalTokensUsed           Int             @default(0)
+  mana                      Int             @default(20)
+  maxMana                   Int             @default(20)
+  hp                        Int             @default(100)
+  maxHP                     Int             @default(100)
+  baseAttack                Float           @default(5)
+  attackPower               Float           @default(5)
+  critChance                Float           @default(0)
+  critValue                 Float           @default(0)
+  defChance                 Float           @default(0)
+  defValue                  Float           @default(0)
+  healEffectiveness         Float           @default(0)
   inventory                 UserStatsInv[]
   skills                    UserSkill[]
   cooking                   UserCooking[]
-  activeSkills              String[]       @default([])
+  activeSkills              String[]        @default([])
   activeEffects             UserEffect[]
   requests                  UserRequest[]
-  exp                       Int            @default(0)
-  worldLevel                Int            @default(1)
-  highestWL                 Int            @default(1)
-  currentAbyssFloor         Int            @default(1)
-  abyssFloor                Int            @default(0)
+  exp                       Int             @default(0)
+  worldLevel                Int             @default(1)
+  highestWL                 Int             @default(1)
+  currentAbyssFloor         Int             @default(1)
+  abyssFloor                Int             @default(0)
   equippedWeapon            String?
   equippedFlower            String?
   equippedPlume             String?
   equippedSands             String?
   equippedGoblet            String?
   equippedCirclet           String?
-  region                    String         @default("Liyue")
-  location                  String         @default("Liyue Harbor")
-  isTravelling              Boolean        @default(false)
-  isHunting                 Boolean        @default(false)
-  alchemyProgress           Int            @default(0)
-  totalAssigned             Int            @default(0)
-  assignedHp                Int            @default(0)
-  assignedAtk               Int            @default(0)
-  assignedCritValue         Int            @default(0)
-  assignedDefValue          Int            @default(0)
-  lifetimeRequestsCompleted Int            @default(0)
-  beatenBosses              String[]       @default([])
-  abyssMode                 Boolean        @default(false)
+  region                    String          @default("Liyue")
+  location                  String          @default("Liyue Harbor")
+  isTravelling              Boolean         @default(false)
+  isHunting                 Boolean         @default(false)
+  alchemyProgress           Int             @default(0)
+  totalAssigned             Int             @default(0)
+  assignedHp                Int             @default(0)
+  assignedAtk               Int             @default(0)
+  assignedCritValue         Int             @default(0)
+  assignedDefValue          Int             @default(0)
+  lifetimeRequestsCompleted Int             @default(0)
+  beatenBosses              String[]        @default([])
+  abyssMode                 Boolean         @default(false)
   abyssCoordX               Int?
   abyssCoordY               Int?
-  collectedChests           String[]       @default([])
-  hasKey                    Boolean        @default(false)
+  collectedChests           String[]        @default([])
+  hasKey                    Boolean         @default(false)
   deity                     String?
-  castQueue                 String[]       @default([])
-  timesFished               Int            @default(0)
-  timesFishedForLevel       Int            @default(0)
-  fishingLevel              Int            @default(1)
-  longestFish               Float          @default(0)
-  lifetimeFishCaught        Int            @default(0)
-  legendariesCaught         Int            @default(0)
-  masterySword              Int            @default(0)
-  masteryClaymore           Int            @default(0)
-  masteryBow                Int            @default(0)
-  masteryPolearm            Int            @default(0)
-  masteryCatalyst           Int            @default(0)
-  masteryRod                Int            @default(0)
-  unlockedSpecialSkills     String[]       @default([])
-  resonance                 Int            @default(0)
+  castQueue                 String[]        @default([])
+  timesFished               Int             @default(0)
+  timesFishedForLevel       Int             @default(0)
+  fishingLevel              Int             @default(1)
+  longestFish               Float           @default(0)
+  lifetimeFishCaught        Int             @default(0)
+  legendariesCaught         Int             @default(0)
+  masterySword              Int             @default(0)
+  masteryClaymore           Int             @default(0)
+  masteryBow                Int             @default(0)
+  masteryPolearm            Int             @default(0)
+  masteryCatalyst           Int             @default(0)
+  masteryRod                Int             @default(0)
+  unlockedSpecialSkills     String[]        @default([])
+  characters                UserCharacter[]
+  resonance                 Int             @default(0)
 }
 
 type Strikes {

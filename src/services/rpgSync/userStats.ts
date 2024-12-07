@@ -1,18 +1,17 @@
 import { is, make, noop } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
-import { prisma } from "../prisma";
-import { calculateMasteryLevel } from "../utils/masteryHelper";
+import { prisma } from "../../prisma";
+import { calculateMasteryLevel } from "../../utils/masteryHelper";
 import type {
     ArtifactSetName,
     ArtifactType,
-} from "../utils/rpgitems/artifacts";
+} from "../../utils/rpgitems/artifacts";
 import {
     artifacts,
     artifactSets,
-    getArtifactSetBonuses,
     type ArtifactName,
-} from "../utils/rpgitems/artifacts";
-import { weapons, type WeaponName } from "../utils/rpgitems/weapons";
+} from "../../utils/rpgitems/artifacts";
+import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 interface InventoryItem {
     item: string;
@@ -356,55 +355,3 @@ export const removeItemFromInventory = async (
         },
     });
 };
-
-export function calculateSetBonuses(equippedArtifacts: {
-    [slot in ArtifactType]?: ArtifactName;
-}): {
-    attackPowerPercentage: number;
-    critChance: number;
-    critValuePercentage: number;
-    maxHPPercentage: number;
-    defChance: number;
-    defValuePercentage: number;
-    healEffectiveness: number;
-} {
-    const bonuses = {
-        attackPowerPercentage: 0,
-        critChance: 0,
-        critValuePercentage: 0,
-        maxHPPercentage: 0,
-        defChance: 0,
-        defValuePercentage: 0,
-        healEffectiveness: 0,
-    };
-
-    const setCounts: { [setName: string]: number } = {};
-
-    for (const artifactName of Object.values(equippedArtifacts)) {
-        const artifact = artifacts[artifactName];
-        if (artifact) {
-            const setName = artifact.artifactSet;
-            setCounts[setName] = (setCounts[setName] || 0) + 1;
-        }
-    }
-
-    for (const [setName, count] of Object.entries(setCounts)) {
-        const setBonuses = getArtifactSetBonuses(setName as ArtifactSetName);
-        if (setBonuses) {
-            if (count >= 2) {
-                const bonus2pc = setBonuses["2pc"];
-                for (const [key, value] of Object.entries(bonus2pc)) {
-                    bonuses[key as keyof typeof bonuses] += value as number;
-                }
-            }
-            if (count >= 4) {
-                const bonus4pc = setBonuses["4pc"];
-                for (const [key, value] of Object.entries(bonus4pc)) {
-                    bonuses[key as keyof typeof bonuses] += value as number;
-                }
-            }
-        }
-    }
-
-    return bonuses;
-}

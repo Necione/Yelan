@@ -1,10 +1,19 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, make, noop } from "@elara-services/utils";
-import type { Prisma } from "@prisma/client";
+import { type UserCharacter } from "@prisma/client";
 import { SlashCommandBuilder } from "discord.js";
-import { getUserStats, syncStats, updateUserStats } from "../../services";
 import {
+    getUserCharacters,
+    getUserStats,
+    syncCharacter,
+    syncStats,
+    updateUserCharacter,
+    updateUserStats,
+} from "../../services";
+import {
+    calculateCharacterStatChanges,
     calculateStatChanges,
+    getCharacterSetBonusMessages,
     getSetBonusMessages,
 } from "../../utils/artifactHelper";
 import type { ArtifactType } from "../../utils/rpgitems/artifacts";
@@ -17,9 +26,16 @@ export const unequip = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("unequip")
         .setDescription(
-            "[RPG] Unequip your currently equipped weapon or artifact.",
+            "[RPG] Unequip your currently equipped weapon or artifact from a character or yourself (Traveller).",
         )
         .setDMPermission(false)
+        .addStringOption((option) =>
+            option
+                .setName("character")
+                .setDescription("The character or 'Traveller' to unequip from")
+                .setRequired(true)
+                .setAutocomplete(true),
+        )
         .addStringOption((option) =>
             option
                 .setName("item")
@@ -29,258 +45,504 @@ export const unequip = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
     async autocomplete(i) {
-        const stats = await getUserStats(i.user.id);
+        const focused = i.options.getFocused(true);
+        const optionName = focused.name;
+        const input = focused.value.toLowerCase();
 
-        if (!stats) {
-            return i
-                .respond([{ name: "No stats found.", value: "n/a" }])
-                .catch(noop);
-        }
+        if (optionName === "character") {
+            const characters = await getUserCharacters(i.user.id);
+            const baseEntries = [{ name: "Traveller", value: "Traveller" }];
 
-        const equippedItems = make.array<{ name: string; value: string }>();
+            const charEntries = characters.map((c) => ({
+                name: c.nickname ? `${c.nickname} (${c.name})` : c.name,
+                value: c.name,
+            }));
 
-        equippedItems.push({
-            name: "All",
-            value: "All",
-        });
+            const all = baseEntries.concat(charEntries);
+            const filtered = all.filter((c) =>
+                c.name.toLowerCase().includes(input),
+            );
 
-        if (stats.equippedWeapon) {
-            equippedItems.push({
-                name: stats.equippedWeapon,
-                value: stats.equippedWeapon,
-            });
-        }
+            if (filtered.length === 0) {
+                return i
+                    .respond([{ name: "No match found.", value: "n/a" }])
+                    .catch(noop);
+            }
 
-        const artifactTypes = make.array<ArtifactType>([
-            "Flower",
-            "Plume",
-            "Sands",
-            "Goblet",
-            "Circlet",
-        ]);
+            return i.respond(filtered.slice(0, 25)).catch(noop);
+        } else if (optionName === "item") {
+            const characterName = i.options.getString("character");
+            if (!characterName || characterName === "n/a") {
+                return i
+                    .respond([
+                        {
+                            name: "Please select a character or Traveller first.",
+                            value: "n/a",
+                        },
+                    ])
+                    .catch(noop);
+            }
 
-        for (const type of artifactTypes) {
-            const field = `equipped${type}` as keyof typeof stats;
-            const itemName = stats[field];
-            if (itemName && typeof itemName === "string") {
+            if (characterName.toLowerCase() === "traveller") {
+                const stats = await getUserStats(i.user.id);
+                if (!stats) {
+                    return i
+                        .respond([{ name: "No stats found.", value: "n/a" }])
+                        .catch(noop);
+                }
+
+                const equippedItems = make.array<{
+                    name: string;
+                    value: string;
+                }>();
+                equippedItems.push({ name: "All", value: "All" });
+                if (stats.equippedWeapon) {
+                    equippedItems.push({
+                        name: stats.equippedWeapon,
+                        value: stats.equippedWeapon,
+                    });
+                }
+
+                const artifactTypes = make.array<ArtifactType>([
+                    "Flower",
+                    "Plume",
+                    "Sands",
+                    "Goblet",
+                    "Circlet",
+                ]);
+
+                for (const type of artifactTypes) {
+                    const field = `equipped${type}` as keyof typeof stats;
+                    const itemName = stats[field];
+                    if (itemName && typeof itemName === "string") {
+                        equippedItems.push({
+                            name: itemName,
+                            value: itemName,
+                        });
+                    }
+                }
+
+                let items = equippedItems;
+                if (input) {
+                    items = items.filter((c) =>
+                        c.name.toLowerCase().includes(input),
+                    );
+                }
+
+                if (!is.array(items) || items.length === 0) {
+                    return i
+                        .respond([{ name: "No match found.", value: "n/a" }])
+                        .catch(noop);
+                }
+
+                return i.respond(items.slice(0, 25)).catch(noop);
+            } else {
+                const characters = await getUserCharacters(i.user.id);
+                const character = characters.find(
+                    (c) => c.name.toLowerCase() === characterName.toLowerCase(),
+                );
+                if (!character) {
+                    return i
+                        .respond([
+                            { name: "Character not found.", value: "n/a" },
+                        ])
+                        .catch(noop);
+                }
+
+                const equippedItems = make.array<{
+                    name: string;
+                    value: string;
+                }>();
+
                 equippedItems.push({
-                    name: itemName,
-                    value: itemName,
+                    name: "All",
+                    value: "All",
                 });
+
+                if (character.equippedWeapon) {
+                    equippedItems.push({
+                        name: character.equippedWeapon,
+                        value: character.equippedWeapon,
+                    });
+                }
+
+                const artifactTypes = make.array<ArtifactType>([
+                    "Flower",
+                    "Plume",
+                    "Sands",
+                    "Goblet",
+                    "Circlet",
+                ]);
+
+                for (const type of artifactTypes) {
+                    const field = `equipped${type}` as keyof typeof character;
+                    const itemName = character[field];
+                    if (itemName && typeof itemName === "string") {
+                        equippedItems.push({
+                            name: itemName,
+                            value: itemName,
+                        });
+                    }
+                }
+
+                let items = equippedItems;
+                if (input) {
+                    items = items.filter((c) =>
+                        c.name.toLowerCase().includes(input),
+                    );
+                }
+
+                if (!is.array(items) || items.length === 0) {
+                    return i
+                        .respond([{ name: "No match found.", value: "n/a" }])
+                        .catch(noop);
+                }
+
+                return i.respond(items.slice(0, 25)).catch(noop);
             }
         }
-
-        const input = i.options.getString("item", false) ?? "";
-
-        let items = equippedItems;
-        if (input) {
-            items = items.filter((c) =>
-                c.name.toLowerCase().includes(input.toLowerCase()),
-            );
-        }
-
-        if (!is.array(items)) {
-            return i
-                .respond([{ name: "No match found.", value: "n/a" }])
-                .catch(noop);
-        }
-
-        return i.respond(items.slice(0, 25)).catch(noop);
     },
 
     async execute(i, r) {
+        const characterName = i.options.getString("character", true);
         const itemName = i.options.getString("item", true);
-        let stats = await getUserStats(i.user.id);
 
-        if (!stats) {
-            return r.edit(
-                embedComment(
-                    `No stats found for you, please set up your profile.`,
-                ),
-            );
+        if (itemName === "n/a") {
+            return r.edit(embedComment(`You provided an invalid item name.`));
         }
 
-        if (stats.isHunting) {
-            return r.edit(embedComment("You cannot unequip while hunting!"));
-        }
-
-        if (stats.castQueue.length > 0) {
-            if (itemName === "All" && stats.equippedWeapon) {
+        if (characterName.toLowerCase() === "traveller") {
+            let stats = await getUserStats(i.user.id);
+            if (!stats) {
                 return r.edit(
                     embedComment(
-                        `You cannot unequip your weapon while you have spells in your queue.`,
+                        `No stats found for you, please set up your profile.`,
+                    ),
+                );
+            }
+
+            if (stats.isHunting) {
+                return r.edit(
+                    embedComment("You cannot unequip while hunting!"),
+                );
+            }
+
+            const beforeStats = { ...stats };
+
+            if (itemName === "All") {
+                const updates: Partial<{
+                    equippedWeapon: null;
+                    equippedFlower: null;
+                    equippedPlume: null;
+                    equippedSands: null;
+                    equippedGoblet: null;
+                    equippedCirclet: null;
+                }> = {};
+
+                if (stats.equippedWeapon) {
+                    updates.equippedWeapon = null;
+                }
+
+                const artifactTypes = [
+                    "Flower",
+                    "Plume",
+                    "Sands",
+                    "Goblet",
+                    "Circlet",
+                ] as const;
+                for (const type of artifactTypes) {
+                    const field = `equipped${type}` as keyof typeof stats;
+                    if (stats[field]) {
+                        updates[field as keyof typeof updates] = null;
+                    }
+                }
+
+                if (Object.keys(updates).length === 0) {
+                    return r.edit(
+                        embedComment(`You have no items equipped to unequip.`),
+                    );
+                }
+
+                await updateUserStats(i.user.id, updates);
+                stats = await syncStats(i.user.id);
+
+                if (!stats) {
+                    return r.edit(
+                        embedComment(`Failed to sync stats after unequipping.`),
+                    );
+                }
+
+                const statChanges = calculateStatChanges(beforeStats, stats);
+                const setBonusMessages = getSetBonusMessages(
+                    beforeStats,
+                    stats,
+                    "deactivated",
+                );
+
+                return r.edit(
+                    embedComment(
+                        `You have unequipped all items.\n${[
+                            ...statChanges,
+                            ...setBonusMessages,
+                        ].join("\n")}`,
+                        "Green",
                     ),
                 );
             }
 
             if (itemName === stats.equippedWeapon) {
-                return r.edit(
-                    embedComment(
-                        `You cannot unequip your weapon while you have spells in your queue.`,
-                    ),
-                );
-            }
-        }
-
-        const updatedStats = make.array<string>();
-        const beforeStats = { ...stats };
-
-        if (itemName === "All") {
-            const updates: Prisma.UserStatsUpdateInput = {};
-            const unequippableItems = make.array<string>();
-
-            if (stats.equippedWeapon) {
                 if (stats.castQueue.length > 0) {
-                    unequippableItems.push(
-                        `**${stats.equippedWeapon}** (Weapon)`,
+                    return r.edit(
+                        embedComment(
+                            `You cannot unequip your weapon while you have spells in your queue.`,
+                        ),
                     );
-                } else {
-                    updates.equippedWeapon = { set: null };
                 }
-            }
 
-            const artifactTypes = make.array<ArtifactType>([
-                "Flower",
-                "Plume",
-                "Sands",
-                "Goblet",
-                "Circlet",
-            ]);
+                await updateUserStats(i.user.id, {
+                    equippedWeapon: { set: null },
+                });
 
-            for (const type of artifactTypes) {
-                const field = `equipped${type}` as keyof typeof stats;
-                if (stats[field]) {
-                    // @ts-ignore
-                    updates[field] = { set: null };
+                stats = await syncStats(i.user.id);
+                if (!stats) {
+                    return r.edit(embedComment(`Failed to sync stats.`));
                 }
-            }
 
-            if (
-                unequippableItems.length > 0 &&
-                Object.keys(updates).length === 0
-            ) {
+                const statChanges = calculateStatChanges(beforeStats, stats);
                 return r.edit(
                     embedComment(
-                        `You cannot unequip the following items while you have spells in your queue:\n${unequippableItems
-                            .map((item) => `- ${item}`)
-                            .join("\n")}`,
+                        `You have unequipped your weapon: **${itemName}**.\n${statChanges.join(
+                            "\n",
+                        )}`,
+                        "Green",
                     ),
                 );
             }
 
-            if (unequippableItems.length > 0) {
-                r.edit(
-                    embedComment(
-                        `You cannot unequip the following items while you have spells in your queue:\n${unequippableItems
-                            .map((item) => `- ${item}`)
-                            .join(
-                                "\n",
-                            )}\n\nOther equipped artifacts have been unequipped.`,
-                        "Yellow",
-                    ),
-                ).catch(noop);
-            }
+            const artifactType = getArtifactType(itemName as ArtifactName);
 
-            if (Object.keys(updates).length === 0) {
-                return r.edit(
-                    embedComment(`You have no items equipped to unequip.`),
-                );
-            }
-
-            await updateUserStats(i.user.id, updates);
-
-            stats = await syncStats(i.user.id);
-
-            const statChanges = calculateStatChanges(beforeStats, stats);
-            updatedStats.push(...statChanges);
-
-            const setBonusMessages = getSetBonusMessages(
-                beforeStats,
-                stats,
-                "deactivated",
-            );
-            updatedStats.push(...setBonusMessages);
-
-            return r.edit(
-                embedComment(
-                    `You have unequipped all items you can.\n${updatedStats.join(
-                        "\n",
-                    )}`,
-                    "Green",
-                ),
-            );
-        }
-
-        if (itemName === stats.equippedWeapon) {
-            if (stats.castQueue.length > 0) {
+            if (!artifactType) {
                 return r.edit(
                     embedComment(
-                        `You cannot unequip your weapon while you have spells in your queue.`,
+                        `Unable to find the artifact type for "${itemName}"`,
                     ),
                 );
             }
 
-            await updateUserStats(i.user.id, {
-                equippedWeapon: { set: null },
-            });
+            const equippedField =
+                `equipped${artifactType}` as keyof typeof stats;
 
-            stats = await syncStats(i.user.id);
+            if (stats[equippedField] === itemName) {
+                await updateUserStats(i.user.id, {
+                    [equippedField]: { set: null },
+                });
 
-            const statChanges = calculateStatChanges(beforeStats, stats);
-            updatedStats.push(...statChanges);
+                stats = await syncStats(i.user.id);
+                if (!stats) {
+                    return r.edit(embedComment(`Failed to sync stats.`));
+                }
+                const statChanges = calculateStatChanges(beforeStats, stats);
+                const setBonusMessages = getSetBonusMessages(
+                    beforeStats,
+                    stats,
+                    "deactivated",
+                );
 
-            return r.edit(
-                embedComment(
-                    `You have unequipped your weapon: **${itemName}**.\n${updatedStats.join(
-                        "\n",
-                    )}`,
-                    "Green",
-                ),
-            );
-        }
-
-        const artifactType = getArtifactType(itemName as ArtifactName);
-
-        if (!artifactType) {
-            return r.edit(
-                embedComment(
-                    `Unable to find the artifact type for "${itemName}"`,
-                ),
-            );
-        }
-
-        const equippedField = `equipped${artifactType}` as keyof typeof stats;
-
-        if (stats[equippedField] === itemName) {
-            await updateUserStats(i.user.id, {
-                [equippedField]: { set: null },
-            });
-
-            stats = await syncStats(i.user.id);
-            const statChanges = calculateStatChanges(beforeStats, stats);
-            updatedStats.push(...statChanges);
-
-            const setBonusMessages = getSetBonusMessages(
-                beforeStats,
-                stats,
-                "deactivated",
-            );
-            updatedStats.push(...setBonusMessages);
-
-            return r.edit(
-                embedComment(
-                    `You have unequipped your artifact: **${itemName}**.\n${updatedStats.join(
-                        "\n",
-                    )}`,
-                    "Green",
-                ),
-            );
+                return r.edit(
+                    embedComment(
+                        `You have unequipped your artifact: **${itemName}**.\n${[
+                            ...statChanges,
+                            ...setBonusMessages,
+                        ].join("\n")}`,
+                        "Green",
+                    ),
+                );
+            } else {
+                return r.edit(
+                    embedComment(
+                        `You don't have the artifact "${itemName}" equipped.`,
+                    ),
+                );
+            }
         } else {
-            return r.edit(
-                embedComment(
-                    `You don't have the artifact "${itemName}" equipped.`,
-                ),
+            const characters = await getUserCharacters(i.user.id);
+            const character = characters.find(
+                (c) => c.name.toLowerCase() === characterName.toLowerCase(),
             );
+            if (!character) {
+                return r.edit(
+                    embedComment(
+                        `You don't have a character named "${characterName}".`,
+                    ),
+                );
+            }
+
+            const before = { ...character };
+
+            if (itemName === "All") {
+                const updates: Partial<{
+                    equippedWeapon: null;
+                    equippedFlower: null;
+                    equippedPlume: null;
+                    equippedSands: null;
+                    equippedGoblet: null;
+                    equippedCirclet: null;
+                }> = {};
+
+                if (character.equippedWeapon) {
+                    updates.equippedWeapon = null;
+                }
+
+                const artifactTypes = [
+                    "Flower",
+                    "Plume",
+                    "Sands",
+                    "Goblet",
+                    "Circlet",
+                ] as const;
+                for (const type of artifactTypes) {
+                    const field = `equipped${type}` as keyof typeof character;
+                    if (character[field]) {
+                        updates[field as keyof typeof updates] = null;
+                    }
+                }
+
+                if (Object.keys(updates).length === 0) {
+                    return r.edit(
+                        embedComment(
+                            `"${
+                                character.nickname
+                                    ? `${character.nickname} (${character.name})`
+                                    : character.name
+                            }" has no items equipped to unequip.`,
+                        ),
+                    );
+                }
+
+                await updateUserCharacter(character.id, updates);
+                const updatedChar = await syncCharacter(character.id);
+
+                if (!updatedChar) {
+                    return r.edit(
+                        embedComment(
+                            `Failed to sync character stats after unequipping.`,
+                        ),
+                    );
+                }
+
+                const statChanges = calculateCharacterStatChanges(
+                    before,
+                    updatedChar as UserCharacter,
+                );
+                const setBonusMessages = getCharacterSetBonusMessages(
+                    before,
+                    updatedChar as UserCharacter,
+                    "activated",
+                );
+
+                return r.edit(
+                    embedComment(
+                        `You have unequipped all items from **${
+                            character.nickname
+                                ? `${character.nickname} (${character.name})`
+                                : character.name
+                        }**.\n${[...statChanges, ...setBonusMessages].join(
+                            "\n",
+                        )}`,
+                        "Green",
+                    ),
+                );
+            }
+
+            if (character.equippedWeapon === itemName) {
+                await updateUserCharacter(character.id, {
+                    equippedWeapon: null,
+                });
+
+                const updatedChar = await syncCharacter(character.id);
+                if (!updatedChar) {
+                    return r.edit(
+                        embedComment(
+                            `Failed to sync character stats after unequipping weapon.`,
+                        ),
+                    );
+                }
+
+                const statChanges = calculateCharacterStatChanges(
+                    before,
+                    updatedChar as UserCharacter,
+                );
+                return r.edit(
+                    embedComment(
+                        `You have unequipped the weapon: **${itemName}** from **${
+                            character.nickname
+                                ? `${character.nickname} (${character.name})`
+                                : character.name
+                        }**.\n${statChanges.join("\n")}`,
+                        "Green",
+                    ),
+                );
+            }
+
+            const artifactType = getArtifactType(itemName as ArtifactName);
+            if (!artifactType) {
+                return r.edit(
+                    embedComment(
+                        `Unable to find the artifact type for "${itemName}"`,
+                    ),
+                );
+            }
+
+            const equippedField =
+                `equipped${artifactType}` as keyof typeof character;
+
+            if (character[equippedField] === itemName) {
+                await updateUserCharacter(character.id, {
+                    [equippedField]: null,
+                });
+
+                const updatedChar = await syncCharacter(character.id);
+                if (!updatedChar) {
+                    return r.edit(
+                        embedComment(
+                            `Failed to sync character stats after unequipping artifact.`,
+                        ),
+                    );
+                }
+
+                const statChanges = calculateCharacterStatChanges(
+                    before,
+                    updatedChar as UserCharacter,
+                );
+                const setBonusMessages = getCharacterSetBonusMessages(
+                    before,
+                    updatedChar as UserCharacter,
+                    "activated",
+                );
+
+                return r.edit(
+                    embedComment(
+                        `You have unequipped the artifact: **${itemName}** from **${
+                            character.nickname
+                                ? `${character.nickname} (${character.name})`
+                                : character.name
+                        }**.\n${[...statChanges, ...setBonusMessages].join(
+                            "\n",
+                        )}`,
+                        "Green",
+                    ),
+                );
+            } else {
+                return r.edit(
+                    embedComment(
+                        `**${
+                            character.nickname
+                                ? `${character.nickname} (${character.name})`
+                                : character.name
+                        }** doesn't have the item "${itemName}" equipped.`,
+                    ),
+                );
+            }
         }
     },
 });
