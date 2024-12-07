@@ -6,7 +6,7 @@ import {
     noop,
     snowflakes,
 } from "@elara-services/utils";
-import { UserCharacter, UserStats } from "@prisma/client";
+import { type UserCharacter } from "@prisma/client";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,

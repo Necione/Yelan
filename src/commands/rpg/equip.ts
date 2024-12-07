@@ -2,7 +2,7 @@ import type { SlashCommand } from "@elara-services/botbuilder";
 import { buildCommand } from "@elara-services/botbuilder";
 import { embedComment, getKeys, is, noop } from "@elara-services/utils";
 import type { UserCharacter } from "@prisma/client";
-import { UserStats } from "@prisma/client";
+import { type UserStats } from "@prisma/client";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getUserCharacters,
