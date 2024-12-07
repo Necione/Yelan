@@ -18,6 +18,7 @@ export * from "./info";
 export * from "./learn";
 export * from "./masteries";
 export * from "./move";
+export * from "./nickname";
 export * from "./rebirth";
 export * from "./requests";
 export * from "./rpg";

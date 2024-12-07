@@ -349,7 +349,7 @@ export const rpg = buildCommand<SlashCommand>({
                     .setTitle(`${i.user.username}'s Character: ${displayName}`)
                     .setThumbnail(chosenThumbnail)
                     .setDescription(
-                        `**Status:** ${expeditionStatus}\n\n${hpDisplay}\n` +
+                        `**Expedition Status:** ${expeditionStatus}\n\n${hpDisplay}\n` +
                             `⚔️ ATK: \`${character.attackPower.toFixed(
                                 2,
                             )}\` (Base: ${character.baseAttack})\n` +
