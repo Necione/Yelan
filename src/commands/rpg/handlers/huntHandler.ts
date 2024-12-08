@@ -12,6 +12,7 @@ import type { UserStats, UserWallet } from "@prisma/client";
 import type {
     ButtonInteraction,
     ChatInputCommandInteraction,
+    ColorResolvable,
     Message,
     PublicThreadChannel,
     User,
@@ -170,8 +171,29 @@ export async function handleHunt(
             const isMutated = Math.random() * 100 < actualMutationChance;
 
             if (isMutated) {
-                monster.name = `Mutated ${monster.name}`;
-                monster.isMutated = true;
+                const mutationTypes = [
+                    "Bloodthirsty",
+                    "Strange",
+                    "Infected",
+                ] as const;
+                const chosenMutation =
+                    mutationTypes[
+                        Math.floor(Math.random() * mutationTypes.length)
+                    ];
+
+                monster.mutationType = chosenMutation;
+
+                switch (chosenMutation) {
+                    case "Bloodthirsty":
+                        monster.name = `Bloodthirsty ${monster.name}`;
+                        break;
+                    case "Strange":
+                        monster.name = `Strange ${monster.name}`;
+                        break;
+                    case "Infected":
+                        monster.name = `Infected ${monster.name}`;
+                        break;
+                }
             }
 
             monstersEncountered.push(monster);
@@ -198,8 +220,10 @@ export async function handleHunt(
             getRandomValue(monsterStats.minHp, monsterStats.maxHp),
         );
 
-        if (monster.isMutated) {
-            currentMonsterHp *= 1.2;
+        if (monster.mutationType === "Strange") {
+            currentMonsterHp = Math.floor(currentMonsterHp * 1.5);
+        } else if (monster.mutationType === "Infected") {
+            currentMonsterHp = Math.floor(currentMonsterHp * 2);
         }
 
         const initialMonsterHp = currentMonsterHp;
@@ -219,7 +243,6 @@ export async function handleHunt(
 
             const bar = "█".repeat(filledLength) + "░".repeat(emptyLength);
             if (current <= 0) {
-                // If the 'current' health is below 0 then just display 0 instead of `-XXX`
                 current = 0;
             }
             return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
@@ -227,8 +250,19 @@ export async function handleHunt(
 
         const deathThreshold = getDeathThreshold(stats);
 
+        let embedColor: ColorResolvable = 0x00ffff;
+        if (monster.mutationType === "Bloodthirsty") {
+            embedColor = 0xb40000;
+        }
+        if (monster.mutationType === "Strange") {
+            embedColor = 0x658e4d;
+        }
+        if (monster.mutationType === "Infected") {
+            embedColor = 0x88349b;
+        }
+
         const battleEmbed = new EmbedBuilder()
-            .setColor(monster.isMutated ? "#658e4d" : "Aqua")
+            .setColor(embedColor)
             .setTitle(`You encountered a ${monster.name}!`)
             .setDescription(selectedDescription)
             .setThumbnail(monster.image)

@@ -19,7 +19,7 @@ export default {
         },
     ],
 
-    critChance: 5,
+    critChance: 2,
     critValue: 100,
     defChance: 50,
     defValue: 50,

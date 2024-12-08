@@ -334,8 +334,17 @@ export async function monsterAttack(
         monsterStats.maxDamage,
     );
 
-    if (monster.isMutated) {
-        monsterDamage *= 1.2;
+    switch (monster.mutationType) {
+        case "Bloodthirsty":
+            monsterDamage *= 2;
+            break;
+        case "Strange":
+            monsterDamage *= 1.5;
+            break;
+        case "Infected":
+            break;
+        default:
+            break;
     }
 
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
@@ -427,10 +436,10 @@ export async function monsterAttack(
     const hasVortexVanquisher =
         equippedWeaponName && equippedWeaponName.includes("Vortex Vanquisher");
 
-    const damageReductionFactor = hasVortexVanquisher ? 0.75 : 1;
+    const damageReductionFactor = hasVortexVanquisher ? 0.50 : 1;
     if (hasVortexVanquisher) {
         messages.push(
-            `\`🌀\` **Vortex Vanquisher** has reduced all damage taken by 25%.`,
+            `\`🌀\` **Vortex Vanquisher** has reduced all damage taken by 50%.`,
         );
     }
 
@@ -506,7 +515,7 @@ export async function monsterAttack(
                 stats.maxHP,
             );
             if (currentPlayerHp > startHP) {
-                healAmount = Math.floor(currentPlayerHp - startHP); // TODO: Idk figure this one out, my head hurts.
+                healAmount = Math.floor(currentPlayerHp - startHP);
                 currentPlayerHp = startHP;
             }
             messages.push(

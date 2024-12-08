@@ -5,7 +5,7 @@ export type SpecialSkillName =
     | "Backstep"
     | "Perfect Parry"
     | "Bolster"
-    | "Undying"
+    | "Fortress"
     | "Fear"
     | "Soulstealer"
     | "Thrust"
@@ -42,7 +42,7 @@ export const specialSkills = make.array<SpecialSkill>([
         description: "Deal 300% damage on your first hit in a battle",
     },
     {
-        skillName: "Undying",
+        skillName: "Fortress",
         emoji: "💀",
         description:
             "The next attack that kills you leaves you at 1 HP instead",

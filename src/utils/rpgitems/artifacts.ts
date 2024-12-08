@@ -1009,7 +1009,7 @@ export const artifactSets = {
         },
         "4pc": {
             critChance: 10,
-            attackPowerPercentage: 0.1,
+            attackPowerPercentage: 0.5,
         },
     },
     "The Exile": {
@@ -1032,11 +1032,11 @@ export const artifactSets = {
     },
     "Defender's Will": {
         "2pc": {
-            defValuePercentage: 0.15,
+            defValuePercentage: 0.20,
         },
         "4pc": {
-            defValuePercentage: 0.15,
-            maxHPPercentage: 0.1,
+            defValuePercentage: 0.25,
+            maxHPPercentage: 0.25,
         },
     },
     "Maiden Beloved": {
@@ -1050,10 +1050,10 @@ export const artifactSets = {
     },
     "Gladiator's Finale": {
         "2pc": {
-            attackPowerPercentage: 0.18,
+            attackPowerPercentage: 0.2,
         },
         "4pc": {
-            attackPowerPercentage: 0.18,
+            attackPowerPercentage: 0.25,
             critChance: 10,
         },
     },
@@ -1077,10 +1077,10 @@ export const artifactSets = {
     },
     "Noblesse Oblige": {
         "2pc": {
-            attackPowerPercentage: 0.2,
+            attackPowerPercentage: 0.25,
         },
         "4pc": {
-            attackPowerPercentage: 0.2,
+            attackPowerPercentage: 0.3,
             critChance: 15,
         },
     },

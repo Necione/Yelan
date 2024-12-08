@@ -61,7 +61,7 @@ export const worship = buildCommand<SlashCommand>({
                 return r.edit(embedComment(cc.message));
             }
 
-            const healAmount = Math.floor(0.5 * stats.maxHP);
+            const healAmount = Math.floor(0.25 * stats.maxHP);
             const newHp = Math.min(stats.hp + healAmount, stats.maxHP);
 
             const newResonance = (stats.resonance || 0) + 1;

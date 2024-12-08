@@ -18,6 +18,7 @@ export interface Monster {
     minWorldLevel: number;
     image: string;
     isMutated?: boolean;
+    mutationType?: "Bloodthirsty" | "Strange" | "Infected";
     drops: {
         item: string;
         minAmount: number;
