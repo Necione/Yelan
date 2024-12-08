@@ -6,8 +6,8 @@ export default {
     currentHp: 0,
     name: "Eremite: Loremaster",
     group: MonsterGroup.Eremite,
-    minExp: 40,
-    maxExp: 60,
+    minExp: 75,
+    maxExp: 100,
     minWorldLevel: 24,
     image: "https://lh.elara.workers.dev/rpg/monsters/loremaster.png",
     drops: [

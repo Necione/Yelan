@@ -6,8 +6,8 @@ export default {
     currentHp: 0,
     name: "Geo Specter",
     group: MonsterGroup.Specter,
-    minExp: 45,
-    maxExp: 50,
+    minExp: 75,
+    maxExp: 100,
     minWorldLevel: 30,
     image: "https://lh.elara.workers.dev/rpg/monsters/geo_specter.png",
     drops: [

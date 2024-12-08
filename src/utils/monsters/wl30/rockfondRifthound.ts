@@ -6,8 +6,8 @@ export default {
     currentHp: 0,
     name: "Rockfond Rifthound",
     group: MonsterGroup.Abyss,
-    minExp: 45,
-    maxExp: 50,
+    minExp: 75,
+    maxExp: 100,
     minWorldLevel: 30,
     image: "https://lh.elara.workers.dev/rpg/monsters/rockfond_rifthound.png",
     drops: [
