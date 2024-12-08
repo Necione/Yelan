@@ -927,8 +927,8 @@ export const artifacts = {
         maxHP: 300,
         defChance: 20,
         defValue: 50,
-        minWorldLevel: 0,
-        chestChance: 0,
+        minWorldLevel: 35,
+        chestChance: 1,
     },
     "Golden Bird's Shedding": {
         type: "Plume",
@@ -940,8 +940,8 @@ export const artifacts = {
         maxHP: 250,
         defChance: 5,
         defValue: 75,
-        minWorldLevel: 0,
-        chestChance: 0,
+        minWorldLevel: 35,
+        chestChance: 1,
     },
     "Golden Era's Prelude": {
         type: "Sands",
@@ -953,8 +953,8 @@ export const artifacts = {
         maxHP: 10,
         defChance: 5,
         defValue: 5,
-        minWorldLevel: 0,
-        chestChance: 0,
+        minWorldLevel: 35,
+        chestChance: 1,
     },
     "Golden Night's Bustle": {
         type: "Goblet",
@@ -966,8 +966,8 @@ export const artifacts = {
         maxHP: 100,
         defChance: 10,
         defValue: 10,
-        minWorldLevel: 0,
-        chestChance: 0,
+        minWorldLevel: 35,
+        chestChance: 1,
     },
     "Golden Troupe's Reward": {
         type: "Circlet",
@@ -979,8 +979,8 @@ export const artifacts = {
         maxHP: 400,
         defChance: 15,
         defValue: 20,
-        minWorldLevel: 0,
-        chestChance: 0,
+        minWorldLevel: 35,
+        chestChance: 1,
     },
 };
 
