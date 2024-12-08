@@ -14,8 +14,8 @@ import { locationEmojis, locations } from "./travel";
 type LocationName = keyof typeof locations;
 
 const expeditionTimes = {
-    Scavenge: 60 * 60,
-    Adeventure: 120 * 60,
+    Scavenge: 120 * 60,
+    Adeventure: 240 * 60,
 } as const;
 
 const expeditionItemsCount = {
@@ -53,8 +53,8 @@ export const expedition = buildCommand<SlashCommand>({
                 .setDescription("The type of expedition")
                 .setRequired(false)
                 .addChoices(
-                    { name: "Scavenge (1h)", value: "Scavenge" },
-                    { name: "Adeventure (2h)", value: "Adeventure" },
+                    { name: "Scavenge (2h)", value: "Scavenge" },
+                    { name: "Adeventure (4h)", value: "Adeventure" },
                 ),
         ),
     defer: { silent: false },
