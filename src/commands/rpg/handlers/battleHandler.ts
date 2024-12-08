@@ -147,6 +147,16 @@ export async function playerAttack(
         await updateUserStats(stats.userId, updateData);
     }
 
+    if (isFishingMonster(monster)) {
+        messages.push(`\`🎣\` None of your skills will work while fishing`);
+        return {
+            currentMonsterHp,
+            currentPlayerHp,
+            vigilanceUsed,
+            monsterState,
+        };
+    }
+
     // eslint-disable-next-line prefer-const
     let { paladinSwapped, attackPower } = getEffectiveStats(stats);
 
@@ -377,7 +387,7 @@ export async function monsterAttack(
     );
     monsterDamage *= multiplier;
 
-    if (hasCrystallize) {
+    if (hasCrystallize && !isFishingMonster(monster)) {
         const monsterTurn = Math.ceil(turnNumber / 2);
 
         let damageMultiplier: number;
@@ -402,7 +412,7 @@ export async function monsterAttack(
         messages.push(effectDescription);
     }
 
-    if (hasFatigue) {
+    if (hasFatigue && !isFishingMonster(monster)) {
         const monsterTurn = Math.ceil(turnNumber / 2);
 
         let damageMultiplier: number;
@@ -484,13 +494,13 @@ export async function monsterAttack(
     const hasBackstep = skills.has(stats, "Backstep");
     const hasParry = skills.has(stats, "Parry");
 
-    if (hasBackstep && Math.random() < 0.25) {
+    if (hasBackstep && Math.random() < 0.25 && !isFishingMonster(monster)) {
         messages.push(
             `\`💨\` Backstep skill activated! You dodged the attack completely`,
         );
         reducedMonsterDamage = 0;
     } else {
-        if (hasParry && Math.random() < 0.2) {
+        if (hasParry && Math.random() < 0.2 && !isFishingMonster(monster)) {
             const parriedDamage = reducedMonsterDamage * 0.5;
             reducedMonsterDamage *= 0.5;
             currentMonsterHp -= parriedDamage;
@@ -511,7 +521,7 @@ export async function monsterAttack(
 
     const leechLevelData = getUserSkillLevelData(stats, "Leech");
 
-    if (leechLevelData) {
+    if (leechLevelData && !isFishingMonster(monster)) {
         const levelData = leechLevelData.levelData || {};
 
         const lifestealPercentage = levelData.lifestealPercentage || 0;
@@ -793,4 +803,8 @@ function getEffectiveStats(stats: UserStats): {
     }
 
     return { attackPower, defValue, paladinSwapped };
+}
+
+function isFishingMonster(monster: Monster): boolean {
+    return has("Fishing", monster, true);
 }
