@@ -190,7 +190,14 @@ export async function handleHunt(
 
             const mutationChance = stats.rebirths * 5;
             const actualMutationChance = Math.min(mutationChance, 100);
-            const isMutated = Math.random() * 100 < actualMutationChance;
+
+            let preventMutation = false;
+            if (isWieldingPolearm && polearmMasteryLevel >= 4) {
+                preventMutation = true;
+            }
+
+            const isMutated =
+                !preventMutation && Math.random() * 100 < actualMutationChance;
 
             if (isMutated) {
                 const mutationTypes = [

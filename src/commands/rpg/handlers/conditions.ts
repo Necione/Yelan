@@ -10,6 +10,7 @@ import {
 } from "../../../services";
 import { cooldowns, texts } from "../../../utils";
 import { calculateDrop, type Monster } from "../../../utils/hunt";
+import { calculateMasteryLevel } from "../../../utils/masteryHelper";
 import { weapons, type WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {
@@ -170,7 +171,17 @@ export async function handleVictory(
         }
 
         if (equippedWeapon && equippedWeapon.type === "Catalyst") {
-            const manaRestored = Math.floor(Math.random() * 11) + 5;
+            const catalystMasteryPoints = stats.masteryCatalyst || 0;
+            const { numericLevel } = calculateMasteryLevel(
+                catalystMasteryPoints,
+            );
+
+            let manaRestored = Math.floor(Math.random() * 11) + 5;
+
+            if (numericLevel >= 4) {
+                manaRestored = Math.floor(manaRestored * 1.5);
+            }
+
             const newMana = Math.min(stats.mana + manaRestored, stats.maxMana);
             stats.mana = newMana;
 
