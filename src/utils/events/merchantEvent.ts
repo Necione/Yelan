@@ -2,6 +2,7 @@ import {
     addButtonRow,
     awaitComponent,
     get,
+    getRandom,
     make,
     noop,
 } from "@elara-services/utils";
@@ -116,20 +117,9 @@ export async function merchantEvent(
         false,
         "Purchased from Merchant",
     );
-
-    let receivedItem;
-    if (Math.random() < 0.25) {
-        // 25% chance to get a golden item
-        const randomGoldenItem =
-            goldenItems[Math.floor(Math.random() * goldenItems.length)];
-        receivedItem = randomGoldenItem;
-    } else {
-        // 75% chance to get another item
-        const randomOtherItem =
-            otherItems[Math.floor(Math.random() * otherItems.length)];
-        receivedItem = randomOtherItem;
-    }
-
+    const receivedItem = getRandom(
+        Math.random() < 0.25 ? goldenItems : otherItems,
+    );
     await addItemToInventory(stats.userId, [receivedItem]);
 
     return message

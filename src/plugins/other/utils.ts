@@ -36,6 +36,12 @@ export const skills = {
         isSpecial = false,
     ) => {
         if (specialSkills.find((c) => c.skillName === name) || isSpecial) {
+            if (active) {
+                return (
+                    stats.unlockedSpecialSkills.includes(name) &&
+                    stats.activeSkills.includes(name)
+                );
+            }
             return stats.unlockedSpecialSkills.includes(name);
         }
         if (active) {
