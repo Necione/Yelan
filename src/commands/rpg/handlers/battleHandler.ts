@@ -464,6 +464,14 @@ export async function monsterAttack(
         );
     }
 
+    if (monster.element === MonsterElement.Electro && Math.random() < 0.5) {
+        const surgeDamage = Math.ceil(monsterDamage * 0.5);
+        currentPlayerHp -= surgeDamage;
+        messages.push(
+            `\`⚔️\` The ${monster.name} dealt \`${surgeDamage}\` damage to you \`⚡ SURGE\``,
+        );
+    }
+
     if (monster.element === MonsterElement.Pyro) {
         const burnDamage = Math.ceil(
             stats.maxHP * (0.03 + 0.01 * Math.floor(stats.worldLevel / 2)),
@@ -479,7 +487,7 @@ export async function monsterAttack(
         const splashDamage = Math.ceil(stats.hp * 0.1);
         currentPlayerHp -= splashDamage;
         messages.push(
-            `\`💦\` The ${monster.name} dealt \`${splashDamage} HP\` damage to you with a Hydro attack`,
+            `\`⚔️\` The ${monster.name} dealt \`${splashDamage}\` damage to you \`💦 SPLASH\``,
         );
     }
 
