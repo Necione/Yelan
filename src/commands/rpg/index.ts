@@ -11,6 +11,7 @@ export * from "./downgrade";
 export * from "./eat";
 export * from "./equip";
 export * from "./expedition";
+export * from "./explore";
 export * from "./fish";
 export * from "./heal";
 export * from "./hunt";
@@ -31,3 +32,4 @@ export * from "./unequip";
 export * from "./upgrade";
 export * from "./whereami";
 export * from "./worship";
+
