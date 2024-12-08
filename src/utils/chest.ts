@@ -20,11 +20,11 @@ type ChestRarity = {
 };
 
 const rarities = make.array<ChestRarity>([
-    { rarity: "Common", multiplier: 1, weight: 50 },
+    { rarity: "Common", multiplier: 1, weight: 60 },
     { rarity: "Exquisite", multiplier: 2, weight: 25 },
-    { rarity: "Precious", multiplier: 3, weight: 15 },
-    { rarity: "Luxurious", multiplier: 4, weight: 8 },
-    { rarity: "Remarkable", multiplier: 5, weight: 2 },
+    { rarity: "Precious", multiplier: 3, weight: 10 },
+    { rarity: "Luxurious", multiplier: 4, weight: 4 },
+    { rarity: "Remarkable", multiplier: 5, weight: 1 },
 ]);
 
 const chestLoot = make.array<LootItem>([
