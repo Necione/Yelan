@@ -35,6 +35,7 @@ import {
     type Monster,
 } from "../../../utils/hunt";
 import { calculateMasteryLevel } from "../../../utils/masteryHelper";
+import { elementEmojis } from "../../../utils/monsterHelper";
 import { handleRandomEvent } from "../../../utils/randomEvents";
 import { type WeaponName, weapons } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
@@ -282,9 +283,15 @@ export async function handleHunt(
             embedColor = 0x88349b;
         }
 
+        let displayedMonsterName = monster.name;
+        const element = monster.element;
+        if (element && elementEmojis[element]) {
+            displayedMonsterName = `${elementEmojis[element]} ${displayedMonsterName}`;
+        }
+
         const battleEmbed = new EmbedBuilder()
             .setColor(embedColor)
-            .setTitle(`You encountered a ${monster.name}!`)
+            .setTitle(`You encountered a ${displayedMonsterName}!`)
             .setDescription(selectedDescription)
             .setThumbnail(monster.image)
             .addFields(

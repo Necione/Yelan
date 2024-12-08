@@ -1,11 +1,12 @@
 import { limits } from "..";
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
     name: "Eremite: Clearwater",
     group: MonsterGroup.Eremite,
+    element: MonsterElement.Hydro,
     minExp: 10,
     maxExp: 25,
     minWorldLevel: 13,

@@ -1,11 +1,12 @@
 import { limits } from "..";
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
     name: "Eremite: Loremaster",
     group: MonsterGroup.Eremite,
+    element: MonsterElement.Pyro,
     minExp: 75,
     maxExp: 100,
     minWorldLevel: 30,

@@ -1,11 +1,12 @@
 import { limits } from "..";
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
     name: "Electro Specter",
     group: MonsterGroup.Specter,
+    element: MonsterElement.Electro,
     minExp: 45,
     maxExp: 50,
     minWorldLevel: 26,
@@ -29,8 +30,8 @@ export default {
     critValue: 1.2,
     defChance: 75,
     defValue: 400,
-    baseHp: 22,
-    baseAtk: 15,
+    baseHp: 19,
+    baseAtk: 11,
     getStatsForWorldLevel(worldLevel: number) {
         if (!limits.check(worldLevel)) {
             return null;

@@ -1,11 +1,12 @@
 import { limits } from "..";
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
     name: "Dendro Slime",
     group: MonsterGroup.Slime,
+    element: MonsterElement.Dendro,
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 4,

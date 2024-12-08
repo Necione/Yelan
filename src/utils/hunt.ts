@@ -2,13 +2,14 @@ import { getRandomValue, is, log, make } from "@elara-services/utils";
 import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import { locationGroupWeights } from "./locationGroupWeights";
-import { MonsterGroup } from "./monsterHelper";
+import { MonsterElement, MonsterGroup } from "./monsterHelper";
 import type { WeaponType } from "./rpgitems/weapons";
 
 export interface Monster {
     currentHp: number;
     name: string;
     group: MonsterGroup;
+    element: MonsterElement;
     minExp: number;
     maxExp: number;
     critChance: number;

@@ -1,11 +1,12 @@
 import { limits } from "..";
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
     name: "Ruin Defender",
     group: MonsterGroup.Machine,
+    element: MonsterElement.Physical,
     minExp: 50,
     maxExp: 75,
     minWorldLevel: 20,
