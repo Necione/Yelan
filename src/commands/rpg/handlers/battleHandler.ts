@@ -475,6 +475,14 @@ export async function monsterAttack(
         );
     }
 
+    if (monster.element === MonsterElement.Hydro && Math.random() < 0.5) {
+        const splashDamage = Math.ceil(stats.hp * 0.1);
+        currentPlayerHp -= splashDamage;
+        messages.push(
+            `\`💦\` The ${monster.name} dealt \`${splashDamage} HP\` damage to you with a Hydro attack`,
+        );
+    }
+
     if (monster.element === MonsterElement.Cryo && Math.random() < 0.5) {
         const crippleDamage = Math.ceil(
             stats.maxHP * (0.05 + 0.01 * Math.floor(stats.worldLevel / 2)),
@@ -485,7 +493,7 @@ export async function monsterAttack(
         );
         currentPlayerHp -= reducedCrippleDamage;
         messages.push(
-            `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${reducedCrippleDamage}\` Cripple damage.`,
+            `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${reducedCrippleDamage}\` Cripple damage`,
         );
     }
 
@@ -705,7 +713,7 @@ export function checkMonsterDefenses(
         attackMissed = true;
         monsterState.vanishedUsed = true;
         messages.push(
-            `\`👤\` The ${monster.name} has vanished, dodging your attack!`,
+            `\`👤\` The ${monster.name} has vanished, dodging your attack`,
         );
     }
 
