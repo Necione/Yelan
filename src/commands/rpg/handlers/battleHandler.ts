@@ -147,6 +147,16 @@ export async function playerAttack(
         await updateUserStats(stats.userId, updateData);
     }
 
+    if (isFishingMonster(monster)) {
+        messages.push(`\`🎣\` None of your skills will work while fishing`);
+        return {
+            currentMonsterHp,
+            currentPlayerHp,
+            vigilanceUsed,
+            monsterState,
+        };
+    }
+
     // eslint-disable-next-line prefer-const
     let { paladinSwapped, attackPower } = getEffectiveStats(stats);
 
@@ -377,7 +387,7 @@ export async function monsterAttack(
     );
     monsterDamage *= multiplier;
 
-    if (hasCrystallize) {
+    if (hasCrystallize && !isFishingMonster(monster)) {
         const monsterTurn = Math.ceil(turnNumber / 2);
 
         let damageMultiplier: number;
@@ -402,7 +412,7 @@ export async function monsterAttack(
         messages.push(effectDescription);
     }
 
-    if (hasFatigue) {
+    if (hasFatigue && !isFishingMonster(monster)) {
         const monsterTurn = Math.ceil(turnNumber / 2);
 
         let damageMultiplier: number;
@@ -454,6 +464,14 @@ export async function monsterAttack(
         );
     }
 
+    if (monster.element === MonsterElement.Electro && Math.random() < 0.5) {
+        const surgeDamage = Math.ceil(monsterDamage * 0.5);
+        currentPlayerHp -= surgeDamage;
+        messages.push(
+            `\`⚔️\` The ${monster.name} dealt \`${surgeDamage}\` damage to you \`⚡ SURGE\``,
+        );
+    }
+
     if (monster.element === MonsterElement.Pyro) {
         const burnDamage = Math.ceil(
             stats.maxHP * (0.03 + 0.01 * Math.floor(stats.worldLevel / 2)),
@@ -462,6 +480,14 @@ export async function monsterAttack(
         currentPlayerHp -= reducedBurnDamage;
         messages.push(
             `\`🔥\` The ${monster.name} inflicted Burn! You took \`${reducedBurnDamage}\` Burn damage`,
+        );
+    }
+
+    if (monster.element === MonsterElement.Hydro && Math.random() < 0.5) {
+        const splashDamage = Math.ceil(stats.hp * 0.1);
+        currentPlayerHp -= splashDamage;
+        messages.push(
+            `\`⚔️\` The ${monster.name} dealt \`${splashDamage}\` damage to you \`💦 SPLASH\``,
         );
     }
 
@@ -475,7 +501,7 @@ export async function monsterAttack(
         );
         currentPlayerHp -= reducedCrippleDamage;
         messages.push(
-            `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${reducedCrippleDamage}\` Cripple damage.`,
+            `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${reducedCrippleDamage}\` Cripple damage`,
         );
     }
 
@@ -484,13 +510,13 @@ export async function monsterAttack(
     const hasBackstep = skills.has(stats, "Backstep");
     const hasParry = skills.has(stats, "Parry");
 
-    if (hasBackstep && Math.random() < 0.25) {
+    if (hasBackstep && Math.random() < 0.25 && !isFishingMonster(monster)) {
         messages.push(
             `\`💨\` Backstep skill activated! You dodged the attack completely`,
         );
         reducedMonsterDamage = 0;
     } else {
-        if (hasParry && Math.random() < 0.2) {
+        if (hasParry && Math.random() < 0.2 && !isFishingMonster(monster)) {
             const parriedDamage = reducedMonsterDamage * 0.5;
             reducedMonsterDamage *= 0.5;
             currentMonsterHp -= parriedDamage;
@@ -498,6 +524,23 @@ export async function monsterAttack(
                 `\`🎆\` Parry skill activated! You parried __50%__ of the incoming damage \`(${parriedDamage.toFixed(
                     2,
                 )})\`, dealing it back to the ${monster.name}`,
+            );
+        }
+    }
+
+    let resistanceReduced = 0;
+    const resistanceEffect = stats.activeEffects.find(
+        (effect) => effect.name === "Resistance" && effect.remainingUses > 0,
+    );
+    if (resistanceEffect) {
+        const initialDamage = reducedMonsterDamage;
+        reducedMonsterDamage *= resistanceEffect.effectValue;
+        resistanceReduced = initialDamage - reducedMonsterDamage;
+
+        resistanceEffect.remainingUses -= 1;
+        if (resistanceEffect.remainingUses <= 0) {
+            stats.activeEffects = stats.activeEffects.filter(
+                (eff) => eff !== resistanceEffect,
             );
         }
     }
@@ -511,7 +554,7 @@ export async function monsterAttack(
 
     const leechLevelData = getUserSkillLevelData(stats, "Leech");
 
-    if (leechLevelData) {
+    if (leechLevelData && !isFishingMonster(monster)) {
         const levelData = leechLevelData.levelData || {};
 
         const lifestealPercentage = levelData.lifestealPercentage || 0;
@@ -538,7 +581,10 @@ export async function monsterAttack(
     }
 
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP);
-    await updateUserStats(stats.userId, { hp: { set: currentPlayerHp } });
+    await updateUserStats(stats.userId, {
+        hp: { set: currentPlayerHp },
+        activeEffects: { set: stats.activeEffects },
+    });
 
     let critText = "";
     if (
@@ -553,6 +599,11 @@ export async function monsterAttack(
         defendText = `\`🛡️ DEFENDED ${damageReduced.toFixed(2)}\``;
     }
 
+    let resistText = "";
+    if (resistanceReduced > 0) {
+        resistText = `\`🌺 RESIST ${resistanceReduced.toFixed(2)}\``;
+    }
+
     const finalDamageDealt = hasVortexVanquisher
         ? reducedMonsterDamage
         : monsterDamage;
@@ -560,7 +611,7 @@ export async function monsterAttack(
     messages.push(
         `\`⚔️\` The ${monster.name} dealt \`${finalDamageDealt.toFixed(
             2,
-        )}\` damage to you ${defendText} ${critText}`,
+        )}\` damage to you ${defendText} ${critText} ${resistText}`,
     );
 
     return { currentPlayerHp, currentMonsterHp };
@@ -598,6 +649,23 @@ export function applyAttackModifiers(
             `\`〽️\` You are displaced! Your attack power is reduced by __80%__`,
         );
     }
+
+    const weaknessEffect = stats.activeEffects.find(
+        (effect) => effect.name === "Weakness" && effect.remainingUses > 0,
+    );
+    if (weaknessEffect) {
+        attackPower *= 1 + weaknessEffect.effectValue;
+        messages.push(
+            `\`🥀\` Weakness effect applied! Your attack power is reduced by __${(
+                weaknessEffect.effectValue * 100
+            ).toFixed(0)}%__`,
+        );
+        weaknessEffect.remainingUses -= 1;
+    }
+
+    updateUserStats(stats.userId, {
+        activeEffects: { set: stats.activeEffects },
+    });
 
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
 
@@ -695,7 +763,7 @@ export function checkMonsterDefenses(
         attackMissed = true;
         monsterState.vanishedUsed = true;
         messages.push(
-            `\`👤\` The ${monster.name} has vanished, dodging your attack!`,
+            `\`👤\` The ${monster.name} has vanished, dodging your attack`,
         );
     }
 
@@ -793,4 +861,8 @@ function getEffectiveStats(stats: UserStats): {
     }
 
     return { attackPower, defValue, paladinSwapped };
+}
+
+function isFishingMonster(monster: Monster): boolean {
+    return has("Fishing", monster, true);
 }

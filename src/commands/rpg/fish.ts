@@ -47,7 +47,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 .setRequired(true)
                 .addChoices(bait.map((c) => ({ name: c, value: c }))),
         ),
-    only: { text: true, threads: false, voice: false, dms: false },
+    only: { text: true, threads: true, voice: false, dms: false },
     defer: { silent: false },
     async execute(i, r) {
         locked.set(i.user);

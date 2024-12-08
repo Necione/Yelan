@@ -16,6 +16,7 @@ export async function handleRandomEvent(
             ev.secretCultEvent,
             ev.thiefEvent,
             ev.merchantEvent,
+            ev.cursedWitchEvent,
         ]),
     )(message, stats, userWallet);
 }
