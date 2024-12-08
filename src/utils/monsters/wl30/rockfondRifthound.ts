@@ -4,13 +4,15 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Cryo Cicin",
+    name: "Rockfond Rifthound",
     group: MonsterGroup.Abyss,
     minExp: 45,
     maxExp: 50,
-    minWorldLevel: 26,
-    image: "https://lh.elara.workers.dev/rpg/monsters/cryo_cicin.png",
+    minWorldLevel: 30,
+    image: "https://lh.elara.workers.dev/rpg/monsters/rockfond_rifthound.png",
     drops: [
+        { item: "Concealed Claw", minAmount: 1, maxAmount: 1, chance: 50 },
+        { item: "Concealed Unguis", minAmount: 1, maxAmount: 1, chance: 25 },
         {
             item: "Life Essence",
             minAmount: 1,
@@ -20,11 +22,11 @@ export default {
     ],
 
     critChance: 20,
-    critValue: 1.5,
-    defChance: 50,
-    defValue: 300,
-    baseHp: 18,
-    baseAtk: 18,
+    critValue: 1.1,
+    defChance: 75,
+    defValue: 100,
+    baseHp: 28,
+    baseAtk: 15,
     getStatsForWorldLevel(worldLevel: number) {
         if (!limits.check(worldLevel)) {
             return null;

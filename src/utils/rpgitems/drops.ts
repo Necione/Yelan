@@ -407,6 +407,22 @@ export const drops = {
         chestChance: 2,
         rarity: 3,
     },
+    "Concealed Claw": {
+        sellPrice: 30,
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 30,
+        chestChance: 1,
+        rarity: 1,
+    },
+    "Concealed Unguis": {
+        sellPrice: 40,
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 30,
+        chestChance: 1,
+        rarity: 2,
+    },
     "Life Essence": {
         sellPrice: 1,
         minAmount: 0,

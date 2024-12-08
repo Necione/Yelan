@@ -4,15 +4,21 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Cryo Cicin",
-    group: MonsterGroup.Abyss,
+    name: "Geo Specter",
+    group: MonsterGroup.Specter,
     minExp: 45,
     maxExp: 50,
-    minWorldLevel: 26,
-    image: "https://lh.elara.workers.dev/rpg/monsters/cryo_cicin.png",
+    minWorldLevel: 30,
+    image: "https://lh.elara.workers.dev/rpg/monsters/geo_specter.png",
     drops: [
         {
-            item: "Life Essence",
+            item: "Spectral Husk",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 75,
+        },
+        {
+            item: "Spectral Heart",
             minAmount: 1,
             maxAmount: 1,
             chance: 10,
@@ -20,11 +26,11 @@ export default {
     ],
 
     critChance: 20,
-    critValue: 1.5,
-    defChance: 50,
-    defValue: 300,
-    baseHp: 18,
-    baseAtk: 18,
+    critValue: 1.2,
+    defChance: 75,
+    defValue: 400,
+    baseHp: 19,
+    baseAtk: 12,
     getStatsForWorldLevel(worldLevel: number) {
         if (!limits.check(worldLevel)) {
             return null;

@@ -4,13 +4,21 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Cryo Cicin",
-    group: MonsterGroup.Abyss,
+    name: "Hydro Samachurl",
+    group: MonsterGroup.Hilichurl,
     minExp: 45,
     maxExp: 50,
-    minWorldLevel: 26,
-    image: "https://lh.elara.workers.dev/rpg/monsters/cryo_cicin.png",
+    minWorldLevel: 30,
+    image: "https://lh.elara.workers.dev/rpg/monsters/hydro_samachurl.png",
     drops: [
+        { item: "Divining Scroll", minAmount: 1, maxAmount: 2, chance: 100 },
+        { item: "Sealed Scroll", minAmount: 1, maxAmount: 1, chance: 100 },
+        {
+            item: "Forbidden Curse Scroll",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 75,
+        },
         {
             item: "Life Essence",
             minAmount: 1,
@@ -19,12 +27,12 @@ export default {
         },
     ],
 
-    critChance: 20,
-    critValue: 1.5,
-    defChance: 50,
-    defValue: 300,
-    baseHp: 18,
-    baseAtk: 18,
+    critChance: 25,
+    critValue: 1.2,
+    defChance: 75,
+    defValue: 150,
+    baseHp: 25,
+    baseAtk: 16,
     getStatsForWorldLevel(worldLevel: number) {
         if (!limits.check(worldLevel)) {
             return null;

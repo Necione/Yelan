@@ -23,7 +23,7 @@ export type ItemDrop = {
     amount: number;
 };
 
-const maxWorldLevel = 30;
+const maxWorldLevel = 35;
 
 export async function handleVictory(
     message: Message,

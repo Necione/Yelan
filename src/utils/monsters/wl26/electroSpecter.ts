@@ -29,8 +29,8 @@ export default {
     critValue: 1.2,
     defChance: 75,
     defValue: 400,
-    baseHp: 19,
-    baseAtk: 11,
+    baseHp: 22,
+    baseAtk: 15,
     getStatsForWorldLevel(worldLevel: number) {
         if (!limits.check(worldLevel)) {
             return null;

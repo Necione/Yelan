@@ -4,12 +4,12 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
-    name: "Cryo Cicin",
+    name: "Hydro Cicin",
     group: MonsterGroup.Abyss,
     minExp: 45,
     maxExp: 50,
-    minWorldLevel: 26,
-    image: "https://lh.elara.workers.dev/rpg/monsters/cryo_cicin.png",
+    minWorldLevel: 30,
+    image: "https://lh.elara.workers.dev/rpg/monsters/hydro_cicin.png",
     drops: [
         {
             item: "Life Essence",
@@ -23,8 +23,8 @@ export default {
     critValue: 1.5,
     defChance: 50,
     defValue: 300,
-    baseHp: 18,
-    baseAtk: 18,
+    baseHp: 25,
+    baseAtk: 20,
     getStatsForWorldLevel(worldLevel: number) {
         if (!limits.check(worldLevel)) {
             return null;
