@@ -436,7 +436,7 @@ export async function monsterAttack(
     const hasVortexVanquisher =
         equippedWeaponName && equippedWeaponName.includes("Vortex Vanquisher");
 
-    const damageReductionFactor = hasVortexVanquisher ? 0.50 : 1;
+    const damageReductionFactor = hasVortexVanquisher ? 0.5 : 1;
     if (hasVortexVanquisher) {
         messages.push(
             `\`🌀\` **Vortex Vanquisher** has reduced all damage taken by 50%.`,

@@ -1032,7 +1032,7 @@ export const artifactSets = {
     },
     "Defender's Will": {
         "2pc": {
-            defValuePercentage: 0.20,
+            defValuePercentage: 0.2,
         },
         "4pc": {
             defValuePercentage: 0.25,
