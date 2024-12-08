@@ -5,7 +5,7 @@ import { updateUserStats } from "../../../services";
 import { weaponAdvantages, type Monster } from "../../../utils/hunt";
 import { masteryBenefits } from "../../../utils/masteryData";
 import { calculateMasteryLevel } from "../../../utils/masteryHelper";
-import { MonsterGroup } from "../../../utils/monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../../utils/monsterHelper";
 import type { WeaponName, WeaponType } from "../../../utils/rpgitems/weapons";
 import { weapons } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
@@ -68,7 +68,7 @@ export async function playerAttack(
                     stats.maxHP,
                 );
                 messages.push(
-                    `\`✨\` Heal spell casted! Restored \`${healAmount} HP\`.`,
+                    `\`✨\` Heal spell casted! Restored \`${healAmount} HP\``,
                 );
                 break;
             }
@@ -76,7 +76,7 @@ export async function playerAttack(
             case "Fury": {
                 stats.attackPower *= 2;
                 messages.push(
-                    `\`⚡\` Fury spell casted! Your next attack will deal double damage.`,
+                    `\`⚡\` Fury spell casted! Your next attack will deal double damage`,
                 );
                 break;
             }
@@ -85,7 +85,7 @@ export async function playerAttack(
                 const burnDamage = Math.floor(0.5 * monster.currentHp);
                 currentMonsterHp = Math.max(currentMonsterHp - burnDamage, 0);
                 messages.push(
-                    `\`🔥\` Burn spell casted! Dealt \`${burnDamage} damage\` to the ${monster.name}.`,
+                    `\`🔥\` Burn spell casted! Dealt \`${burnDamage} damage\` to the ${monster.name}`,
                 );
                 break;
             }
@@ -97,7 +97,7 @@ export async function playerAttack(
                     0,
                 );
                 messages.push(
-                    `\`❄️\` Cripple spell casted! Dealt \`${crippleDamage} damage\` to the ${monster.name}.`,
+                    `\`❄️\` Cripple spell casted! Dealt \`${crippleDamage} damage\` to the ${monster.name}`,
                 );
                 break;
             }
@@ -105,7 +105,7 @@ export async function playerAttack(
             case "Stun": {
                 monsterState.stunned = true;
                 messages.push(
-                    `\`💫\` Stun spell casted! The enemy is stunned and will miss its next attack.`,
+                    `\`💫\` Stun spell casted! The enemy is stunned and will miss its next attack`,
                 );
                 break;
             }
@@ -114,11 +114,11 @@ export async function playerAttack(
                 if (!monsterState.poisoned) {
                     monsterState.poisoned = true;
                     messages.push(
-                        `\`💚\` Poison spell casted! The ${monster.name} is poisoned and will lose 10% of its HP each turn.`,
+                        `\`💚\` Poison spell casted! The ${monster.name} is poisoned and will lose __10%__ of its HP each turn`,
                     );
                 } else {
                     messages.push(
-                        `\`💚\` Poison spell casted again! The ${monster.name} is already poisoned.`,
+                        `\`💚\` Poison spell casted again! The ${monster.name} is already poisoned`,
                     );
                 }
                 break;
@@ -126,7 +126,7 @@ export async function playerAttack(
 
             default:
                 messages.push(
-                    `\`❓\` The spell "${spellName}" was found but has no effect.`,
+                    `\`❓\` The spell "${spellName}" was found but has no effect`,
                 );
                 break;
         }
@@ -152,14 +152,14 @@ export async function playerAttack(
 
     if (paladinSwapped) {
         messages.push(
-            `\`🛡️\` Paladin skill activated! Your ATK and DEF Value have been swapped.`,
+            `\`🛡️\` Paladin skill activated! Your ATK and DEF Value have been swapped`,
         );
     }
 
     if (hasWrath) {
         attackPower *= 1.5;
         messages.push(
-            `\`💢\` Wrath skill activated! You deal 150% more damage.`,
+            `\`💢\` Wrath skill activated! You deal __150%__ more damage`,
         );
     }
 
@@ -167,7 +167,7 @@ export async function playerAttack(
         const poisonDamage = Math.floor(0.2 * monster.currentHp);
         currentMonsterHp = Math.max(currentMonsterHp - poisonDamage, 0);
         messages.push(
-            `\`💚\` Poisoned! The ${monster.name} loses \`${poisonDamage} HP\` due to poison.`,
+            `\`💚\` Poisoned! The ${monster.name} loses \`${poisonDamage} HP\` due to poison`,
         );
 
         if (currentMonsterHp === 0) {
@@ -181,7 +181,7 @@ export async function playerAttack(
         if (hpPercentage < 25) {
             attackPower *= 1.5;
             messages.push(
-                `\`💪\` Vigor skill activated! Your low HP grants you 150% more damage.`,
+                `\`💪\` Vigor skill activated! Your low HP grants you __150%__ more damage`,
             );
         }
     }
@@ -204,7 +204,7 @@ export async function playerAttack(
     if (isNobushi) {
         critChance = 0;
         messages.push(
-            `\`👹\` The Ninja's Code prevents you from landing a critical hit.`,
+            `\`👹\` The Ninja's Code prevents you from landing a critical hit`,
         );
     }
 
@@ -214,7 +214,7 @@ export async function playerAttack(
     if (currentPlayerHp > stats.maxHP) {
         attackPower *= 0.5;
         messages.push(
-            `\`💜\` You are poisoned due to **OVERHEAL**, and your damage has been halved.`,
+            `\`💜\` You are poisoned due to **OVERHEAL**, and your damage has been halved`,
         );
     }
 
@@ -253,7 +253,7 @@ export async function playerAttack(
         messages.push(
             `\`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
                 2,
-            )}\` damage to the ${monster.name} ✨ (Vigilance).`,
+            )}\` damage to the ${monster.name} \`✨ VIGILANCE\``,
         );
     }
     currentMonsterHp -= attackPower;
@@ -279,7 +279,7 @@ export async function playerAttack(
         messages.push(
             `\`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
                 2,
-            )}\` bonus damage with the Kindle skill!`,
+            )}\` bonus damage with the Kindle skill`,
         );
     }
 
@@ -290,7 +290,7 @@ export async function playerAttack(
     ) {
         currentMonsterHp = 1;
         monsterState.shieldUsed = true;
-        messages.push("`⛔` The Machine's Shield prevents it from dying.");
+        messages.push("`⛔` The Machine's Shield prevents it from dying");
     }
 
     const deathThreshold = getDeathThreshold(stats);
@@ -318,7 +318,7 @@ export async function monsterAttack(
 }> {
     if (monsterState.stunned) {
         messages.push(
-            `\`💫\` The ${monster.name} is stunned and couldn't attack this turn!`,
+            `\`💫\` The ${monster.name} is stunned and couldn't attack this turn`,
         );
         monsterState.stunned = false;
         return { currentPlayerHp, currentMonsterHp };
@@ -327,6 +327,17 @@ export async function monsterAttack(
     const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
     if (!monsterStats) {
         throw new Error(`Stats not found for monster: ${monster.name}`);
+    }
+
+    if (monster.element === MonsterElement.Geo && Math.random() < 1) {
+        const regenAmount = Math.ceil(monsterStats.maxHp * 0.1);
+        currentMonsterHp = Math.min(
+            currentMonsterHp + regenAmount,
+            monsterStats.maxHp,
+        );
+        messages.push(
+            `\`🌿\` The ${monster.name} regenerated \`${regenAmount}\` HP!`,
+        );
     }
 
     let monsterDamage = getRandomValue(
@@ -356,7 +367,7 @@ export async function monsterAttack(
         monsterCritChance = 0;
         monsterCritValue = 1;
         messages.push(
-            `\`⚜️\` Your **Absolution** prevents enemies from landing Critical Hits on you.`,
+            `\`⚜️\` Your **Absolution** prevents enemies from landing Critical Hits on you`,
         );
     }
 
@@ -378,14 +389,14 @@ export async function monsterAttack(
 
             monsterDamage *= damageMultiplier;
 
-            effectDescription = `\`🧊\` Crystallize reduces the ${monster.name}'s damage by ${reductionPercent}%.`;
+            effectDescription = `\`🧊\` Crystallize reduces the ${monster.name}'s damage by __${reductionPercent}%__`;
         } else {
             const increasePercent = (monsterTurn - 6) * 5;
             damageMultiplier = 1 + increasePercent / 100;
 
             monsterDamage *= damageMultiplier;
 
-            effectDescription = `\`🧊\` Crystallize increases the ${monster.name}'s damage by ${increasePercent}%.`;
+            effectDescription = `\`🧊\` Crystallize increases the ${monster.name}'s damage by __${increasePercent}%__`;
         }
 
         messages.push(effectDescription);
@@ -401,12 +412,12 @@ export async function monsterAttack(
 
         if (percentChange >= 0) {
             damageMultiplier = 1 + percentChange / 100;
-            effectDescription = `\`🐌\` Fatigue increases the ${monster.name}'s damage by ${percentChange}%.`;
+            effectDescription = `\`🐌\` Fatigue increases the ${monster.name}'s damage by __${percentChange}%__`;
         } else {
             damageMultiplier = 1 + percentChange / 100;
             effectDescription = `\`🐌\` Fatigue reduces the ${
                 monster.name
-            }'s damage by ${Math.abs(percentChange)}%.`;
+            }'s damage by __${Math.abs(percentChange)}%__`;
         }
 
         monsterDamage *= damageMultiplier;
@@ -429,7 +440,7 @@ export async function monsterAttack(
         }
     } else {
         messages.push(
-            `\`⚙️\` The ${monster.name} ignores your defenses and deals **TRUE DAMAGE**.`,
+            `\`⚙️\` The ${monster.name} ignores your defenses and deals **TRUE DAMAGE**`,
         );
     }
 
@@ -439,27 +450,29 @@ export async function monsterAttack(
     const damageReductionFactor = hasVortexVanquisher ? 0.5 : 1;
     if (hasVortexVanquisher) {
         messages.push(
-            `\`🌀\` **Vortex Vanquisher** has reduced all damage taken by 50%.`,
+            `\`🌀\` **Vortex Vanquisher** has reduced all damage taken by __50%__`,
         );
     }
 
-    if (has(["Pyro", "Flames"], monster)) {
+    if (monster.element === MonsterElement.Pyro) {
         const burnDamage = Math.ceil(
             stats.maxHP * (0.03 + 0.01 * Math.floor(stats.worldLevel / 2)),
         );
         const reducedBurnDamage = burnDamage * damageReductionFactor;
         currentPlayerHp -= reducedBurnDamage;
         messages.push(
-            `\`🔥\` The ${monster.name} inflicted Burn! You took \`${reducedBurnDamage}\` Burn damage.`,
+            `\`🔥\` The ${monster.name} inflicted Burn! You took \`${reducedBurnDamage}\` Burn damage`,
         );
     }
 
-    if (has(["Cryo", "Frost"], monster) && Math.random() < 0.5) {
+    if (monster.element === MonsterElement.Cryo && Math.random() < 0.5) {
         const crippleDamage = Math.ceil(
             stats.maxHP * (0.05 + 0.01 * Math.floor(stats.worldLevel / 2)),
         );
 
-        const reducedCrippleDamage = crippleDamage * damageReductionFactor;
+        const reducedCrippleDamage = Math.floor(
+            crippleDamage * damageReductionFactor,
+        );
         currentPlayerHp -= reducedCrippleDamage;
         messages.push(
             `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${reducedCrippleDamage}\` Cripple damage.`,
@@ -473,7 +486,7 @@ export async function monsterAttack(
 
     if (hasBackstep && Math.random() < 0.25) {
         messages.push(
-            `\`💨\` Backstep skill activated! You dodged the attack completely.`,
+            `\`💨\` Backstep skill activated! You dodged the attack completely`,
         );
         reducedMonsterDamage = 0;
     } else {
@@ -482,9 +495,9 @@ export async function monsterAttack(
             reducedMonsterDamage *= 0.5;
             currentMonsterHp -= parriedDamage;
             messages.push(
-                `\`🛡️\` Parry skill activated! You parried 50% of the incoming damage (\`${parriedDamage.toFixed(
+                `\`🎆\` Parry skill activated! You parried __50%__ of the incoming damage \`(${parriedDamage.toFixed(
                     2,
-                )}\`), dealing it back to the ${monster.name}.`,
+                )})\`, dealing it back to the ${monster.name}`,
             );
         }
     }
@@ -519,7 +532,7 @@ export async function monsterAttack(
                 currentPlayerHp = startHP;
             }
             messages.push(
-                `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}.`,
+                `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}`,
             );
         }
     }
@@ -532,12 +545,12 @@ export async function monsterAttack(
         isCrit &&
         (!equippedWeaponName || !equippedWeaponName.includes("Absolution"))
     ) {
-        critText = " 💢 (Critical Hit!)";
+        critText = "`💢 CRIT`";
     }
 
     let defendText = "";
     if (defended && damageReduced > 0) {
-        defendText = ` 🛡️ (Defended ${damageReduced.toFixed(2)})`;
+        defendText = `\`🛡️ DEFENDED ${damageReduced.toFixed(2)}\``;
     }
 
     const finalDamageDealt = hasVortexVanquisher
@@ -547,7 +560,7 @@ export async function monsterAttack(
     messages.push(
         `\`⚔️\` The ${monster.name} dealt \`${finalDamageDealt.toFixed(
             2,
-        )}\` damage to you${defendText}${critText}.`,
+        )}\` damage to you ${defendText} ${critText}`,
     );
 
     return { currentPlayerHp, currentMonsterHp };
@@ -574,7 +587,7 @@ export function applyAttackModifiers(
     if (hasBackstab && isHumanOrFatui) {
         attackPower *= 1.5;
         messages.push(
-            `\`🗡️\` Backstab skill activated! You deal 150% more DMG!`,
+            `\`🗡️\` Backstab skill activated! You deal __150%__ more DMG`,
         );
     }
 
@@ -582,7 +595,7 @@ export function applyAttackModifiers(
         attackPower *= 0.2;
         monsterState.displaced = false;
         messages.push(
-            `\`〽️\` You are displaced! Your attack power is reduced by 80%.`,
+            `\`〽️\` You are displaced! Your attack power is reduced by __80%__`,
         );
     }
 
@@ -599,7 +612,7 @@ export function applyAttackModifiers(
         if (has(effectiveGroups, monster, true)) {
             attackPower *= 1.1;
             messages.push(
-                `\`⚔️\` **${weaponType}** advantage! You deal 110% more DMG to **${monster.group}**.`,
+                `\`⚔️\` **${weaponType}** advantage! You deal __110%__ more DMG to **${monster.group}**`,
             );
         }
 
@@ -619,9 +632,9 @@ export function applyAttackModifiers(
                 const multiplier = parseInt(damageMultiplierMatch[1], 10) / 100;
                 attackPower *= multiplier;
                 messages.push(
-                    `\`➰\` Mastery effect activated! Your ${weaponType} deals ${(
+                    `\`➰\` Mastery effect activated! Your ${weaponType} deals __${(
                         multiplier * 100
-                    ).toFixed(0)}% damage.`,
+                    ).toFixed(0)}%__ damage`,
                 );
             }
         }
@@ -632,9 +645,9 @@ export function applyAttackModifiers(
                 const damageMultiplier = 1 + 0.5 * hpThreshold;
                 attackPower *= damageMultiplier;
                 messages.push(
-                    `\`🐺\` Wolf's Gravestone effect! You deal ${(
+                    `\`🐺\` Wolf's Gravestone effect! You deal __${(
                         damageMultiplier * 100
-                    ).toFixed(0)}% more damage based on the monster's HP.`,
+                    ).toFixed(0)}%__ more damage based on the monster's HP`,
                 );
             }
         }
@@ -647,7 +660,7 @@ export function applyAttackModifiers(
     if (furyEffect) {
         attackPower *= 2;
         messages.push(
-            `\`⚡\` Fury effect activated! Your attack deals double damage this turn.`,
+            `\`⚡\` Fury effect activated! Your attack deals double damage this turn`,
         );
 
         furyEffect.remainingUses -= 1;
@@ -686,42 +699,31 @@ export function checkMonsterDefenses(
         );
     }
 
-    const isLawachurlOrElectro = has(["Lawachurl", "Electro"], monster);
-    const stunChance = Math.random() < 0.25;
-
-    if (isLawachurlOrElectro && stunChance) {
+    if (monster.element === MonsterElement.Electro && Math.random() < 0.25) {
         messages.push(
-            `\`💫\` The ${monster.name} stunned you! You missed your attack.`,
+            `\`💫\` The ${monster.name} stunned you! You missed your attack`,
         );
         attackMissed = true;
     }
 
-    const isAnemo = has("Anemo", monster);
-    const dodgeChance = Math.random() < 0.25;
-
-    if (isAnemo && dodgeChance) {
+    if (monster.element === MonsterElement.Anemo && Math.random() < 0.25) {
         messages.push(
-            `\`💨\` The ${monster.name} dodged your attack with its Anemo agility!`,
+            `\`💨\` The ${monster.name} dodged your attack with its Anemo agility`,
         );
         attackMissed = true;
     }
 
-    const isBoss = has("Boss", monster, true);
-    const bossDodgeChance = Math.random() < 0.2;
-
-    if (isBoss && bossDodgeChance) {
+    if (has(["Boss"], monster, true) && Math.random() < 0.25) {
         messages.push(
-            `\`👑\` The ${monster.name} dodged your attack with its superior agility!`,
+            `\`👑\` The ${monster.name} dodged your attack with its superior agility`,
         );
         attackMissed = true;
     }
 
-    const isFatui = has(["Fatui"], monster, true);
-    const displacementChance = Math.random() < 0.25;
-    if (isFatui && displacementChance) {
+    if (has(["Fatui"], monster, true) && Math.random() < 0.25) {
         monsterState.displaced = true;
         messages.push(
-            `\`〽️\` The ${monster.name} displaced you! You will deal 80% less damage next turn.`,
+            `\`〽️\` The ${monster.name} displaced you! You will deal __80%__ less damage next turn`,
         );
     }
 
@@ -766,10 +768,10 @@ function sendDamageMessage(
         2,
     )}\` damage to the ${monsterName}`;
     if (isCrit) {
-        message += " 💢 (Critical Hit!)";
+        message += " `💢 CRIT`";
     }
     if (monsterDefended && damageReduced > 0) {
-        message += ` 🛡️ (Defended ${damageReduced.toFixed(2)})`;
+        message += ` \`🛡️ DEFENDED ${damageReduced.toFixed(2)}\``;
     }
     messages.push(message);
 }

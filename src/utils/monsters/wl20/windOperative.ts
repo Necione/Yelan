@@ -1,11 +1,12 @@
 import { limits } from "..";
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
     name: "Wind Operative",
     group: MonsterGroup.Fatui,
+    element: MonsterElement.Anemo,
     minExp: 40,
     maxExp: 60,
     minWorldLevel: 20,

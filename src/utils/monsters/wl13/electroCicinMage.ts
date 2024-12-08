@@ -1,11 +1,12 @@
 import { limits } from "..";
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
     name: "Electro Cicin Mage",
     group: MonsterGroup.Fatui,
+    element: MonsterElement.Electro,
     minExp: 10,
     maxExp: 25,
     minWorldLevel: 13,

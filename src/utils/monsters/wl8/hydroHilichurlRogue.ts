@@ -1,11 +1,12 @@
 import { limits } from "..";
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
     name: "Hydro Hilichurl Rogue",
     group: MonsterGroup.Hilichurl,
+    element: MonsterElement.Hydro,
     minExp: 5,
     maxExp: 10,
     minWorldLevel: 8,

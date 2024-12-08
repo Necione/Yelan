@@ -1,11 +1,12 @@
 import { limits } from "..";
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     currentHp: 0,
     name: "Treasure Hoarder Gravedigger",
     group: MonsterGroup.Human,
+    element: MonsterElement.Physical,
     minExp: 7,
     maxExp: 13,
     minWorldLevel: 7,

@@ -15,6 +15,7 @@ import type {
     ColorResolvable,
     Message,
     PublicThreadChannel,
+    ThreadChannel,
     User,
 } from "discord.js";
 import { EmbedBuilder } from "discord.js";
@@ -34,6 +35,7 @@ import {
     type Monster,
 } from "../../../utils/hunt";
 import { calculateMasteryLevel } from "../../../utils/masteryHelper";
+import { elementEmojis } from "../../../utils/monsterHelper";
 import { handleRandomEvent } from "../../../utils/randomEvents";
 import { type WeaponName, weapons } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
@@ -48,11 +50,31 @@ const sinSkills = ["Wrath", "Sloth", "Pride", "Greed"];
 
 export type AnyInteraction = ButtonInteraction | ChatInputCommandInteraction;
 
+export type HuntHandlers = {
+    win?: (
+        message: Message,
+        thread: ThreadChannel,
+        stats: UserStats,
+        monstersEncountered: Monster[],
+        currentPlayerHp: number,
+        userWallet: UserWallet,
+    ) => Promise<unknown> | unknown;
+    lose?: (
+        message: Message,
+        thread: ThreadChannel,
+        stats: UserStats,
+        monster: Monster,
+        currentPlayerHp: number,
+        userWallet: UserWallet,
+    ) => Promise<unknown> | unknown;
+};
+
 export async function handleHunt(
     message: Message,
     stats: UserStats,
     userWallet: UserWallet,
     selectedMonstersByName?: string[],
+    handlers?: HuntHandlers,
 ) {
     let selectedMonsters = make.array<Monster>();
     if (is.array(selectedMonstersByName)) {
@@ -261,9 +283,15 @@ export async function handleHunt(
             embedColor = 0x88349b;
         }
 
+        let displayedMonsterName = monster.name;
+        const element = monster.element;
+        if (element && elementEmojis[element]) {
+            displayedMonsterName = `${elementEmojis[element]} ${displayedMonsterName}`;
+        }
+
         const battleEmbed = new EmbedBuilder()
             .setColor(embedColor)
-            .setTitle(`You encountered a ${monster.name}!`)
+            .setTitle(`You encountered a ${displayedMonsterName}!`)
             .setDescription(selectedDescription)
             .setThumbnail(monster.image)
             .addFields(
@@ -487,14 +515,25 @@ export async function handleHunt(
                 await handleMonsterBattle(thread);
             } else {
                 if (thread) {
-                    await handleVictory(
-                        message,
-                        thread,
-                        stats,
-                        monstersEncountered,
-                        currentPlayerHp,
-                        userWallet,
-                    );
+                    if (handlers?.win && typeof handlers?.win === "function") {
+                        await handlers.win(
+                            message,
+                            thread,
+                            stats,
+                            monstersEncountered,
+                            currentPlayerHp,
+                            userWallet,
+                        );
+                    } else {
+                        await handleVictory(
+                            message,
+                            thread,
+                            stats,
+                            monstersEncountered,
+                            currentPlayerHp,
+                            userWallet,
+                        );
+                    }
 
                     if (isBossEncounter) {
                         stats.beatenBosses.push(bossName);
@@ -506,14 +545,25 @@ export async function handleHunt(
             }
         } else {
             if (thread) {
-                await handleDefeat(
-                    message,
-                    thread,
-                    stats,
-                    monstersEncountered[currentMonsterIndex],
-                    currentPlayerHp,
-                    userWallet,
-                );
+                if (handlers?.lose && typeof handlers?.lose === "function") {
+                    await handlers.lose(
+                        message,
+                        thread,
+                        stats,
+                        monstersEncountered[currentMonsterIndex],
+                        currentPlayerHp,
+                        userWallet,
+                    );
+                } else {
+                    await handleDefeat(
+                        message,
+                        thread,
+                        stats,
+                        monstersEncountered[currentMonsterIndex],
+                        currentPlayerHp,
+                        userWallet,
+                    );
+                }
             }
         }
     };
@@ -525,6 +575,7 @@ export async function startHunt(
     message: Message,
     user: User,
     monsters?: string[],
+    handlers?: HuntHandlers,
 ) {
     const r = getMessageResponder(message);
     locked.set(user, "hunt");
@@ -590,7 +641,7 @@ export async function startHunt(
         );
     }
     await updateUserStats(user.id, { isHunting: { set: true } });
-    await handleHunt(message, stats, p, monsters);
+    await handleHunt(message, stats, p, monsters, handlers);
 
     locked.del(user.id);
 }
