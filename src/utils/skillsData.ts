@@ -30,6 +30,7 @@ export interface SkillLevel {
 
 export interface Skill {
     name: SkillName;
+    passive: boolean;
     emoji: string;
     levels: SkillLevel[];
     requirements?: {
@@ -43,6 +44,7 @@ export interface Skill {
 export const skills = make.array<Skill>([
     {
         name: "Vigilance",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -81,6 +83,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Leech",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -119,6 +122,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Totem",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -151,6 +155,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Insomnia",
+        passive: true,
         levels: [
             {
                 level: 1,
@@ -181,6 +186,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Kindle",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -220,6 +226,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Scrounge",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -238,6 +245,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Energize",
+        passive: true,
         levels: [
             {
                 level: 1,
@@ -268,6 +276,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Distraction",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -300,6 +309,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Backstab",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -319,6 +329,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Growth",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -338,6 +349,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Fatigue",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -358,6 +370,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Crystallize",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -378,6 +391,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Vigor",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -398,6 +412,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Paladin",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -418,6 +433,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Sloth",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -438,6 +454,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Wrath",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -459,6 +476,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Pride",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -480,6 +498,7 @@ export const skills = make.array<Skill>([
     },
     {
         name: "Greed",
+        passive: false,
         levels: [
             {
                 level: 1,
@@ -523,9 +542,17 @@ export const skillsMap: Record<SkillName, Skill> = skills.reduce(
 
 export function getUserSkillLevelData(
     userStats: UserStats,
-    skillName: string,
+    skillName: SkillName,
 ): SkillLevel | undefined {
-    if (!userStats.activeSkills.includes(skillName)) {
+    const skill = skillsMap[skillName];
+    if (!skill) {
+        return undefined;
+    }
+
+    const isPassive = skill.passive;
+    const isActive = userStats.activeSkills.includes(skillName);
+
+    if (!isPassive && !isActive) {
         return undefined;
     }
 
@@ -536,10 +563,5 @@ export function getUserSkillLevelData(
         return undefined;
     }
 
-    const skillData = skills.find((skill) => skill.name === skillName);
-    if (!skillData) {
-        return undefined;
-    }
-
-    return skillData.levels.find((lvl) => lvl.level === userSkill.level);
+    return skill.levels.find((lvl) => lvl.level === userSkill.level);
 }

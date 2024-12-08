@@ -94,6 +94,12 @@ export const activate = buildCommand<SlashCommand>({
             );
         }
 
+        // Check if the skill is passive before attempting to activate
+        const skillData = skills.find((s) => s.name === skillName);
+        if (skillData && skillData.passive) {
+            return r.edit(embedComment("You cannot activate a passive skill."));
+        }
+
         if (activeSkills.includes(skillName)) {
             activeSkills = activeSkills.filter((skill) => skill !== skillName);
 

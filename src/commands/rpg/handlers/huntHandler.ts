@@ -250,7 +250,7 @@ export async function handleHunt(
 
         const deathThreshold = getDeathThreshold(stats);
 
-        let embedColor: ColorResolvable = 0x00ffff;
+        let embedColor: ColorResolvable = 0xb84df1;
         if (monster.mutationType === "Bloodthirsty") {
             embedColor = 0xb40000;
         }

@@ -2,6 +2,7 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats } from "../../services";
+import { getPaginatedMessage } from "../../utils";
 import { skills } from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
@@ -47,26 +48,48 @@ export const skillsCommand = buildCommand<SlashCommand>({
         const alchemyProgress = stats.alchemyProgress || 0;
         const MAX_ACTIVE_SKILLS = getMaxActiveSkills(alchemyProgress);
 
+        const learnedPassiveSkills = learnedSkills.filter((s) => {
+            const skillData = skills.find((sk) => sk.name === s.name);
+            return skillData?.passive;
+        });
+
         const activeList = activeSkills.length
             ? activeSkills
                   .map((skill) => {
+                      const skillData = learnedSkills.find(
+                          (s) => s.name === skill,
+                      );
+                      const skillLevel = skillData
+                          ? ` \`(Lv${skillData.level})\``
+                          : "";
                       const specialSkill = specialSkills.find(
                           (s) => s.skillName === skill,
                       );
                       return specialSkill
-                          ? `${specialSkill.emoji} **${skill}**`
-                          : `${getSkillEmoji(skill)} **${skill}**`;
+                          ? `${specialSkill.emoji} **${skill}**${skillLevel}`
+                          : `${getSkillEmoji(skill)} **${skill}**${skillLevel}`;
                   })
                   .join("\n")
             : "You have no active skills.";
 
-        const skillsList = learnedSkills.length
+        const passiveSkillsList = learnedPassiveSkills.length
+            ? learnedPassiveSkills
+                  .map(
+                      (skill) =>
+                          `${getSkillEmoji(skill.name)} **${
+                              skill.name
+                          }** \`(Lv${skill.level})\``,
+                  )
+                  .join("\n")
+            : "You have not unlocked any passive skills yet.";
+
+        const allLearnedSkills = learnedSkills.length
             ? learnedSkills
                   .map(
                       (skill) =>
                           `${getSkillEmoji(skill.name)} **${
                               skill.name
-                          }** (Level: ${skill.level})`,
+                          }** \`(Lv${skill.level})\``,
                   )
                   .join("\n")
             : "You haven't learned any skills yet.";
@@ -86,9 +109,11 @@ export const skillsCommand = buildCommand<SlashCommand>({
 
         const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
 
-        const embed = new EmbedBuilder()
+        const pager = getPaginatedMessage();
+
+        const page1 = new EmbedBuilder()
             .setColor(embedColor)
-            .setTitle(`${i.user.username}'s Skills`)
+            .setTitle(`${i.user.username}'s Skills (Page 1)`)
             .setThumbnail(i.user.displayAvatarURL())
             .setDescription(
                 `- Use </learn:1282044626408308736> to learn new skills.\n- Use </activate:1284399993897353292> to enable/disable a skill.\n- Use </upgrade:1310180403385991250> to level up a skill.`,
@@ -99,14 +124,41 @@ export const skillsCommand = buildCommand<SlashCommand>({
                     value: activeList,
                     inline: true,
                 },
-                { name: "Learned Skills", value: skillsList, inline: true },
                 {
-                    name: "Special Skills",
-                    value: specialSkillsList,
-                    inline: false,
+                    name: "Passive Skills",
+                    value: passiveSkillsList,
+                    inline: true,
                 },
             );
 
-        return r.edit({ embeds: [embed] });
+        const page2 = new EmbedBuilder()
+            .setColor(embedColor)
+            .setTitle(`${i.user.username}'s Skills (Page 2)`)
+            .setThumbnail(i.user.displayAvatarURL())
+            .setDescription(
+                `- Use </learn:1282044626408308736> to learn new skills.\n- Use </activate:1284399993897353292> to enable/disable a skill.\n- Use </upgrade:1310180403385991250> to level up a skill.`,
+            )
+            .addFields(
+                {
+                    name: "Learned Skills",
+                    value: allLearnedSkills,
+                    inline: true,
+                },
+                {
+                    name: "Special Skills",
+                    value: specialSkillsList,
+                    inline: true,
+                },
+            );
+
+        pager.pages.push({ embeds: [page1] });
+        pager.pages.push({ embeds: [page2] });
+
+        return pager.run(i, i.user).catch((error: Error) => {
+            console.error("Error running pager:", error);
+            r.edit(
+                embedComment("An error occurred while displaying your skills."),
+            );
+        });
     },
 });

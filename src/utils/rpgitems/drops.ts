@@ -407,6 +407,22 @@ export const drops = {
         chestChance: 2,
         rarity: 3,
     },
+    "Spectral Husk": {
+        sellPrice: 25,
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 26,
+        chestChance: 1,
+        rarity: 1,
+    },
+    "Spectral Heart": {
+        sellPrice: 30,
+        minAmount: 1,
+        maxAmount: 1,
+        minWorldLevel: 26,
+        chestChance: 1,
+        rarity: 2,
+    },
     "Concealed Claw": {
         sellPrice: 30,
         minAmount: 1,
