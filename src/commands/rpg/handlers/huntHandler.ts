@@ -370,18 +370,18 @@ export async function handleHunt(
 
         if (isWieldingPolearm && polearmMasteryLevel >= 1) {
             startingMessages.push(
-                `\`💙\` **Polearm Mastery** activated. Your starting HP is increased by 10%.`,
+                `\`💙\` **Polearm Mastery** activated. Your starting HP is increased by __10%__`,
             );
         }
 
         if (hasSloth) {
             startingMessages.push(
-                `\`💤\` **SIN OF SLOTH** activated. Your starting HP is increased by 25%.`,
+                `\`💤\` **SIN OF SLOTH** activated. Your starting HP is increased by __25%__`,
             );
         }
         if (hasWrath) {
             startingMessages.push(
-                `\`💢\` **SIN OF WRATH** activated. Your starting HP is reduced by 25%.`,
+                `\`💢\` **SIN OF WRATH** activated. Your starting HP is reduced by __25%__`,
             );
         }
 

@@ -528,6 +528,23 @@ export async function monsterAttack(
         }
     }
 
+    let resistanceReduced = 0;
+    const resistanceEffect = stats.activeEffects.find(
+        (effect) => effect.name === "Resistance" && effect.remainingUses > 0,
+    );
+    if (resistanceEffect) {
+        const initialDamage = reducedMonsterDamage;
+        reducedMonsterDamage *= resistanceEffect.effectValue;
+        resistanceReduced = initialDamage - reducedMonsterDamage;
+
+        resistanceEffect.remainingUses -= 1;
+        if (resistanceEffect.remainingUses <= 0) {
+            stats.activeEffects = stats.activeEffects.filter(
+                (eff) => eff !== resistanceEffect,
+            );
+        }
+    }
+
     currentPlayerHp -= reducedMonsterDamage;
 
     const deathThreshold = getDeathThreshold(stats);
@@ -564,7 +581,10 @@ export async function monsterAttack(
     }
 
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP);
-    await updateUserStats(stats.userId, { hp: { set: currentPlayerHp } });
+    await updateUserStats(stats.userId, {
+        hp: { set: currentPlayerHp },
+        activeEffects: { set: stats.activeEffects },
+    });
 
     let critText = "";
     if (
@@ -579,6 +599,11 @@ export async function monsterAttack(
         defendText = `\`🛡️ DEFENDED ${damageReduced.toFixed(2)}\``;
     }
 
+    let resistText = "";
+    if (resistanceReduced > 0) {
+        resistText = `\`🌺 RESIST ${resistanceReduced.toFixed(2)}\``;
+    }
+
     const finalDamageDealt = hasVortexVanquisher
         ? reducedMonsterDamage
         : monsterDamage;
@@ -586,7 +611,7 @@ export async function monsterAttack(
     messages.push(
         `\`⚔️\` The ${monster.name} dealt \`${finalDamageDealt.toFixed(
             2,
-        )}\` damage to you ${defendText} ${critText}`,
+        )}\` damage to you ${defendText} ${critText} ${resistText}`,
     );
 
     return { currentPlayerHp, currentMonsterHp };
@@ -624,6 +649,23 @@ export function applyAttackModifiers(
             `\`〽️\` You are displaced! Your attack power is reduced by __80%__`,
         );
     }
+
+    const weaknessEffect = stats.activeEffects.find(
+        (effect) => effect.name === "Weakness" && effect.remainingUses > 0,
+    );
+    if (weaknessEffect) {
+        attackPower *= 1 + weaknessEffect.effectValue;
+        messages.push(
+            `\`🥀\` Weakness effect applied! Your attack power is reduced by __${(
+                weaknessEffect.effectValue * 100
+            ).toFixed(0)}%__`,
+        );
+        weaknessEffect.remainingUses -= 1;
+    }
+
+    updateUserStats(stats.userId, {
+        activeEffects: { set: stats.activeEffects },
+    });
 
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
 

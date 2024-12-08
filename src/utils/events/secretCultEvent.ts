@@ -47,7 +47,7 @@ export async function secretCultEvent(message: Message, stats: UserStats) {
             })
             .catch(noop);
     }
-    if (c.customId !== "events_accept") {
+    if (c.customId !== "event_accept") {
         return message
             .edit({
                 embeds: [
@@ -61,13 +61,14 @@ export async function secretCultEvent(message: Message, stats: UserStats) {
     }
 
     const outcome = Math.random();
-    const remainingUses = 5;
+    let remainingUses = 0;
     let effectName = "";
     let effectValue = 0;
 
     if (outcome < 0.5) {
         effectName = "Regeneration";
         effectValue = 0.2;
+        remainingUses = 5;
         await message
             .edit({
                 embeds: [
@@ -79,13 +80,14 @@ export async function secretCultEvent(message: Message, stats: UserStats) {
             })
             .catch(noop);
     } else {
-        effectName = "Poisoning";
-        effectValue = -0.25;
+        effectName = "Resistance";
+        effectValue = 0.8;
+        remainingUses = 10;
         await message
             .edit({
                 embeds: [
                     embed.setDescription(
-                        `The cult's blessing backfires! You have been inflicted with **Poisoning** effect for the next **${remainingUses} hunts**.`,
+                        `The cult bestows a blessing upon you! You have gained **Resistance** effect for the next **${remainingUses} rounds**.`,
                     ),
                 ],
                 components: [],

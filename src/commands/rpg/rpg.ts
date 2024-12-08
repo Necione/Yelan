@@ -217,6 +217,20 @@ export const rpg = buildCommand<SlashCommand>({
                 });
             }
 
+            if (stats.activeEffects && stats.activeEffects.length > 0) {
+                const effectsList = stats.activeEffects
+                    .map(
+                        (effect) =>
+                            `\`${effect.name}\`: ${effect.remainingUses} uses left`,
+                    )
+                    .join("\n");
+
+                embed.addFields({
+                    name: "Active Effects",
+                    value: effectsList,
+                });
+            }
+
             pager.pages.push({ embeds: [embed] });
         }
 
