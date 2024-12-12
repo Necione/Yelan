@@ -182,6 +182,23 @@ type Roles {
   role String
 }
 
+model Loadout {
+  id                String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String
+  name              String
+  isPrivate         Boolean        @default(true)
+  equippedWeapon    String?
+  equippedFlower    String?
+  equippedPlume     String?
+  equippedSands     String?
+  equippedGoblet    String?
+  equippedCirclet   String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@unique([userId, name], name: "user_loadout_unique")
+}
+
 model UserCharacter {
   id                  String    @id @default(auto()) @map("_id") @db.ObjectId
   userId              String
