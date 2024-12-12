@@ -1,7 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, noop, time } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { prisma } from "../../prisma";
 import { loadouts } from "../../services";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
@@ -27,22 +26,11 @@ export const viewloadout = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
     async autocomplete(i) {
-        const loadouts = await prisma.loadout
-            .findMany({
-                where: {
-                    userId: i.user.id,
-                    name: {
-                        contains: i.options
-                            .getFocused(true)
-                            .value.toLowerCase(),
-                        mode: "insensitive",
-                    },
-                },
-                take: 25,
-            })
-            .catch(() => []);
-
-        const options = loadouts.map((loadout) => ({
+        const lds = await loadouts.list(
+            i.user.id,
+            i.options.getFocused(true).value.toLowerCase().trim(),
+        );
+        const options = lds.map((loadout) => ({
             name: loadout.isPrivate
                 ? `${i.user.username}'s ${loadout.name} (Private)`
                 : `${i.user.username}'s ${loadout.name}`,

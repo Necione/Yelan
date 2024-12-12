@@ -1,7 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { prisma } from "../../prisma";
 import {
     getUserStats,
     loadouts,
@@ -29,26 +28,12 @@ export const load = buildCommand<SlashCommand>({
     async autocomplete(i) {
         const focused = i.options.getFocused(true);
         const input = focused.value.toLowerCase();
-        const userId = i.user.id;
-        const username = i.user.username;
+        const lds = await loadouts.list(i.user.id, input);
 
-        const loadouts = await prisma.loadout
-            .findMany({
-                where: {
-                    userId,
-                    name: {
-                        contains: input,
-                        mode: "insensitive",
-                    },
-                },
-                take: 25,
-            })
-            .catch(() => []);
-
-        const options = loadouts.map((loadout) => ({
+        const options = lds.map((loadout) => ({
             name: loadout.isPrivate
-                ? `${username}'s ${loadout.name} (Private)`
-                : `${username}'s ${loadout.name}`,
+                ? `${i.user.username}'s ${loadout.name} (Private)`
+                : `${i.user.username}'s ${loadout.name}`,
             value: loadout.name,
         }));
 

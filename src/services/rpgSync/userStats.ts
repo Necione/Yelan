@@ -404,4 +404,18 @@ export const loadouts = {
     create: async (data: Prisma.LoadoutCreateInput) => {
         return await prisma.loadout.create({ data }).catch(noop);
     },
+    list: async (user: string | User, name: string) => {
+        return await prisma.loadout
+            .findMany({
+                where: {
+                    userId: is.string(user) ? user : user.id,
+                    name: {
+                        contains: name,
+                        mode: "insensitive",
+                    },
+                },
+                take: 25,
+            })
+            .catch(() => []);
+    },
 };
