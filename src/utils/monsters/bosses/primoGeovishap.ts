@@ -6,7 +6,7 @@ export default {
     group: MonsterGroup.Boss,
     minExp: 75,
     maxExp: 75,
-    minWorldLevel: 20,
+    minadventurerank: 20,
     image: "https://lh.elara.workers.dev/rpg/bosses/primo_geovishap.png",
     drops: [
         {
@@ -21,16 +21,16 @@ export default {
     critValue: 1.5,
     defChance: 90,
     defValue: 0.3,
-    getStatsForWorldLevel(worldLevel: number) {
+    getStatsForadventureRank(adventureRank: number) {
         const stats = [
             {
-                worldLevel: 20,
+                adventureRank: 20,
                 minHp: 3500,
                 maxHp: 3500,
                 minDamage: 60,
                 maxDamage: 80,
             },
         ];
-        return stats.find((stat) => stat.worldLevel === worldLevel) || null;
+        return stats.find((stat) => stat.adventureRank === adventureRank) || null;
     },
 };

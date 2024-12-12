@@ -24,7 +24,7 @@ export type ItemDrop = {
     amount: number;
 };
 
-const maxWorldLevel = 35;
+const maxadventureRank = 35;
 
 export async function handleVictory(
     message: Message,
@@ -94,24 +94,24 @@ export async function handleVictory(
     }
 
     let newExp = stats.exp + totalExpGained;
-    let expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
+    let expRequired = 20 * Math.pow(1.2, stats.adventureRank - 1);
 
-    while (newExp >= expRequired && stats.worldLevel < maxWorldLevel) {
+    while (newExp >= expRequired && stats.adventureRank < maxadventureRank) {
         newExp -= expRequired;
-        stats.worldLevel += 1;
-        expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
+        stats.adventureRank += 1;
+        expRequired = 20 * Math.pow(1.2, stats.adventureRank - 1);
     }
 
-    if (stats.worldLevel >= maxWorldLevel) {
+    if (stats.adventureRank >= maxadventureRank) {
         newExp = 0;
         finalEmbed.setDescription(
-            `You've hit the max Adventure Rank for this patch (${maxWorldLevel}) and cannot progress any further.`,
+            `You've hit the max Adventure Rank for this patch (${maxadventureRank}) and cannot progress any further.`,
         );
     }
 
     await updateUserStats(stats.userId, {
         exp: { set: newExp },
-        worldLevel: { set: stats.worldLevel },
+        adventureRank: { set: stats.adventureRank },
     });
 
     const monstersFought = monstersEncountered
@@ -122,7 +122,7 @@ export async function handleVictory(
         .setColor("Green")
         .setTitle(`Victory in ${stats.location}!`)
         .setDescription(
-            `You defeated the following monsters:\n\`${monstersFought}\`!\n-# \`⭐\` \`+${totalExpGained} EXP\` (\`🌍\` AR${stats.worldLevel})`,
+            `You defeated the following monsters:\n\`${monstersFought}\`!\n-# \`⭐\` \`+${totalExpGained} EXP\` (\`🌍\` AR${stats.adventureRank})`,
         )
         .setThumbnail(
             monstersEncountered[monstersEncountered.length - 1].image,

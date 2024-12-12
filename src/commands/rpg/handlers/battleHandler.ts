@@ -334,7 +334,7 @@ export async function monsterAttack(
         return { currentPlayerHp, currentMonsterHp };
     }
 
-    const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
+    const monsterStats = monster.getStatsForadventureRank(stats.adventureRank);
     if (!monsterStats) {
         throw new Error(`Stats not found for monster: ${monster.name}`);
     }
@@ -474,7 +474,7 @@ export async function monsterAttack(
 
     if (monster.element === MonsterElement.Pyro) {
         const burnDamage = Math.ceil(
-            stats.maxHP * (0.03 + 0.01 * Math.floor(stats.worldLevel / 2)),
+            stats.maxHP * (0.03 + 0.01 * Math.floor(stats.adventureRank / 2)),
         );
         const reducedBurnDamage = burnDamage * damageReductionFactor;
         currentPlayerHp -= reducedBurnDamage;
@@ -493,7 +493,7 @@ export async function monsterAttack(
 
     if (monster.element === MonsterElement.Cryo && Math.random() < 0.5) {
         const crippleDamage = Math.ceil(
-            stats.maxHP * (0.05 + 0.01 * Math.floor(stats.worldLevel / 2)),
+            stats.maxHP * (0.05 + 0.01 * Math.floor(stats.adventureRank / 2)),
         );
 
         const reducedCrippleDamage = Math.floor(

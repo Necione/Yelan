@@ -9,7 +9,7 @@ export default {
     element: MonsterElement.Electro,
     minExp: 10,
     maxExp: 25,
-    minWorldLevel: 13,
+    minadventurerank: 13,
     image: "https://lh.elara.workers.dev/rpg/monsters/thunderhelm_lawachurl.png",
     drops: [
         { item: "Stained Mask", minAmount: 1, maxAmount: 3, chance: 90 },
@@ -30,23 +30,23 @@ export default {
     defValue: 25,
     baseHp: 17,
     baseAtk: 8,
-    getStatsForWorldLevel(worldLevel: number) {
-        if (!limits.check(worldLevel)) {
+    getStatsForadventureRank(adventureRank: number) {
+        if (!limits.check(adventureRank)) {
             return null;
         }
 
-        const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
+        const hpScaleMultiplier = getHpScaleMultiplier(adventureRank);
         const newBaseHp = this.baseHp * hpScaleMultiplier;
         const minHp = Math.ceil(newBaseHp * 0.9);
         const maxHp = Math.ceil(newBaseHp * 1.1);
 
-        const atkScaleMultiplier = getAtkScaleMultiplier(worldLevel);
+        const atkScaleMultiplier = getAtkScaleMultiplier(adventureRank);
         const newBaseAtk = Math.ceil(this.baseAtk * atkScaleMultiplier);
         const minDamage = Math.floor(newBaseAtk * 0.95);
         const maxDamage = Math.ceil(newBaseAtk * 1.05);
 
         return {
-            worldLevel,
+            adventureRank,
             minHp,
             maxHp,
             minDamage,

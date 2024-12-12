@@ -9,7 +9,7 @@ export default {
     element: MonsterElement.Physical,
     minExp: 3,
     maxExp: 6,
-    minWorldLevel: 1,
+    minadventurerank: 1,
     image: "https://lh.elara.workers.dev/rpg/monsters/hilichurl.png",
     drops: [
         { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 90 },
@@ -23,23 +23,23 @@ export default {
     ],
     baseHp: 12,
     baseAtk: 4,
-    getStatsForWorldLevel(worldLevel: number) {
-        if (!limits.check(worldLevel)) {
+    getStatsForadventureRank(adventureRank: number) {
+        if (!limits.check(adventureRank)) {
             return null;
         }
 
-        const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
+        const hpScaleMultiplier = getHpScaleMultiplier(adventureRank);
         const newBaseHp = this.baseHp * hpScaleMultiplier;
         const minHp = Math.ceil(newBaseHp * 0.9);
         const maxHp = Math.ceil(newBaseHp * 1.1);
 
-        const atkScaleMultiplier = getAtkScaleMultiplier(worldLevel);
+        const atkScaleMultiplier = getAtkScaleMultiplier(adventureRank);
         const newBaseAtk = Math.ceil(this.baseAtk * atkScaleMultiplier);
         const minDamage = Math.floor(newBaseAtk * 0.95);
         const maxDamage = Math.ceil(newBaseAtk * 1.05);
 
         return {
-            worldLevel,
+            adventureRank,
             minHp,
             maxHp,
             minDamage,

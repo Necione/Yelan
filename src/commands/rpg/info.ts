@@ -225,7 +225,7 @@ export const info = buildCommand<SlashCommand>({
                 .addFields(
                     {
                         name: "Min Adventure Rank",
-                        value: `${monster.minWorldLevel}`,
+                        value: `${monster.minadventurerank}`,
                         inline: true,
                     },
                     {
@@ -308,7 +308,7 @@ export const info = buildCommand<SlashCommand>({
                         "imageURL",
                         "sellPrice",
                         "chestChance",
-                        "minWorldLevel",
+                        "minadventurerank",
                         "name",
                     ].includes(key)
                 ) {

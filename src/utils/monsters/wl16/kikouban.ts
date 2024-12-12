@@ -9,7 +9,7 @@ export default {
     element: MonsterElement.Physical,
     minExp: 20,
     maxExp: 30,
-    minWorldLevel: 16,
+    minadventurerank: 16,
     image: "https://lh.elara.workers.dev/rpg/monsters/kikouban.png",
     critChance: 25,
     critValue: 5,
@@ -25,23 +25,23 @@ export default {
     ],
     baseHp: 14,
     baseAtk: 7,
-    getStatsForWorldLevel(worldLevel: number) {
-        if (!limits.check(worldLevel)) {
+    getStatsForadventureRank(adventureRank: number) {
+        if (!limits.check(adventureRank)) {
             return null;
         }
 
-        const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
+        const hpScaleMultiplier = getHpScaleMultiplier(adventureRank);
         const newBaseHp = this.baseHp * hpScaleMultiplier;
         const minHp = Math.ceil(newBaseHp * 0.9);
         const maxHp = Math.ceil(newBaseHp * 1.1);
 
-        const atkScaleMultiplier = getAtkScaleMultiplier(worldLevel);
+        const atkScaleMultiplier = getAtkScaleMultiplier(adventureRank);
         const newBaseAtk = Math.ceil(this.baseAtk * atkScaleMultiplier);
         const minDamage = Math.floor(newBaseAtk * 0.95);
         const maxDamage = Math.ceil(newBaseAtk * 1.05);
 
         return {
-            worldLevel,
+            adventureRank,
             minHp,
             maxHp,
             minDamage,

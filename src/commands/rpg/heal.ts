@@ -52,8 +52,8 @@ export const heal = buildCommand<SlashCommand>({
         }
 
         const baseHealCost = Math.floor(Math.random() * (50 - 40 + 1)) + 40;
-        const worldLevelCost = stats.worldLevel * 1;
-        const initialHealCost = baseHealCost + worldLevelCost;
+        const adventureRankCost = stats.adventureRank * 1;
+        const initialHealCost = baseHealCost + adventureRankCost;
 
         const rebirthMultiplier = 1 + 0.2 * stats.rebirths;
 

@@ -1,12 +1,12 @@
-export function getHpScaleMultiplier(worldLevel: number) {
-    if (worldLevel < 1) {
+export function getHpScaleMultiplier(adventureRank: number) {
+    if (adventureRank < 1) {
         return 1;
     }
     let total = 0;
     let x = 1;
     let z = 5;
 
-    for (let level = 1; level <= worldLevel; level++) {
+    for (let level = 1; level <= adventureRank; level++) {
         total += x;
         if (level % 5 === 0) {
             total += z;
@@ -17,15 +17,15 @@ export function getHpScaleMultiplier(worldLevel: number) {
     return total;
 }
 
-export function getAtkScaleMultiplier(worldLevel: number) {
-    if (worldLevel < 1) {
+export function getAtkScaleMultiplier(adventureRank: number) {
+    if (adventureRank < 1) {
         return 1;
     }
     let total = 0;
     let x = 1;
     let z = 1;
 
-    for (let level = 1; level <= worldLevel; level++) {
+    for (let level = 1; level <= adventureRank; level++) {
         total += x;
         if (level % 5 === 0) {
             total += z;

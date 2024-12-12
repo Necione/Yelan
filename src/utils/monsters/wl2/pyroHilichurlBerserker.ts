@@ -9,7 +9,7 @@ export default {
     element: MonsterElement.Pyro,
     minExp: 4,
     maxExp: 8,
-    minWorldLevel: 2,
+    minadventurerank: 2,
     image: "https://lh.elara.workers.dev/rpg/monsters/pyro_hilichurl_berserker.png",
     drops: [
         { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 90 },
@@ -29,23 +29,23 @@ export default {
     defValue: 20,
     baseHp: 12,
     baseAtk: 4,
-    getStatsForWorldLevel(worldLevel: number) {
-        if (!limits.check(worldLevel)) {
+    getStatsForadventureRank(adventureRank: number) {
+        if (!limits.check(adventureRank)) {
             return null;
         }
 
-        const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
+        const hpScaleMultiplier = getHpScaleMultiplier(adventureRank);
         const newBaseHp = this.baseHp * hpScaleMultiplier;
         const minHp = Math.ceil(newBaseHp * 0.9);
         const maxHp = Math.ceil(newBaseHp * 1.1);
 
-        const atkScaleMultiplier = getAtkScaleMultiplier(worldLevel);
+        const atkScaleMultiplier = getAtkScaleMultiplier(adventureRank);
         const newBaseAtk = Math.ceil(this.baseAtk * atkScaleMultiplier);
         const minDamage = Math.floor(newBaseAtk * 0.95);
         const maxDamage = Math.ceil(newBaseAtk * 1.05);
 
         return {
-            worldLevel,
+            adventureRank,
             minHp,
             maxHp,
             minDamage,

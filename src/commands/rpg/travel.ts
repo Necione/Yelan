@@ -170,7 +170,7 @@ export const travel = buildCommand<SlashCommand>({
 
         if (isAtPort) {
             if (currentLocation === "Liyue Harbor") {
-                if (stats.worldLevel >= 30) {
+                if (stats.adventureRank >= 30) {
                     travelOptions.push("Ritou");
                 }
             } else if (currentLocation === "Ritou") {
@@ -241,7 +241,7 @@ export const travel = buildCommand<SlashCommand>({
             const targetRegion = locations[selectedLocation].region;
             if (
                 targetRegion === "Inazuma" &&
-                stats.worldLevel < 20 &&
+                stats.adventureRank < 20 &&
                 currentLocation !== "Ritou"
             ) {
                 return interaction

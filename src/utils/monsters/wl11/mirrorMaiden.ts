@@ -9,7 +9,7 @@ export default {
     element: MonsterElement.Hydro,
     minExp: 10,
     maxExp: 15,
-    minWorldLevel: 11,
+    minadventurerank: 11,
     image: "https://lh.elara.workers.dev/rpg/monsters/mirror_maiden.png",
     drops: [
         { item: "Dismal Prism", minAmount: 1, maxAmount: 2, chance: 75 },
@@ -28,23 +28,23 @@ export default {
     defValue: 30,
     baseHp: 18,
     baseAtk: 5,
-    getStatsForWorldLevel(worldLevel: number) {
-        if (!limits.check(worldLevel)) {
+    getStatsForadventureRank(adventureRank: number) {
+        if (!limits.check(adventureRank)) {
             return null;
         }
 
-        const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
+        const hpScaleMultiplier = getHpScaleMultiplier(adventureRank);
         const newBaseHp = this.baseHp * hpScaleMultiplier;
         const minHp = Math.ceil(newBaseHp * 0.9);
         const maxHp = Math.ceil(newBaseHp * 1.1);
 
-        const atkScaleMultiplier = getAtkScaleMultiplier(worldLevel);
+        const atkScaleMultiplier = getAtkScaleMultiplier(adventureRank);
         const newBaseAtk = Math.ceil(this.baseAtk * atkScaleMultiplier);
         const minDamage = Math.floor(newBaseAtk * 0.95);
         const maxDamage = Math.ceil(newBaseAtk * 1.05);
 
         return {
-            worldLevel,
+            adventureRank,
             minHp,
             maxHp,
             minDamage,

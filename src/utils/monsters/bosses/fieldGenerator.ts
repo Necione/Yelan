@@ -7,7 +7,7 @@ export default {
     element: MonsterElement.Geo,
     minExp: 40,
     maxExp: 50,
-    minWorldLevel: 35,
+    minadventurerank: 35,
     image: "https://lh.elara.workers.dev/rpg/monsters/proto.png",
     drops: [
         {
@@ -22,9 +22,9 @@ export default {
     critValue: 1.5,
     defChance: 75,
     defValue: 100,
-    getStatsForWorldLevel(worldLevel: number) {
+    getStatsForadventureRank(adventureRank: number) {
         return {
-            worldLevel,
+            adventureRank,
             minHp: 15000,
             maxHp: 20000,
             minDamage: 700,

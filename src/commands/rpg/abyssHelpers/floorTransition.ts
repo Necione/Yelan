@@ -34,7 +34,7 @@ export async function handleFloorTransition(
 
     if (direction === "descend" && newFloor > 1) {
         const requiredLevel = floorRequirements[newFloor] || 0;
-        if (stats.worldLevel < requiredLevel) {
+        if (stats.adventureRank < requiredLevel) {
             await i.editReply(
                 embedComment(
                     `You come across a massive stairwell with guards next to it. They say that you need to be at least **Adventure Rank ${requiredLevel}** to ${direction} to Floor **${newFloor}**.`,

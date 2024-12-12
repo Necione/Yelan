@@ -34,7 +34,7 @@ export interface Skill {
     emoji: string;
     levels: SkillLevel[];
     requirements?: {
-        worldLevel: number;
+        adventureRank: number;
         coins: number;
         items: { item: string; amount: number }[];
         rebirthsRequired?: number;
@@ -73,7 +73,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "✨",
         requirements: {
-            worldLevel: 2,
+            adventureRank: 2,
             coins: 100,
             items: [
                 { item: "Ominous Mask", amount: 2 },
@@ -115,7 +115,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "💖",
         requirements: {
-            worldLevel: 3,
+            adventureRank: 3,
             coins: 150,
             items: [{ item: "Slime Concentrate", amount: 2 }],
         },
@@ -148,7 +148,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "⭐",
         requirements: {
-            worldLevel: 1,
+            adventureRank: 1,
             coins: 100,
             items: [{ item: "Stained Mask", amount: 5 }],
         },
@@ -176,7 +176,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "🌙",
         requirements: {
-            worldLevel: 4,
+            adventureRank: 4,
             coins: 150,
             items: [
                 { item: "Firm Arrowhead", amount: 3 },
@@ -215,7 +215,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "💥",
         requirements: {
-            worldLevel: 5,
+            adventureRank: 5,
             coins: 200,
             items: [
                 { item: "Forbidden Curse Scroll", amount: 2 },
@@ -235,7 +235,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "💸",
         requirements: {
-            worldLevel: 3,
+            adventureRank: 3,
             coins: 250,
             items: [
                 { item: "Sealed Scroll", amount: 3 },
@@ -266,7 +266,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "⚡",
         requirements: {
-            worldLevel: 5,
+            adventureRank: 5,
             coins: 250,
             items: [
                 { item: "Ominous Mask", amount: 5 },
@@ -302,7 +302,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "💫",
         requirements: {
-            worldLevel: 10,
+            adventureRank: 10,
             coins: 300,
             items: [{ item: "Dismal Prism", amount: 2 }],
         },
@@ -318,7 +318,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "🔪",
         requirements: {
-            worldLevel: 10,
+            adventureRank: 10,
             rebirthsRequired: 1,
             coins: 150,
             items: [
@@ -338,7 +338,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "🌱",
         requirements: {
-            worldLevel: 10,
+            adventureRank: 10,
             rebirthsRequired: 2,
             coins: 500,
             items: [
@@ -358,7 +358,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "🐌",
         requirements: {
-            worldLevel: 10,
+            adventureRank: 10,
             rebirthsRequired: 2,
             coins: 150,
             items: [
@@ -379,7 +379,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "🧊",
         requirements: {
-            worldLevel: 10,
+            adventureRank: 10,
             rebirthsRequired: 2,
             coins: 150,
             items: [
@@ -400,7 +400,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "💪",
         requirements: {
-            worldLevel: 10,
+            adventureRank: 10,
             rebirthsRequired: 2,
             coins: 500,
             items: [
@@ -422,7 +422,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "🛡️",
         requirements: {
-            worldLevel: 10,
+            adventureRank: 10,
             rebirthsRequired: 2,
             coins: 500,
             items: [
@@ -442,7 +442,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "💤",
         requirements: {
-            worldLevel: 15,
+            adventureRank: 15,
             rebirthsRequired: 2,
             coins: 500,
             items: [
@@ -464,7 +464,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "💢",
         requirements: {
-            worldLevel: 15,
+            adventureRank: 15,
             rebirthsRequired: 2,
             coins: 500,
             items: [
@@ -486,7 +486,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "🏅",
         requirements: {
-            worldLevel: 15,
+            adventureRank: 15,
             rebirthsRequired: 6,
             coins: 1000,
             items: [
@@ -508,7 +508,7 @@ export const skills = make.array<Skill>([
         ],
         emoji: "🖤",
         requirements: {
-            worldLevel: 25,
+            adventureRank: 25,
             rebirthsRequired: 6,
             coins: 5000,
             items: [

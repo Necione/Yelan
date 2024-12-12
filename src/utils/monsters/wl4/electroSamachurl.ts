@@ -9,7 +9,7 @@ export default {
     element: MonsterElement.Electro,
     minExp: 5,
     maxExp: 10,
-    minWorldLevel: 4,
+    minadventurerank: 4,
     image: "https://lh.elara.workers.dev/rpg/monsters/electro_samachurl.png",
     drops: [
         { item: "Divining Scroll", minAmount: 1, maxAmount: 3, chance: 85 },
@@ -28,23 +28,23 @@ export default {
     defValue: 20,
     baseHp: 17,
     baseAtk: 6,
-    getStatsForWorldLevel(worldLevel: number) {
-        if (!limits.check(worldLevel)) {
+    getStatsForadventureRank(adventureRank: number) {
+        if (!limits.check(adventureRank)) {
             return null;
         }
 
-        const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
+        const hpScaleMultiplier = getHpScaleMultiplier(adventureRank);
         const newBaseHp = this.baseHp * hpScaleMultiplier;
         const minHp = Math.ceil(newBaseHp * 0.9);
         const maxHp = Math.ceil(newBaseHp * 1.1);
 
-        const atkScaleMultiplier = getAtkScaleMultiplier(worldLevel);
+        const atkScaleMultiplier = getAtkScaleMultiplier(adventureRank);
         const newBaseAtk = Math.ceil(this.baseAtk * atkScaleMultiplier);
         const minDamage = Math.floor(newBaseAtk * 0.95);
         const maxDamage = Math.ceil(newBaseAtk * 1.05);
 
         return {
-            worldLevel,
+            adventureRank,
             minHp,
             maxHp,
             minDamage,

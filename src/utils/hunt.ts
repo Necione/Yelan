@@ -16,7 +16,7 @@ export interface Monster {
     critValue: number;
     defChance: number;
     defValue: number;
-    minWorldLevel: number;
+    minadventurerank: number;
     image: string;
     isMutated?: boolean;
     mutationType?: "Bloodthirsty" | "Strange" | "Infected";
@@ -26,7 +26,7 @@ export interface Monster {
         maxAmount: number;
         chance: number;
     }[];
-    getStatsForWorldLevel: (worldLevel: number) => {
+    getStatsForadventureRank: (adventureRank: number) => {
         minHp: number;
         maxHp: number;
         minDamage: number;
@@ -95,7 +95,7 @@ export function calculateDrop(
 }
 
 export async function getRandomMonster(
-    worldLevel: number,
+    adventureRank: number,
     location: string,
     playerStats: {
         currentHp: number;
@@ -113,7 +113,7 @@ export async function getRandomMonster(
 
     const availableMonsters = monsters.filter(
         (monster) =>
-            worldLevel >= monster.minWorldLevel && monster.group !== "Boss",
+            adventureRank >= monster.minadventurerank && monster.group !== "Boss",
     );
 
     if (!is.array(availableMonsters)) {
@@ -165,7 +165,7 @@ export async function getRandomMonster(
     }
 
     const totalMonsterWeight = monstersInGroup.reduce(
-        (acc, monster) => acc + monster.minWorldLevel,
+        (acc, monster) => acc + monster.minadventurerank,
         0,
     );
 
@@ -173,7 +173,7 @@ export async function getRandomMonster(
     let selectedMonster: Monster | null = null;
 
     for (const monster of monstersInGroup) {
-        randomMonsterWeight -= monster.minWorldLevel;
+        randomMonsterWeight -= monster.minadventurerank;
         if (randomMonsterWeight <= 0) {
             selectedMonster = monster;
             break;
@@ -201,15 +201,15 @@ export async function getRandomMonster(
         return monsterInstance;
     }
 
-    if (typeof selectedMonster.getStatsForWorldLevel !== "function") {
+    if (typeof selectedMonster.getStatsForadventureRank !== "function") {
         console.error(
-            `getStatsForWorldLevel is not a function for monster: ${selectedMonster.name}`,
+            `getStatsForadventureRank is not a function for monster: ${selectedMonster.name}`,
         );
         return null;
     }
 
-    const stats = selectedMonster.getStatsForWorldLevel
-        ? selectedMonster.getStatsForWorldLevel(worldLevel)
+    const stats = selectedMonster.getStatsForadventureRank
+        ? selectedMonster.getStatsForadventureRank(adventureRank)
         : null;
 
     if (stats) {
@@ -225,7 +225,7 @@ export async function getRandomMonster(
         return monsterInstance;
     } else {
         log(
-            `Stats for Adventure Rank ${worldLevel} not found for monster: ${selectedMonster.name}`,
+            `Stats for Adventure Rank ${adventureRank} not found for monster: ${selectedMonster.name}`,
         );
         return null;
     }
@@ -366,7 +366,7 @@ export { abyssMonsters, abyssMonstersLoaded };
 
 export async function getMonsterByName(
     name: string,
-    worldLevel?: number,
+    adventureRank?: number,
 ): Promise<MonsterInstance | null> {
     if (!monstersLoaded) {
         await initializeMonsters();
@@ -379,16 +379,16 @@ export async function getMonsterByName(
         return null;
     }
 
-    if (typeof monster.getStatsForWorldLevel !== "function") {
+    if (typeof monster.getStatsForadventureRank !== "function") {
         log(
-            `getStatsForWorldLevel is not a function for monster: ${monster.name}`,
+            `getStatsForadventureRank is not a function for monster: ${monster.name}`,
         );
         return null;
     }
 
-    const selectedWorldLevel = worldLevel ?? monster.minWorldLevel;
+    const selectedadventureRank = adventureRank ?? monster.minadventurerank;
 
-    const stats = monster.getStatsForWorldLevel(selectedWorldLevel);
+    const stats = monster.getStatsForadventureRank(selectedadventureRank);
 
     if (stats) {
         const monsterInstance: MonsterInstance = {
@@ -401,12 +401,12 @@ export async function getMonsterByName(
         };
 
         log(
-            `Created MonsterInstance for ${monster.name} at Adventure Rank ${selectedWorldLevel}.`,
+            `Created MonsterInstance for ${monster.name} at Adventure Rank ${selectedadventureRank}.`,
         );
         return monsterInstance;
     } else {
         log(
-            `Stats for Adventure Rank ${selectedWorldLevel} not found for monster: ${monster.name}`,
+            `Stats for Adventure Rank ${selectedadventureRank} not found for monster: ${monster.name}`,
         );
         return null;
     }

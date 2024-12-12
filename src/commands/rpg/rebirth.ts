@@ -42,12 +42,12 @@ export const rebirth = buildCommand<SlashCommand>({
         }
 
         const rebirthRequirements = [5, 10, 15, 20, 25, 30, 35, 40];
-        const requiredWorldLevel = rebirthRequirements[stats.rebirths] || 50;
+        const requiredadventureRank = rebirthRequirements[stats.rebirths] || 50;
 
-        if (stats.worldLevel < requiredWorldLevel) {
+        if (stats.adventureRank < requiredadventureRank) {
             return r.edit(
                 embedComment(
-                    `You must be Adventure Rank ${requiredWorldLevel} or higher to rebirth.`,
+                    `You must be Adventure Rank ${requiredadventureRank} or higher to rebirth.`,
                     "Red",
                 ),
             );
@@ -133,7 +133,7 @@ async function handleRebirth(
     totalSellPrice: number,
 ) {
     const defaultStats: Partial<UserStats> = {
-        worldLevel: 1,
+        adventureRank: 1,
         exp: 0,
         attackPower: 5,
         maxHP: 100,

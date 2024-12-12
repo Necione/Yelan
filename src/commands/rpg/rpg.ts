@@ -62,7 +62,7 @@ export const rpg = buildCommand<SlashCommand>({
             const huntCooldown = cooldowns.get(p, "hunt");
             const exploreCooldown = cooldowns.get(p, "explore");
 
-            const expRequired = 20 * Math.pow(1.2, stats.worldLevel - 1);
+            const expRequired = 20 * Math.pow(1.2, stats.adventureRank - 1);
 
             const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
 
@@ -164,7 +164,7 @@ export const rpg = buildCommand<SlashCommand>({
                     name: "Your Stats",
                     value:
                         `🌍 Adventure Rank: \`${
-                            stats.worldLevel
+                            stats.adventureRank
                         }\` | <:Item_Adventure_EXP:1287247325135114356> EXP: \`${
                             stats.exp
                         }/${expRequired.toFixed(0)}\`\n` +

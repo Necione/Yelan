@@ -9,7 +9,7 @@ export const artifacts = {
         maxHP: 10,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
     "Adventurer's Tail Feather": {
@@ -22,7 +22,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
     "Adventurer's Pocket Watch": {
@@ -35,7 +35,7 @@ export const artifacts = {
         maxHP: 5,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
     "Adventurer's Golden Goblet": {
@@ -48,7 +48,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 10,
         defValue: 2,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
     "Adventurer's Bandana": {
@@ -61,7 +61,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
 
@@ -75,7 +75,7 @@ export const artifacts = {
         maxHP: 15,
         defChance: 5,
         defValue: 4,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
     "Travelling Doctor's Owl Feather": {
@@ -88,7 +88,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 5,
         defValue: 3,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
     "Travelling Doctor's Pocket Watch": {
@@ -101,7 +101,7 @@ export const artifacts = {
         maxHP: 10,
         defChance: 5,
         defValue: 2,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
     "Travelling Doctor's Medicine Pot": {
@@ -114,7 +114,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 15,
         defValue: 1,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
     "Travelling Doctor's Handkerchief": {
@@ -127,7 +127,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: 15,
         defValue: 2,
-        minWorldLevel: 2,
+        minadventurerank: 2,
         chestChance: 10,
     },
 
@@ -141,7 +141,7 @@ export const artifacts = {
         maxHP: -5,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 4,
+        minadventurerank: 4,
         chestChance: 10,
     },
     "Berserker's Indigo Feather": {
@@ -154,7 +154,7 @@ export const artifacts = {
         maxHP: -20,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 4,
+        minadventurerank: 4,
         chestChance: 10,
     },
     "Berserker's Timepiece": {
@@ -167,7 +167,7 @@ export const artifacts = {
         maxHP: -20,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 4,
+        minadventurerank: 4,
         chestChance: 10,
     },
     "Berserker's Bone Goblet": {
@@ -180,7 +180,7 @@ export const artifacts = {
         maxHP: -10,
         defChance: 0,
         defValue: -5,
-        minWorldLevel: 4,
+        minadventurerank: 4,
         chestChance: 10,
     },
     "Berserker's Battle Mask": {
@@ -193,7 +193,7 @@ export const artifacts = {
         maxHP: -5,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 4,
+        minadventurerank: 4,
         chestChance: 10,
     },
 
@@ -207,7 +207,7 @@ export const artifacts = {
         maxHP: 15,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
     "Exile's Feather": {
@@ -220,7 +220,7 @@ export const artifacts = {
         maxHP: -10,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
     "Exile's Pocket Watch": {
@@ -233,7 +233,7 @@ export const artifacts = {
         maxHP: 5,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
     "Exile's Goblet": {
@@ -246,7 +246,7 @@ export const artifacts = {
         maxHP: 0,
         defChance: -5,
         defValue: 5,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
     "Exile's Circlet": {
@@ -259,7 +259,7 @@ export const artifacts = {
         maxHP: -10,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
 
@@ -273,7 +273,7 @@ export const artifacts = {
         maxHP: 20,
         defChance: 5,
         defValue: 5,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
     "Bard's Arrow Feather": {
@@ -286,7 +286,7 @@ export const artifacts = {
         maxHP: 5,
         defChance: 5,
         defValue: 10,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
     "Concert's Final Hour": {
@@ -299,7 +299,7 @@ export const artifacts = {
         maxHP: 10,
         defChance: 5,
         defValue: 3,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
     "Wanderer's String-Kettle": {
@@ -312,7 +312,7 @@ export const artifacts = {
         maxHP: 5,
         defChance: 5,
         defValue: 6,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
     "Conductor's Top Hat": {
@@ -325,7 +325,7 @@ export const artifacts = {
         maxHP: 20,
         defChance: 5,
         defValue: 3,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 10,
     },
 
@@ -339,7 +339,7 @@ export const artifacts = {
         maxHP: 25,
         defChance: 10,
         defValue: 5,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 8,
     },
     "Guardian's Sigil": {
@@ -352,7 +352,7 @@ export const artifacts = {
         maxHP: 10,
         defChance: 20,
         defValue: 6,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 8,
     },
     "Guardian's Clock": {
@@ -365,7 +365,7 @@ export const artifacts = {
         maxHP: 20,
         defChance: 15,
         defValue: 4,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 8,
     },
     "Guardian's Vessel": {
@@ -378,7 +378,7 @@ export const artifacts = {
         maxHP: 5,
         defChance: 25,
         defValue: 4,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 8,
     },
     "Guardian's Band": {
@@ -391,7 +391,7 @@ export const artifacts = {
         maxHP: 15,
         defChance: 30,
         defValue: 4,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 8,
     },
 
@@ -405,7 +405,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: 10,
         defValue: 0,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 3,
     },
     "Maiden's Heart-Stricken Infatuation": {
@@ -418,7 +418,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: -50,
         defValue: 0,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 3,
     },
     "Maiden's Passing Youth": {
@@ -431,7 +431,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 3,
     },
     "Maiden's Fleeting Leisure": {
@@ -444,7 +444,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 3,
     },
     "Maiden's Fading Beauty": {
@@ -457,7 +457,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: -50,
         defValue: 0,
-        minWorldLevel: 6,
+        minadventurerank: 6,
         chestChance: 3,
     },
     "Gladiator's Nostalgia": {
@@ -470,7 +470,7 @@ export const artifacts = {
         maxHP: 25,
         defChance: 10,
         defValue: 0,
-        minWorldLevel: 10,
+        minadventurerank: 10,
         chestChance: 3,
     },
     "Gladiator's Destiny": {
@@ -483,7 +483,7 @@ export const artifacts = {
         maxHP: 10,
         defChance: -10,
         defValue: 0,
-        minWorldLevel: 10,
+        minadventurerank: 10,
         chestChance: 3,
     },
     "Gladiator's Longing": {
@@ -496,7 +496,7 @@ export const artifacts = {
         maxHP: -25,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 10,
+        minadventurerank: 10,
         chestChance: 3,
     },
     "Gladiator's Intoxication": {
@@ -509,7 +509,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: 0,
         defValue: 0,
-        minWorldLevel: 10,
+        minadventurerank: 10,
         chestChance: 3,
     },
     "Gladiator's Triumphus": {
@@ -522,7 +522,7 @@ export const artifacts = {
         maxHP: 25,
         defChance: 0,
         defValue: 5,
-        minWorldLevel: 10,
+        minadventurerank: 10,
         chestChance: 3,
     },
 
@@ -536,7 +536,7 @@ export const artifacts = {
         maxHP: 25,
         defChance: 10,
         defValue: 10,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
     "Thundersoother's Plume": {
@@ -549,7 +549,7 @@ export const artifacts = {
         maxHP: -20,
         defChance: 5,
         defValue: 7,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
     "Hour of Soothing Thunder": {
@@ -562,7 +562,7 @@ export const artifacts = {
         maxHP: -5,
         defChance: 10,
         defValue: 7,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
     "Thundersoother's Goblet": {
@@ -575,7 +575,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: 0,
         defValue: 5,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
     "Thundersoother's Diadem": {
@@ -588,7 +588,7 @@ export const artifacts = {
         maxHP: -100,
         defChance: 0,
         defValue: 10,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
 
@@ -602,7 +602,7 @@ export const artifacts = {
         maxHP: -20,
         defChance: 15,
         defValue: 7,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
     "Survivor of Catastrophe": {
@@ -615,7 +615,7 @@ export const artifacts = {
         maxHP: -200,
         defChance: -10,
         defValue: 0,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
     "Hourglass of Thunder": {
@@ -628,7 +628,7 @@ export const artifacts = {
         maxHP: 10,
         defChance: 5,
         defValue: 3,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
     "Omen of Thunderstorm": {
@@ -641,7 +641,7 @@ export const artifacts = {
         maxHP: -20,
         defChance: 10,
         defValue: 3,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
     "Thunder Summoner's Crown": {
@@ -654,7 +654,7 @@ export const artifacts = {
         maxHP: -50,
         defChance: 5,
         defValue: 10,
-        minWorldLevel: 13,
+        minadventurerank: 13,
         chestChance: 3,
     },
     "Royal Flora": {
@@ -667,7 +667,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: -10,
         defValue: 0,
-        minWorldLevel: 15,
+        minadventurerank: 15,
         chestChance: 3,
     },
     "Royal Plume": {
@@ -680,7 +680,7 @@ export const artifacts = {
         maxHP: 75,
         defChance: -30,
         defValue: 0,
-        minWorldLevel: 15,
+        minadventurerank: 15,
         chestChance: 3,
     },
     "Royal Pocket Watch": {
@@ -693,7 +693,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: -10,
         defValue: -5,
-        minWorldLevel: 15,
+        minadventurerank: 15,
         chestChance: 3,
     },
     "Royal Silver Urn": {
@@ -706,7 +706,7 @@ export const artifacts = {
         maxHP: 75,
         defChance: -10,
         defValue: -5,
-        minWorldLevel: 15,
+        minadventurerank: 15,
         chestChance: 3,
     },
     "Royal Masque": {
@@ -719,7 +719,7 @@ export const artifacts = {
         maxHP: 75,
         defChance: -5,
         defValue: 0,
-        minWorldLevel: 15,
+        minadventurerank: 15,
         chestChance: 3,
     },
     "Witch's Flower of Blaze": {
@@ -732,7 +732,7 @@ export const artifacts = {
         maxHP: 50,
         defChance: 10,
         defValue: 10,
-        minWorldLevel: 5,
+        minadventurerank: 5,
         chestChance: 0,
     },
     "Witch's Ever-Burning Plume": {
@@ -745,7 +745,7 @@ export const artifacts = {
         maxHP: 75,
         defChance: 15,
         defValue: 10,
-        minWorldLevel: 10,
+        minadventurerank: 10,
         chestChance: 0,
     },
     "Witch's End Time": {
@@ -758,7 +758,7 @@ export const artifacts = {
         maxHP: 100,
         defChance: 10,
         defValue: 20,
-        minWorldLevel: 15,
+        minadventurerank: 15,
         chestChance: 0,
     },
     "Witch's Heart Flames": {
@@ -771,7 +771,7 @@ export const artifacts = {
         maxHP: 175,
         defChance: 15,
         defValue: 10,
-        minWorldLevel: 20,
+        minadventurerank: 20,
         chestChance: 0,
     },
     "Witch's Scorching Hat": {
@@ -784,7 +784,7 @@ export const artifacts = {
         maxHP: 200,
         defChance: 10,
         defValue: 15,
-        minWorldLevel: 25,
+        minadventurerank: 25,
         chestChance: 0,
     },
     "Snowswept Memory": {
@@ -797,7 +797,7 @@ export const artifacts = {
         maxHP: 100,
         defChance: -10,
         defValue: 40,
-        minWorldLevel: 20,
+        minadventurerank: 20,
         chestChance: 2,
     },
     "Icebreaker's Resolve": {
@@ -810,7 +810,7 @@ export const artifacts = {
         maxHP: 150,
         defChance: 10,
         defValue: 10,
-        minWorldLevel: 20,
+        minadventurerank: 20,
         chestChance: 2,
     },
     "Frozen Homeland's Demise": {
@@ -823,7 +823,7 @@ export const artifacts = {
         maxHP: 100,
         defChance: 10,
         defValue: 25,
-        minWorldLevel: 20,
+        minadventurerank: 20,
         chestChance: 2,
     },
     "Frost-Weaved Dignity": {
@@ -836,7 +836,7 @@ export const artifacts = {
         maxHP: 200,
         defChance: 15,
         defValue: 10,
-        minWorldLevel: 20,
+        minadventurerank: 20,
         chestChance: 2,
     },
     "Broken Rime's Echo": {
@@ -849,7 +849,7 @@ export const artifacts = {
         maxHP: 150,
         defChance: 5,
         defValue: 30,
-        minWorldLevel: 20,
+        minadventurerank: 20,
         chestChance: 2,
     },
     "Sea-Dyed Blossom": {
@@ -862,7 +862,7 @@ export const artifacts = {
         maxHP: 150,
         defChance: -10,
         defValue: 75,
-        minWorldLevel: 23,
+        minadventurerank: 23,
         chestChance: 2,
     },
     "Deep Palace's Plume": {
@@ -875,7 +875,7 @@ export const artifacts = {
         maxHP: 200,
         defChance: 10,
         defValue: 25,
-        minWorldLevel: 23,
+        minadventurerank: 23,
         chestChance: 2,
     },
     "Cowry of Parting": {
@@ -888,7 +888,7 @@ export const artifacts = {
         maxHP: 350,
         defChance: 0,
         defValue: 50,
-        minWorldLevel: 23,
+        minadventurerank: 23,
         chestChance: 2,
     },
     "Pearl Cage": {
@@ -901,7 +901,7 @@ export const artifacts = {
         maxHP: 150,
         defChance: 15,
         defValue: 50,
-        minWorldLevel: 20,
+        minadventurerank: 20,
         chestChance: 2,
     },
     "Crown of Watatsumi": {
@@ -914,7 +914,7 @@ export const artifacts = {
         maxHP: 175,
         defChance: 5,
         defValue: 30,
-        minWorldLevel: 23,
+        minadventurerank: 23,
         chestChance: 2,
     },
     "Golden Song's Variation": {
@@ -927,7 +927,7 @@ export const artifacts = {
         maxHP: 300,
         defChance: 20,
         defValue: 50,
-        minWorldLevel: 35,
+        minadventurerank: 35,
         chestChance: 1,
     },
     "Golden Bird's Shedding": {
@@ -940,7 +940,7 @@ export const artifacts = {
         maxHP: 250,
         defChance: 5,
         defValue: 75,
-        minWorldLevel: 35,
+        minadventurerank: 35,
         chestChance: 1,
     },
     "Golden Era's Prelude": {
@@ -953,7 +953,7 @@ export const artifacts = {
         maxHP: 10,
         defChance: 5,
         defValue: 5,
-        minWorldLevel: 35,
+        minadventurerank: 35,
         chestChance: 1,
     },
     "Golden Night's Bustle": {
@@ -966,7 +966,7 @@ export const artifacts = {
         maxHP: 100,
         defChance: 10,
         defValue: 10,
-        minWorldLevel: 35,
+        minadventurerank: 35,
         chestChance: 1,
     },
     "Golden Troupe's Reward": {
@@ -979,7 +979,7 @@ export const artifacts = {
         maxHP: 400,
         defChance: 15,
         defValue: 20,
-        minWorldLevel: 35,
+        minadventurerank: 35,
         chestChance: 1,
     },
 };

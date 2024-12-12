@@ -9,7 +9,7 @@ type LootItem = {
     name: DropName | WeaponName | ArtifactName;
     minAmount: number;
     maxAmount: number;
-    minWorldLevel: number;
+    minadventurerank: number;
     chestChance: number;
 };
 
@@ -32,21 +32,21 @@ const chestLoot = make.array<LootItem>([
         name: drop as DropName,
         minAmount: drops[drop as DropName].minAmount || 1,
         maxAmount: drops[drop as DropName].maxAmount || 1,
-        minWorldLevel: drops[drop as DropName].minWorldLevel,
+        minadventurerank: drops[drop as DropName].minadventurerank,
         chestChance: drops[drop as DropName].chestChance,
     })),
     ...Object.keys(weapons).map((weapon) => ({
         name: weapon as WeaponName,
         minAmount: 1,
         maxAmount: 1,
-        minWorldLevel: weapons[weapon as WeaponName].minWorldLevel,
+        minadventurerank: weapons[weapon as WeaponName].minadventurerank,
         chestChance: weapons[weapon as WeaponName].chestChance,
     })),
     ...Object.keys(artifacts).map((artifact) => ({
         name: artifact as ArtifactName,
         minAmount: 1,
         maxAmount: 1,
-        minWorldLevel: artifacts[artifact as ArtifactName].minWorldLevel,
+        minadventurerank: artifacts[artifact as ArtifactName].minadventurerank,
         chestChance: artifacts[artifact as ArtifactName].chestChance,
     })),
 ]);
@@ -72,7 +72,7 @@ function isWeapon(name: string) {
 }
 
 export function generateChestLoot(
-    worldLevel: number,
+    adventureRank: number,
     maxUniqueItemsOverride?: number,
 ) {
     const selectedRarity = selectChestRarity();
@@ -93,18 +93,18 @@ export function generateChestLoot(
     let hasWeapon = false;
 
     const eligibleLoot = chestLoot.filter(
-        (lootItem) => worldLevel >= lootItem.minWorldLevel,
+        (lootItem) => adventureRank >= lootItem.minadventurerank,
     );
 
     while (totalUniqueItems < maxUniqueItems && eligibleLoot.length > 0) {
         const totalWeight = eligibleLoot.reduce(
-            (acc, lootItem) => acc + lootItem.minWorldLevel,
+            (acc, lootItem) => acc + lootItem.minadventurerank,
             0,
         );
         let randomWeight = Math.random() * totalWeight;
 
         for (const lootItem of eligibleLoot) {
-            if (randomWeight < lootItem.minWorldLevel) {
+            if (randomWeight < lootItem.minadventurerank) {
                 const chance = Math.random() * 100;
                 if (chance <= lootItem.chestChance) {
                     const amount = getRandomValue(
@@ -142,7 +142,7 @@ export function generateChestLoot(
                     break;
                 }
             }
-            randomWeight -= lootItem.minWorldLevel;
+            randomWeight -= lootItem.minadventurerank;
         }
     }
 

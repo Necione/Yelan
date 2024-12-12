@@ -34,13 +34,13 @@ export async function syncStats(userId: string) {
         stats.totalAssigned = stats.alchemyProgress;
     }
 
-    const calculatedBaseAttack = 5 + (stats.worldLevel - 1) * 0.5;
+    const calculatedBaseAttack = 5 + (stats.adventureRank - 1) * 0.5;
 
     const assignedAttackBonus = (stats.assignedAtk || 0) * 0.25;
     const alchemyBaseAttack = calculatedBaseAttack + assignedAttackBonus;
 
     const calculatedMaxHP =
-        100 + (stats.worldLevel - 1) * 10 + (stats.rebirths || 0) * 5;
+        100 + (stats.adventureRank - 1) * 10 + (stats.rebirths || 0) * 5;
 
     const assignedHpBonus = (stats.assignedHp || 0) * 2;
     const finalMaxHP = calculatedMaxHP + assignedHpBonus;
@@ -258,7 +258,7 @@ export const getUserStats = async (userId: string) => {
                 critValue: 1,
                 inventory: [],
                 exp: 0,
-                worldLevel: 1,
+                adventureRank: 1,
                 healEffectiveness: 0,
                 maxMana: 20,
             },

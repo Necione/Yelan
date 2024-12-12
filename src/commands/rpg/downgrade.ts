@@ -48,7 +48,7 @@ export const downgrade = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.worldLevel <= 1) {
+        if (stats.adventureRank <= 1) {
             return r.edit(
                 embedComment(
                     `You are already at the lowest Adventure Rank (1)! You cannot downgrade further.`,
@@ -56,11 +56,11 @@ export const downgrade = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.worldLevel > stats.highestWL) {
+        if (stats.adventureRank > stats.highestWL) {
             await updateUserStats(i.user.id, {
-                highestWL: stats.worldLevel,
+                highestWL: stats.adventureRank,
             });
-            stats.highestWL = stats.worldLevel;
+            stats.highestWL = stats.adventureRank;
         }
 
         if (userProfile.balance < 250) {
@@ -76,7 +76,7 @@ export const downgrade = buildCommand<SlashCommand>({
 
         const minDowngradeLevel = Math.max(stats.highestWL - 2, 1);
 
-        if (stats.worldLevel <= minDowngradeLevel) {
+        if (stats.adventureRank <= minDowngradeLevel) {
             return r.edit(
                 embedComment(
                     `You cannot downgrade lower than 2 levels below your highest Adventure Rank (${stats.highestWL}).`,
@@ -87,7 +87,7 @@ export const downgrade = buildCommand<SlashCommand>({
 
         const downgradeLevels = [];
         for (
-            let level = stats.worldLevel - 1;
+            let level = stats.adventureRank - 1;
             level >= minDowngradeLevel;
             level--
         ) {
@@ -110,7 +110,7 @@ export const downgrade = buildCommand<SlashCommand>({
                 `Select the Adventure Rank you want to downgrade to. Downgrading costs **${getAmount(
                     250,
                 )}**.\nYour current Adventure Rank is ${
-                    stats.worldLevel
+                    stats.adventureRank
                 }.\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
                 "Yellow",
             ),
@@ -135,11 +135,11 @@ export const downgrade = buildCommand<SlashCommand>({
             i.user.id,
             250,
             true,
-            `Paid 250 ${texts.c.u} to downgrade Adventure Rank from ${stats.worldLevel} to ${selectedLevel}`,
+            `Paid 250 ${texts.c.u} to downgrade Adventure Rank from ${stats.adventureRank} to ${selectedLevel}`,
         );
 
         await updateUserStats(i.user.id, {
-            worldLevel: { set: selectedLevel },
+            adventureRank: { set: selectedLevel },
             exp: { set: 0 },
         });
 

@@ -51,11 +51,11 @@ export async function handleAbyssBattle(
     const selectedMonsterName =
         possibleMonsters[Math.floor(Math.random() * possibleMonsters.length)];
 
-    const abyssWorldLevel = stats.currentAbyssFloor === 2 ? 15 : 10;
+    const abyssadventureRank = stats.currentAbyssFloor === 2 ? 15 : 10;
 
     const selectedMonster = await getMonsterByName(
         selectedMonsterName,
-        abyssWorldLevel,
+        abyssadventureRank,
     );
 
     if (!selectedMonster) {
@@ -87,8 +87,8 @@ export async function handleAbyssBattle(
     ) => {
         const monster = monstersEncountered[currentMonsterIndex];
 
-        const abyssWorldLevel = stats.currentAbyssFloor === 2 ? 15 : 10;
-        const monsterStats = monster.getStatsForWorldLevel(abyssWorldLevel);
+        const abyssadventureRank = stats.currentAbyssFloor === 2 ? 15 : 10;
+        const monsterStats = monster.getStatsForadventureRank(abyssadventureRank);
 
         if (!monsterStats) {
             throw new Error(`Stats not found for monster: ${monster.name}`);

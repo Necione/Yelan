@@ -6,7 +6,7 @@ export default {
     group: MonsterGroup.Boss,
     minExp: 20,
     maxExp: 20,
-    minWorldLevel: 5,
+    minadventurerank: 5,
     image: "https://lh.elara.workers.dev/rpg/bosses/electro_hypostasis.png",
     drops: [
         {
@@ -21,16 +21,16 @@ export default {
     critValue: 2,
     defChance: 50,
     defValue: 0.25,
-    getStatsForWorldLevel(worldLevel: number) {
+    getStatsForadventureRank(adventureRank: number) {
         const stats = [
             {
-                worldLevel: 5,
+                adventureRank: 5,
                 minHp: 300,
                 maxHp: 300,
                 minDamage: 10,
                 maxDamage: 18,
             },
         ];
-        return stats.find((stat) => stat.worldLevel === worldLevel) || null;
+        return stats.find((stat) => stat.adventureRank === adventureRank) || null;
     },
 };

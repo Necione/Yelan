@@ -6,7 +6,7 @@ export default {
     group: MonsterGroup.Boss,
     minExp: 40,
     maxExp: 40,
-    minWorldLevel: 15,
+    minadventurerank: 15,
     image: "https://lh.elara.workers.dev/rpg/bosses/oceanid.png",
     drops: [
         {
@@ -21,16 +21,16 @@ export default {
     critValue: 1.5,
     defChance: 100,
     defValue: 0.1,
-    getStatsForWorldLevel(worldLevel: number) {
+    getStatsForadventureRank(adventureRank: number) {
         const stats = [
             {
-                worldLevel: 15,
+                adventureRank: 15,
                 minHp: 1750,
                 maxHp: 1750,
                 minDamage: 35,
                 maxDamage: 60,
             },
         ];
-        return stats.find((stat) => stat.worldLevel === worldLevel) || null;
+        return stats.find((stat) => stat.adventureRank === adventureRank) || null;
     },
 };

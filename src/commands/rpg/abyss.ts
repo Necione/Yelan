@@ -44,7 +44,7 @@ export const abyss = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.worldLevel < 10) {
+        if (stats.adventureRank < 10) {
             locked.del(i.user.id);
             return r.edit(
                 embedComment(

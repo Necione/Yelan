@@ -172,8 +172,8 @@ export const expedition = buildCommand<SlashCommand>({
                             expeditionLocation: { set: null },
                         });
 
-                        const worldLevel = stats.worldLevel;
-                        const chest = generateChestLoot(worldLevel, itemsCount);
+                        const adventureRank = stats.adventureRank;
+                        const chest = generateChestLoot(adventureRank, itemsCount);
 
                         await addBalance(
                             i.user.id,
@@ -309,8 +309,8 @@ export const expedition = buildCommand<SlashCommand>({
                 expeditionLocation: { set: null },
             });
 
-            const worldLevel = stats.worldLevel;
-            const chest = generateChestLoot(worldLevel, itemsCount);
+            const adventureRank = stats.adventureRank;
+            const chest = generateChestLoot(adventureRank, itemsCount);
 
             await addBalance(
                 i.user.id,

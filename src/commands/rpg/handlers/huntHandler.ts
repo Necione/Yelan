@@ -96,31 +96,31 @@ export async function handleHunt(
         20: "Primo Geovishap",
     };
 
-    const currentWorldLevel = stats.worldLevel;
+    const currentadventureRank = stats.adventureRank;
     let isBossEncounter = false;
     let bossName = "";
 
     if (
-        bossEncounters[currentWorldLevel] &&
-        !stats.beatenBosses.includes(bossEncounters[currentWorldLevel])
+        bossEncounters[currentadventureRank] &&
+        !stats.beatenBosses.includes(bossEncounters[currentadventureRank])
     ) {
         isBossEncounter = true;
-        bossName = bossEncounters[currentWorldLevel];
+        bossName = bossEncounters[currentadventureRank];
     }
 
     const numberOfMonsters = isBossEncounter
         ? 1
-        : stats.worldLevel <= 5
+        : stats.adventureRank <= 5
           ? 1
-          : stats.worldLevel <= 15
+          : stats.adventureRank <= 15
             ? Math.random() < 0.75
                 ? 2
                 : 1
-            : stats.worldLevel <= 25
+            : stats.adventureRank <= 25
               ? Math.random() < 0.75
                   ? 2
                   : 3
-              : stats.worldLevel <= 35
+              : stats.adventureRank <= 35
                 ? Math.random() < 0.5
                     ? 2
                     : 3
@@ -170,7 +170,7 @@ export async function handleHunt(
                 }
             } else {
                 monster = await getRandomMonster(
-                    stats.worldLevel,
+                    stats.adventureRank,
                     stats.location,
                     {
                         currentHp: stats.hp,
@@ -241,7 +241,7 @@ export async function handleHunt(
             monster.name,
             stats.location,
         );
-        const monsterStats = monster.getStatsForWorldLevel(stats.worldLevel);
+        const monsterStats = monster.getStatsForadventureRank(stats.adventureRank);
         if (!monsterStats) {
             throw new Error(`Stats not found for monster: ${monster.name}`);
         }

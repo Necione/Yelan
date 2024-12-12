@@ -44,7 +44,7 @@ export async function handleChest(
             }[];
         }>();
         for (let j = 0; j < 3; j++) {
-            chestLoots.push(generateChestLoot(stats.worldLevel));
+            chestLoots.push(generateChestLoot(stats.adventureRank));
         }
 
         const rarity = chestLoots[0].rarity;

@@ -9,7 +9,7 @@ export default {
     element: MonsterElement.Geo,
     minExp: 75,
     maxExp: 100,
-    minWorldLevel: 30,
+    minadventurerank: 30,
     image: "https://lh.elara.workers.dev/rpg/monsters/rockfond_rifthound.png",
     drops: [
         { item: "Concealed Claw", minAmount: 1, maxAmount: 1, chance: 50 },
@@ -28,23 +28,23 @@ export default {
     defValue: 100,
     baseHp: 28,
     baseAtk: 15,
-    getStatsForWorldLevel(worldLevel: number) {
-        if (!limits.check(worldLevel)) {
+    getStatsForadventureRank(adventureRank: number) {
+        if (!limits.check(adventureRank)) {
             return null;
         }
 
-        const hpScaleMultiplier = getHpScaleMultiplier(worldLevel);
+        const hpScaleMultiplier = getHpScaleMultiplier(adventureRank);
         const newBaseHp = this.baseHp * hpScaleMultiplier;
         const minHp = Math.ceil(newBaseHp * 0.9);
         const maxHp = Math.ceil(newBaseHp * 1.1);
 
-        const atkScaleMultiplier = getAtkScaleMultiplier(worldLevel);
+        const atkScaleMultiplier = getAtkScaleMultiplier(adventureRank);
         const newBaseAtk = Math.ceil(this.baseAtk * atkScaleMultiplier);
         const minDamage = Math.floor(newBaseAtk * 0.95);
         const maxDamage = Math.ceil(newBaseAtk * 1.05);
 
         return {
-            worldLevel,
+            adventureRank,
             minHp,
             maxHp,
             minDamage,
