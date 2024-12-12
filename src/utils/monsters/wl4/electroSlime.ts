@@ -7,9 +7,9 @@ export default {
     name: "Electro Slime",
     group: MonsterGroup.Slime,
     element: MonsterElement.Electro,
-    minExp: 3,
-    maxExp: 6,
-    minWorldLevel: 1,
+    minExp: 5,
+    maxExp: 10,
+    minWorldLevel: 4,
     image: "https://lh.elara.workers.dev/rpg/monsters/electro_slime.png",
     drops: [
         {
@@ -31,8 +31,8 @@ export default {
             chance: 10,
         },
     ],
-    baseHp: 10,
-    baseAtk: 4,
+    baseHp: 14,
+    baseAtk: 7,
     getStatsForWorldLevel(worldLevel: number) {
         if (!limits.check(worldLevel)) {
             return null;

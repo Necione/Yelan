@@ -19,7 +19,9 @@ import { getAmount } from "../../utils";
 export const downgrade = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("downgrade")
-        .setDescription("[RPG] Downgrade your world level by up to 2 levels.")
+        .setDescription(
+            "[RPG] Downgrade your Adventure Rank by up to 2 levels.",
+        )
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
@@ -49,7 +51,7 @@ export const downgrade = buildCommand<SlashCommand>({
         if (stats.worldLevel <= 1) {
             return r.edit(
                 embedComment(
-                    `You are already at the lowest world level (1)! You cannot downgrade further.`,
+                    `You are already at the lowest Adventure Rank (1)! You cannot downgrade further.`,
                 ),
             );
         }
@@ -66,7 +68,7 @@ export const downgrade = buildCommand<SlashCommand>({
                 embedComment(
                     `You need **${getAmount(
                         250,
-                    )}** to downgrade your world level.`,
+                    )}** to downgrade your Adventure Rank.`,
                     "Red",
                 ),
             );
@@ -77,7 +79,7 @@ export const downgrade = buildCommand<SlashCommand>({
         if (stats.worldLevel <= minDowngradeLevel) {
             return r.edit(
                 embedComment(
-                    `You cannot downgrade lower than 2 levels below your highest world level (${stats.highestWL}).`,
+                    `You cannot downgrade lower than 2 levels below your highest Adventure Rank (${stats.highestWL}).`,
                     "Red",
                 ),
             );
@@ -95,7 +97,7 @@ export const downgrade = buildCommand<SlashCommand>({
         const buttons = downgradeLevels.map((level) =>
             new ButtonBuilder()
                 .setCustomId(`downgrade_${level}`)
-                .setLabel(`Downgrade to WL${level}`)
+                .setLabel(`Downgrade to AR${level}`)
                 .setStyle(ButtonStyle.Primary),
         );
 
@@ -105,9 +107,9 @@ export const downgrade = buildCommand<SlashCommand>({
 
         await r.edit({
             ...embedComment(
-                `Select the world level you want to downgrade to. Downgrading costs **${getAmount(
+                `Select the Adventure Rank you want to downgrade to. Downgrading costs **${getAmount(
                     250,
-                )}**.\nYour current world level is ${
+                )}**.\nYour current Adventure Rank is ${
                     stats.worldLevel
                 }.\nThis will reduce enemy difficulty and rewards, and your EXP will be reset.`,
                 "Yellow",
@@ -133,7 +135,7 @@ export const downgrade = buildCommand<SlashCommand>({
             i.user.id,
             250,
             true,
-            `Paid 250 ${texts.c.u} to downgrade world level from ${stats.worldLevel} to ${selectedLevel}`,
+            `Paid 250 ${texts.c.u} to downgrade Adventure Rank from ${stats.worldLevel} to ${selectedLevel}`,
         );
 
         await updateUserStats(i.user.id, {
@@ -143,7 +145,7 @@ export const downgrade = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `Your world level has been downgraded to ${selectedLevel}, your EXP has been reset to 0, and **${getAmount(
+                `Your Adventure Rank has been downgraded to ${selectedLevel}, your EXP has been reset to 0, and **${getAmount(
                     250,
                 )}** have been deducted from your wallet.`,
                 "Green",

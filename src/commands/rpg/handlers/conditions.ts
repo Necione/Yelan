@@ -105,7 +105,7 @@ export async function handleVictory(
     if (stats.worldLevel >= maxWorldLevel) {
         newExp = 0;
         finalEmbed.setDescription(
-            `You've hit the max world level for this patch (${maxWorldLevel}) and cannot progress any further.`,
+            `You've hit the max Adventure Rank for this patch (${maxWorldLevel}) and cannot progress any further.`,
         );
     }
 
@@ -122,7 +122,7 @@ export async function handleVictory(
         .setColor("Green")
         .setTitle(`Victory in ${stats.location}!`)
         .setDescription(
-            `You defeated the following monsters:\n\`${monstersFought}\`!\n-# \`⭐\` \`+${totalExpGained} EXP\` (\`🌍\` WL${stats.worldLevel})`,
+            `You defeated the following monsters:\n\`${monstersFought}\`!\n-# \`⭐\` \`+${totalExpGained} EXP\` (\`🌍\` AR${stats.worldLevel})`,
         )
         .setThumbnail(
             monstersEncountered[monstersEncountered.length - 1].image,
@@ -384,7 +384,7 @@ export async function handleDefeat(
         .setColor("Red")
         .setTitle(`Defeat...`)
         .setDescription(
-            `Oh no :( You were defeated by the **${monster.name}**...\n-# Use </downgrade:1282035993242767450> if this WL is too hard.`,
+            `Oh no :( You were defeated by the **${monster.name}**...`,
         );
 
     await updateUserStats(stats.userId, {

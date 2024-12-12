@@ -37,7 +37,7 @@ export async function handleFloorTransition(
         if (stats.worldLevel < requiredLevel) {
             await i.editReply(
                 embedComment(
-                    `You come across a massive stairwell with guards next to it. They say that you need to be at least **World Level ${requiredLevel}** to ${direction} to Floor **${newFloor}**.`,
+                    `You come across a massive stairwell with guards next to it. They say that you need to be at least **Adventure Rank ${requiredLevel}** to ${direction} to Floor **${newFloor}**.`,
                     "Red",
                 ),
             );

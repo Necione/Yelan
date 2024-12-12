@@ -247,7 +247,7 @@ export const travel = buildCommand<SlashCommand>({
                 return interaction
                     .reply({
                         content:
-                            "You need to be world level 20 or higher to travel to Inazuma.",
+                            "You need to be Adventure Rank 20 or higher to travel to Inazuma.",
                         ephemeral: true,
                     })
                     .catch(noop);

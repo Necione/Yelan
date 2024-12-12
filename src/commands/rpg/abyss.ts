@@ -48,7 +48,7 @@ export const abyss = buildCommand<SlashCommand>({
             locked.del(i.user.id);
             return r.edit(
                 embedComment(
-                    `You need to be at least World Level 10 to enter the Abyss.`,
+                    `You need to be at least Adventure Rank 10 to enter the Abyss.`,
                     "Red",
                 ),
             );

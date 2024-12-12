@@ -224,7 +224,7 @@ export const info = buildCommand<SlashCommand>({
                 .setTitle(`${monster.name}`)
                 .addFields(
                     {
-                        name: "Min World Level",
+                        name: "Min Adventure Rank",
                         value: `${monster.minWorldLevel}`,
                         inline: true,
                     },

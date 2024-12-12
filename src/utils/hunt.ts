@@ -225,7 +225,7 @@ export async function getRandomMonster(
         return monsterInstance;
     } else {
         log(
-            `Stats for world level ${worldLevel} not found for monster: ${selectedMonster.name}`,
+            `Stats for Adventure Rank ${worldLevel} not found for monster: ${selectedMonster.name}`,
         );
         return null;
     }
@@ -401,12 +401,12 @@ export async function getMonsterByName(
         };
 
         log(
-            `Created MonsterInstance for ${monster.name} at world level ${selectedWorldLevel}.`,
+            `Created MonsterInstance for ${monster.name} at Adventure Rank ${selectedWorldLevel}.`,
         );
         return monsterInstance;
     } else {
         log(
-            `Stats for world level ${selectedWorldLevel} not found for monster: ${monster.name}`,
+            `Stats for Adventure Rank ${selectedWorldLevel} not found for monster: ${monster.name}`,
         );
         return null;
     }

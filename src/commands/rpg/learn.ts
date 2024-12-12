@@ -87,7 +87,7 @@ export const learn = buildCommand<SlashCommand>({
 
         if (stats.worldLevel < (skillData.requirements?.worldLevel || 0)) {
             missingRequirements.push(
-                `**World Level**: You need to be at least **World Level ${skillData.requirements?.worldLevel}**.`,
+                `**Adventure Rank**: You need to be at least **Adventure Rank ${skillData.requirements?.worldLevel}**.`,
             );
         }
 

@@ -47,7 +47,7 @@ export const rebirth = buildCommand<SlashCommand>({
         if (stats.worldLevel < requiredWorldLevel) {
             return r.edit(
                 embedComment(
-                    `You must be World Level ${requiredWorldLevel} or higher to rebirth.`,
+                    `You must be Adventure Rank ${requiredWorldLevel} or higher to rebirth.`,
                     "Red",
                 ),
             );
@@ -57,7 +57,7 @@ export const rebirth = buildCommand<SlashCommand>({
             .setColor("Yellow")
             .setTitle("Are you sure you want to Rebirth?")
             .setDescription(
-                "All your stats will be reset, and you will go back to World Level 1. All items in your bag will be sold.\n\nYou will get +50 Max HP and a higher selling price.",
+                "All your stats will be reset, and you will go back to Adventure Rank 1. All items in your bag will be sold.\n\nYou will get +50 Max HP and a higher selling price.",
             )
             .setFooter({ text: "You have 10 seconds to confirm or cancel." });
 

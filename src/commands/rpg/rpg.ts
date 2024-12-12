@@ -163,7 +163,7 @@ export const rpg = buildCommand<SlashCommand>({
                 .addFields({
                     name: "Your Stats",
                     value:
-                        `🌍 World Level: \`${
+                        `🌍 Adventure Rank: \`${
                             stats.worldLevel
                         }\` | <:Item_Adventure_EXP:1287247325135114356> EXP: \`${
                             stats.exp
