@@ -27,13 +27,15 @@ export const load = buildCommand<SlashCommand>({
     async autocomplete(i) {
         const focused = i.options.getFocused(true);
         const input = focused.value.toLowerCase();
+        const userId = i.user.id;
         const username = i.user.username;
 
         try {
             const loadouts = await prisma.loadout.findMany({
                 where: {
+                    userId,
                     name: {
-                        contains: `${username}'s ${input}`,
+                        contains: input,
                         mode: "insensitive",
                     },
                 },
@@ -42,9 +44,9 @@ export const load = buildCommand<SlashCommand>({
 
             const options = loadouts.map((loadout) => ({
                 name: loadout.isPrivate
-                    ? `${loadout.name} (Private)`
-                    : loadout.name,
-                value: loadout.name.replace(`${username}'s `, ""),
+                    ? `${username}'s ${loadout.name} (Private)`
+                    : `${username}'s ${loadout.name}`,
+                value: loadout.name,
             }));
 
             if (options.length === 0) {
@@ -63,21 +65,18 @@ export const load = buildCommand<SlashCommand>({
     },
     async execute(i, r) {
         const inputName = i.options.getString("name", true).trim();
-        const username = i.user.username;
         const userId = i.user.id;
 
         if (!inputName) {
             return r.edit(embedComment("Loadout name cannot be empty."));
         }
 
-        const loadoutName = `${username}'s ${inputName}`;
-
         try {
             const loadout = await prisma.loadout.findUnique({
                 where: {
                     user_loadout_unique: {
                         userId: i.user.id,
-                        name: loadoutName,
+                        name: inputName,
                     },
                 },
             });
@@ -88,7 +87,7 @@ export const load = buildCommand<SlashCommand>({
                 );
             }
 
-            const stats = await getUserStats(i.user.id);
+            const stats = await getUserStats(userId);
             if (!stats) {
                 return r.edit(
                     embedComment("No stats found. Please set up your profile."),
@@ -104,7 +103,7 @@ export const load = buildCommand<SlashCommand>({
                 loadout.equippedCirclet,
             ].filter(Boolean) as string[];
 
-            console.log("Attempting to load loadout:", loadoutName);
+            console.log("Attempting to load loadout:", loadout.name);
             console.log("Items to Equip:", itemsToEquip);
             console.log(
                 "User Inventory:",

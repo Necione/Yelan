@@ -27,23 +27,23 @@ export const save = buildCommand<SlashCommand>({
     async execute(i, r) {
         const inputName = i.options.getString("name", true).trim();
         const isPrivate = i.options.getBoolean("private") ?? true;
-        const username = i.user.username;
+        const userId = i.user.id;
 
         if (!inputName) {
             return r.edit(embedComment("Loadout name cannot be empty."));
         }
 
-        const stats = await getUserStats(i.user.id);
+        const stats = await getUserStats(userId);
         if (!stats) {
             return r.edit(
                 embedComment("No stats found. Please set up your profile."),
             );
         }
 
-        const loadoutName = `${username}'s ${inputName}`;
+        const loadoutName = inputName;
 
         const loadoutData = {
-            userId: i.user.id,
+            userId,
             name: loadoutName,
             isPrivate,
             equippedWeapon: stats.equippedWeapon,
@@ -58,7 +58,7 @@ export const save = buildCommand<SlashCommand>({
             const existing = await prisma.loadout.findUnique({
                 where: {
                     user_loadout_unique: {
-                        userId: i.user.id,
+                        userId,
                         name: loadoutName,
                     },
                 },

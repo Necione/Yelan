@@ -2,7 +2,6 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { prisma } from "../../prisma";
-
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 const artifactSlotEmojis: Record<string, string> = {
@@ -29,13 +28,15 @@ export const viewloadout = buildCommand<SlashCommand>({
     async autocomplete(i) {
         const focused = i.options.getFocused(true);
         const input = focused.value.toLowerCase();
+        const userId = i.user.id;
         const username = i.user.username;
 
         try {
             const loadouts = await prisma.loadout.findMany({
                 where: {
+                    userId,
                     name: {
-                        contains: `${username}'s ${input}`,
+                        contains: input,
                         mode: "insensitive",
                     },
                 },
@@ -43,8 +44,10 @@ export const viewloadout = buildCommand<SlashCommand>({
             });
 
             const options = loadouts.map((loadout) => ({
-                name: `${loadout.name} ${loadout.isPrivate ? "(Private)" : ""}`,
-                value: loadout.name.replace(`${username}'s `, ""),
+                name: loadout.isPrivate
+                    ? `${username}'s ${loadout.name} (Private)`
+                    : `${username}'s ${loadout.name}`,
+                value: loadout.name,
             }));
 
             if (options.length === 0) {
@@ -61,23 +64,21 @@ export const viewloadout = buildCommand<SlashCommand>({
                 .catch(noop);
         }
     },
+
     async execute(i, r) {
         const inputName = i.options.getString("name", true).trim();
-        const userid = i.user.id;
-        const username = i.user.username;
+        const userId = i.user.id;
 
         if (!inputName) {
             return r.edit(embedComment("Loadout name cannot be empty."));
         }
 
-        const loadoutName = `${username}'s ${inputName}`;
-
         try {
             const loadout = await prisma.loadout.findUnique({
                 where: {
                     user_loadout_unique: {
-                        userId: i.user.id,
-                        name: loadoutName,
+                        userId,
+                        name: inputName,
                     },
                 },
             });
@@ -124,7 +125,7 @@ export const viewloadout = buildCommand<SlashCommand>({
                 .setColor("Blue")
                 .setTitle(`Loadout: ${inputName}`)
                 .setDescription(
-                    `**Creaed By:** <@${userid}>\n**Created At:** ${creationTimeDiscord}`,
+                    `**Created By:** <@${userId}>\n**Created At:** ${creationTimeDiscord}`,
                 )
                 .addFields({
                     name: "Equipped Items",
