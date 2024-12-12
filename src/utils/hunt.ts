@@ -113,7 +113,8 @@ export async function getRandomMonster(
 
     const availableMonsters = monsters.filter(
         (monster) =>
-            adventureRank >= monster.minadventurerank && monster.group !== "Boss",
+            adventureRank >= monster.minadventurerank &&
+            monster.group !== "Boss",
     );
 
     if (!is.array(availableMonsters)) {

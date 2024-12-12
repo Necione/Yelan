@@ -31,6 +31,8 @@ export default {
                 maxDamage: 60,
             },
         ];
-        return stats.find((stat) => stat.adventureRank === adventureRank) || null;
+        return (
+            stats.find((stat) => stat.adventureRank === adventureRank) || null
+        );
     },
 };
