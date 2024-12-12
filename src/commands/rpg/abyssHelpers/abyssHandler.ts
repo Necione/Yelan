@@ -88,7 +88,8 @@ export async function handleAbyssBattle(
         const monster = monstersEncountered[currentMonsterIndex];
 
         const abyssadventureRank = stats.currentAbyssFloor === 2 ? 15 : 10;
-        const monsterStats = monster.getStatsForadventureRank(abyssadventureRank);
+        const monsterStats =
+            monster.getStatsForadventureRank(abyssadventureRank);
 
         if (!monsterStats) {
             throw new Error(`Stats not found for monster: ${monster.name}`);

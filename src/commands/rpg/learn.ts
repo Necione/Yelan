@@ -85,7 +85,9 @@ export const learn = buildCommand<SlashCommand>({
             );
         }
 
-        if (stats.adventureRank < (skillData.requirements?.adventureRank || 0)) {
+        if (
+            stats.adventureRank < (skillData.requirements?.adventureRank || 0)
+        ) {
             missingRequirements.push(
                 `**Adventure Rank**: You need to be at least **Adventure Rank ${skillData.requirements?.adventureRank}**.`,
             );

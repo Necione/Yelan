@@ -173,7 +173,10 @@ export const expedition = buildCommand<SlashCommand>({
                         });
 
                         const adventureRank = stats.adventureRank;
-                        const chest = generateChestLoot(adventureRank, itemsCount);
+                        const chest = generateChestLoot(
+                            adventureRank,
+                            itemsCount,
+                        );
 
                         await addBalance(
                             i.user.id,

@@ -241,7 +241,9 @@ export async function handleHunt(
             monster.name,
             stats.location,
         );
-        const monsterStats = monster.getStatsForadventureRank(stats.adventureRank);
+        const monsterStats = monster.getStatsForadventureRank(
+            stats.adventureRank,
+        );
         if (!monsterStats) {
             throw new Error(`Stats not found for monster: ${monster.name}`);
         }
