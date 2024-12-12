@@ -1,14 +1,17 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, noop } from "@elara-services/utils";
-import type { UserStats } from "@prisma/client";
 import { SlashCommandBuilder } from "discord.js";
 import { prisma } from "../../prisma";
-import { getUserStats, syncStats } from "../../services";
+import {
+    getUserStats,
+    loadouts,
+    syncStats,
+    updateUserStats,
+} from "../../services";
 import {
     calculateStatChanges,
     getSetBonusMessages,
 } from "../../utils/artifactHelper";
-
 
 export const load = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -29,16 +32,18 @@ export const load = buildCommand<SlashCommand>({
         const userId = i.user.id;
         const username = i.user.username;
 
-        const loadouts = await prisma.loadout.findMany({
-            where: {
-                userId,
-                name: {
-                    contains: input,
-                    mode: "insensitive",
+        const loadouts = await prisma.loadout
+            .findMany({
+                where: {
+                    userId,
+                    name: {
+                        contains: input,
+                        mode: "insensitive",
+                    },
                 },
-            },
-            take: 25,
-        }).catch(() => []);
+                take: 25,
+            })
+            .catch(() => []);
 
         const options = loadouts.map((loadout) => ({
             name: loadout.isPrivate
@@ -62,20 +67,9 @@ export const load = buildCommand<SlashCommand>({
         if (!inputName) {
             return r.edit(embedComment("Loadout name cannot be empty."));
         }
-
-        const loadout = await prisma.loadout.findUnique({
-            where: {
-                user_loadout_unique: {
-                    userId: i.user.id,
-                    name: inputName,
-                },
-            },
-        }).catch(noop);
-
+        const loadout = await loadouts.get(i.user, inputName);
         if (!loadout) {
-            return r.edit(
-                embedComment(`Loadout **${inputName}** not found.`),
-            );
+            return r.edit(embedComment(`Loadout **${inputName}** not found.`));
         }
 
         const stats = await getUserStats(userId);
@@ -94,7 +88,6 @@ export const load = buildCommand<SlashCommand>({
             loadout.equippedCirclet,
         ].filter(Boolean) as string[];
 
-
         if (!is.array(itemsToEquip)) {
             return r.edit(
                 embedComment("The selected loadout has no items to equip."),
@@ -103,8 +96,7 @@ export const load = buildCommand<SlashCommand>({
 
         const hasAllItems = itemsToEquip.every((item) =>
             stats.inventory.some(
-                (invItem) =>
-                    invItem.item.toLowerCase() === item.toLowerCase(),
+                (invItem) => invItem.item.toLowerCase() === item.toLowerCase(),
             ),
         );
 
@@ -122,38 +114,32 @@ export const load = buildCommand<SlashCommand>({
             );
         }
 
-        await prisma.userStats.update({
-            where: { userId },
-            data: {
-                equippedWeapon: loadout.equippedWeapon
-                    ? { set: loadout.equippedWeapon }
-                    : { set: null },
-                equippedFlower: loadout.equippedFlower
-                    ? { set: loadout.equippedFlower }
-                    : { set: null },
-                equippedPlume: loadout.equippedPlume
-                    ? { set: loadout.equippedPlume }
-                    : { set: null },
-                equippedSands: loadout.equippedSands
-                    ? { set: loadout.equippedSands }
-                    : { set: null },
-                equippedGoblet: loadout.equippedGoblet
-                    ? { set: loadout.equippedGoblet }
-                    : { set: null },
-                equippedCirclet: loadout.equippedCirclet
-                    ? { set: loadout.equippedCirclet }
-                    : { set: null },
-            },
-        }).catch(noop);
+        await updateUserStats(userId, {
+            equippedWeapon: loadout.equippedWeapon
+                ? { set: loadout.equippedWeapon }
+                : { set: null },
+            equippedFlower: loadout.equippedFlower
+                ? { set: loadout.equippedFlower }
+                : { set: null },
+            equippedPlume: loadout.equippedPlume
+                ? { set: loadout.equippedPlume }
+                : { set: null },
+            equippedSands: loadout.equippedSands
+                ? { set: loadout.equippedSands }
+                : { set: null },
+            equippedGoblet: loadout.equippedGoblet
+                ? { set: loadout.equippedGoblet }
+                : { set: null },
+            equippedCirclet: loadout.equippedCirclet
+                ? { set: loadout.equippedCirclet }
+                : { set: null },
+        });
         const updatedStats = await syncStats(userId);
 
-        const statChanges = calculateStatChanges(
-            stats,
-            updatedStats as UserStats,
-        );
+        const statChanges = calculateStatChanges(stats, updatedStats);
         const setBonusMessages = getSetBonusMessages(
             stats,
-            updatedStats as UserStats,
+            updatedStats,
             "activated",
         );
 

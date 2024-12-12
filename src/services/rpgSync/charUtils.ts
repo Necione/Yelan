@@ -1,4 +1,4 @@
-import { make } from "@elara-services/utils";
+import { make, noop } from "@elara-services/utils";
 import type { Prisma, UserCharacter } from "@prisma/client";
 import { prisma } from "../../prisma";
 import { calculateSetBonuses } from "../../utils/artifactHelper";
@@ -25,17 +25,11 @@ interface CharacterStats {
 export async function getCharacterById(
     characterId: string,
 ): Promise<UserCharacter | null> {
-    try {
-        return await prisma.userCharacter.findUnique({
+    return await prisma.userCharacter
+        .findUnique({
             where: { id: characterId },
-        });
-    } catch (error) {
-        console.error(
-            `Error fetching character with ID "${characterId}":`,
-            error,
-        );
-        return null;
-    }
+        })
+        .catch(noop);
 }
 
 export async function syncCharacter(
@@ -174,32 +168,23 @@ export async function syncCharacter(
 export async function getUserCharacters(
     userId: string,
 ): Promise<UserCharacter[]> {
-    try {
-        return await prisma.userCharacter.findMany({
+    return await prisma.userCharacter
+        .findMany({
             where: { userId },
-        });
-    } catch (error) {
-        console.error(`Error fetching characters for user "${userId}":`, error);
-        return [];
-    }
+        })
+        .catch(() => []);
 }
 
 export async function updateUserCharacter(
     characterId: string,
     data: Prisma.UserCharacterUpdateInput,
 ): Promise<UserCharacter | null> {
-    try {
-        return await prisma.userCharacter.update({
+    return await prisma.userCharacter
+        .update({
             where: { id: characterId },
             data,
-        });
-    } catch (error) {
-        console.error(
-            `Error updating character with ID "${characterId}":`,
-            error,
-        );
-        return null;
-    }
+        })
+        .catch(noop);
 }
 
 function applySetBonuses(
@@ -241,16 +226,15 @@ function applySetBonuses(
 
 export async function createDefaultCharacterForUser(
     userId: string,
-    characterName: string = "Amber",
+    characterName = "Amber",
 ): Promise<UserCharacter | null> {
     const characterData = chars[characterName];
     if (!characterData) {
         console.error(`Character data for "${characterName}" not found.`);
         return null;
     }
-
-    try {
-        return await prisma.userCharacter.create({
+    return await prisma.userCharacter
+        .create({
             data: {
                 userId,
                 name: characterName,
@@ -274,12 +258,6 @@ export async function createDefaultCharacterForUser(
                 maxMana: 20,
                 expedition: false,
             },
-        });
-    } catch (error) {
-        console.error(
-            `Error creating default character for user "${userId}":`,
-            error,
-        );
-        return null;
-    }
+        })
+        .catch(noop);
 }

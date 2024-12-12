@@ -1,5 +1,6 @@
 import { is, make, noop, snowflakes } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
+import type { User } from "discord.js";
 import { prisma } from "../../prisma";
 import { calculateMasteryLevel } from "../../utils/masteryHelper";
 import type {
@@ -377,4 +378,30 @@ export const removeItemFromInventory = async (
             set: inventory,
         },
     });
+};
+
+export const loadouts = {
+    get: async (user: string | User, name: string) => {
+        return await prisma.loadout
+            .findUnique({
+                where: {
+                    user_loadout_unique: {
+                        userId: is.string(user) ? user : user.id,
+                        name,
+                    },
+                },
+            })
+            .catch(noop);
+    },
+    update: async (id: string, data: Prisma.LoadoutUpdateInput) => {
+        return await prisma.loadout
+            .update({
+                where: { id },
+                data,
+            })
+            .catch(noop);
+    },
+    create: async (data: Prisma.LoadoutCreateInput) => {
+        return await prisma.loadout.create({ data }).catch(noop);
+    },
 };
