@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import { embedComment, is, noop } from "@elara-services/utils";
 import type { UserStats } from "@prisma/client";
 import { SlashCommandBuilder } from "discord.js";
 import { prisma } from "../../prisma";
@@ -49,7 +49,7 @@ export const load = buildCommand<SlashCommand>({
                 value: loadout.name,
             }));
 
-            if (options.length === 0) {
+            if (!is.array) {
                 return i
                     .respond([{ name: "No loadouts found.", value: "n/a" }])
                     .catch(noop);
@@ -64,7 +64,7 @@ export const load = buildCommand<SlashCommand>({
         }
     },
     async execute(i, r) {
-        const inputName = i.options.getString("name", true).trim();
+        const inputName = i.options.getString("name", true)
         const userId = i.user.id;
 
         if (!inputName) {
