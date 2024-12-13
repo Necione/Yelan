@@ -293,6 +293,22 @@ export async function playerAttack(
         );
     }
 
+    const spiceLevelData = getUserSkillLevelData(stats, "Spice");
+
+    if (spiceLevelData) {
+        const levelData = spiceLevelData.levelData || {};
+        const damageBonus = levelData.damageBonus || 0;
+
+        const spiceDamageBonus = monster.currentHp * damageBonus;
+        currentMonsterHp -= spiceDamageBonus;
+
+        messages.push(
+            `\`🌶️\` You dealt an additional \`${spiceDamageBonus.toFixed(
+                2,
+            )}\` bonus damage with the Spice skill`,
+        );
+    }
+
     if (
         has("Machine", monster, true) &&
         currentMonsterHp <= 0 &&

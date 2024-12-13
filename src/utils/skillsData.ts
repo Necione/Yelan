@@ -7,6 +7,7 @@ export type SkillName =
     | "Totem"
     | "Insomnia"
     | "Kindle"
+    | "Spice"
     | "Scrounge"
     | "Energize"
     | "Lure"
@@ -50,7 +51,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Attack twice at the start of battle, the second attack dealing **25%** of your ATK",
+                    "Attack twice at the start of battle, the second attack dealing **25%** of your ATK.",
                 levelData: {
                     secondAttackPercentage: 0.25,
                 },
@@ -58,7 +59,7 @@ export const skills = make.array<Skill>([
             {
                 level: 2,
                 description:
-                    "Attack twice at the start of battle, the second attack dealing **50%** of your ATK",
+                    "Attack twice at the start of battle, the second attack dealing **50%** of your ATK.",
                 levelData: {
                     secondAttackPercentage: 0.5,
                 },
@@ -66,7 +67,7 @@ export const skills = make.array<Skill>([
             {
                 level: 3,
                 description:
-                    "Attack twice at the start of battle, the second attack dealing **70%** of your ATK",
+                    "Attack twice at the start of battle, the second attack dealing **70%** of your ATK.",
                 levelData: {
                     secondAttackPercentage: 0.7,
                 },
@@ -89,7 +90,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Gain **5%** lifesteal from each enemy's Max HP **40%** of the time",
+                    "Gain **5%** lifesteal from each enemy's Max HP **40%** of the time.",
                 levelData: {
                     lifestealPercentage: 0.05,
                     triggerChance: 0.25,
@@ -98,7 +99,7 @@ export const skills = make.array<Skill>([
             {
                 level: 2,
                 description:
-                    "Gain **10%** lifesteal from each enemy's Max HP **50%** of the time",
+                    "Gain **10%** lifesteal from each enemy's Max HP **50%** of the time.",
                 levelData: {
                     lifestealPercentage: 0.1,
                     triggerChance: 0.5,
@@ -107,7 +108,7 @@ export const skills = make.array<Skill>([
             {
                 level: 3,
                 description:
-                    "Gain **13%** lifesteal from each enemy's Max HP **55%** of the time",
+                    "Gain **13%** lifesteal from each enemy's Max HP **55%** of the time.",
                 levelData: {
                     lifestealPercentage: 0.13,
                     triggerChance: 0.55,
@@ -161,7 +162,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Reduce your hunt cooldown from 30 minutes to **20 minutes**",
+                    "Reduce your hunt cooldown from 30 minutes to **20 minutes**.",
                 levelData: {
                     cooldown: 20,
                 },
@@ -169,7 +170,7 @@ export const skills = make.array<Skill>([
             {
                 level: 2,
                 description:
-                    "Reduce your hunt cooldown from 20 minutes to **15 minutes**",
+                    "Reduce your hunt cooldown from 20 minutes to **15 minutes**.",
                 levelData: {
                     cooldown: 15,
                 },
@@ -192,7 +193,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Deal **10%** of your Max HP as bonus damage per turn",
+                    "Deal **10%** of your Max HP as bonus damage per turn.",
                 levelData: {
                     damageBonus: 0.1,
                 },
@@ -200,7 +201,7 @@ export const skills = make.array<Skill>([
             {
                 level: 2,
                 description:
-                    "Deal **15%** of your Max HP as bonus damage per turn",
+                    "Deal **15%** of your Max HP as bonus damage per turn.",
                 levelData: {
                     damageBonus: 0.15,
                 },
@@ -208,7 +209,7 @@ export const skills = make.array<Skill>([
             {
                 level: 3,
                 description:
-                    "Deal **25%** of your Max HP as bonus damage per turn",
+                    "Deal **25%** of your Max HP as bonus damage per turn.",
                 levelData: {
                     damageBonus: 0.25,
                 },
@@ -231,7 +232,7 @@ export const skills = make.array<Skill>([
         levels: [
             {
                 level: 1,
-                description: "In addition to drops, earn coins per hunt",
+                description: "In addition to drops, earn coins per hunt.",
             },
         ],
         emoji: "💸",
@@ -251,7 +252,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Reduce your explore cooldown from 30 minutes to **20 minutes**",
+                    "Reduce your explore cooldown from 30 minutes to **20 minutes**.",
                 levelData: {
                     cooldown: 20,
                 },
@@ -259,7 +260,7 @@ export const skills = make.array<Skill>([
             {
                 level: 2,
                 description:
-                    "Reduce your explore cooldown from 20 minutes to **15 minutes**",
+                    "Reduce your explore cooldown from 20 minutes to **15 minutes**.",
                 levelData: {
                     cooldown: 15,
                 },
@@ -282,7 +283,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Reduce your explore cooldown from 1 hour to **30 minutes**",
+                    "Reduce your explore cooldown from 1 hour to **30 minutes**.",
                 levelData: {
                     cooldown: 30,
                 },
@@ -290,7 +291,7 @@ export const skills = make.array<Skill>([
             {
                 level: 2,
                 description:
-                    "Reduce your explore cooldown from 1 hour to **20 minutes**",
+                    "Reduce your explore cooldown from 1 hour to **20 minutes**.",
                 levelData: {
                     cooldown: 20,
                 },
@@ -314,21 +315,21 @@ export const skills = make.array<Skill>([
         levels: [
             {
                 level: 1,
-                description: "Go first **75%** of the time when hunting",
+                description: "Go first **75%** of the time when hunting.",
                 levelData: {
                     priority: 0.75,
                 },
             },
             {
                 level: 2,
-                description: "Go first **80%** of the time when hunting",
+                description: "Go first **80%** of the time when hunting.",
                 levelData: {
                     priority: 0.8,
                 },
             },
             {
                 level: 3,
-                description: "Go first **95%** of the time when hunting",
+                description: "Go first **95%** of the time when hunting.",
                 levelData: {
                     priority: 0.95,
                 },
@@ -347,7 +348,7 @@ export const skills = make.array<Skill>([
         levels: [
             {
                 level: 1,
-                description: "Deal 150% more DMG to humans",
+                description: "Deal 150% more DMG to humans.",
             },
         ],
         emoji: "🔪",
@@ -367,7 +368,7 @@ export const skills = make.array<Skill>([
         levels: [
             {
                 level: 1,
-                description: "Earn 150% more EXP at the end of each battle",
+                description: "Earn 150% more EXP at the end of each battle.",
             },
         ],
         emoji: "🌱",
@@ -387,7 +388,7 @@ export const skills = make.array<Skill>([
         levels: [
             {
                 level: 1,
-                description: "Monsters deal more DMG early, but less later on",
+                description: "Monsters deal more DMG early, but less later on.",
             },
         ],
         emoji: "🐌",
@@ -408,7 +409,7 @@ export const skills = make.array<Skill>([
         levels: [
             {
                 level: 1,
-                description: "Monsters deal less DMG early, but more later on",
+                description: "Monsters deal less DMG early, but more later on.",
             },
         ],
         emoji: "🧊",
@@ -429,7 +430,7 @@ export const skills = make.array<Skill>([
         levels: [
             {
                 level: 1,
-                description: "Deal more damage at lower HP",
+                description: "Deal more damage at lower HP.",
             },
         ],
         emoji: "💪",
@@ -471,7 +472,7 @@ export const skills = make.array<Skill>([
         levels: [
             {
                 level: 1,
-                description: "Start each round with 125% your current HP",
+                description: "Start each round with 125% your current HP.",
             },
         ],
         emoji: "💤",
@@ -493,7 +494,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Deal 150% more DMG, start each round with 25% less HP",
+                    "Deal 150% more DMG, start each round with 25% less HP.",
             },
         ],
         emoji: "💢",
@@ -505,6 +506,39 @@ export const skills = make.array<Skill>([
                 { item: "Crystal Prism", amount: 10 },
                 { item: "Slime Concentrate", amount: 20 },
                 { item: "Life Essence", amount: 5 },
+            ],
+        },
+    },
+    {
+        name: "Spice",
+        passive: false,
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Deal **10%** of the monster's HP as bonus damage per turn.",
+                levelData: {
+                    damageBonus: 0.1,
+                },
+            },
+            {
+                level: 2,
+                description:
+                    "Deal **20%** of the monster's HP as bonus damage per turn.",
+                levelData: {
+                    damageBonus: 0.2,
+                },
+            },
+        ],
+        emoji: "🌶️",
+        requirements: {
+            adventureRank: 20,
+            rebirthsRequired: 4,
+            coins: 750,
+            items: [
+                { item: "Lieutenant's Insignia", amount: 5 },
+                { item: "Chaos Oculus", amount: 5 },
+                { item: "Operative's Standard Pocket Watch", amount: 5 },
             ],
         },
     },

@@ -591,7 +591,6 @@ export const artifacts = {
         minadventurerank: 13,
         chestChance: 3,
     },
-
     "Thunderbird's Mercy": {
         type: "Flower",
         artifactSet: "Thundering Fury",
