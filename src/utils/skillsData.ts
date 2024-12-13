@@ -283,7 +283,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Reduce your explore cooldown from 1 hour to **30 minutes**.",
+                    "Reduce your fishing cooldown from 1 hour to **30 minutes**.",
                 levelData: {
                     cooldown: 30,
                 },
@@ -291,7 +291,7 @@ export const skills = make.array<Skill>([
             {
                 level: 2,
                 description:
-                    "Reduce your explore cooldown from 1 hour to **20 minutes**.",
+                    "Reduce your fishing cooldown from 1 hour to **20 minutes**.",
                 levelData: {
                     cooldown: 20,
                 },
