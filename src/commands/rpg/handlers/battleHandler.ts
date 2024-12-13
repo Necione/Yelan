@@ -493,7 +493,12 @@ export async function monsterAttack(
         );
     }
 
-    if (monster.element === MonsterElement.Electro && Math.random() < 0.5) {
+    if (
+        monster.element === MonsterElement.Electro &&
+        Math.random() < 0.5 &&
+        equippedWeaponName &&
+        !equippedWeaponName.includes("Everlasting Moonglow")
+    ) {
         const surgeDamage = Math.ceil(monsterDamage * 0.5);
         currentPlayerHp -= surgeDamage;
         messages.push(
@@ -787,6 +792,7 @@ export function checkMonsterDefenses(
     let attackMissed = false;
     let monsterDefended = false;
     let damageReduced = 0;
+    const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
 
     if (has("Agent", monster) && !monsterState.vanishedUsed) {
         attackMissed = true;
@@ -796,14 +802,24 @@ export function checkMonsterDefenses(
         );
     }
 
-    if (monster.element === MonsterElement.Electro && Math.random() < 0.25) {
+    if (
+        monster.element === MonsterElement.Electro &&
+        Math.random() < 0.25 &&
+        equippedWeaponName &&
+        !equippedWeaponName.includes("Everlasting Moonglow")
+    ) {
         messages.push(
             `\`💫\` The ${monster.name} stunned you! You missed your attack`,
         );
         attackMissed = true;
     }
 
-    if (monster.element === MonsterElement.Anemo && Math.random() < 0.25) {
+    if (
+        monster.element === MonsterElement.Anemo &&
+        Math.random() < 0.25 &&
+        equippedWeaponName &&
+        !equippedWeaponName.includes("Everlasting Moonglow")
+    ) {
         messages.push(
             `\`💨\` The ${monster.name} dodged your attack with its Anemo agility`,
         );

@@ -398,6 +398,16 @@ export const info = buildCommand<SlashCommand>({
                 });
             }
 
+            if (
+                fullWeaponName &&
+                fullWeaponName.includes("Everlasting Moonglow")
+            ) {
+                embed.addFields({
+                    name: "Special Effect",
+                    value: "Disable all Anemo and Electro elemental effects.",
+                });
+            }
+
             return r.edit({ embeds: [embed] });
         } else {
             return r.edit(

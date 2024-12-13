@@ -820,6 +820,22 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Memory_of_Dust:1303985604060643359>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/memory_of_dust.png",
     },
+    "Ever­last­ing Moon­glow": {
+        name: "Ever­last­ing Moon­glow",
+        type: "Catalyst",
+        sellPrice: 100,
+        attackPower: 5,
+        critChance: 0,
+        critValue: 0,
+        defValue: -1000,
+        defChance: -100,
+        additionalHP: 2500,
+        minadventurerank: 29,
+        chestChance: 1,
+        emoji: "<:Weapon_Everlasting_Moonglow1:1317048177895014410>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/everlasting_moonglow.png",
+    },
     // Reworking
     "Aqua Simulacra": {
         name: "Aqua Simulacra",
