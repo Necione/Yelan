@@ -544,7 +544,7 @@ export const fishCommand = buildCommand<SlashCommand>({
             const fishingCooldown = lureSkill?.levelData?.cooldown
                 ? get.mins(lureSkill.levelData.cooldown)
                 : get.hrs(1);
-            await cooldowns.set(user, "lure", fishingCooldown);
+            await cooldowns.set(user, "fish", fishingCooldown);
 
             locked.del(i.user.id);
 

@@ -12,6 +12,7 @@ export type SkillName =
     | "Energize"
     | "Lure"
     | "Distraction"
+    | "Taunt"
     | "Backstab"
     | "Crystallize"
     | "Growth"
@@ -441,6 +442,27 @@ export const skills = make.array<Skill>([
             items: [
                 { item: "Rich Red Brocade", amount: 5 },
                 { item: "Golden Raven Insignia", amount: 5 },
+                { item: "Slime Concentrate", amount: 10 },
+            ],
+        },
+    },
+    {
+        name: "Taunt",
+        passive: false,
+        levels: [
+            {
+                level: 1,
+                description: "Encounter 1 more monster per hunt.",
+            },
+        ],
+        emoji: "🎷",
+        requirements: {
+            adventureRank: 15,
+            rebirthsRequired: 3,
+            coins: 750,
+            items: [
+                { item: "Ley Line Sprout", amount: 5 },
+                { item: "Weathered Arrowhead", amount: 3 },
                 { item: "Slime Concentrate", amount: 10 },
             ],
         },

@@ -28,6 +28,7 @@ const upgradeChains = make.array<DropName[]>([
     ["A Flower Yet to Bloom", "Treasured Flower", "Wanderer's Blooming Flower"],
     ["Faded Red Satin", "Trimmed Red Silk", "Rich Red Brocade"],
     ["Old Handguard", "Kageuchi Handguard", "Famed Handguard"],
+    ["Recruit's Insignia", "Sergeant's Insignia", "Lieutenant's Insignia"],
 ]);
 
 export const craft = buildCommand<SlashCommand>({

@@ -108,7 +108,7 @@ export async function handleHunt(
         bossName = bossEncounters[currentadventureRank];
     }
 
-    const numberOfMonsters = isBossEncounter
+    let numberOfMonsters = isBossEncounter
         ? 1
         : stats.adventureRank <= 5
           ? 1
@@ -125,6 +125,12 @@ export async function handleHunt(
                     ? 2
                     : 3
                 : 3;
+
+    const tauntSkill = getUserSkillLevelData(stats, "Taunt");
+
+    if (tauntSkill && tauntSkill.level > 0) {
+        numberOfMonsters += 1;
+    }
 
     const monstersEncountered = is.array(selectedMonsters)
         ? selectedMonsters
@@ -369,6 +375,10 @@ export async function handleHunt(
         let turnNumber = 1;
 
         const startingMessages = make.array<string>();
+
+        if (tauntSkill && tauntSkill.level > 0) {
+            startingMessages.push("`🎷` The **Taunt** skill is active");
+        }
 
         if (isWieldingPolearm && polearmMasteryLevel >= 1) {
             startingMessages.push(
