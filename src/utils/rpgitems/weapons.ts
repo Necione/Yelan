@@ -820,8 +820,8 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Memory_of_Dust:1303985604060643359>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/memory_of_dust.png",
     },
-    "Ever­last­ing Moon­glow": {
-        name: "Ever­last­ing Moon­glow",
+    "Everlasting Moonglow": {
+        name: "Everlasting Moonglow",
         type: "Catalyst",
         sellPrice: 100,
         attackPower: 5,
