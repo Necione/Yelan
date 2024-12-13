@@ -16,6 +16,7 @@ export type MonsterState = {
     stunned?: boolean;
     poisoned?: boolean;
     shieldUsed?: boolean;
+    dendroAttackMultiplier?: number;
 };
 
 export function getDeathThreshold(stats: UserStats): number {
@@ -382,6 +383,18 @@ export async function monsterAttack(
             break;
         default:
             break;
+    }
+
+    if (monster.element === MonsterElement.Dendro) {
+        if (monsterState.dendroAttackMultiplier) {
+            monsterState.dendroAttackMultiplier *= 1.1;
+        } else {
+            monsterState.dendroAttackMultiplier = 1.1;
+        }
+        monsterDamage *= monsterState.dendroAttackMultiplier;
+        messages.push(
+            `\`🍁\` The ${monster.name}'s **Dendro** element increases its attack power by __10%__`,
+        );
     }
 
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
