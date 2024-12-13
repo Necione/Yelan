@@ -23,6 +23,7 @@ import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { type FishData, fishList } from "../../utils/rpgitems/fish";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
+import { getUserSkillLevelData } from "../../utils/skillsData";
 import {
     calculateFishingLevel,
     selectFish,
@@ -538,7 +539,12 @@ export const fishCommand = buildCommand<SlashCommand>({
 
             await r.edit({ embeds: [caughtEmbed], components: [] }).catch(noop);
 
-            await cooldowns.set(user, "fish", get.hrs(1));
+            const lureSkill = getUserSkillLevelData(stats, "Lure");
+
+            const fishingCooldown = lureSkill?.levelData?.cooldown
+                ? get.mins(lureSkill.levelData.cooldown)
+                : get.hrs(1);
+            await cooldowns.set(user, "lure", fishingCooldown);
 
             locked.del(i.user.id);
 

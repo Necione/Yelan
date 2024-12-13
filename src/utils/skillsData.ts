@@ -9,6 +9,7 @@ export type SkillName =
     | "Kindle"
     | "Scrounge"
     | "Energize"
+    | "Lure"
     | "Distraction"
     | "Backstab"
     | "Crystallize"
@@ -271,6 +272,39 @@ export const skills = make.array<Skill>([
             items: [
                 { item: "Ominous Mask", amount: 5 },
                 { item: "Sealed Scroll", amount: 10 },
+            ],
+        },
+    },
+    {
+        name: "Lure",
+        passive: true,
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Reduce your explore cooldown from 1 hour to **30 minutes**",
+                levelData: {
+                    cooldown: 30,
+                },
+            },
+            {
+                level: 2,
+                description:
+                    "Reduce your explore cooldown from 1 hour to **20 minutes**",
+                levelData: {
+                    cooldown: 20,
+                },
+            },
+        ],
+        emoji: "🎣",
+        requirements: {
+            adventureRank: 5,
+            rebirthsRequired: 1,
+            coins: 500,
+            items: [
+                { item: "Fish", amount: 5 },
+                { item: "Sugardew Bait", amount: 10 },
+                { item: "Redrot Bait", amount: 10 },
             ],
         },
     },
