@@ -17,6 +17,7 @@ export type MonsterState = {
     poisoned?: boolean;
     shieldUsed?: boolean;
     dendroAttackMultiplier?: number;
+    isEnraged?: boolean;
 };
 
 export function getDeathThreshold(stats: UserStats): number {
@@ -383,6 +384,16 @@ export async function monsterAttack(
             break;
         default:
             break;
+    }
+
+    if (turnNumber > 50) {
+        if (!monsterState.isEnraged) {
+            monsterState.isEnraged = true;
+            monsterDamage *= 2;
+            messages.push(`\`🐲\` The ${monster.name} has become **enraged**`);
+        } else {
+            monsterDamage *= 2;
+        }
     }
 
     if (monster.element === MonsterElement.Dendro) {
