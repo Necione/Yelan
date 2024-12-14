@@ -1,6 +1,7 @@
-import { noop } from "@elara-services/utils";
+import { is, noop, status } from "@elara-services/utils";
 import { Webhook, type sendOptions } from "@elara-services/webhooks";
 import type { UserStats } from "@prisma/client";
+import type { TextBasedChannel } from "discord.js";
 import client from "../../client";
 import type { SkillName } from "../../utils/skillsData";
 import {
@@ -9,7 +10,18 @@ import {
 } from "../../utils/specialSkills";
 let hook: Webhook;
 
-export async function sendToChannel(id: string, options: sendOptions) {
+export async function sendToChannel(
+    channel: TextBasedChannel | string,
+    options: sendOptions,
+) {
+    const id = is.string(channel)
+        ? channel
+        : "id" in channel && channel.id
+          ? channel.id
+          : null;
+    if (!id) {
+        return status.error(`No channelId found for "sendToChannel"`);
+    }
     if (!hook) {
         hook = new Webhook(process.env.TOKEN as string);
     }

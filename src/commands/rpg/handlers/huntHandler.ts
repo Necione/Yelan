@@ -1,10 +1,12 @@
 import {
+    colors,
     embedComment,
     get,
     getMessageResponder,
     getRandomValue,
     is,
     make,
+    ms,
     noop,
     sleep,
 } from "@elara-services/utils";
@@ -76,6 +78,7 @@ export async function handleHunt(
     selectedMonstersByName?: string[],
     handlers?: HuntHandlers,
 ) {
+    const start = Date.now();
     let selectedMonsters = make.array<Monster>();
     if (is.array(selectedMonstersByName)) {
         selectedMonsters = await getMonstersByName(selectedMonstersByName);
@@ -404,8 +407,13 @@ export async function handleHunt(
                 });
             }
         }
-
+        let endedByTime = false;
+        const timeBy = get.mins(10);
         while (currentPlayerHp > deathThreshold && currentMonsterHp > 0) {
+            if (Date.now() - start >= timeBy) {
+                endedByTime = true;
+                break;
+            }
             if (isPlayerTurn) {
                 const playerMessages = make.array<string>();
 
@@ -526,6 +534,38 @@ export async function handleHunt(
             }
 
             turnNumber++;
+        }
+        if (endedByTime) {
+            await updateUserStats(stats.userId, { isHunting: false });
+            try {
+                await cooldowns.del(
+                    await getProfileByUserId(stats.userId),
+                    "hunt",
+                );
+            } catch {
+                /* empty */
+            }
+            if (thread) {
+                await sendToChannel(thread.id, {
+                    content: `>>> 🛑 Ended due to being over ${ms.convert(
+                        timeBy / 1000,
+                    )} in battle.`,
+                });
+                await sleep(get.secs(2));
+                await thread.edit({ archived: true, locked: true }).catch(noop);
+            }
+            battleEmbed.setColor(colors.red).setFields([
+                {
+                    name: "Hunt Ended",
+                    value: `Due to the hunt being above ${ms.convert(
+                        timeBy / 1000,
+                    )} in battle.`,
+                },
+            ]);
+            await message
+                .edit({ embeds: [battleEmbed], components: [] })
+                .catch(noop);
+            return;
         }
 
         if (currentPlayerHp > deathThreshold) {
