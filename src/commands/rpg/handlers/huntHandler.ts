@@ -201,7 +201,7 @@ export async function handleHunt(
             const actualMutationChance = Math.min(mutationChance, 100);
 
             let preventMutation = false;
-            if (isWieldingPolearm && polearmMasteryLevel >= 4) {
+            if (isWieldingPolearm && polearmMasteryLevel >= 5) {
                 preventMutation = true;
             }
 

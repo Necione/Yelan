@@ -116,11 +116,11 @@ export const masteryBenefits: Record<
             specialSkill: "Thrust",
         },
         4: {
-            description:
-                "Never encounter mutated monsters when wielding the Polearm.",
+            description: "Deal 200% damage when wielding the Polearm.",
         },
         5: {
-            description: "Deal 200% damage when wielding the Polearm.",
+            description:
+                "Never encounter mutated monsters when wielding the Polearm.",
         },
         10: {
             description: "Deal 500% damage when wielding the Polearm.",
