@@ -6,6 +6,7 @@ export * from "./bag";
 export * from "./cook";
 export * from "./craft";
 export * from "./csv";
+export * from "./devtools";
 export * from "./diffuse";
 export * from "./downgrade";
 export * from "./eat";

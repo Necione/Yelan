@@ -1,6 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, get } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
+import { getProfileByUserId } from "../../services";
+import { cooldowns, locked } from "../../utils";
 import { startHunt } from "./handlers/huntHandler";
 
 export const hunt = buildCommand<SlashCommand>({
@@ -19,6 +21,17 @@ export const hunt = buildCommand<SlashCommand>({
                 embedComment("Unable to fetch the original message."),
             );
         }
+
+        const userWallet = await getProfileByUserId(i.user.id);
+        if (!userWallet) {
+            locked.del(i.user.id);
+            return r.edit(
+                embedComment("Unable to find/create your user profile."),
+            );
+        }
+
+        const stuckHelperTime = get.mins(5);
+        await cooldowns.set(userWallet, "stuckHelper", stuckHelperTime);
         await startHunt(message, i.user);
     },
 });
