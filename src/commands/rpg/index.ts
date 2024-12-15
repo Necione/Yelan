@@ -2,6 +2,7 @@ export * from "../other/daily";
 export * from "./abyss";
 export * from "./activate";
 export * from "./alchemy";
+export * from "./ascend";
 export * from "./bag";
 export * from "./cook";
 export * from "./craft";

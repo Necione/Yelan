@@ -884,6 +884,38 @@ const baseWeapons: { [key: string]: WeaponData } = {
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/engulfing_lightning.png",
     },
+    // Ascended Weapons
+    "✪ Harbinger of Dawn": {
+        name: "✪ Harbinger of Dawn",
+        type: "Sword",
+        sellPrice: 30,
+        attackPower: 40,
+        critChance: 35,
+        critValue: 2.5,
+        defValue: 100,
+        defChance: 10,
+        additionalHP: 150,
+        minadventurerank: 20,
+        chestChance: 0,
+        emoji: "<:Weapon_Harbinger_of_Dawn_2nd:1317755526980964423>",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/asc/harbinger_of_dawn.png",
+    },
+    "✪ Messenger": {
+        name: "✪ Messenger",
+        type: "Bow",
+        sellPrice: 30,
+        attackPower: 75,
+        critChance: 15,
+        critValue: 2.75,
+        defValue: -100,
+        defChance: 0,
+        additionalHP: -50,
+        minadventurerank: 20,
+        chestChance: 0,
+        emoji: "<:Weapon_Messenger_2nd:1317756274548408380>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/asc/messenger.png",
+    },
 };
 
 const prefixes: {
