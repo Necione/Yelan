@@ -168,7 +168,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         attackPower: 8,
         critChance: 25,
         critValue: 1.5,
-        defValue: 0,
+        defValue: 0,    
         defChance: 0,
         additionalHP: 20,
         minadventurerank: 6,
@@ -546,7 +546,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     },
     "Lithic Blade": {
         name: "Lithic Blade",
-        type: "Sword",
+        type: "Claymore",
         sellPrice: 30,
         attackPower: 35,
         critChance: -5,
