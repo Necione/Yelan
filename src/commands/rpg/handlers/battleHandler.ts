@@ -309,7 +309,7 @@ export async function playerAttack(
 
     const spiceLevelData = getUserSkillLevelData(stats, "Spice");
 
-    if (spiceLevelData) {
+    if (spiceLevelData && currentMonsterHp > 0) {
         const levelData = spiceLevelData.levelData || {};
         const damageBonus = levelData.damageBonus || 0;
 
