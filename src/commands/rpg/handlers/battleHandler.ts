@@ -87,6 +87,7 @@ export async function playerAttack(
             case "Burn": {
                 const burnDamage = Math.floor(0.5 * currentMonsterHp);
                 currentMonsterHp = Math.max(currentMonsterHp - burnDamage, 0);
+
                 messages.push(
                     `\`🔥\` Burn spell casted! Dealt \`${burnDamage}\` damage to the ${monster.name}`,
                 );
@@ -99,6 +100,7 @@ export async function playerAttack(
                     currentMonsterHp - crippleDamage,
                     0,
                 );
+
                 messages.push(
                     `\`❄️\` Cripple spell casted! Dealt \`${crippleDamage}\` damage to the ${monster.name}`,
                 );
@@ -349,7 +351,6 @@ export async function monsterAttack(
     hasCrystallize: boolean,
     hasFatigue: boolean,
     monsterState: MonsterState,
-    startHP: number,
 ): Promise<{
     currentPlayerHp: number;
     currentMonsterHp: number;
@@ -372,10 +373,10 @@ export async function monsterAttack(
     }
 
     if (monster.element === MonsterElement.Geo && Math.random() < 1) {
-        const regenAmount = Math.ceil(monsterStats.maxHp * 0.1);
+        const regenAmount = Math.ceil(monster.startingHp * 0.1);
         currentMonsterHp = Math.min(
             currentMonsterHp + regenAmount,
-            monsterStats.maxHp,
+            monster.startingHp,
         );
         messages.push(
             `\`🌿\` The ${monster.name} regenerated \`${regenAmount}\` HP!`,
@@ -607,7 +608,6 @@ export async function monsterAttack(
     currentPlayerHp -= reducedMonsterDamage;
 
     const leechLevelData = getUserSkillLevelData(stats, "Leech");
-
     if (leechLevelData && !isFishingMonster(monster)) {
         const levelData = leechLevelData.levelData || {};
 
@@ -617,17 +617,15 @@ export async function monsterAttack(
         const leechTriggered = Math.random() < triggerChance;
 
         if (leechTriggered) {
-            let healAmount = Math.ceil(
-                monsterStats.maxHp * lifestealPercentage,
+            const healAmount = Math.ceil(
+                monster.startingHp * lifestealPercentage,
             );
+
             currentPlayerHp = Math.min(
                 currentPlayerHp + healAmount,
                 stats.maxHP,
             );
-            if (currentPlayerHp > startHP) {
-                healAmount = Math.floor(currentPlayerHp - startHP);
-                currentPlayerHp = startHP;
-            }
+
             messages.push(
                 `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}`,
             );

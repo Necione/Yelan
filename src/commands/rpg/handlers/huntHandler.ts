@@ -167,7 +167,7 @@ export async function handleHunt(
     }
 
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
-    const startHP = parseInt(`${currentPlayerHp}`);
+
     if (!is.array(selectedMonsters)) {
         for (let encounter = 0; encounter < numberOfMonsters; encounter++) {
             let monster: Monster | null;
@@ -267,6 +267,8 @@ export async function handleHunt(
         }
 
         const initialMonsterHp = currentMonsterHp;
+        monster.startingHp = initialMonsterHp;
+
         const initialPlayerHp = currentPlayerHp;
 
         const createHealthBar = (
@@ -481,7 +483,6 @@ export async function handleHunt(
                     hasCrystallize,
                     hasFatigue,
                     monsterState,
-                    startHP,
                 ));
 
                 if (is.array(monsterMessages)) {
