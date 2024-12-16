@@ -83,19 +83,6 @@ export async function syncStats(userId: string) {
         totalStats.defValue += weapon.defValue || 0;
         totalStats.maxHP += weapon.additionalHP || 0;
         totalStats.healEffectiveness || 0;
-
-        if (weapon.type === "Sword") {
-            const swordMasteryPoints = stats.masterySword || 0;
-            const { numericLevel } = calculateMasteryLevel(swordMasteryPoints);
-
-            if (numericLevel >= 4) {
-                totalStats.critChance += 10;
-            }
-
-            if (numericLevel >= 5) {
-                totalStats.critValue += totalStats.critValue * 0.1;
-            }
-        }
     }
 
     const artifactTypes = make.array<ArtifactType>([
@@ -144,6 +131,36 @@ export async function syncStats(userId: string) {
             if (count >= 4) {
                 const bonus4pc = setBonuses["4pc"];
                 applySetBonuses(totalStats, bonus4pc);
+            }
+        }
+    }
+
+    if (stats.equippedWeapon && weapons[stats.equippedWeapon as WeaponName]) {
+        const weapon = weapons[stats.equippedWeapon as WeaponName];
+
+        if (weapon.type === "Sword") {
+            const swordMasteryPoints = stats.masterySword || 0;
+            const { numericLevel } = calculateMasteryLevel(swordMasteryPoints);
+
+            if (numericLevel >= 4) {
+                totalStats.critChance += 10;
+            }
+
+            if (numericLevel >= 5) {
+                totalStats.critValue += totalStats.critValue * 0.1;
+            }
+        }
+
+        if (weapon.type === "Claymore") {
+            const claymoreMasteryPoints = stats.masteryClaymore || 0;
+            const { numericLevel } = calculateMasteryLevel(
+                claymoreMasteryPoints,
+            );
+
+            if (numericLevel >= 5) {
+                totalStats.defValue += totalStats.defValue * 0.5;
+            } else if (numericLevel >= 4) {
+                totalStats.defValue += totalStats.defValue * 0.25;
             }
         }
     }

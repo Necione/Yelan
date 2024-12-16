@@ -18,6 +18,7 @@ export type MonsterState = {
     shieldUsed?: boolean;
     dendroAttackMultiplier?: number;
     isEnraged?: boolean;
+    fortressUsed?: boolean;
 };
 
 export function getDeathThreshold(stats: UserStats): number {
@@ -344,6 +345,10 @@ export async function monsterAttack(
     currentPlayerHp: number;
     currentMonsterHp: number;
 }> {
+    if (typeof monsterState.fortressUsed === "undefined") {
+        monsterState.fortressUsed = false;
+    }
+
     if (monsterState.stunned) {
         messages.push(
             `\`💫\` The ${monster.name} is stunned and couldn't attack this turn`,
@@ -592,11 +597,6 @@ export async function monsterAttack(
 
     currentPlayerHp -= reducedMonsterDamage;
 
-    const deathThreshold = getDeathThreshold(stats);
-    if (currentPlayerHp < deathThreshold) {
-        currentPlayerHp = deathThreshold;
-    }
-
     const leechLevelData = getUserSkillLevelData(stats, "Leech");
 
     if (leechLevelData && !isFishingMonster(monster)) {
@@ -626,6 +626,21 @@ export async function monsterAttack(
     }
 
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP);
+
+    const deathThreshold = getDeathThreshold(stats);
+
+    if (currentPlayerHp <= deathThreshold) {
+        if (skills.has(stats, "Fortress") && !monsterState.fortressUsed) {
+            currentPlayerHp = 1;
+            messages.push(
+                "`💀` Fortress skill activated. You should've died this turn",
+            );
+            monsterState.fortressUsed = true;
+        } else {
+            currentPlayerHp = deathThreshold;
+        }
+    }
+
     await updateUserStats(stats.userId, {
         hp: { set: currentPlayerHp },
         activeEffects: { set: stats.activeEffects },
