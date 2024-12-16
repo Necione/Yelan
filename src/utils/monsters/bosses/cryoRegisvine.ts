@@ -1,7 +1,7 @@
 import { MonsterGroup } from "../../monsterHelper";
 
 export default {
-    currentHp: 0,
+    startingHp: 0,
     name: "Cryo Regisvine",
     group: MonsterGroup.Boss,
     minExp: 10,

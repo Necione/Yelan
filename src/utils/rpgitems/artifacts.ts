@@ -394,7 +394,6 @@ export const artifacts = {
         minadventurerank: 6,
         chestChance: 8,
     },
-
     "Maiden's Distant Love": {
         type: "Flower",
         artifactSet: "Maiden Beloved",

@@ -182,7 +182,7 @@ export async function handleHunt(
                     stats.adventureRank,
                     stats.location,
                     {
-                        currentHp: stats.hp,
+                        startingHp: stats.hp,
                         attackPower: stats.attackPower,
                         critChance: stats.critChance,
                         critValue: stats.critValue,

@@ -85,22 +85,31 @@ export async function playerAttack(
             }
 
             case "Burn": {
-                const burnDamage = Math.floor(0.5 * monster.currentHp);
+                const burnDamage = Math.floor(0.5 * currentMonsterHp);
                 currentMonsterHp = Math.max(currentMonsterHp - burnDamage, 0);
                 messages.push(
-                    `\`🔥\` Burn spell casted! Dealt \`${burnDamage} damage\` to the ${monster.name}`,
+                    `\`🔥\` Burn spell casted! Dealt \`${burnDamage}\` damage to the ${monster.name}`,
                 );
                 break;
             }
 
             case "Cripple": {
-                const crippleDamage = Math.floor(0.2 * monster.currentHp);
+                const crippleDamage = Math.floor(0.2 * monster.startingHp);
                 currentMonsterHp = Math.max(
                     currentMonsterHp - crippleDamage,
                     0,
                 );
                 messages.push(
-                    `\`❄️\` Cripple spell casted! Dealt \`${crippleDamage} damage\` to the ${monster.name}`,
+                    `\`❄️\` Cripple spell casted! Dealt \`${crippleDamage}\` damage to the ${monster.name}`,
+                );
+                break;
+            }
+
+            case "Flare": {
+                const flareDamage = currentPlayerHp;
+                currentMonsterHp = Math.max(currentMonsterHp - flareDamage, 0);
+                messages.push(
+                    `\`🎇\` Flare spell casted! Dealt \`${flareDamage}\` damage to the ${monster.name}`,
                 );
                 break;
             }
@@ -177,7 +186,7 @@ export async function playerAttack(
     }
 
     if (monsterState.poisoned) {
-        const poisonDamage = Math.floor(0.2 * monster.currentHp);
+        const poisonDamage = Math.floor(0.2 * monster.startingHp);
         currentMonsterHp = Math.max(currentMonsterHp - poisonDamage, 0);
         messages.push(
             `\`💚\` Poisoned! The ${monster.name} loses \`${poisonDamage} HP\` due to poison`,
@@ -302,7 +311,7 @@ export async function playerAttack(
         const levelData = spiceLevelData.levelData || {};
         const damageBonus = levelData.damageBonus || 0;
 
-        const spiceDamageBonus = monster.currentHp * damageBonus;
+        const spiceDamageBonus = currentMonsterHp * damageBonus;
         currentMonsterHp -= spiceDamageBonus;
 
         messages.push(
@@ -768,7 +777,7 @@ export function applyAttackModifiers(
         }
 
         if (equippedWeaponName.includes("Wolf's Gravestone")) {
-            const hpThreshold = Math.floor(monster.currentHp / 1000);
+            const hpThreshold = Math.floor(monster.startingHp / 1000);
             if (hpThreshold > 0) {
                 const damageMultiplier = 1 + 0.5 * hpThreshold;
                 attackPower *= damageMultiplier;

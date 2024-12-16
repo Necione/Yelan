@@ -3,7 +3,7 @@ import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
-    currentHp: 0,
+    startingHp: 0,
     name: "Pyro Specter",
     group: MonsterGroup.Specter,
     element: MonsterElement.Pyro,

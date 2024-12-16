@@ -1,7 +1,7 @@
 import { MonsterGroup } from "../../monsterHelper";
 
 export default {
-    currentHp: 0,
+    startingHp: 0,
     name: "Rhodeia of Loch",
     group: MonsterGroup.Boss,
     minExp: 40,

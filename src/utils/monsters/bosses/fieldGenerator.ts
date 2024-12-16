@@ -1,7 +1,7 @@
 import { MonsterElement, MonsterGroup } from "../../monsterHelper";
 
 export default {
-    currentHp: 0,
+    startingHp: 0,
     name: "Experimental Field Generator",
     group: MonsterGroup.Boss,
     element: MonsterElement.Geo,

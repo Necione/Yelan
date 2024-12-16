@@ -1,7 +1,7 @@
 import { MonsterGroup } from "../../monsterHelper";
 
 export default {
-    currentHp: 0,
+    startingHp: 0,
     name: "Primo Geovishap",
     group: MonsterGroup.Boss,
     minExp: 75,

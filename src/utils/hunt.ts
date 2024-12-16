@@ -6,7 +6,7 @@ import { type MonsterElement, MonsterGroup } from "./monsterHelper";
 import type { WeaponType } from "./rpgitems/weapons";
 
 export interface Monster {
-    currentHp: number;
+    startingHp: number;
     name: string;
     group: MonsterGroup;
     element: MonsterElement;
@@ -98,7 +98,7 @@ export async function getRandomMonster(
     adventureRank: number,
     location: string,
     playerStats: {
-        currentHp: number;
+        startingHp: number;
         attackPower: number;
         critChance: number;
         critValue: number;
@@ -188,7 +188,7 @@ export async function getRandomMonster(
     if (selectedMonster.name === "Mirror Maiden") {
         const monsterInstance: MonsterInstance = {
             ...selectedMonster,
-            currentHp: playerStats.currentHp,
+            startingHp: playerStats.maxHp,
             minDamage: playerStats.attackPower,
             maxDamage: playerStats.attackPower,
             critChance: playerStats.critChance,
@@ -220,7 +220,7 @@ export async function getRandomMonster(
             maxHp: stats.maxHp,
             minDamage: stats.minDamage,
             maxDamage: stats.maxDamage,
-            currentHp: stats.minHp,
+            startingHp: stats.minHp,
         };
 
         return monsterInstance;
@@ -398,7 +398,7 @@ export async function getMonsterByName(
             maxHp: stats.maxHp,
             minDamage: stats.minDamage,
             maxDamage: stats.maxDamage,
-            currentHp: stats.minHp,
+            startingHp: stats.minHp,
         };
 
         log(

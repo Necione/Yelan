@@ -131,7 +131,7 @@ export const masteryBenefits: Record<
             description: "Increase your Maximum Mana by 10.",
         },
         2: {
-            description: "Unlock the spell `Poison`",
+            description: "Unlock the spells `Poison`, `Flare`",
         },
         3: {
             description: "Increase your Maximum Mana by 30.",
