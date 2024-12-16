@@ -22,6 +22,7 @@ const prefixes = [
     "Ancient",
     "Clean",
     "Wise",
+    "Jaded"
 ];
 
 function getPrefix(weaponName: string): string {
