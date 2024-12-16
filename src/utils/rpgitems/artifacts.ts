@@ -328,7 +328,6 @@ export const artifacts = {
         minadventurerank: 5,
         chestChance: 10,
     },
-
     "Guardian's Flower": {
         type: "Flower",
         artifactSet: "Defender's Will",

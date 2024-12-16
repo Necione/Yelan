@@ -109,7 +109,7 @@ export async function injuredManEvent(
             .edit({
                 embeds: [
                     embed.setDescription(
-                        `You gave the man \`100 Coins\`. The man thanks you and gives you a \`${randomItem.item}\` as a token of his appreciation.`,
+                        `You gave the man \`50 Coins\`. The man thanks you and gives you a \`${randomItem.item}\` as a token of his appreciation.`,
                     ),
                 ],
                 components: [],
@@ -120,7 +120,7 @@ export async function injuredManEvent(
         .edit({
             embeds: [
                 embed.setDescription(
-                    "You gave the man `100 Coins`. The man thanks you and continues on his way.",
+                    "You gave the man `50 Coins`. The man thanks you and continues on his way.",
                 ),
             ],
             components: [],
