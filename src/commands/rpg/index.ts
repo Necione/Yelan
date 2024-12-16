@@ -24,6 +24,7 @@ export * from "./masteries";
 export * from "./move";
 export * from "./nickname";
 export * from "./rebirth";
+export * from "./reforge";
 export * from "./requests";
 export * from "./rpg";
 export * from "./save";

@@ -36,6 +36,7 @@ export function calculateStatChanges(
         { key: "maxHP" as const, label: "❤️ Max HP" },
         { key: "defChance" as const, label: "🛡️ DEF Rate", isPercentage: true },
         { key: "defValue" as const, label: "🛡️ DEF Value" },
+        { key: "maxMana" as const, label: "✨ Max Mana" },
     ];
 
     for (const stat of statsToCheck) {

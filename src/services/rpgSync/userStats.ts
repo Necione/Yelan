@@ -82,6 +82,7 @@ export async function syncStats(userId: string) {
         totalStats.defChance += weapon.defChance || 0;
         totalStats.defValue += weapon.defValue || 0;
         totalStats.maxHP += weapon.additionalHP || 0;
+        totalStats.maxMana += weapon.additionalMana || 0;
         totalStats.healEffectiveness || 0;
     }
 
