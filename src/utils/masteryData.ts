@@ -134,10 +134,10 @@ export const masteryBenefits: Record<
             description: "Unlock the spells `Poison`, `Flare`",
         },
         3: {
-            description: "Increase your Maximum Mana by 30.",
+            description: "Increase your Maximum Mana by 20.",
         },
         4: {
-            description: "Regenerate 50% more mana after hunts.",
+            description: "Restore 50 - 75% of your max mana after hunts.",
         },
         5: {
             specialSkill: "Peer",

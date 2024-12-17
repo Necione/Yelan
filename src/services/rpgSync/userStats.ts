@@ -65,7 +65,7 @@ export async function syncStats(userId: string) {
     const catalystMastery = calculateMasteryLevel(catalystMasteryPoints);
     const catalystManaBonuses: { [level: number]: number } = {
         1: 10,
-        3: 30,
+        3: 20,
     };
 
     for (let level = 1; level <= catalystMastery.numericLevel; level++) {

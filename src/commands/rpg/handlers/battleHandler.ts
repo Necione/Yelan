@@ -95,7 +95,7 @@ export async function playerAttack(
             }
 
             case "Cripple": {
-                const crippleDamage = Math.floor(0.2 * monster.startingHp);
+                const crippleDamage = Math.floor(0.1 * monster.startingHp);
                 currentMonsterHp = Math.max(
                     currentMonsterHp - crippleDamage,
                     0,

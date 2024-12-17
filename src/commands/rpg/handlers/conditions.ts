@@ -176,18 +176,26 @@ export async function handleVictory(
                 catalystMasteryPoints,
             );
 
-            let manaRestored = Math.floor(Math.random() * 11) + 5;
+            let minPercent = 0.25;
+            let maxPercent = 0.5;
 
             if (numericLevel >= 4) {
-                manaRestored = Math.floor(manaRestored * 1.5);
+                minPercent = 0.5;
+                maxPercent = 0.75;
             }
+
+            const randomPercent =
+                Math.random() * (maxPercent - minPercent) + minPercent;
+            const manaRestored = Math.floor(stats.maxMana * randomPercent);
 
             const newMana = Math.min(stats.mana + manaRestored, stats.maxMana);
             stats.mana = newMana;
 
             finalEmbed.addFields({
                 name: "Mana Restored",
-                value: `\`✨\` Restored \`${manaRestored}\` Mana`,
+                value: `\`✨\` Restored \`${manaRestored}\` Mana (${Math.round(
+                    randomPercent * 100,
+                )}%)`,
             });
 
             manaFieldAdded = true;

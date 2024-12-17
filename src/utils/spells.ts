@@ -21,28 +21,28 @@ export const spells: Record<string, Spell> = {
     Burn: {
         spellName: "Burn",
         description: "Deals 50% of the enemy's current HP as damage.",
-        cost: 12,
+        cost: 15,
     },
     Cripple: {
         spellName: "Cripple",
-        description: "Deals 20% of the enemy's max HP as damage.",
-        cost: 3,
+        description: "Deals 10% of the enemy's max HP as damage.",
+        cost: 5,
     },
     Stun: {
         spellName: "Stun",
         description: "The monter misses their __next__ attack.",
-        cost: 10,
+        cost: 15,
     },
     Poison: {
         spellName: "Poison",
         description: "The monster loses 20% of their max HP per turn.",
-        cost: 8,
+        cost: 17,
         requiredMasteryLevel: 2,
     },
     Flare: {
         spellName: "Flare",
         description: "Deal damage equal to your current HP.",
-        cost: 18,
+        cost: 25,
         requiredMasteryLevel: 2,
     },
 };
