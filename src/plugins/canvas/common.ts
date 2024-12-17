@@ -32,14 +32,12 @@ export interface CanvasProfile {
     vault: number | string;
     msgs: number | string;
     rep: number | string;
-    lemon: number | string;
     pfp: string;
     background: string;
     frame?: string;
     leaderboard: {
         msgs: number | string;
         mora: number | string;
-        lemon: number | string;
         rep: number | string;
         elo: number | string;
     };

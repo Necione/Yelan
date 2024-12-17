@@ -23,6 +23,7 @@ export type LeaderboardType =
     | "coins"
     | "message"
     | "reputation"
+    // Leave for now
     | "lemon"
     | "elo"
     | string;
@@ -46,6 +47,7 @@ export const configurationByType: Record<LeaderboardType, Configuration> = {
     vault: add(`Vault`, customEmoji.a.z_coins, "vault"),
     message: add("Messages", customEmoji.a.z_diamond, "messagesSent"),
     reputation: add("Reputation", customEmoji.a.z_repute, "staffCredits"),
+    // Leave for now
     lemon: add("Lemons", customEmoji.a.z_lemon, "lemon"),
     elo: add("Ranking Elo", customEmoji.a.questionMark, "elo"),
     trivia: add("Trivia Wins", customEmoji.a.questionMark, "triviaPoints"),

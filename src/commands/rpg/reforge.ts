@@ -1,5 +1,11 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, noop } from "@elara-services/utils";
+import {
+    embedComment,
+    getRandom,
+    is,
+    noop,
+    snowflakes,
+} from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
@@ -10,37 +16,7 @@ import {
 } from "../../services";
 import { getAmount } from "../../utils";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
-
-const prefixes = [
-    "Old",
-    "Sharp",
-    "Godly",
-    "Perfect",
-    "Worthless",
-    "Spicy",
-    "Hearty",
-    "Ancient",
-    "Clean",
-    "Wise",
-    "Jaded"
-];
-
-function getPrefix(weaponName: string): string {
-    for (const prefix of prefixes) {
-        if (weaponName.startsWith(`${prefix} `)) {
-            return prefix;
-        }
-    }
-    return "";
-}
-
-function getBaseName(weaponName: string): string {
-    const prefix = getPrefix(weaponName);
-    if (prefix) {
-        return weaponName.slice(prefix.length + 1);
-    }
-    return weaponName;
-}
+import { getBaseName, prefixes } from "./handlers/utils";
 
 export const reforge = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -163,7 +139,7 @@ export const reforge = buildCommand<SlashCommand>({
         }
 
         const baseName = getBaseName(weaponName);
-        const newPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const newPrefix = getRandom(prefixes);
         const newWeaponName = `${newPrefix} ${baseName}`;
 
         if (!weapons[newWeaponName as WeaponName]) {
@@ -197,7 +173,7 @@ export const reforge = buildCommand<SlashCommand>({
             };
             // Add a new entry for the reforged weapon
             updatedInventory.push({
-                id: `reforged_${Date.now()}`,
+                id: snowflakes.generate(),
                 item: newWeaponName,
                 amount: 1,
                 metadata: null,
@@ -210,32 +186,23 @@ export const reforge = buildCommand<SlashCommand>({
             };
         }
 
-        try {
-            await updateUserStats(i.user.id, {
-                inventory: { set: updatedInventory },
-            });
-            await removeBalance(
-                i.user.id,
-                reforgeCost,
-                true,
-                `Reforged ${weaponName} into ${newWeaponName}`,
-            );
+        await updateUserStats(i.user.id, {
+            inventory: { set: updatedInventory },
+        });
+        await removeBalance(
+            i.user.id,
+            reforgeCost,
+            true,
+            `Reforged ${weaponName} into ${newWeaponName}`,
+        );
 
-            return r.edit(
-                embedComment(
-                    `Successfully reforged **${weaponName}** into **${newWeaponName}** at a cost of ${getAmount(
-                        reforgeCost,
-                    )}.`,
-                    "Green",
-                ),
-            );
-        } catch (error) {
-            console.error("Error during reforging:", error);
-            return r.edit(
-                embedComment(
-                    "An error occurred while attempting to reforge the weapon.",
-                ),
-            );
-        }
+        return r.edit(
+            embedComment(
+                `Successfully reforged **${weaponName}** into **${newWeaponName}** at a cost of ${getAmount(
+                    reforgeCost,
+                )}.`,
+                "Green",
+            ),
+        );
     },
 });

@@ -413,6 +413,7 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
                         .setColor(0xc0f6fb)
                         .setTitle("Other Items")
                         .setDescription(
+                            // Leave for now
                             `${customEmoji.a.z_lemon} Lemon: ${formatNumber(
                                 p.lemon,
                             )}`,
@@ -474,6 +475,7 @@ export function getOriginalInventory(
                             p.collectables.length,
                         )} Unique)`,
                         // `Other: ??? Total`, // Unsure what needs to be added here??
+                        // Leave for now
                         `Lemons: ${formatNumber(p.lemon)} Total`,
                     ]
                         .map((c) => `- ${c}`)

@@ -45,7 +45,6 @@ export async function lb(id: string) {
         sortLB(unsorted, "balance", id),
         sortLB(unsorted, "messagesSent", id),
         sortLB(unsorted, "staffCredits", id),
-        sortLB(unsorted, "lemon", id),
         sortLB(unsorted, "elo", id),
     ];
 }

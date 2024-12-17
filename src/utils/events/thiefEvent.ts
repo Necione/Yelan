@@ -2,6 +2,7 @@ import { addButtonRow, awaitComponent, get, noop } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats } from "@prisma/client";
 import { ButtonStyle, EmbedBuilder, type Message } from "discord.js";
+import { getAmount } from "..";
 import { startHunt } from "../../commands/rpg/handlers/huntHandler";
 import { removeBalance } from "../../services";
 
@@ -13,7 +14,9 @@ export async function thiefEvent(message: Message, stats: UserStats) {
     const embed = new EmbedBuilder()
         .setTitle("A Thief Appears!")
         .setDescription(
-            "While traveling, a thief suddenly appears and attempts to steal 150 coins from you! Do you want to try and catch him?",
+            `While traveling, a thief suddenly appears and attempts to steal ${getAmount(
+                150,
+            )} from you! Do you want to try and catch him?`,
         )
         .setColor("Red");
 

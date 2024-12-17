@@ -121,7 +121,6 @@ export async function createProfile(user: CanvasProfile) {
     );
     const [msgs, msgstext] = getValue(`${formatNumber(user.msgs)} | Messages`);
     const [rep, reptext] = getValue(`${formatNumber(user.rep)} | Reputation`);
-    // const [lemon, lemontext] = getValue(`${formatNumber(user.lemon)} | Lemons`);
 
     // Write user stats.
     // Count for the user
@@ -130,7 +129,6 @@ export async function createProfile(user: CanvasProfile) {
     ctx.fillText(mora, 110, 280);
     ctx.fillText(msgs, 110, 360);
     ctx.fillText(rep, 110, 440);
-    // ctx.fillText(lemon, 110, 520);
 
     // Text for the name of the count
     ctx.fillStyle = "#fefefe";
@@ -138,7 +136,6 @@ export async function createProfile(user: CanvasProfile) {
     ctx.fillText(moratext, getWidth(140, mora), 280);
     ctx.fillText(msgstext, getWidth(140, msgs), 360);
     ctx.fillText(reptext, getWidth(135, rep), 440);
-    // ctx.fillText(lemontext, getWidth(130, lemon), 520);
 
     // Leaderboard
     ctx.fillStyle = "#c0c0c0";
@@ -158,11 +155,6 @@ export async function createProfile(user: CanvasProfile) {
         getWidth(135, `${rep} ${reptext}`),
         440,
     );
-    // ctx.fillText(
-    //     `(#${formatNumber(lb.lemon)})`,
-    //     getWidth(130, `${lemon} ${lemontext}`),
-    //     520,
-    // );
 
     // Sub cell background.
     // ctx.globalAlpha = 0.2;

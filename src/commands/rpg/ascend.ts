@@ -1,10 +1,12 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, noop } from "@elara-services/utils";
+import { embedComment, is, noop, snowflakes } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
 import { weapons } from "../../utils/rpgitems/weapons";
+import { getBaseName, getPrefix } from "./handlers/utils";
 
 const prefixes = [
+    // TODO: Is this list supposed to be the same one from 'rpg/handlers/utils.ts' ?
     "Old",
     "Sharp",
     "Godly",
@@ -13,23 +15,6 @@ const prefixes = [
     "Spicy",
     "Hearty",
 ];
-
-function getPrefix(weaponName: string): string {
-    for (const prefix of prefixes) {
-        if (weaponName.startsWith(`${prefix} `)) {
-            return prefix;
-        }
-    }
-    return "";
-}
-
-function getBaseName(weaponName: string): string {
-    const prefix = getPrefix(weaponName);
-    if (prefix) {
-        return weaponName.slice(prefix.length + 1);
-    }
-    return weaponName;
-}
 
 export const ascend = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -54,7 +39,7 @@ export const ascend = buildCommand<SlashCommand>({
         const ascendableBaseWeapons = ["Harbinger of Dawn", "Messenger"];
 
         const ascendableWeapons = Object.keys(weapons).filter((weaponName) => {
-            const baseName = getBaseName(weaponName);
+            const baseName = getBaseName(weaponName, prefixes);
 
             const isAscended = baseName.startsWith("✪ ");
             if (isAscended) {
@@ -71,7 +56,7 @@ export const ascend = buildCommand<SlashCommand>({
                 value: weaponName,
             }));
 
-        if (!is.array(filtered) || filtered.length === 0) {
+        if (!is.array(filtered)) {
             return i
                 .respond([
                     { name: "No ascendable weapons found.", value: "n/a" },
@@ -106,7 +91,7 @@ export const ascend = buildCommand<SlashCommand>({
                 .catch(noop);
         }
 
-        const prefix = getPrefix(weaponName);
+        const prefix = getPrefix(weaponName, prefixes);
         const baseName = getBaseName(weaponName);
         const ascendableBaseWeapons = ["Harbinger of Dawn", "Messenger"];
 
@@ -164,7 +149,7 @@ export const ascend = buildCommand<SlashCommand>({
         const updatedInventory = stats.inventory
             .map((item) => {
                 if (item.item === weaponName) {
-                    return { ...item, amount: item.amount - 10 };
+                    item.amount = Math.floor(item.amount - 10);
                 }
                 return item;
             })
@@ -175,35 +160,24 @@ export const ascend = buildCommand<SlashCommand>({
             updatedInventory.push(existingAscended);
         } else {
             updatedInventory.push({
-                id: `ascended_${baseName}`,
+                id: snowflakes.generate(),
                 item: ascendedWeaponName,
                 amount: 1,
                 metadata: null,
             });
         }
 
-        try {
-            await updateUserStats(i.user.id, {
-                inventory: { set: updatedInventory },
-            });
+        await updateUserStats(i.user.id, {
+            inventory: { set: updatedInventory },
+        });
 
-            return r
-                .edit(
-                    embedComment(
-                        `You have successfully ascended 3x **${weaponName}** into 1x **${ascendedWeaponName}**!`,
-                        "Green",
-                    ),
-                )
-                .catch(noop);
-        } catch (error) {
-            console.error("Error during weapon ascension:", error);
-            return r
-                .edit(
-                    embedComment(
-                        "An error occurred while attempting to ascend the weapon.",
-                    ),
-                )
-                .catch(noop);
-        }
+        return r
+            .edit(
+                embedComment(
+                    `You have successfully ascended 3x **${weaponName}** into 1x **${ascendedWeaponName}**!`,
+                    "Green",
+                ),
+            )
+            .catch(noop);
     },
 });

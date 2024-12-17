@@ -8,6 +8,7 @@ import {
 import { customEmoji } from "@liyueharbor/econ";
 import type { UserStats, UserWallet } from "@prisma/client";
 import { ButtonStyle, EmbedBuilder, type Message } from "discord.js";
+import { getAmount } from "..";
 import { addItemToInventory, removeBalance } from "../../services";
 
 const items = make.array<{ item: string; amount: number }>([
@@ -109,7 +110,11 @@ export async function injuredManEvent(
             .edit({
                 embeds: [
                     embed.setDescription(
-                        `You gave the man \`50 Coins\`. The man thanks you and gives you a \`${randomItem.item}\` as a token of his appreciation.`,
+                        `You gave the man ${getAmount(
+                            50,
+                        )}. The man thanks you and gives you a \`${
+                            randomItem.item
+                        }\` as a token of his appreciation.`,
                     ),
                 ],
                 components: [],
@@ -120,7 +125,9 @@ export async function injuredManEvent(
         .edit({
             embeds: [
                 embed.setDescription(
-                    "You gave the man `50 Coins`. The man thanks you and continues on his way.",
+                    `You gave the man ${getAmount(
+                        50,
+                    )}. The man thanks you and continues on his way.`,
                 ),
             ],
             components: [],

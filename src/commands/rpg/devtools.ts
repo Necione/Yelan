@@ -1,10 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
-import {
-    AttachmentBuilder,
-    EmbedBuilder,
-    SlashCommandBuilder,
-} from "discord.js";
+import { embedComment, make, noop } from "@elara-services/utils";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
     getUserStats,
@@ -24,10 +20,10 @@ export const devtools = buildCommand<SlashCommand>({
                 .setDescription("Choose an option.")
                 .setRequired(true)
                 .addChoices(
-                    { name: "unstuck", value: "unstuck" },
-                    { name: "export_data", value: "export_data" },
+                    { name: "Unstuck Hunting", value: "unstuck" },
+                    { name: "Export Data", value: "export_data" },
                     { name: "exp_calc", value: "exp_calc" },
-                    { name: "explode", value: "explode" },
+                    { name: "Reset your HP", value: "explode" },
                 ),
         )
         .setDMPermission(false),
@@ -93,34 +89,20 @@ export const devtools = buildCommand<SlashCommand>({
                     .catch(noop);
             }
 
-            try {
-                const userStatsJson = JSON.stringify(userStats, null, 2);
-
-                const buffer = Buffer.from(userStatsJson, "utf-8");
-
-                const fileName = `userstats_${i.user.id}.json`;
-
-                const attachment = new AttachmentBuilder(buffer, {
-                    name: fileName,
-                });
-
-                await r
-                    .edit({
-                        content:
-                            "> Here is your exported data. Please save this as backup incase we need to reroll.",
-                        files: [attachment],
-                    })
-                    .catch(noop);
-            } catch (error) {
-                console.error("Error exporting user data:", error);
-                await r
-                    .edit(
-                        embedComment(
-                            "An error occurred while exporting your data.",
-                        ),
-                    )
-                    .catch(noop);
-            }
+            await r
+                .edit({
+                    content:
+                        "> Here is your exported data. Please save this as backup incase we need to reroll.",
+                    files: [
+                        {
+                            name: `user_stats.json`,
+                            attachment: Buffer.from(
+                                JSON.stringify(userStats, null, 2),
+                            ),
+                        },
+                    ],
+                })
+                .catch(noop);
         } else if (selectedOption === "explode") {
             const userStats = await getUserStats(i.user.id);
 
@@ -133,27 +115,15 @@ export const devtools = buildCommand<SlashCommand>({
                     )
                     .catch(noop);
             }
+            await updateUserStats(i.user.id, {
+                hp: { set: 0 },
+            });
 
-            try {
-                await updateUserStats(i.user.id, {
-                    hp: { set: 0 },
-                });
-
-                return r
-                    .edit(embedComment("Your HP has been set to 0."))
-                    .catch(noop);
-            } catch (error) {
-                console.error("Error setting HP to 0:", error);
-                await r
-                    .edit(
-                        embedComment(
-                            "An error occurred while setting your HP to 0.",
-                        ),
-                    )
-                    .catch(noop);
-            }
+            return r
+                .edit(embedComment("Your HP has been set to 0."))
+                .catch(noop);
         } else if (selectedOption === "exp_calc") {
-            const expRequirements: string[] = [];
+            const expRequirements = make.array<string>();
             for (let rank = 1; rank <= 35; rank++) {
                 const expRequired = 20 * Math.pow(1.2, rank - 1);
                 expRequirements.push(

@@ -72,6 +72,7 @@ export const view = buildCommand({
                         }`,
                         `Messages: ${formatNumber(p.messagesSent)}`,
                         `Rep: ${formatNumber(p.staffCredits)}`,
+                        // Leave for now...
                         `Lemons: ${formatNumber(p.lemon)}`,
                         `Elo: ${formatNumber(p.elo || 0)}`,
                         `Trivia Points: ${formatNumber(p.triviaPoints || 0)}`,

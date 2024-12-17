@@ -50,6 +50,7 @@ export const stats = buildCommand({
             stats[name] = Math.floor(stats[name] + Math.floor(amount));
         };
         for (const db of dbs) {
+            // Leave for now...
             if (is.number(db.lemon)) {
                 inc("lemons", db.lemon);
             }

@@ -24,7 +24,6 @@ const valid: ValidTypes[] = [
     "balanceRemove",
     "dailyLimit",
     "daily",
-    "lemon",
     "messagesSent",
     "staffCredits",
     "triviaPoints",

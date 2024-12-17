@@ -75,7 +75,7 @@ export async function createCanvasProfile(
     guildId: string,
     url?: string,
 ) {
-    const [mora, messages, rep, lemon, elo] = await lb(user.id);
+    const [mora, messages, rep, elo] = await lb(user.id);
     const lvl = await levels.api.users.get(user.id, guildId);
     const db = getData(
         // @ts-ignore
@@ -107,14 +107,12 @@ export async function createCanvasProfile(
         mora: p.balance,
         vault: p.vault || 0,
         msgs: p.messagesSent,
-        lemon: p.lemon,
         name: user.username,
         rep: p.staffCredits || 0,
         background: getBackgroundUrl(url || p.backgroundUrl),
         frame: getFrameUrl(p.frameUrl),
         leaderboard: {
             mora: mora || 0,
-            lemon: lemon || 0,
             msgs: messages || 0,
             rep: rep || 0,
             elo: elo || 0,
