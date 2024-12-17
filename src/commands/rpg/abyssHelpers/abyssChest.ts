@@ -1,11 +1,6 @@
 import type { UserStats } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
-import {
-    addBalance,
-    addItemToInventory,
-    updateUserStats,
-} from "../../../services";
-import { getAmount } from "../../../utils";
+import { addItemToInventory, updateUserStats } from "../../../services";
 import { generateChestLoot } from "../../../utils/chest";
 
 export async function handleAbyssChest(
@@ -56,13 +51,6 @@ export async function handleAbyssChest(
         chestLoot.loot.push({ item: "Geode", amount: 1 });
     }
 
-    await addBalance(
-        i.user.id,
-        chestLoot.coins,
-        false,
-        `Collected a Treasure Chest at Floor ${currentFloor} (${currentX}, ${currentY})`,
-    );
-
     if (chestLoot.loot.length > 0) {
         await addItemToInventory(i.user.id, chestLoot.loot);
     }
@@ -79,12 +67,7 @@ export async function handleAbyssChest(
                   .join(", ")
             : "No items";
 
-    const resultMessage =
-        chestLoot.coins > 0
-            ? `<a:z_reward:1091219256395452517> You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!\nIt contained ${getAmount(
-                  chestLoot.coins,
-              )}\``
-            : `<a:z_reward:1091219256395452517> You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!`;
+    const resultMessage = `<a:z_reward:1091219256395452517> You have collected the chest at floor **${currentFloor}**, position \`${currentX}, ${currentY}\`!`;
 
     return chestLoot.loot.length > 0
         ? `${resultMessage} and the following items:\n${lootDescription}`

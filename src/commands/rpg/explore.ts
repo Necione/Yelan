@@ -93,7 +93,7 @@ export const explore = buildCommand<SlashCommand>({
             if (exploreType === "chest") {
                 await handleChest(i, stats);
             } else if (exploreType === "materials") {
-                await handleMaterials(i, stats);
+                await handleMaterials(i);
             } else {
                 await r.edit(embedComment("Invalid exploration type."));
             }

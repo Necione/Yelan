@@ -2,7 +2,6 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, make, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
-    addBalance,
     addItemToInventory,
     getUserCharacters,
     getUserStats,
@@ -178,16 +177,6 @@ export const expedition = buildCommand<SlashCommand>({
                             itemsCount,
                         );
 
-                        await addBalance(
-                            i.user.id,
-                            chest.coins,
-                            false,
-                            `${
-                                character.nickname
-                                    ? `${character.nickname} (${character.name})`
-                                    : character.name
-                            }'s Expedition Rewards`,
-                        );
                         if (chest.loot && chest.loot.length > 0) {
                             await addItemToInventory(
                                 i.user.id,
@@ -214,9 +203,7 @@ export const expedition = buildCommand<SlashCommand>({
                                     character.nickname
                                         ? `${character.nickname} (${character.name})`
                                         : character.name
-                                } returned from the expedition! They found:\n\n**Coins:** ${
-                                    chest.coins
-                                }\n**Items:** ${lootDescription}`,
+                                } returned from the expedition! They found:\n\n**Items:** ${lootDescription}`,
                             )
                             .setColor("Green");
                         expeditionEmbeds.push(embed);
@@ -315,16 +302,6 @@ export const expedition = buildCommand<SlashCommand>({
             const adventureRank = stats.adventureRank;
             const chest = generateChestLoot(adventureRank, itemsCount);
 
-            await addBalance(
-                i.user.id,
-                chest.coins,
-                false,
-                `${
-                    character.nickname
-                        ? `${character.nickname} (${character.name})`
-                        : character.name
-                }'s Expedition Rewards`,
-            );
             if (chest.loot && chest.loot.length > 0) {
                 await addItemToInventory(
                     i.user.id,
@@ -348,9 +325,7 @@ export const expedition = buildCommand<SlashCommand>({
                         character.nickname
                             ? `${character.nickname} (${character.name})`
                             : character.name
-                    } returned from the expedition!\n\nThey found:\n**Coins:** ${
-                        chest.coins
-                    }\n**Items:** ${lootDescription}`,
+                    } returned from the expedition!\n\nThey found:\n**Items:** ${lootDescription}`,
                     "Green",
                 ),
             );

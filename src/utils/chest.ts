@@ -15,17 +15,49 @@ type LootItem = {
 
 type ChestRarity = {
     rarity: string;
-    multiplier: number;
     weight: number;
 };
 
 const rarities = make.array<ChestRarity>([
-    { rarity: "Common", multiplier: 1, weight: 60 },
-    { rarity: "Exquisite", multiplier: 2, weight: 25 },
-    { rarity: "Precious", multiplier: 3, weight: 10 },
-    { rarity: "Luxurious", multiplier: 4, weight: 4 },
-    { rarity: "Remarkable", multiplier: 5, weight: 1 },
+    { rarity: "Common", weight: 26 },
+    { rarity: "Exquisite", weight: 51 }, // Yes this is intentional
+    { rarity: "Precious", weight: 13 },
+    { rarity: "Luxurious", weight: 7 },
+    { rarity: "Remarkable", weight: 3 },
 ]);
+
+function selectChestRarity(): ChestRarity {
+    const totalWeight = rarities.reduce(
+        (acc, rarity) => acc + rarity.weight,
+        0,
+    );
+    let randomWeight = Math.random() * totalWeight;
+
+    for (const rarity of rarities) {
+        if (randomWeight < rarity.weight) {
+            return rarity;
+        }
+        randomWeight -= rarity.weight;
+    }
+    return rarities[0];
+}
+
+function getMaxItemsByRarity(rarity: string) {
+    switch (rarity) {
+        case "Common":
+            return 1;
+        case "Exquisite":
+            return 2;
+        case "Precious":
+            return 3;
+        case "Luxurious":
+            return 4;
+        case "Remarkable":
+            return 5;
+        default:
+            return 1;
+    }
+}
 
 const chestLoot = make.array<LootItem>([
     ...Object.keys(drops).map((drop) => ({
@@ -51,22 +83,6 @@ const chestLoot = make.array<LootItem>([
     })),
 ]);
 
-function selectChestRarity(): ChestRarity {
-    const totalWeight = rarities.reduce(
-        (acc, rarity) => acc + rarity.weight,
-        0,
-    );
-    let randomWeight = Math.random() * totalWeight;
-
-    for (const rarity of rarities) {
-        if (randomWeight < rarity.weight) {
-            return rarity;
-        }
-        randomWeight -= rarity.weight;
-    }
-    return rarities[0];
-}
-
 function isWeapon(name: string) {
     return name in weapons;
 }
@@ -77,81 +93,64 @@ export function generateChestLoot(
 ) {
     const selectedRarity = selectChestRarity();
 
-    const maxUniqueItems =
-        maxUniqueItemsOverride ??
-        Math.min(
-            1 + rarities.findIndex((r) => r.rarity === selectedRarity.rarity),
-            4,
-        );
+    const rarityMaxItems = getMaxItemsByRarity(selectedRarity.rarity);
+    const maxUniqueItems = maxUniqueItemsOverride ?? rarityMaxItems;
 
     const loot = make.array<{
         item: DropName | WeaponName | ArtifactName;
         amount: number;
     }>();
 
-    let totalUniqueItems = 0;
     let hasWeapon = false;
 
     const eligibleLoot = chestLoot.filter(
         (lootItem) => adventureRank >= lootItem.minadventurerank,
     );
 
-    while (totalUniqueItems < maxUniqueItems && eligibleLoot.length > 0) {
-        const totalWeight = eligibleLoot.reduce(
-            (acc, lootItem) => acc + lootItem.minadventurerank,
-            0,
-        );
-        let randomWeight = Math.random() * totalWeight;
-
-        for (const lootItem of eligibleLoot) {
-            if (randomWeight < lootItem.minadventurerank) {
-                const chance = Math.random() * 100;
-                if (chance <= lootItem.chestChance) {
-                    const amount = getRandomValue(
-                        lootItem.minAmount,
-                        lootItem.maxAmount,
-                    );
-
-                    if (amount > 0) {
-                        const isWeaponItem = isWeapon(lootItem.name as string);
-                        if (isWeaponItem && hasWeapon) {
-                            eligibleLoot.splice(
-                                eligibleLoot.indexOf(lootItem),
-                                1,
-                            );
-                            break;
-                        } else {
-                            if (isWeaponItem) {
-                                hasWeapon = true;
-                            }
-                            loot.push({
-                                item: lootItem.name,
-                                amount: Math.floor(amount),
-                            });
-                            totalUniqueItems++;
-
-                            eligibleLoot.splice(
-                                eligibleLoot.indexOf(lootItem),
-                                1,
-                            );
-                            break;
-                        }
-                    }
-                } else {
-                    eligibleLoot.splice(eligibleLoot.indexOf(lootItem), 1);
-                    break;
-                }
-            }
-            randomWeight -= lootItem.minadventurerank;
+    for (let count = 0; count < maxUniqueItems; count++) {
+        if (eligibleLoot.length === 0) {
+            break;
         }
-    }
 
-    const coins = getRandomValue(2, 4) * selectedRarity.multiplier;
+        const randomIndex = Math.floor(Math.random() * eligibleLoot.length);
+        const lootItem = eligibleLoot[randomIndex];
+
+        if (isWeapon(lootItem.name as string) && hasWeapon) {
+            eligibleLoot.splice(randomIndex, 1);
+            count--;
+            continue;
+        }
+
+        const chance = Math.random() * 100;
+        if (chance > lootItem.chestChance) {
+            eligibleLoot.splice(randomIndex, 1);
+            count--;
+            continue;
+        }
+
+        let quantity = 1;
+        if (
+            !isWeapon(lootItem.name as string) &&
+            !(lootItem.name in artifacts)
+        ) {
+            quantity = getWeightedQuantity();
+        }
+
+        if (isWeapon(lootItem.name as string)) {
+            hasWeapon = true;
+        }
+
+        loot.push({
+            item: lootItem.name,
+            amount: quantity,
+        });
+
+        eligibleLoot.splice(randomIndex, 1);
+    }
 
     return {
         rarity: selectedRarity.rarity,
         loot,
-        coins,
     };
 }
 
@@ -209,4 +208,26 @@ export function getRandomDrop(): RandomDrop {
         ],
         quantity: randomNumber({ min: 2, max: 6, integer: true }),
     };
+}
+
+function getWeightedQuantity() {
+    const weights = [
+        { quantity: 1, weight: 40 },
+        { quantity: 2, weight: 30 },
+        { quantity: 3, weight: 15 },
+        { quantity: 4, weight: 10 },
+        { quantity: 5, weight: 5 },
+    ];
+
+    const randomVal = Math.random();
+    let cumulative = 0;
+
+    for (const entry of weights) {
+        cumulative += entry.weight;
+        if (randomVal <= cumulative) {
+            return entry.quantity;
+        }
+    }
+
+    return 1;
 }
