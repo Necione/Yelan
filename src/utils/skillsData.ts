@@ -557,7 +557,7 @@ export const skills = make.array<Skill>([
             {
                 level: 3,
                 description:
-                    "Steal 50% of the monster's current HP 5% of the time.",
+                    "Steal 50% of the monster's current HP 50% of the time.",
                 levelData: {
                     lifestealPercentage: 0.5,
                     triggerChance: 0.5,
