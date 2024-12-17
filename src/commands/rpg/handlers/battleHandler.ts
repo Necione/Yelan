@@ -632,6 +632,32 @@ export async function monsterAttack(
         }
     }
 
+    const drainLevelData = getUserSkillLevelData(stats, "Drain");
+    if (drainLevelData && !isFishingMonster(monster)) {
+        const levelData = drainLevelData.levelData || {};
+        const lifestealPercentage = levelData.lifestealPercentage || 0;
+        const triggerChance = levelData.triggerChance || 0;
+
+        const drainTriggered = Math.random() < triggerChance;
+
+        if (drainTriggered && currentMonsterHp > 0) {
+            const drainAmount = Math.ceil(
+                currentMonsterHp * lifestealPercentage,
+            );
+
+            currentMonsterHp = Math.max(currentMonsterHp - drainAmount, 0);
+
+            currentPlayerHp = Math.min(
+                currentPlayerHp + drainAmount,
+                stats.maxHP,
+            );
+
+            messages.push(
+                `\`🩸\` Drain skill activated! You drained \`${drainAmount}\` HP directly from the ${monster.name}`,
+            );
+        }
+    }
+
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP);
 
     const deathThreshold = getDeathThreshold(stats);

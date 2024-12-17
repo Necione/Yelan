@@ -5,8 +5,11 @@ import { getUserStats, updateUserStats } from "../../services";
 import { skills } from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
-const sinSkills = ["Wrath", "Sloth", "Pride", "Greed"];
-const mutuallyExclusiveSkills = ["Crystallize", "Fatigue"];
+const forbiddenCombinations = [
+    ["Drain", "Leech"],
+    ["Crystallize", "Fatigue"],
+    ["Wrath", "Sloth", "Pride", "Greed"],
+];
 
 function getMaxActiveSkills(alchemyProgress: number) {
     if (alchemyProgress >= 360) {
@@ -62,12 +65,9 @@ export const activate = buildCommand<SlashCommand>({
             );
         }
 
-        const learnedSkills = stats.skills || [];
         let activeSkills = stats.activeSkills || [];
+        const learnedSkills = stats.skills || [];
         const unlockedSpecialSkills = stats.unlockedSpecialSkills || [];
-
-        const alchemyProgress = stats.alchemyProgress || 0;
-        const MAX_ACTIVE_SKILLS = getMaxActiveSkills(alchemyProgress);
 
         const isSpecialSkill = specialSkills.some(
             (skill) => skill.skillName === skillName,
@@ -94,7 +94,6 @@ export const activate = buildCommand<SlashCommand>({
             );
         }
 
-        // Check if the skill is passive before attempting to activate
         const skillData = skills.find((s) => s.name === skillName);
         if (skillData && skillData.passive) {
             return r.edit(embedComment("You cannot activate a passive skill."));
@@ -102,11 +101,8 @@ export const activate = buildCommand<SlashCommand>({
 
         if (activeSkills.includes(skillName)) {
             activeSkills = activeSkills.filter((skill) => skill !== skillName);
-
             await updateUserStats(i.user.id, {
-                activeSkills: {
-                    set: activeSkills,
-                },
+                activeSkills: { set: activeSkills },
             });
 
             return r.edit(
@@ -114,52 +110,37 @@ export const activate = buildCommand<SlashCommand>({
             );
         }
 
-        if (sinSkills.includes(skillName)) {
-            const activeSinSkills = activeSkills.filter((skill) =>
-                sinSkills.includes(skill),
-            );
-
-            if (activeSinSkills.length >= 1) {
-                return r.edit(
-                    embedComment(
-                        `You can only have one Sin skill active at a time. Currently active: **${activeSinSkills.join(
-                            ", ",
-                        )}**.`,
-                    ),
+        for (const combo of forbiddenCombinations) {
+            if (combo.includes(skillName)) {
+                const conflictingSkills = combo.filter(
+                    (skill) =>
+                        skill !== skillName && activeSkills.includes(skill),
                 );
+                if (conflictingSkills.length > 0) {
+                    return r.edit(
+                        embedComment(
+                            `You cannot activate "${skillName}" while the following skill(s) are active: **${conflictingSkills.join(
+                                ", ",
+                            )}**.`,
+                        ),
+                    );
+                }
             }
         }
 
-        if (mutuallyExclusiveSkills.includes(skillName)) {
-            const activeExclusiveSkills = activeSkills.filter((skill) =>
-                mutuallyExclusiveSkills.includes(skill),
-            );
-
-            if (activeExclusiveSkills.length >= 1) {
-                return r.edit(
-                    embedComment(
-                        `You cannot activate "${skillName}" while the following skill is active: **${activeExclusiveSkills.join(
-                            ", ",
-                        )}**.`,
-                    ),
-                );
-            }
-        }
-
+        const alchemyProgress = stats.alchemyProgress || 0;
+        const MAX_ACTIVE_SKILLS = getMaxActiveSkills(alchemyProgress);
         if (activeSkills.length >= MAX_ACTIVE_SKILLS) {
             return r.edit(
                 embedComment(
-                    `You can only have ${MAX_ACTIVE_SKILLS} active skills at a time based on your Alchemy rank.`,
+                    `You can only have ${MAX_ACTIVE_SKILLS} active skills at a time.`,
                 ),
             );
         }
 
         activeSkills.push(skillName);
-
         await updateUserStats(i.user.id, {
-            activeSkills: {
-                set: activeSkills,
-            },
+            activeSkills: { set: activeSkills },
         });
 
         return r.edit(

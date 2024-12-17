@@ -18,6 +18,7 @@ export type SkillName =
     | "Growth"
     | "Vigor"
     | "Paladin"
+    | "Drain"
     | "Pride"
     | "Fatigue"
     | "Greed"
@@ -528,6 +529,49 @@ export const skills = make.array<Skill>([
                 { item: "Crystal Prism", amount: 10 },
                 { item: "Slime Concentrate", amount: 20 },
                 { item: "Life Essence", amount: 5 },
+            ],
+        },
+    },
+    {
+        name: "Drain",
+        passive: false,
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Steal 10% of the monster's current HP 40% of the time.",
+                levelData: {
+                    lifestealPercentage: 0.1,
+                    triggerChance: 0.4,
+                },
+            },
+            {
+                level: 2,
+                description:
+                    "Steal 25% of the monster's current HP 50% of the time.",
+                levelData: {
+                    lifestealPercentage: 0.25,
+                    triggerChance: 0.5,
+                },
+            },
+            {
+                level: 3,
+                description:
+                    "Steal 50% of the monster's current HP 5% of the time.",
+                levelData: {
+                    lifestealPercentage: 0.5,
+                    triggerChance: 0.5,
+                },
+            },
+        ],
+        emoji: "🩸",
+        requirements: {
+            adventureRank: 20,
+            rebirthsRequired: 4,
+            coins: 750,
+            items: [
+                { item: "Slime Concentrate", amount: 15 },
+                { item: "Ensnaring Gaze", amount: 3 },
             ],
         },
     },
