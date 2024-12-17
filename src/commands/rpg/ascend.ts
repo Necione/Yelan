@@ -5,17 +5,6 @@ import { getUserStats, updateUserStats } from "../../services";
 import { weapons } from "../../utils/rpgitems/weapons";
 import { getBaseName, getPrefix } from "./handlers/utils";
 
-const prefixes = [
-    // TODO: Is this list supposed to be the same one from 'rpg/handlers/utils.ts' ?
-    "Old",
-    "Sharp",
-    "Godly",
-    "Perfect",
-    "Worthless",
-    "Spicy",
-    "Hearty",
-];
-
 export const ascend = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("ascend")
@@ -39,7 +28,7 @@ export const ascend = buildCommand<SlashCommand>({
         const ascendableBaseWeapons = ["Harbinger of Dawn", "Messenger"];
 
         const ascendableWeapons = Object.keys(weapons).filter((weaponName) => {
-            const baseName = getBaseName(weaponName, prefixes);
+            const baseName = getBaseName(weaponName);
 
             const isAscended = baseName.startsWith("✪ ");
             if (isAscended) {
@@ -91,7 +80,7 @@ export const ascend = buildCommand<SlashCommand>({
                 .catch(noop);
         }
 
-        const prefix = getPrefix(weaponName, prefixes);
+        const prefix = getPrefix(weaponName);
         const baseName = getBaseName(weaponName);
         const ascendableBaseWeapons = ["Harbinger of Dawn", "Messenger"];
 
