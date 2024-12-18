@@ -114,7 +114,8 @@ export const load = buildCommand<SlashCommand>({
 
         const hasAllItems = itemsToEquip.every((item) =>
             stats.inventory.some(
-                (invItem) => invItem.item.toLowerCase() === item.toLowerCase(),
+                (invItem) =>
+                    invItem.item.toLowerCase() === (item || "").toLowerCase(),
             ),
         );
 
