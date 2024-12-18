@@ -44,11 +44,13 @@ export const load = buildCommand<SlashCommand>({
                 return {
                     name:
                         loadout.userId === i.user.id
-                            ? `${loadout.name} - ${loadout.isPrivate ? "Private" : "Public"} Loadout by you.`
+                            ? `${loadout.name} - ${
+                                  loadout.isPrivate ? "Private" : "Public"
+                              } Loadout by you.`
                             : `${loadout.name} - Public Loadout by ${userName}`,
                     value: loadout.id,
                 };
-            })
+            }),
         );
 
         if (!is.array(options)) {
@@ -74,7 +76,9 @@ export const load = buildCommand<SlashCommand>({
         }
 
         if (loadout.isPrivate && loadout.userId !== userId) {
-            return r.edit(embedComment("This is a private loadout, you cannot use it."));
+            return r.edit(
+                embedComment("This is a private loadout, you cannot use it."),
+            );
         }
 
         const stats = await getUserStats(userId);

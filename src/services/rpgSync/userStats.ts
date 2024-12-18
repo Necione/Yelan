@@ -445,7 +445,7 @@ export const loadouts = {
             (c) => c.userId !== userId && c.isPrivate === false,
         );
 
-        return [...userLoadouts, ...publicLoadouts].slice(0,25);
+        return [...userLoadouts, ...publicLoadouts].slice(0, 25);
     },
     getById: async (id: string) => {
         return await prisma.loadout
