@@ -73,6 +73,10 @@ export const load = buildCommand<SlashCommand>({
             return r.edit(embedComment(`Loadout **${inputName}** not found.`));
         }
 
+        if (loadout.isPrivate && loadout.userId !== userId) {
+            return r.edit(embedComment("This is a private loadout, you cannot use it."));
+        }
+
         const stats = await getUserStats(userId);
         if (!stats) {
             return r.edit(
