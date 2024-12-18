@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, noop } from "@elara-services/utils";
+import { discord, embedComment, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getUserStats,
@@ -37,8 +37,13 @@ export const load = buildCommand<SlashCommand>({
                 if (loadout.userId === i.user.id) {
                     userName = i.user.username;
                 } else {
-                    const user = await i.client.users.fetch(loadout.userId);
-                    userName = user ? user.username : "Unknown User";
+                    const u = await discord.user(i.client, loadout.userId, {
+                        fetch: true,
+                        mock: true,
+                    });
+                    if (u) {
+                        userName = u.username;
+                    }
                 }
 
                 return {
@@ -72,12 +77,16 @@ export const load = buildCommand<SlashCommand>({
         const loadout = await loadouts.getById(inputName);
 
         if (!loadout) {
-            return r.edit(embedComment(`Loadout **${inputName}** not found.`));
+            return r.edit(
+                embedComment(`Loadout ID (\`${inputName}\`) not found.`),
+            );
         }
 
         if (loadout.isPrivate && loadout.userId !== userId) {
             return r.edit(
-                embedComment("This is a private loadout, you cannot use it."),
+                embedComment(
+                    `Loadout (\`${loadout.name}\`) is a private loadout, you cannot use it.`,
+                ),
             );
         }
 
@@ -95,7 +104,7 @@ export const load = buildCommand<SlashCommand>({
             loadout.equippedSands,
             loadout.equippedGoblet,
             loadout.equippedCirclet,
-        ].filter(Boolean) as string[];
+        ].filter((c) => is.string(c));
 
         if (!is.array(itemsToEquip)) {
             return r.edit(
@@ -148,10 +157,9 @@ export const load = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `Loadout **${loadout.name.replace(
-                    `${userId}'s `,
-                    "",
-                )}** has been loaded successfully!\n${[
+                `Loadout **${loadout.name}** by <@${
+                    loadout.userId
+                }> has been loaded successfully!\n${[
                     ...statChanges,
                     ...setBonusMessages,
                 ].join("\n")}`,
