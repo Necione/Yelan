@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, noop } from "@elara-services/utils";
+import { discord, embedComment, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getUserStats,
@@ -30,12 +30,33 @@ export const load = buildCommand<SlashCommand>({
         const input = focused.value.toLowerCase();
         const lds = await loadouts.list(i.user.id, input);
 
-        const options = lds.map((loadout) => ({
-            name: loadout.isPrivate
-                ? `${i.user.username}'s ${loadout.name} (Private)`
-                : `${i.user.username}'s ${loadout.name}`,
-            value: loadout.name,
-        }));
+        const options = await Promise.all(
+            lds.map(async (loadout) => {
+                let userName = "Unknown User";
+
+                if (loadout.userId === i.user.id) {
+                    userName = i.user.username;
+                } else {
+                    const u = await discord.user(i.client, loadout.userId, {
+                        fetch: true,
+                        mock: true,
+                    });
+                    if (u) {
+                        userName = u.username;
+                    }
+                }
+
+                return {
+                    name:
+                        loadout.userId === i.user.id
+                            ? `${loadout.name} - ${
+                                  loadout.isPrivate ? "Private" : "Public"
+                              } Loadout by you.`
+                            : `${loadout.name} - Public Loadout by ${userName}`,
+                    value: loadout.id,
+                };
+            }),
+        );
 
         if (!is.array(options)) {
             return i
@@ -52,9 +73,21 @@ export const load = buildCommand<SlashCommand>({
         if (!inputName) {
             return r.edit(embedComment("Loadout name cannot be empty."));
         }
-        const loadout = await loadouts.get(i.user, inputName);
+
+        const loadout = await loadouts.getById(inputName);
+
         if (!loadout) {
-            return r.edit(embedComment(`Loadout **${inputName}** not found.`));
+            return r.edit(
+                embedComment(`Loadout ID (\`${inputName}\`) not found.`),
+            );
+        }
+
+        if (loadout.isPrivate && loadout.userId !== userId) {
+            return r.edit(
+                embedComment(
+                    `Loadout (\`${loadout.name}\`) is a private loadout, you cannot use it.`,
+                ),
+            );
         }
 
         const stats = await getUserStats(userId);
@@ -71,7 +104,7 @@ export const load = buildCommand<SlashCommand>({
             loadout.equippedSands,
             loadout.equippedGoblet,
             loadout.equippedCirclet,
-        ].filter(Boolean) as string[];
+        ].filter((c) => is.string(c));
 
         if (!is.array(itemsToEquip)) {
             return r.edit(
@@ -81,7 +114,8 @@ export const load = buildCommand<SlashCommand>({
 
         const hasAllItems = itemsToEquip.every((item) =>
             stats.inventory.some(
-                (invItem) => invItem.item.toLowerCase() === item.toLowerCase(),
+                (invItem) =>
+                    invItem.item.toLowerCase() === (item || "").toLowerCase(),
             ),
         );
 
@@ -90,12 +124,6 @@ export const load = buildCommand<SlashCommand>({
                 embedComment(
                     "You do not possess all items required by this loadout.",
                 ),
-            );
-        }
-
-        if (!stats) {
-            return r.edit(
-                embedComment("No stats found. Please set up your profile."),
             );
         }
 
@@ -119,8 +147,8 @@ export const load = buildCommand<SlashCommand>({
                 ? { set: loadout.equippedCirclet }
                 : { set: null },
         });
-        const updatedStats = await syncStats(userId);
 
+        const updatedStats = await syncStats(userId);
         const statChanges = calculateStatChanges(stats, updatedStats);
         const setBonusMessages = getSetBonusMessages(
             stats,
@@ -130,10 +158,9 @@ export const load = buildCommand<SlashCommand>({
 
         return r.edit(
             embedComment(
-                `Loadout **${loadout.name.replace(
-                    `${userId}'s `,
-                    "",
-                )}** has been loaded successfully!\n${[
+                `Loadout **${loadout.name}** by <@${
+                    loadout.userId
+                }> has been loaded successfully!\n${[
                     ...statChanges,
                     ...setBonusMessages,
                 ].join("\n")}`,
