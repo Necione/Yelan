@@ -37,16 +37,9 @@ export const load = buildCommand<SlashCommand>({
                 if (loadout.userId === i.user.id) {
                     userName = i.user.username;
                 } else {
-                    try {
                         const user = await i.client.users.fetch(loadout.userId);
                         userName = user ? user.username : "Unknown User";
-                    } catch (error) {
-                        console.error(
-                            `Failed to fetch user with ID ${loadout.userId}:`,
-                            error,
-                        );
                     }
-                }
 
                 return {
                     name:
@@ -58,7 +51,7 @@ export const load = buildCommand<SlashCommand>({
             }),
         );
 
-        if (options.length === 0) {
+        if (!is.array(options)) {
             return i
                 .respond([{ name: "No loadouts found.", value: "n/a" }])
                 .catch(noop);

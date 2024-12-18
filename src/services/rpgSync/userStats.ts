@@ -433,7 +433,6 @@ export const loadouts = {
                         mode: "insensitive",
                     },
                 },
-                take: 25,
             })
             .catch(() => []);
 
@@ -446,6 +445,6 @@ export const loadouts = {
             (c) => c.userId !== userId && c.isPrivate === false,
         );
 
-        return [...userLoadouts, ...publicLoadouts];
+        return [...userLoadouts, ...publicLoadouts].slice(0,25);
     },
 };
