@@ -447,4 +447,11 @@ export const loadouts = {
 
         return [...userLoadouts, ...publicLoadouts].slice(0,25);
     },
+    getById: async (id: string) => {
+        return await prisma.loadout
+            .findFirst({
+                where: { id },
+            })
+            .catch(noop);
+    },
 };

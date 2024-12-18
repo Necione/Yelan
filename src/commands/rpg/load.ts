@@ -37,18 +37,18 @@ export const load = buildCommand<SlashCommand>({
                 if (loadout.userId === i.user.id) {
                     userName = i.user.username;
                 } else {
-                        const user = await i.client.users.fetch(loadout.userId);
-                        userName = user ? user.username : "Unknown User";
-                    }
+                    const user = await i.client.users.fetch(loadout.userId);
+                    userName = user ? user.username : "Unknown User";
+                }
 
                 return {
                     name:
                         loadout.userId === i.user.id
                             ? `${loadout.name} - ${loadout.isPrivate ? "Private" : "Public"} Loadout by you.`
                             : `${loadout.name} - Public Loadout by ${userName}`,
-                    value: loadout.name,
+                    value: loadout.id,
                 };
-            }),
+            })
         );
 
         if (!is.array(options)) {
@@ -67,13 +67,7 @@ export const load = buildCommand<SlashCommand>({
             return r.edit(embedComment("Loadout name cannot be empty."));
         }
 
-        const loadout =
-            (await loadouts.get(i.user, inputName)) ||
-            (await loadouts.list(i.user, inputName)).find(
-                (ld) =>
-                    !ld.isPrivate &&
-                    ld.name.toLowerCase() === inputName.toLowerCase(),
-            );
+        const loadout = await loadouts.getById(inputName);
 
         if (!loadout) {
             return r.edit(embedComment(`Loadout **${inputName}** not found.`));
