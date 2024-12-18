@@ -433,6 +433,7 @@ export const loadouts = {
                         mode: "insensitive",
                     },
                 },
+                take: 25,
             })
             .catch(() => []);
 
