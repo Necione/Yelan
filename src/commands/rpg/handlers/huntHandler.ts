@@ -362,9 +362,15 @@ export async function handleHunt(
         const distractionSkill = getUserSkillLevelData(stats, "Distraction");
         const hasDistraction = distractionSkill;
 
-        const isMonsterFirst = hasDistraction
-            ? Math.random() >= (distractionSkill?.levelData?.priority || 0)
-            : Math.random() < 0.5;
+        let isMonsterFirst: boolean;
+        if (monster.mutationType) {
+            isMonsterFirst = true;
+        } else {
+            isMonsterFirst = hasDistraction
+                ? Math.random() >= (distractionSkill?.levelData?.priority || 0)
+                : Math.random() < 0.5;
+        }
+
         let isPlayerTurn = !isMonsterFirst;
 
         let monsterState = {
