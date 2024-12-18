@@ -216,7 +216,7 @@ export const sell = buildCommand<SlashCommand>({
 
         if (item.metadata?.length && fish[itemName as FishName]) {
             const lengthMultiplier =
-                Math.floor(item.metadata.length / 30) * 0.05;
+                Math.floor(item.metadata.length / 30) * 0.02;
             baseSellPrice = Math.round(baseSellPrice * (1 + lengthMultiplier));
         }
 

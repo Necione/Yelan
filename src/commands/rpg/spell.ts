@@ -184,9 +184,8 @@ export const spell = buildCommand<SlashCommand>({
                     .setColor("Green")
                     .setTitle("Spell Casted")
                     .setDescription(
-                        `You have casted "**${spellName}**". It has been added to your spell queue.\n\n- **Remaining Mana**: ${stats.mana}/${stats.maxMana}`,
-                    )
-                    .setTimestamp();
+                        `You have casted \`${spellName}\`. It has been added to your spell queue.\n- **Remaining Mana**: ${stats.mana}/${stats.maxMana}`,
+                    );
 
                 return r.edit({ embeds: [spellCastEmbed] });
             } else {
