@@ -28,42 +28,48 @@ export const load = buildCommand<SlashCommand>({
     async autocomplete(i) {
         const focused = i.options.getFocused(true);
         const input = focused.value.toLowerCase();
-        const lds = await loadouts.list(i.user.id, input);
-
+        const lds = await loadouts.list(i.user, input);
+    
         const options = lds.map((loadout) => ({
-            name: loadout.isPrivate
-                ? `${i.user.username}'s ${loadout.name} (Private)`
-                : `${i.user.username}'s ${loadout.name}`,
+            name: loadout.userId === i.user.id
+                ? `${loadout.name} - ${loadout.isPrivate ? "Private" : "Public"} Loadout by you.`
+                : `${loadout.name} - Public Loadout by ${loadout.userId}`,
             value: loadout.name,
         }));
-
-        if (!is.array(options)) {
+    
+        if (options.length === 0) {
             return i
                 .respond([{ name: "No loadouts found.", value: "n/a" }])
                 .catch(noop);
         }
-
+    
         return i.respond(options).catch(noop);
     },
     async execute(i, r) {
         const inputName = i.options.getString("name", true);
         const userId = i.user.id;
-
+    
         if (!inputName) {
             return r.edit(embedComment("Loadout name cannot be empty."));
         }
-        const loadout = await loadouts.get(i.user, inputName);
+    
+        const loadout =
+        (await loadouts.get(i.user, inputName)) ||
+        (await loadouts.list(i.user, inputName)).find(
+            (ld) => !ld.isPrivate && ld.name.toLowerCase() === inputName.toLowerCase(),
+        );
+    
         if (!loadout) {
             return r.edit(embedComment(`Loadout **${inputName}** not found.`));
         }
-
+    
         const stats = await getUserStats(userId);
         if (!stats) {
             return r.edit(
                 embedComment("No stats found. Please set up your profile."),
             );
         }
-
+    
         const itemsToEquip = [
             loadout.equippedWeapon,
             loadout.equippedFlower,
@@ -72,19 +78,19 @@ export const load = buildCommand<SlashCommand>({
             loadout.equippedGoblet,
             loadout.equippedCirclet,
         ].filter(Boolean) as string[];
-
+    
         if (!is.array(itemsToEquip)) {
             return r.edit(
                 embedComment("The selected loadout has no items to equip."),
             );
         }
-
+    
         const hasAllItems = itemsToEquip.every((item) =>
             stats.inventory.some(
                 (invItem) => invItem.item.toLowerCase() === item.toLowerCase(),
             ),
         );
-
+    
         if (!hasAllItems) {
             return r.edit(
                 embedComment(
@@ -92,13 +98,7 @@ export const load = buildCommand<SlashCommand>({
                 ),
             );
         }
-
-        if (!stats) {
-            return r.edit(
-                embedComment("No stats found. Please set up your profile."),
-            );
-        }
-
+    
         await updateUserStats(userId, {
             equippedWeapon: loadout.equippedWeapon
                 ? { set: loadout.equippedWeapon }
@@ -119,15 +119,15 @@ export const load = buildCommand<SlashCommand>({
                 ? { set: loadout.equippedCirclet }
                 : { set: null },
         });
+    
         const updatedStats = await syncStats(userId);
-
         const statChanges = calculateStatChanges(stats, updatedStats);
         const setBonusMessages = getSetBonusMessages(
             stats,
             updatedStats,
             "activated",
         );
-
+    
         return r.edit(
             embedComment(
                 `Loadout **${loadout.name.replace(
