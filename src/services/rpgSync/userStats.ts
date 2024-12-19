@@ -411,7 +411,7 @@ export async function syncInventoryItems(client: Client<true>) {
     const changePerms = async (lock = true) => {
         const channel = await discord.channel<TextChannel>(
             client,
-            "1036814719450877983" /*"1280336582263443591"*/,
+            "1280336582263443591",
         );
         if (!channel) {
             return status.error(`Unable to find the genshin-rpg channel.`);
