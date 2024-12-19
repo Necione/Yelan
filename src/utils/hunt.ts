@@ -105,6 +105,7 @@ export async function getRandomMonster(
         defChance: number;
         defValue: number;
         maxHp: number;
+        rebirths: number;
     },
 ): Promise<MonsterInstance | null> {
     if (!monstersLoaded) {
@@ -214,6 +215,15 @@ export async function getRandomMonster(
         : null;
 
     if (stats) {
+        const rebirths = playerStats.rebirths || 0;
+        const hpMultiplier = 1 + rebirths * 0.1;
+        const damageMultiplier = 1 + rebirths * 0.05;
+
+        stats.minHp = Math.floor(stats.minHp * hpMultiplier);
+        stats.maxHp = Math.floor(stats.maxHp * hpMultiplier);
+        stats.minDamage = Math.floor(stats.minDamage * damageMultiplier);
+        stats.maxDamage = Math.floor(stats.maxDamage * damageMultiplier);
+
         const monsterInstance: MonsterInstance = {
             ...selectedMonster,
             minHp: stats.minHp,

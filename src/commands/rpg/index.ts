@@ -29,7 +29,6 @@ export * from "./requests";
 export * from "./rpg";
 export * from "./save";
 export * from "./sell";
-export * from "./sellall";
 export * from "./skills";
 export * from "./spell";
 export { travel } from "./travel";

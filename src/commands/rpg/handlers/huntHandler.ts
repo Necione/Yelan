@@ -189,6 +189,7 @@ export async function handleHunt(
                         defChance: stats.defChance,
                         defValue: stats.defValue,
                         maxHp: stats.maxHP,
+                        rebirths: stats.rebirths,
                     },
                 );
             }
