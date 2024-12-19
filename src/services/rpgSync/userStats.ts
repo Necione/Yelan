@@ -1,6 +1,15 @@
-import { is, make, noop, snowflakes } from "@elara-services/utils";
+import {
+    colors,
+    discord,
+    embedComment,
+    is,
+    make,
+    noop,
+    snowflakes,
+    status,
+} from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
-import type { User } from "discord.js";
+import type { Client, TextChannel, User } from "discord.js";
 import { prisma } from "../../prisma";
 import { calculateMasteryLevel } from "../../utils/masteryHelper";
 import type {
@@ -397,6 +406,70 @@ export const removeItemFromInventory = async (
         },
     });
 };
+
+export async function syncInventoryItems(client: Client<true>) {
+    const changePerms = async (lock = true) => {
+        const channel = await discord.channel<TextChannel>(
+            client,
+            "1036814719450877983" /*"1280336582263443591"*/,
+        );
+        if (!channel) {
+            return status.error(`Unable to find the genshin-rpg channel.`);
+        }
+        await channel.permissionOverwrites
+            .edit(channel.guildId, {
+                SendMessages: lock ? false : true,
+                SendMessagesInThreads: lock ? false : true,
+            })
+            .catch(noop);
+        await channel
+            .send(
+                embedComment(
+                    lock
+                        ? `# Syncing inventory items, channel will be locked for a few minutes.`
+                        : "# Syncing finished, channel will be unlocked now.",
+                    lock ? colors.red : colors.green,
+                ),
+            )
+            .catch(noop);
+        return status.success(`Channel permissions changed.`);
+    };
+    await changePerms(true);
+    const users = await prisma.userStats.findMany().catch(() => []);
+    if (!is.array(users)) {
+        return status.error(`No userStats found?...`);
+    }
+    let i = 0;
+    for await (const db of users) {
+        if (is.array(db.inventory)) {
+            const updated = [];
+            for (const inv of db.inventory) {
+                if (inv.metadata) {
+                    updated.push(inv);
+                    continue;
+                }
+                const f = updated.find((c) => c.item === inv.item);
+                if (f) {
+                    f.amount = Math.floor(f.amount + inv.amount);
+                } else {
+                    updated.push(inv);
+                }
+            }
+            db.inventory = updated.map((c) => {
+                if (!is.string(c.id)) {
+                    c.id = snowflakes.generate();
+                }
+                return c;
+            });
+            await updateUserStats(db.userId, {
+                inventory: { set: db.inventory },
+            });
+            i++;
+        }
+    }
+    await changePerms(false);
+    return status.success(`Updated ${i} users inventory`);
+}
 
 export const loadouts = {
     get: async (user: string | User, name: string) => {
