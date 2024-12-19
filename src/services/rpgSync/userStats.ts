@@ -423,17 +423,35 @@ export const loadouts = {
         return await prisma.loadout.create({ data }).catch(noop);
     },
     list: async (user: string | User, name: string) => {
-        return await prisma.loadout
+        const userId = is.string(user) ? user : user.id;
+
+        const allLoadouts = await prisma.loadout
             .findMany({
                 where: {
-                    userId: is.string(user) ? user : user.id,
                     name: {
                         contains: name,
                         mode: "insensitive",
                     },
                 },
-                take: 25,
             })
             .catch(() => []);
+
+        if (!is.array(allLoadouts)) {
+            return [];
+        }
+
+        const userLoadouts = allLoadouts.filter((c) => c.userId === userId);
+        const publicLoadouts = allLoadouts.filter(
+            (c) => c.userId !== userId && c.isPrivate === false,
+        );
+
+        return [...userLoadouts, ...publicLoadouts].slice(0, 25);
+    },
+    getById: async (id: string) => {
+        return await prisma.loadout
+            .findFirst({
+                where: { id },
+            })
+            .catch(noop);
     },
 };
