@@ -21,14 +21,14 @@ export default {
     critChance: 5,
     critValue: 1.5,
     defChance: 75,
-    defValue: 100,
+    defValue: 250,
     getStatsForadventureRank(adventureRank: number) {
         return {
             adventureRank,
-            minHp: 15000,
-            maxHp: 20000,
-            minDamage: 700,
-            maxDamage: 1400,
+            minHp: 87500,
+            maxHp: 87500,
+            minDamage: 900,
+            maxDamage: 1600,
         };
     },
 };

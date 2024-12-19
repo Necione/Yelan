@@ -608,7 +608,11 @@ export async function monsterAttack(
     currentPlayerHp -= reducedMonsterDamage;
 
     const leechLevelData = getUserSkillLevelData(stats, "Leech");
-    if (leechLevelData && !isFishingMonster(monster)) {
+    if (
+        leechLevelData &&
+        !isFishingMonster(monster) &&
+        has(["Boss"], monster, false)
+    ) {
         const levelData = leechLevelData.levelData || {};
 
         const lifestealPercentage = levelData.lifestealPercentage || 0;
@@ -633,7 +637,11 @@ export async function monsterAttack(
     }
 
     const drainLevelData = getUserSkillLevelData(stats, "Drain");
-    if (drainLevelData && !isFishingMonster(monster)) {
+    if (
+        drainLevelData &&
+        !isFishingMonster(monster) &&
+        has(["Boss"], monster, false)
+    ) {
         const levelData = drainLevelData.levelData || {};
         const lifestealPercentage = levelData.lifestealPercentage || 0;
         const triggerChance = levelData.triggerChance || 0;

@@ -57,7 +57,6 @@ export async function cursedWitchEvent(message: Message, stats: UserStats) {
     }
 
     if (c.customId === ids.fight) {
-        // Player chooses to fight the witch
         if (
             stats.isHunting ||
             stats.isTravelling ||
@@ -76,11 +75,15 @@ export async function cursedWitchEvent(message: Message, stats: UserStats) {
                 .catch(noop);
         }
 
+        const monsters = ["Tenebrous Papilla", "Experimental Field Generator"];
+        const chosenMonster =
+            monsters[Math.floor(Math.random() * monsters.length)];
+
         await message
             .edit({
                 embeds: [
                     embed.setDescription(
-                        "You dare to challenge the witch! She summons a **Tenebrous Papilla** to fight you!",
+                        `You dare to challenge the witch! She summons a **${chosenMonster}** to fight you!`,
                     ),
                 ],
                 components: [],
@@ -96,7 +99,7 @@ export async function cursedWitchEvent(message: Message, stats: UserStats) {
                     embeds: [
                         new EmbedBuilder()
                             .setDescription(
-                                `Prepare to battle the **Tenebrous Papilla** summoned by the witch!`,
+                                `Prepare to battle the **${chosenMonster}** summoned by the witch!`,
                             )
                             .setColor("DarkPurple"),
                     ],
@@ -104,7 +107,7 @@ export async function cursedWitchEvent(message: Message, stats: UserStats) {
                 .catch(noop);
 
             if (msg) {
-                await startHunt(msg, c.user, ["Tenebrous Papilla"]);
+                await startHunt(msg, c.user, [chosenMonster]);
             }
         } else {
             await message.reply(
@@ -115,7 +118,6 @@ export async function cursedWitchEvent(message: Message, stats: UserStats) {
         return;
     }
 
-    // If not fighting, player accepts their fate and receives a curse as before
     const outcome = Math.random();
     let effectName = "";
     let effectValue = 0;
