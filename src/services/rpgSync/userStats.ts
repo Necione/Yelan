@@ -2,15 +2,18 @@ import {
     colors,
     discord,
     embedComment,
+    formatNumber,
+    get,
     is,
     make,
     noop,
     snowflakes,
     status,
 } from "@elara-services/utils";
-import type { Prisma } from "@prisma/client";
+import type { Prisma, UserStats } from "@prisma/client";
 import type { Client, TextChannel, User } from "discord.js";
 import { prisma } from "../../prisma";
+import { cooldowns } from "../../utils";
 import { calculateMasteryLevel } from "../../utils/masteryHelper";
 import type {
     ArtifactSetName,
@@ -22,6 +25,7 @@ import {
     type ArtifactName,
 } from "../../utils/rpgitems/artifacts";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
+import { getProfileByUserId } from "../userProfile";
 
 interface InventoryItem {
     id?: string;
@@ -439,36 +443,67 @@ export async function syncInventoryItems(client: Client<true>) {
     if (!is.array(users)) {
         return status.error(`No userStats found?...`);
     }
-    let i = 0;
     for await (const db of users) {
-        if (is.array(db.inventory)) {
-            const updated = [];
-            for (const inv of db.inventory) {
-                if (inv.metadata) {
-                    updated.push(inv);
-                    continue;
-                }
-                const f = updated.find((c) => c.item === inv.item);
-                if (f) {
-                    f.amount = Math.floor(f.amount + inv.amount);
-                } else {
-                    updated.push(inv);
-                }
-            }
-            db.inventory = updated.map((c) => {
-                if (!is.string(c.id)) {
-                    c.id = snowflakes.generate();
-                }
-                return c;
-            });
-            await updateUserStats(db.userId, {
-                inventory: { set: db.inventory },
-            });
-            i++;
-        }
+        await syncInventoryItemsForUser(db.userId, db, false);
     }
     await changePerms(false);
-    return status.success(`Updated ${i} users inventory`);
+    return status.success(
+        `Updated ${formatNumber(users.length)} users inventory`,
+    );
+}
+
+export async function syncInventoryItemsForUser(
+    userId: string,
+    db?: UserStats,
+    cooldown = true,
+) {
+    if (!db) {
+        // @ts-ignore
+        db = await getUserStats(userId);
+    }
+    if (!db) {
+        return status.error(`Unable to fetch your user stats.`);
+    }
+    if (cooldown === true) {
+        const p = await getProfileByUserId(userId);
+        if (!p) {
+            return status.error(`Unable to fetch your user profile.`);
+        }
+        if (p.locked) {
+            return status.error(`Your user profile is locked..`);
+        }
+        const re = cooldowns.get(p, "syncingInv");
+        if (!re.status) {
+            return status.error(re.message);
+        }
+        await cooldowns.set(p, "syncingInv", get.mins(15));
+    }
+    if (!is.array(db.inventory)) {
+        db.inventory = [];
+    }
+    const updated = [];
+    for (const inv of db.inventory) {
+        if (inv.metadata) {
+            updated.push(inv);
+            continue;
+        }
+        const f = updated.find((c) => c.item === inv.item);
+        if (f) {
+            f.amount = Math.floor(f.amount + inv.amount);
+        } else {
+            updated.push(inv);
+        }
+    }
+    db.inventory = updated.map((c) => {
+        if (!is.string(c.id)) {
+            c.id = snowflakes.generate();
+        }
+        return c;
+    });
+    await updateUserStats(db.userId, {
+        inventory: { set: db.inventory },
+    });
+    return status.success(`Inventory for <@${db.userId}> is now synced!`);
 }
 
 export const loadouts = {

@@ -6,6 +6,7 @@ import {
     getProfileByUserId,
     getUserCharacters,
     syncCharacter,
+    syncInventoryItemsForUser,
     syncStats,
 } from "../../services";
 import { cooldowns, getPaginatedMessage } from "../../utils";
@@ -14,6 +15,8 @@ import { formatChange } from "../../utils/hunt";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 import { calculateFishingLevel } from "./handlers/fishHandler";
+
+const categories = make.array<string>(["General", "Fishing"]);
 
 export const rpg = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -26,14 +29,28 @@ export const rpg = buildCommand<SlashCommand>({
                 .setName("category")
                 .setDescription("The type of stats to display.")
                 .setRequired(false)
-                .addChoices(
-                    { name: "General", value: "General" },
-                    { name: "Fishing", value: "Fishing" },
-                ),
+                .addChoices(...categories.map((c) => ({ name: c, value: c }))),
+        )
+        .addBooleanOption((o) =>
+            o
+                .setName(`sync_inv`)
+                .setDescription(`Sync/fix your inventory data (for duplicates)`)
+                .setRequired(false),
         )
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
+        const o = i.options.getBoolean("sync_inv", false);
+        if (o === true) {
+            const res = await syncInventoryItemsForUser(
+                i.user.id,
+                undefined,
+                true,
+            );
+            return r.edit(
+                embedComment(res.message, res.status ? "Green" : "Red"),
+            );
+        }
         const p = await getProfileByUserId(i.user.id);
         if (!p) {
             return r.edit(
