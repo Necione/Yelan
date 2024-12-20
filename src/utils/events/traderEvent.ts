@@ -1,4 +1,11 @@
-import { addButtonRow, awaitComponent, get, noop } from "@elara-services/utils";
+import {
+    addButtonRow,
+    awaitComponent,
+    chunk,
+    get,
+    getKeys,
+    noop,
+} from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import { ButtonStyle, EmbedBuilder } from "discord.js";
 import { addItemToInventory, removeBalance } from "../../services";
@@ -27,9 +34,9 @@ export const traderEvent = createEvent({
         },
     },
     async execute(message, stats, userWallet) {
-        const coinCost: number = 200;
+        const coinCost = 200;
 
-        const artifactNames: string[] = Object.keys(artifacts);
+        const artifactNames: string[] = getKeys(artifacts);
         if (artifactNames.length < 5) {
             const insufficientEmbed = new EmbedBuilder()
                 .setTitle("Wandering Trader")
@@ -78,7 +85,7 @@ export const traderEvent = createEvent({
             style: ButtonStyle.Danger,
         });
 
-        const buttonRows: any[] = [];
+        const buttonRows = chunk(buttons, 5).map((c) => addButtonRow(c));
         for (let i = 0; i < buttons.length; i += 5) {
             buttonRows.push(addButtonRow(buttons.slice(i, i + 5)));
         }
