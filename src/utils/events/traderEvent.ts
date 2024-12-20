@@ -8,14 +8,10 @@ import {
 } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import { ButtonStyle, EmbedBuilder } from "discord.js";
+import { getAmount } from "..";
 import { addItemToInventory, removeBalance } from "../../services";
 import { artifacts } from "../rpgitems/artifacts";
 import { createEvent } from "./utils";
-
-type InventoryItem = {
-    item: string;
-    amount: number;
-};
 
 function shuffleArray<T>(array: T[]): T[] {
     for (let i = array.length - 1; i > 0; i--) {
@@ -24,6 +20,7 @@ function shuffleArray<T>(array: T[]): T[] {
     }
     return array;
 }
+const coinCost = 200;
 
 export const traderEvent = createEvent({
     name: "traderEvent",
@@ -35,134 +32,109 @@ export const traderEvent = createEvent({
         },
     },
     async execute(message, stats, userWallet) {
-        const coinCost = 200;
-
-        const artifactNames: string[] = getKeys(artifacts);
+        const artifactNames = getKeys(artifacts);
         if (artifactNames.length < 5) {
-            const insufficientEmbed = new EmbedBuilder()
-                .setTitle("Wandering Trader")
-                .setDescription(
-                    "The trader does not have enough items to offer.",
-                )
-                .setColor("Grey");
-
             return message
                 .edit({
-                    embeds: [insufficientEmbed],
+                    embeds: [
+                        new EmbedBuilder()
+                            .setTitle("Wandering Trader")
+                            .setDescription(
+                                "The trader does not have enough items to offer.",
+                            )
+                            .setColor("Grey"),
+                    ],
                     components: [],
                 })
                 .catch(noop);
         }
 
-        const shuffledArtifacts: string[] = shuffleArray([...artifactNames]);
-        const uniqueSelectedArtifacts: string[] = shuffledArtifacts.slice(0, 5);
-
-        const ids: Record<string, string> = uniqueSelectedArtifacts.reduce<
-            Record<string, string>
-        >((acc, artifactName: string) => {
-            const safeName: string = artifactName
-                .replace(/\s+/g, "_")
-                .replace(/[^a-zA-Z0-9_]/g, "");
-            acc[artifactName] = `event_buy_${safeName}`;
-            return acc;
-        }, {});
+        const uniqueSelectedArtifacts = shuffleArray([...artifactNames]).slice(
+            0,
+            5,
+        );
 
         const embed = new EmbedBuilder()
             .setTitle("A Wandering Trader Offers His Wares!")
             .setDescription(
-                `A mysterious trader appears and offers you some rare artifacts for \`200\` ${customEmoji.a.z_coins}.\nChoose an artifact you wish to buy:`,
+                `A mysterious trader appears and offers you some rare artifacts for ${getAmount(
+                    coinCost,
+                )}.\nChoose an artifact you wish to buy:`,
             )
             .setColor("Gold");
 
-        const buttons = uniqueSelectedArtifacts.map((artifactName: string) => ({
-            id: ids[artifactName],
-            label: artifactName,
+        const buttons = uniqueSelectedArtifacts.map((c) => ({
+            id: `event|buy|${c}`,
+            label: c as string,
             style: ButtonStyle.Primary,
         }));
 
         buttons.push({
-            id: "event_ignoreTrader",
+            id: "event|ignoreTrader",
             label: "Leave",
             style: ButtonStyle.Danger,
         });
 
-        const buttonRows = chunk(buttons, 5).map((c) => addButtonRow(c));
-        for (let i = 0; i < buttons.length; i += 5) {
-            buttonRows.push(addButtonRow(buttons.slice(i, i + 5)));
-        }
-
         await message
             .edit({
                 embeds: [embed],
-                components: buttonRows,
+                components: chunk(buttons, 5).map((c) => addButtonRow(c)),
             })
             .catch(noop);
 
         const interaction = await awaitComponent(message, {
-            filter: (ii) => ii.customId.startsWith("event_"),
+            filter: (ii) => ii.customId.startsWith("event|"),
             users: [{ allow: true, id: stats.userId }],
             time: get.secs(15),
         });
 
         if (!interaction) {
-            const timeoutEmbed = embed.setDescription(
-                "The trader waits for a moment but then continues on his way.",
-            );
-
             return message
                 .edit({
-                    embeds: [timeoutEmbed],
+                    embeds: [
+                        embed.setDescription(
+                            "The trader waits for a moment but then continues on his way.",
+                        ),
+                    ],
                     components: [],
                 })
                 .catch(noop);
         }
-
-        if (interaction.customId === "event_ignoreTrader") {
-            const leaveEmbed = embed.setDescription(
-                "You decided not to engage with the trader and continue on your journey.",
-            );
-
+        const [, type, name] = interaction.customId.split("|");
+        if (type === "ignoreTrader") {
             return message
                 .edit({
-                    embeds: [leaveEmbed],
+                    embeds: [
+                        embed.setDescription(
+                            "You decided not to engage with the trader and continue on your journey.",
+                        ),
+                    ],
                     components: [],
                 })
                 .catch(noop);
         }
-
-        const chosenArtifact: string | undefined = uniqueSelectedArtifacts.find(
-            (artifactName: string) => {
-                const safeName: string = artifactName
-                    .replace(/\s+/g, "_")
-                    .replace(/[^a-zA-Z0-9_]/g, "");
-                return interaction.customId === `event_buy_${safeName}`;
-            },
-        );
-
+        const chosenArtifact = uniqueSelectedArtifacts.find((c) => c === name);
         if (!chosenArtifact) {
-            console.error(
-                `Unexpected interaction with customId: ${interaction.customId}`,
-            );
-            const errorEmbed = embed.setDescription(
-                "An unexpected error occurred. Please try again later.",
-            );
-
             return message
                 .edit({
-                    embeds: [errorEmbed],
+                    embeds: [
+                        embed.setDescription(
+                            "An unexpected error occurred. Please try again later.",
+                        ),
+                    ],
                     components: [],
                 })
                 .catch(noop);
         }
 
         if (userWallet.balance < coinCost) {
-            const insufficientFundsEmbed = embed.setDescription(
-                `You don't have enough ${customEmoji.a.z_coins} to buy \`${chosenArtifact}\`. It costs \`${coinCost} Coins\`.`,
-            );
-
             return message
                 .edit({
-                    embeds: [insufficientFundsEmbed],
+                    embeds: [
+                        embed.setDescription(
+                            `You don't have enough ${customEmoji.a.z_coins} to buy \`${chosenArtifact}\`. It costs \`${coinCost} Coins\`.`,
+                        ),
+                    ],
                     components: [],
                 })
                 .catch(noop);
@@ -174,20 +146,20 @@ export const traderEvent = createEvent({
             false,
             `Purchased ${chosenArtifact} from Wandering Trader`,
         );
-
-        const inventoryItem: InventoryItem = {
-            item: chosenArtifact,
-            amount: 1,
-        };
-        await addItemToInventory(stats.userId, [inventoryItem]);
-
-        const purchaseEmbed = embed.setDescription(
-            `You purchased \`${chosenArtifact}\` for \`${coinCost} Coins\`! The trader nods in acknowledgment and continues on his way.`,
-        );
+        await addItemToInventory(stats.userId, [
+            {
+                item: chosenArtifact,
+                amount: 1,
+            },
+        ]);
 
         return message
             .edit({
-                embeds: [purchaseEmbed],
+                embeds: [
+                    embed.setDescription(
+                        `You purchased \`${chosenArtifact}\` for \`${coinCost} Coins\`! The trader nods in acknowledgment and continues on his way.`,
+                    ),
+                ],
                 components: [],
             })
             .catch(noop);
