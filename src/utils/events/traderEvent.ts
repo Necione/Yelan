@@ -2,6 +2,7 @@ import {
     addButtonRow,
     awaitComponent,
     chunk,
+    embedComment,
     get,
     getKeys,
     noop,
@@ -35,17 +36,13 @@ export const traderEvent = createEvent({
         const artifactNames = getKeys(artifacts);
         if (artifactNames.length < 5) {
             return message
-                .edit({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setTitle("Wandering Trader")
-                            .setDescription(
-                                "The trader does not have enough items to offer.",
-                            )
-                            .setColor("Grey"),
-                    ],
-                    components: [],
-                })
+                .edit(
+                    embedComment(
+                        `The trader doesn't have enough items to offer.`,
+                        "Grey",
+                        { embed: { title: "Wandering Trader" } },
+                    ),
+                )
                 .catch(noop);
         }
 
@@ -63,17 +60,18 @@ export const traderEvent = createEvent({
             )
             .setColor("Gold");
 
-        const buttons = uniqueSelectedArtifacts.map((c) => ({
-            id: `event|buy|${c}`,
-            label: c as string,
-            style: ButtonStyle.Primary,
-        }));
-
-        buttons.push({
-            id: "event|ignoreTrader",
-            label: "Leave",
-            style: ButtonStyle.Danger,
-        });
+        const buttons = [
+            ...uniqueSelectedArtifacts.map((c) => ({
+                id: `event|buy|${c}`,
+                label: c as string,
+                style: ButtonStyle.Primary,
+            })),
+            {
+                id: "event|ignoreTrader",
+                label: "Leave",
+                style: ButtonStyle.Danger,
+            },
+        ];
 
         await message
             .edit({
