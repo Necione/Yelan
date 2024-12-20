@@ -43,7 +43,7 @@ export async function handleRandomEvent(
                 }
                 if (is.boolean(or)) {
                     if (or === true) {
-                        if ([res.rank, res.rebirths].includes(false)) {
+                        if (![res.rank, res.rebirths].includes(true)) {
                             add = false;
                         }
                     }
