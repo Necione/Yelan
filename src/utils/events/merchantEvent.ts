@@ -7,9 +7,9 @@ import {
     noop,
 } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
-import type { UserStats, UserWallet } from "@prisma/client";
-import { ButtonStyle, EmbedBuilder, type Message } from "discord.js";
+import { ButtonStyle, EmbedBuilder } from "discord.js";
 import { addItemToInventory, removeBalance } from "../../services";
+import { createEvent } from "./utils";
 
 const goldenItems = make.array<{ item: string; amount: number }>([
     { item: "Golden Song's Variation", amount: 1 },
@@ -35,101 +35,104 @@ const otherItems = make.array<{ item: string; amount: number }>([
     { item: "Redrot Bait", amount: 20 },
 ]);
 
-export async function merchantEvent(
-    message: Message,
-    stats: UserStats,
-    userWallet: UserWallet,
-) {
-    const ids = {
-        buy: "event_buy",
-        ignore: "event_ignore",
-    };
-    const embed = new EmbedBuilder()
-        .setTitle("A Mysterious Merchant Approaches!")
-        .setDescription(
-            `A cloaked figure appears, offering you a rare item for \`1000\` ${texts.c.u}. Do you wish to buy it?`,
-        )
-        .setColor("Gold");
+export const merchant = createEvent({
+    name: "merchant",
+    async execute(message, stats, userWallet) {
+        const ids = {
+            buy: "event_buy",
+            ignore: "event_ignore",
+        };
+        const embed = new EmbedBuilder()
+            .setTitle("A Mysterious Merchant Approaches!")
+            .setDescription(
+                `A cloaked figure appears, offering you a rare item for \`1000\` ${texts.c.u}. Do you wish to buy it?`,
+            )
+            .setColor("Gold");
 
-    await message
-        .edit({
-            embeds: [embed],
-            components: [
-                addButtonRow([
-                    { id: ids.buy, label: "Buy", style: ButtonStyle.Success },
-                    {
-                        id: ids.ignore,
-                        label: "Ignore",
-                        style: ButtonStyle.Danger,
-                    },
-                ]),
-            ],
-        })
-        .catch(noop);
+        await message
+            .edit({
+                embeds: [embed],
+                components: [
+                    addButtonRow([
+                        {
+                            id: ids.buy,
+                            label: "Buy",
+                            style: ButtonStyle.Success,
+                        },
+                        {
+                            id: ids.ignore,
+                            label: "Ignore",
+                            style: ButtonStyle.Danger,
+                        },
+                    ]),
+                ],
+            })
+            .catch(noop);
 
-    const c = await awaitComponent(message, {
-        filter: (ii) => ii.customId.startsWith("event_"),
-        users: [{ allow: true, id: stats.userId }],
-        time: get.secs(10),
-    });
+        const c = await awaitComponent(message, {
+            filter: (ii) => ii.customId.startsWith("event_"),
+            users: [{ allow: true, id: stats.userId }],
+            time: get.secs(10),
+        });
 
-    if (!c) {
+        if (!c) {
+            return message
+                .edit({
+                    embeds: [
+                        embed.setDescription(
+                            "The merchant waits briefly but then disappears into the crowd.",
+                        ),
+                    ],
+                    components: [],
+                })
+                .catch(noop);
+        }
+        if (c.customId !== ids.buy) {
+            return message
+                .edit({
+                    embeds: [
+                        embed.setDescription(
+                            "You decide not to engage with the merchant and continue on your way.",
+                        ),
+                    ],
+                    components: [],
+                })
+                .catch(noop);
+        }
+        const coinCost = 1000;
+        if (userWallet.balance < coinCost) {
+            return message
+                .edit({
+                    embeds: [
+                        embed.setDescription(
+                            `You don't have enough ${customEmoji.a.z_coins} ${texts.c.u} to make the purchase.`,
+                        ),
+                    ],
+                    components: [],
+                })
+                .catch(noop);
+        }
+
+        await removeBalance(
+            stats.userId,
+            coinCost,
+            false,
+            "Purchased from Merchant",
+        );
+        const receivedItem = getRandom(
+            Math.random() < 0.25 ? goldenItems : otherItems,
+        );
+        await addItemToInventory(stats.userId, [receivedItem]);
+
         return message
             .edit({
                 embeds: [
                     embed.setDescription(
-                        "The merchant waits briefly but then disappears into the crowd.",
+                        `You hand over \`${coinCost} ${texts.c.u}\` and receive \`${receivedItem.amount}x ${receivedItem.item}\`! The merchant smiles and vanishes.`,
                     ),
                 ],
                 components: [],
             })
             .catch(noop);
-    }
-    if (c.customId !== ids.buy) {
-        return message
-            .edit({
-                embeds: [
-                    embed.setDescription(
-                        "You decide not to engage with the merchant and continue on your way.",
-                    ),
-                ],
-                components: [],
-            })
-            .catch(noop);
-    }
-    const coinCost = 1000;
-    if (userWallet.balance < coinCost) {
-        return message
-            .edit({
-                embeds: [
-                    embed.setDescription(
-                        `You don't have enough ${customEmoji.a.z_coins} ${texts.c.u} to make the purchase.`,
-                    ),
-                ],
-                components: [],
-            })
-            .catch(noop);
-    }
-
-    await removeBalance(
-        stats.userId,
-        coinCost,
-        false,
-        "Purchased from Merchant",
-    );
-    const receivedItem = getRandom(
-        Math.random() < 0.25 ? goldenItems : otherItems,
-    );
-    await addItemToInventory(stats.userId, [receivedItem]);
-
-    return message
-        .edit({
-            embeds: [
-                embed.setDescription(
-                    `You hand over \`${coinCost} ${texts.c.u}\` and receive \`${receivedItem.amount}x ${receivedItem.item}\`! The merchant smiles and vanishes.`,
-                ),
-            ],
-            components: [],
-        })
-        .catch(noop);
-}
+    },
+});
