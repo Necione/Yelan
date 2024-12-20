@@ -1,4 +1,10 @@
-import { addButtonRow, awaitComponent, get, noop } from "@elara-services/utils";
+import {
+    addButtonRow,
+    awaitComponent,
+    get,
+    getRandom,
+    noop,
+} from "@elara-services/utils";
 import { ButtonStyle, EmbedBuilder } from "discord.js";
 import { startHunt } from "../../commands/rpg/handlers/huntHandler";
 import { updateUserStats } from "../../services";
@@ -114,12 +120,10 @@ export const ninjaChallenge = createEvent({
                 "send" in message.channel &&
                 typeof message.channel.send === "function"
             ) {
-                const ninjaTypes = [
+                const randomNinja = getRandom([
                     "Kairagi: Fiery Might",
                     "Kairagi: Dancing Thunder",
-                ];
-                const randomNinja =
-                    ninjaTypes[Math.floor(Math.random() * ninjaTypes.length)];
+                ]);
 
                 const fightEmbed = new EmbedBuilder()
                     .setDescription(
