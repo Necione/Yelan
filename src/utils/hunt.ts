@@ -224,9 +224,6 @@ export async function getRandomMonster(
         stats.maxHp = Math.floor(stats.maxHp * hpMultiplier);
         stats.minDamage = Math.floor(stats.minDamage * damageMultiplier);
         stats.maxDamage = Math.floor(stats.maxDamage * damageMultiplier);
-        selectedMonster.defValue = Math.floor(
-            selectedMonster.defValue * defValueMultiplier,
-        );
 
         const monsterInstance: MonsterInstance = {
             ...selectedMonster,
