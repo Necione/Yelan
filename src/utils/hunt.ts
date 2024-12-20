@@ -218,7 +218,6 @@ export async function getRandomMonster(
         const rebirths = playerStats.rebirths || 0;
         const hpMultiplier = 1 + rebirths * 0.2;
         const damageMultiplier = 1 + rebirths * 0.05;
-        const defValueMultiplier = 1 + rebirths * 0.05;
 
         stats.minHp = Math.floor(stats.minHp * hpMultiplier);
         stats.maxHp = Math.floor(stats.maxHp * hpMultiplier);
