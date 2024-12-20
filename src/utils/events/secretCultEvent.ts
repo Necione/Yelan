@@ -5,6 +5,12 @@ import { createEvent } from "./utils";
 
 export const secretCult = createEvent({
     name: "secretCult",
+    required: {
+        min: {
+            rank: 5,
+            rebirths: 1,
+        },
+    },
     async execute(message, stats) {
         const embed = new EmbedBuilder()
             .setTitle("You Encounter a Secret Cult!")

@@ -37,6 +37,12 @@ const otherItems = make.array<{ item: string; amount: number }>([
 
 export const merchant = createEvent({
     name: "merchant",
+    required: {
+        min: {
+            rank: 20,
+            rebirths: 3,
+        },
+    },
     async execute(message, stats, userWallet) {
         const ids = {
             buy: "event_buy",

@@ -8,6 +8,12 @@ import { createEvent } from "./utils";
 
 export const thief = createEvent({
     name: "thief",
+    required: {
+        min: {
+            rank: 5,
+            rebirths: 1,
+        },
+    },
     async execute(message, stats) {
         const ids = {
             catch: "event_catch",

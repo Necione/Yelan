@@ -6,6 +6,12 @@ import { createEvent } from "./utils";
 
 export const cursedWitch = createEvent({
     name: "cursedWitch",
+    required: {
+        min: {
+            rank: 15,
+            rebirths: 2,
+        },
+    },
     async execute(message, stats) {
         const ids = {
             acceptForced: "event_accept_forced",
