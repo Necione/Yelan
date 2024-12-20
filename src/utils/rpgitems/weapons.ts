@@ -806,7 +806,8 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minadventurerank: 24,
         chestChance: 3,
         emoji: "<:Weapon_Kitain_Cross_Spear:1319514955829088256>",
-        imageURL: "https://lh.elara.workers.dev/rpg/weapons/kitan_cross_spear.png",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/kitan_cross_spear.png",
     },
     Serendipity: {
         name: "Serendipity",

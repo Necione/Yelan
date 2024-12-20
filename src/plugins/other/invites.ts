@@ -40,7 +40,12 @@ const conf = {
     rewards: make.array<{
         role: string;
         invites: number;
-    }>(),
+    }>([
+        {
+            role: "1319521294131265639",
+            invites: 10,
+        },
+    ]),
 };
 
 export async function handleInviteInteraction(i: ButtonInteraction) {
