@@ -15,19 +15,20 @@ export async function handleRandomEvent(
         if (e.enabled === false) {
             continue;
         }
-        let add = false;
-        if (is.number(e.weight)) {
-            add = true;
+        if (e.bypass === true) {
+            list.push(e);
+            continue;
         }
+        let add = true;
         if (is.object(e.required)) {
             if (is.object(e.required.min)) {
                 const { rebirths, rank } = e.required.min;
 
-                if (is.number(rebirths) && stats.rebirths >= rebirths) {
-                    add = true;
+                if (is.number(rebirths) && stats.rebirths < rebirths) {
+                    add = false;
                 }
-                if (is.number(rank) && stats.adventureRank >= rank) {
-                    add = true;
+                if (is.number(rank) && stats.adventureRank < rank) {
+                    add = false;
                 }
             }
         }

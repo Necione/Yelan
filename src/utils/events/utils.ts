@@ -4,6 +4,7 @@ import { type Message } from "discord.js";
 
 export type RPGEvent = {
     enabled: boolean;
+    bypass: boolean;
     name: string;
     execute: (
         message: Message,
@@ -24,6 +25,7 @@ export const events = new Collection<string, RPGEvent>();
 export function createEvent(options: {
     name: RPGEvent["name"];
     execute: RPGEvent["execute"];
+    bypass?: RPGEvent["bypass"];
     enabled?: RPGEvent["enabled"];
     required?: Partial<{
         min: Partial<RPGEvent["required"]["min"]>;
@@ -43,6 +45,7 @@ export function createEvent(options: {
     }
     const data = {
         enabled: is.boolean(options.enabled) ? options.enabled : true,
+        bypass: is.boolean(options.bypass) ? options.bypass : false,
         name: options.name,
         execute: options.execute,
         required: {
