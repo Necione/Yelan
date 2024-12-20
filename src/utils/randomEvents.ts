@@ -12,6 +12,9 @@ export async function handleRandomEvent(
 ) {
     const list = make.array<RPGEvent>();
     for (const e of events.values()) {
+        if (e.enabled === false) {
+            continue;
+        }
         let add = false;
         if (is.number(e.weight)) {
             add = true;

@@ -3,6 +3,7 @@ import type { UserStats, UserWallet } from "@prisma/client";
 import { type Message } from "discord.js";
 
 export type RPGEvent = {
+    enabled: boolean;
     name: string;
     execute: (
         message: Message,
@@ -23,6 +24,7 @@ export const events = new Collection<string, RPGEvent>();
 export function createEvent(options: {
     name: RPGEvent["name"];
     execute: RPGEvent["execute"];
+    enabled?: RPGEvent["enabled"];
     required?: Partial<{
         min: Partial<RPGEvent["required"]["min"]>;
     }>;
@@ -40,6 +42,7 @@ export function createEvent(options: {
         throw new Error(`Duplicate RPG Event (${options.name})`);
     }
     const data = {
+        enabled: is.boolean(options.enabled) ? options.enabled : true,
         name: options.name,
         execute: options.execute,
         required: {
