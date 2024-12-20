@@ -25,7 +25,7 @@ export default {
     critChance: 20,
     critValue: 1.1,
     defChance: 75,
-    defValue: 100,
+    defValue: 250,
     baseHp: 28,
     baseAtk: 15,
     getStatsForadventureRank(adventureRank: number) {

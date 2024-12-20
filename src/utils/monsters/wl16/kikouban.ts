@@ -14,7 +14,7 @@ export default {
     critChance: 25,
     critValue: 5,
     defchance: 90,
-    defValue: 25,
+    defValue: 50,
     drops: [
         {
             item: "Old Handguard",

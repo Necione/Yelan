@@ -26,10 +26,10 @@ export default {
         },
     ],
 
-    critChance: 25,
-    critValue: 1.25,
+    critChance: 35,
+    critValue: 1.5,
     defChance: 75,
-    defValue: 100,
+    defValue: 200,
     baseHp: 16,
     baseAtk: 9,
     getStatsForadventureRank(adventureRank: number) {

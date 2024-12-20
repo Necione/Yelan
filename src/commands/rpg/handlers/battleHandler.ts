@@ -500,7 +500,7 @@ export async function monsterAttack(
 
         if (defended) {
             const initialMonsterDamage = monsterDamage;
-            monsterDamage = (100 * monsterDamage) / (defValue + 100);
+            monsterDamage = (100 * monsterDamage) / (defValue + 25);
             damageReduced = initialMonsterDamage - monsterDamage;
         }
     } else {
@@ -914,7 +914,7 @@ export function checkMonsterDefenses(
 
     if (monsterDefendedCheck) {
         const initialAttackPower = attackPower;
-        attackPower = (100 * attackPower) / (monsterDefValue + 100);
+        attackPower = (100 * attackPower) / (monsterDefValue + 25);
         damageReduced = initialAttackPower - attackPower;
         monsterDefended = true;
     }
