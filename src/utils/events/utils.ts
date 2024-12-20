@@ -56,10 +56,10 @@ export function createEvent(options: {
                 rebirths: options.required?.min?.rebirths || 0,
                 or: is.boolean(options.required?.min?.or)
                     ? options.required.min.or
-                    : true,
+                    : false,
                 and: is.boolean(options.required?.min?.and)
                     ? options.required.min.and
-                    : false,
+                    : true,
             },
         },
         weight: options.weight || 0,

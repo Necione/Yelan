@@ -6,3 +6,4 @@ export * from "./merchantEvent";
 export * from "./ninjaChallengeEvent";
 export * from "./secretCultEvent";
 export * from "./thiefEvent";
+export * from "./traderEvent";
