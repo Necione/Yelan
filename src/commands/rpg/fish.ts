@@ -302,7 +302,7 @@ export const fishCommand = buildCommand<SlashCommand>({
         if (Math.random() <= 0.15) {
             // 15% chance of encountering a monster >w<
             const monsterEmbed = await r.edit(
-                embedComment("A monster appears!", "Yellow"),
+                embedComment("A monster appears!", "Orange"),
             );
             if (!monsterEmbed) {
                 return r.edit(
