@@ -29,6 +29,7 @@ import {
     selectFish,
     selectFishLength,
 } from "./handlers/fishHandler";
+import { startHunt } from "./handlers/huntHandler";
 
 const bait = make.array<string>([
     "Fruit Paste Bait",
@@ -297,6 +298,45 @@ export const fishCommand = buildCommand<SlashCommand>({
         const maxTime = get.mins(1);
         const timeBeforeFishBites =
             Math.random() * (maxTime - minTime) + minTime;
+
+        const monsterChance = 0.15; // 15% chance of encountering a monster >w<
+        if (Math.random() <= monsterChance) {
+            const monsterEmbed = await r.edit(embedComment("A monster appears!", "Red"));
+            if (!monsterEmbed) {
+                return r.edit(
+                    embedComment("Unable to fetch the original message."),
+                );
+            }
+            const FishMonsters = ["Floating Hydro Fungus"];
+
+            await startHunt(
+                monsterEmbed,
+                i.user,
+                FishMonsters,
+                {
+                    win: async () => {
+                        const embed = new EmbedBuilder()
+                            .setTitle("Another Day Survived...")
+                            .setDescription(
+                                "You defeated the monster and continue fishing <a:loading:1184700865303552031>",
+                            )
+                            .setColor("Blue");
+                        await r.edit({ embeds: [embed] }).catch(noop);
+                        
+                    },
+                    lose: async () => {
+                        await cooldowns.set(user, "fish", get.hrs(1));
+                        locked.del(i.user.id);
+                        const defeatEmbed = new EmbedBuilder()
+                            .setTitle("Fishing Failure!")
+                            .setDescription("You were defeated by the monster and lost your bait!")
+                            .setColor("Red");
+                        await r.edit({ embeds: [defeatEmbed], components: [] }).catch(noop);
+                        return;
+                    },
+                }
+            );
+        }
 
         await sleep(timeBeforeFishBites);
 
