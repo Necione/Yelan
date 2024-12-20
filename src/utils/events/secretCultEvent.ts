@@ -5,6 +5,7 @@ import { createEvent } from "./utils";
 
 export const secretCult = createEvent({
     name: "secretCult",
+    weight: 100,
     required: {
         min: {
             rank: 5,

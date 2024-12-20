@@ -27,6 +27,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export const traderEvent = createEvent({
     name: "traderEvent",
+    weight: 100,
     required: {
         min: {
             rank: 15,
