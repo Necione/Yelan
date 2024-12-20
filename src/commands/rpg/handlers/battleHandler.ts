@@ -108,7 +108,7 @@ export async function playerAttack(
             }
 
             case "Flare": {
-                const flareDamage = currentPlayerHp;
+                const flareDamage = currentPlayerHp / 2;
                 currentMonsterHp = Math.max(currentMonsterHp - flareDamage, 0);
                 messages.push(
                     `\`🎇\` Flare spell casted! Dealt \`${flareDamage}\` damage to the ${monster.name}`,

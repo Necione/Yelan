@@ -41,7 +41,7 @@ export const spells: Record<string, Spell> = {
     },
     Flare: {
         spellName: "Flare",
-        description: "Deal damage equal to your current HP.",
+        description: "Deal damage equal to half your current HP.",
         cost: 25,
         requiredMasteryLevel: 2,
     },
