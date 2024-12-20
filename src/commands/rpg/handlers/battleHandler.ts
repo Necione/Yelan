@@ -611,7 +611,7 @@ export async function monsterAttack(
     if (
         leechLevelData &&
         !isFishingMonster(monster) &&
-        has(["Boss"], monster, false)
+        !has(["Boss"], monster, true)
     ) {
         const levelData = leechLevelData.levelData || {};
 
@@ -640,7 +640,7 @@ export async function monsterAttack(
     if (
         drainLevelData &&
         !isFishingMonster(monster) &&
-        has(["Boss"], monster, false)
+        !has(["Boss"], monster, true)
     ) {
         const levelData = drainLevelData.levelData || {};
         const lifestealPercentage = levelData.lifestealPercentage || 0;
