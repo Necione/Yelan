@@ -4,34 +4,27 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     startingHp: 0,
-    name: "Eremite: Galehunter",
-    group: MonsterGroup.Eremite,
-    element: MonsterElement.Anemo,
+    name: "Nobushi: Hitsukeban",
+    group: MonsterGroup.Nobushi,
+    element: MonsterElement.Physical,
     minExp: 40,
     maxExp: 60,
     minadventurerank: 24,
-    image: "https://lh.elara.workers.dev/rpg/monsters/galehunter.png",
+    image: "https://lh.elara.workers.dev/rpg/monsters/hitsukeban.png",
+    critChance: 50,
+    critValue: 2,
+    defchance: 90,
+    defValue: 300,
     drops: [
         {
-            item: "Faded Red Satin",
+            item: "Old Handguard",
             minAmount: 1,
             maxAmount: 1,
-            chance: 75,
-        },
-        {
-            item: "Life Essence",
-            minAmount: 1,
-            maxAmount: 1,
-            chance: 10,
+            chance: 50,
         },
     ],
-
-    critChance: 20,
-    critValue: 1.2,
-    defChance: 50,
-    defValue: 250,
-    baseHp: 22,
-    baseAtk: 8,
+    baseHp: 25,
+    baseAtk: 15,
     getStatsForadventureRank(adventureRank: number) {
         if (!limits.check(adventureRank)) {
             return null;

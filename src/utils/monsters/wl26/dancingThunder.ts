@@ -4,34 +4,39 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     startingHp: 0,
-    name: "Eremite: Galehunter",
-    group: MonsterGroup.Eremite,
-    element: MonsterElement.Anemo,
+    name: "Kairagi: Dancing Thunder",
+    group: MonsterGroup.Nobushi,
+    element: MonsterElement.Electro,
     minExp: 40,
     maxExp: 60,
-    minadventurerank: 24,
-    image: "https://lh.elara.workers.dev/rpg/monsters/galehunter.png",
+    minadventurerank: 26,
+    image: "https://lh.elara.workers.dev/rpg/monsters/dancing_thunder.png",
+    critChance: 50,
+    critValue: 2,
+    defchance: 100,
+    defValue: 350,
     drops: [
         {
-            item: "Faded Red Satin",
+            item: "Kageuchi Handguard",
             minAmount: 1,
             maxAmount: 1,
-            chance: 75,
+            chance: 50,
         },
         {
-            item: "Life Essence",
+            item: "Famed Handguard",
             minAmount: 1,
             maxAmount: 1,
-            chance: 10,
+            chance: 25,
+        },
+        {
+            item: "Strange Sword Hilt",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 1,
         },
     ],
-
-    critChance: 20,
-    critValue: 1.2,
-    defChance: 50,
-    defValue: 250,
-    baseHp: 22,
-    baseAtk: 8,
+    baseHp: 30,
+    baseAtk: 22,
     getStatsForadventureRank(adventureRank: number) {
         if (!limits.check(adventureRank)) {
             return null;
