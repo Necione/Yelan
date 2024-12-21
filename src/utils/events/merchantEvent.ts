@@ -37,7 +37,7 @@ const otherItems = make.array<{ item: string; amount: number }>([
 
 export const merchant = createEvent({
     name: "merchant",
-    weight: 100,
+    weight: 1,
     required: {
         min: {
             rank: 20,

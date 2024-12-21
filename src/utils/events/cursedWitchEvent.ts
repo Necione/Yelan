@@ -6,7 +6,7 @@ import { createEvent } from "./utils";
 
 export const cursedWitch = createEvent({
     name: "cursedWitch",
-    weight: 100,
+    weight: 1,
     required: {
         min: {
             rank: 15,

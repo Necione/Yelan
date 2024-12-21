@@ -21,11 +21,12 @@ function shuffleArray<T>(array: T[]): T[] {
     }
     return array;
 }
-const coinCost = 200;
+
+const accessFee = 200;
 
 export const traderEvent = createEvent({
     name: "traderEvent",
-    weight: 100,
+    weight: 1,
     required: {
         min: {
             rank: 15,
@@ -33,64 +34,46 @@ export const traderEvent = createEvent({
         },
     },
     async execute(message, stats, userWallet) {
-        const artifactNames = getKeys(artifacts);
-        if (artifactNames.length < 5) {
-            return message
-                .edit(
-                    embedComment(
-                        `The trader doesn't have enough items to offer.`,
-                        "Grey",
-                        { embed: { title: "Wandering Trader" } },
-                    ),
-                )
-                .catch(noop);
-        }
-
-        const uniqueSelectedArtifacts = shuffleArray([...artifactNames]).slice(
-            0,
-            5,
-        );
-
-        const embed = new EmbedBuilder()
-            .setTitle("A Wandering Trader Offers His Wares!")
+        const accessEmbed = new EmbedBuilder()
+            .setTitle("A Wandering Trader Approaches!")
             .setDescription(
-                `A mysterious trader appears and offers you some rare artifacts for ${getAmount(
-                    coinCost,
-                )}.\nChoose an artifact you wish to buy:`,
+                `The trader offers to show you his exclusive collection of rare artifacts for **${getAmount(
+                    accessFee,
+                )}**.\nDo you wish to view his wares?`,
             )
             .setColor("Gold");
 
-        const buttons = [
-            ...uniqueSelectedArtifacts.map((c) => ({
-                id: `event|buy|${c}`,
-                label: c as string,
-                style: ButtonStyle.Primary,
-            })),
+        const accessButtons = [
             {
-                id: "event|ignoreTrader",
-                label: "Leave",
+                id: "event|trader|pay",
+                label: "Pay",
+                style: ButtonStyle.Primary,
+            },
+            {
+                id: "event|trader|ignore",
+                label: "Ignore",
                 style: ButtonStyle.Danger,
             },
         ];
 
         await message
             .edit({
-                embeds: [embed],
-                components: chunk(buttons, 5).map((c) => addButtonRow(c)),
+                embeds: [accessEmbed],
+                components: [addButtonRow(accessButtons)],
             })
             .catch(noop);
 
-        const interaction = await awaitComponent(message, {
-            filter: (ii) => ii.customId.startsWith("event|"),
+        const accessInteraction = await awaitComponent(message, {
+            filter: (ii) => ii.customId.startsWith("event|trader|"),
             users: [{ allow: true, id: stats.userId }],
-            time: get.secs(15),
+            time: get.secs(30),
         });
 
-        if (!interaction) {
+        if (!accessInteraction) {
             return message
                 .edit({
                     embeds: [
-                        embed.setDescription(
+                        accessEmbed.setDescription(
                             "The trader waits for a moment but then continues on his way.",
                         ),
                     ],
@@ -98,12 +81,15 @@ export const traderEvent = createEvent({
                 })
                 .catch(noop);
         }
-        const [, type, name] = interaction.customId.split("|");
-        if (type === "ignoreTrader") {
+
+        const accessCustomIdParts = accessInteraction.customId.split("|");
+        const action = accessCustomIdParts[2];
+
+        if (action === "ignore") {
             return message
                 .edit({
                     embeds: [
-                        embed.setDescription(
+                        accessEmbed.setDescription(
                             "You decided not to engage with the trader and continue on your journey.",
                         ),
                     ],
@@ -111,12 +97,167 @@ export const traderEvent = createEvent({
                 })
                 .catch(noop);
         }
-        const chosenArtifact = uniqueSelectedArtifacts.find((c) => c === name);
-        if (!chosenArtifact) {
+
+        if (action === "pay") {
+            if (userWallet.balance < accessFee) {
+                return message
+                    .edit({
+                        embeds: [
+                            accessEmbed.setDescription(
+                                `You don't have enough ${
+                                    customEmoji.a.z_coins
+                                } to pay the access fee of **${getAmount(
+                                    accessFee,
+                                )} Coins**.`,
+                            ),
+                        ],
+                        components: [],
+                    })
+                    .catch(noop);
+            }
+
+            await removeBalance(
+                stats.userId,
+                accessFee,
+                false,
+                `Paid access fee to Wandering Trader`,
+            );
+
+            const artifactNames = getKeys(artifacts);
+            if (artifactNames.length < 5) {
+                return message
+                    .edit(
+                        embedComment(
+                            `The trader doesn't have enough items to offer.`,
+                            "Grey",
+                            { embed: { title: "Wandering Trader" } },
+                        ),
+                    )
+                    .catch(noop);
+            }
+
+            const uniqueSelectedArtifacts = shuffleArray([
+                ...artifactNames,
+            ]).slice(0, 5);
+
+            const waresEmbed = new EmbedBuilder()
+                .setTitle("A Wandering Trader Offers His Wares!")
+                .setDescription(
+                    `A mysterious trader presents you with some rare artifacts.\nChoose an artifact you wish to take:`,
+                )
+                .setColor("Gold");
+
+            const waresButtons = [
+                ...uniqueSelectedArtifacts.map((c) => ({
+                    id: `event|trader|claim|${c}`,
+                    label: c as string,
+                    style: ButtonStyle.Primary,
+                })),
+                {
+                    id: "event|trader|leave",
+                    label: "Leave",
+                    style: ButtonStyle.Danger,
+                },
+            ];
+
+            await message
+                .edit({
+                    embeds: [waresEmbed],
+                    components: chunk(waresButtons, 5).map((c) =>
+                        addButtonRow(c),
+                    ),
+                })
+                .catch(noop);
+
+            const waresInteraction = await awaitComponent(message, {
+                filter: (ii) => ii.customId.startsWith("event|trader|"),
+                users: [{ allow: true, id: stats.userId }],
+                time: get.secs(30),
+            });
+
+            if (!waresInteraction) {
+                return message
+                    .edit({
+                        embeds: [
+                            waresEmbed.setDescription(
+                                "The trader waits for a moment but then continues on his way.",
+                            ),
+                        ],
+                        components: [],
+                    })
+                    .catch(noop);
+            }
+
+            const waresCustomIdParts = waresInteraction.customId.split("|");
+            const waresAction = waresCustomIdParts[2];
+            const artifactName = waresCustomIdParts[3];
+
+            if (waresAction === "leave") {
+                return message
+                    .edit({
+                        embeds: [
+                            waresEmbed.setDescription(
+                                "You decided not to claim any artifacts and the trader continues on his way.",
+                            ),
+                        ],
+                        components: [],
+                    })
+                    .catch(noop);
+            }
+
+            if (waresAction === "claim") {
+                if (!artifactName) {
+                    return message
+                        .edit({
+                            embeds: [
+                                waresEmbed.setDescription(
+                                    "An unexpected error occurred. Please try again later.",
+                                ),
+                            ],
+                            components: [],
+                        })
+                        .catch(noop);
+                }
+
+                const chosenArtifact = uniqueSelectedArtifacts.find(
+                    (c) => c === artifactName,
+                );
+                if (!chosenArtifact) {
+                    return message
+                        .edit({
+                            embeds: [
+                                waresEmbed.setDescription(
+                                    "An unexpected error occurred. Please try again later.",
+                                ),
+                            ],
+                            components: [],
+                        })
+                        .catch(noop);
+                }
+
+                await addItemToInventory(stats.userId, [
+                    {
+                        item: chosenArtifact,
+                        amount: 1,
+                    },
+                ]);
+
+                return message
+                    .edit({
+                        embeds: [
+                            waresEmbed.setDescription(
+                                `You have claimed \`${chosenArtifact}\`! The trader nods in acknowledgment and continues on his way.`,
+                            ),
+                        ],
+                        components: [],
+                    })
+                    .catch(noop);
+            }
+
             return message
                 .edit({
                     embeds: [
-                        embed.setDescription(
+                        waresEmbed.setDescription(
                             "An unexpected error occurred. Please try again later.",
                         ),
                     ],
@@ -124,42 +265,5 @@ export const traderEvent = createEvent({
                 })
                 .catch(noop);
         }
-
-        if (userWallet.balance < coinCost) {
-            return message
-                .edit({
-                    embeds: [
-                        embed.setDescription(
-                            `You don't have enough ${customEmoji.a.z_coins} to buy \`${chosenArtifact}\`. It costs \`${coinCost} Coins\`.`,
-                        ),
-                    ],
-                    components: [],
-                })
-                .catch(noop);
-        }
-
-        await removeBalance(
-            stats.userId,
-            coinCost,
-            false,
-            `Purchased ${chosenArtifact} from Wandering Trader`,
-        );
-        await addItemToInventory(stats.userId, [
-            {
-                item: chosenArtifact,
-                amount: 1,
-            },
-        ]);
-
-        return message
-            .edit({
-                embeds: [
-                    embed.setDescription(
-                        `You purchased \`${chosenArtifact}\` for \`${coinCost} Coins\`! The trader nods in acknowledgment and continues on his way.`,
-                    ),
-                ],
-                components: [],
-            })
-            .catch(noop);
     },
 });

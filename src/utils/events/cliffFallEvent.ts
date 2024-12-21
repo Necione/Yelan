@@ -5,7 +5,7 @@ import { createEvent } from "./utils";
 
 export const cliffFall = createEvent({
     name: "cliffFallEvent",
-    weight: 100,
+    weight: 1,
     async execute(message, stats) {
         const damagePercentage = 0.1;
         const damageAmount = Math.ceil(stats.maxHP * damagePercentage);

@@ -1,5 +1,4 @@
-import { randomWeight } from "@elara-services/packages";
-import { is, make } from "@elara-services/utils";
+import { is } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { Message } from "discord.js";
 import "./events";
@@ -10,36 +9,62 @@ export async function handleRandomEvent(
     stats: UserStats,
     userWallet: UserWallet,
 ) {
-    const list = make.array<RPGEvent>();
-    for (const e of events.values()) {
-        if (e.enabled === false) {
-            continue;
-        }
-        if (e.bypass === true) {
-            list.push(e);
-            continue;
-        }
-        if (is.object(e.required)) {
-            if (is.object(e.required.min)) {
-                const { rebirths, rank } = e.required.min;
-                const hasRebirth = is.number(rebirths)
-                    ? stats.rebirths >= rebirths
-                    : null;
-                const hasRank = is.number(rank)
-                    ? stats.adventureRank >= rank
-                    : null;
+    const eligibleEvents: RPGEvent[] = [];
 
-                if (hasRank && hasRebirth) {
-                    list.push(e);
-                    continue;
-                }
-            }
+    for (const e of events.values()) {
+        if (!e.enabled) {
+            continue;
         }
-        list.push(e);
-        continue;
+
+        if (e.bypass) {
+            eligibleEvents.push(e);
+            continue;
+        }
+
+        const minRequirements = e.required?.min;
+        if (minRequirements) {
+            const { rebirths, rank } = minRequirements;
+            const hasRebirth = is.number(rebirths)
+                ? stats.rebirths >= rebirths
+                : true;
+            const hasRank = is.number(rank)
+                ? stats.adventureRank >= rank
+                : true;
+
+            if (hasRebirth && hasRank) {
+                eligibleEvents.push(e);
+            }
+        } else {
+            eligibleEvents.push(e);
+        }
     }
-    const event = randomWeight(list);
-    if (event) {
-        return event.execute(message, stats, userWallet);
+
+    console.log(
+        "Eligible Events:",
+        eligibleEvents.map((event) => event.name),
+    );
+
+    if (eligibleEvents.length === 0) {
+        console.log("No eligible events found for the user.");
+        return;
+    }
+
+    const weightedList: RPGEvent[] = [];
+    eligibleEvents.forEach((event) => {
+        const eventWeight = event.weight > 0 ? event.weight : 1;
+        for (let i = 0; i < eventWeight; i++) {
+            weightedList.push(event);
+        }
+    });
+
+    console.log(`Total events in weighted list: ${weightedList.length}`);
+
+    const randomIndex = Math.floor(Math.random() * weightedList.length);
+    const selectedEvent = weightedList[randomIndex];
+
+    console.log("Selected Event:", selectedEvent.name);
+
+    if (selectedEvent) {
+        return selectedEvent.execute(message, stats, userWallet);
     }
 }

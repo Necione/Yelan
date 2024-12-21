@@ -5,7 +5,7 @@ import { createEvent } from "./utils";
 
 export const healingWell = createEvent({
     name: "healingWell",
-    weight: 100,
+    weight: 1,
     async execute(message, stats) {
         const ids = {
             drink: "event_drink",

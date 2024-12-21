@@ -23,7 +23,7 @@ const items = make.array<{ item: string; amount: number }>([
 
 export const injuredMan = createEvent({
     name: "injuredMan",
-    weight: 100,
+    weight: 1,
     async execute(message, stats, userWallet) {
         const randomItem = getRandom(items);
         const ids = {

@@ -8,7 +8,7 @@ import { createEvent } from "./utils";
 
 export const thief = createEvent({
     name: "thief",
-    weight: 100,
+    weight: 1,
     required: {
         min: {
             rank: 5,

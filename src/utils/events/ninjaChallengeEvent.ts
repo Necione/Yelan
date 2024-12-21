@@ -12,7 +12,7 @@ import { createEvent } from "./utils";
 
 export const ninjaChallenge = createEvent({
     name: "ninjaChallenge",
-    weight: 100,
+    weight: 1,
     required: {
         min: {
             rank: 20,
