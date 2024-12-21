@@ -21,7 +21,7 @@ export async function handleRandomEvent(
         }
         if (is.object(e.required)) {
             if (is.object(e.required.min)) {
-                const { rebirths, rank, and, or } = e.required.min;
+                const { rebirths, rank } = e.required.min;
                 const hasRebirth = is.number(rebirths)
                     ? stats.rebirths >= rebirths
                     : null;
@@ -29,18 +29,9 @@ export async function handleRandomEvent(
                     ? stats.adventureRank >= rank
                     : null;
 
-                if (!is.null(hasRebirth) || !is.null(hasRank)) {
-                    if (or === true) {
-                        if (hasRank || hasRebirth) {
-                            list.push(e);
-                            continue;
-                        }
-                    } else if (and === true) {
-                        if (hasRank && hasRebirth) {
-                            list.push(e);
-                            continue;
-                        }
-                    }
+                if (hasRank && hasRebirth) {
+                    list.push(e);
+                    continue;
                 }
             }
         }

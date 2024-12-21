@@ -15,8 +15,6 @@ export type RPGEvent = {
         min: {
             rank: number;
             rebirths: number;
-            or: boolean;
-            and: boolean;
         };
     };
     weight: number;
@@ -54,12 +52,6 @@ export function createEvent(options: {
             min: {
                 rank: options.required?.min?.rank || 0,
                 rebirths: options.required?.min?.rebirths || 0,
-                or: is.boolean(options.required?.min?.or)
-                    ? options.required.min.or
-                    : false,
-                and: is.boolean(options.required?.min?.and)
-                    ? options.required.min.and
-                    : true,
             },
         },
         weight: options.weight || 0,
