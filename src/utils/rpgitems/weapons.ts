@@ -1045,9 +1045,9 @@ const prefixes: {
         chestChance: 0,
     }),
     Jaded: (weaponData) => ({
-        attackPower: weaponData.attackPower * 0.75,
+        attackPower: weaponData.attackPower * 1.1,
         critChance: weaponData.critChance + 10,
-        critValue: weaponData.critValue * 2,
+        critValue: weaponData.critValue * 1.25,
         chestChance: 0,
     }),
 };

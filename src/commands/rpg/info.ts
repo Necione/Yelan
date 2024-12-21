@@ -384,7 +384,7 @@ export const info = buildCommand<SlashCommand>({
             ) {
                 embed.addFields({
                     name: "Special Effect",
-                    value: "Deal 50% more damage per 1000 HP the monster has.",
+                    value: "Deal 20% more damage per 1000 HP the monster has.",
                 });
             }
 

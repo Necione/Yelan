@@ -1024,7 +1024,7 @@ export function applyAttackModifiers(
         if (equippedWeaponName.includes("Wolf's Gravestone")) {
             const hpThreshold = Math.floor(monster.startingHp / 1000);
             if (hpThreshold > 0) {
-                const damageMultiplier = 1 + 0.5 * hpThreshold;
+                const damageMultiplier = 1 + 0.2 * hpThreshold;
                 attackPower *= damageMultiplier;
                 messages.push(
                     `\`🐺\` Wolf's Gravestone effect! You deal __${(
