@@ -1002,23 +1002,44 @@ export function applyAttackModifiers(
 
         const { numericLevel } = calculateMasteryLevel(masteryPoints);
 
-        const masteryBenefit = masteryBenefits[weaponType]?.[numericLevel];
-        if (masteryBenefit?.description) {
-            const damageMultiplierMatch =
-                masteryBenefit.description.match(/(\d+)% damage/);
-            if (damageMultiplierMatch) {
-                const multiplier = parseInt(damageMultiplierMatch[1], 10) / 100;
-                attackPower *= multiplier;
-                messages.push(
-                    `\`➰\` Mastery effect activated! Your ${weaponType} deals __${(
-                        multiplier * 100
-                    ).toFixed(0)}%__ damage`,
-                );
-                debugMultipliers.push(`Mastery (${multiplier * 100}%)`);
-                console.log(
-                    `${username} Mastery effect: ${weaponType} damage multiplied by ${multiplier} to ${attackPower}`,
-                );
+        let applicableMultiplier = 1;
+        let appliedMasteryLevel = 0;
+
+        for (let lvl = 1; lvl <= numericLevel; lvl++) {
+            const benefit = masteryBenefits[weaponType]?.[lvl];
+            if (benefit?.description) {
+                const damageMultiplierMatch =
+                    benefit.description.match(/(\d+)% damage/);
+                if (damageMultiplierMatch) {
+                    const multiplier =
+                        parseInt(damageMultiplierMatch[1], 10) / 100;
+                    if (multiplier > applicableMultiplier) {
+                        applicableMultiplier = multiplier;
+                        appliedMasteryLevel = lvl;
+                    }
+                }
             }
+        }
+
+        if (applicableMultiplier > 1) {
+            attackPower *= applicableMultiplier;
+            const benefitDescription =
+                masteryBenefits[weaponType][appliedMasteryLevel]?.description;
+            const masteryMessage = benefitDescription
+                ? `\`➰\` Mastery Level ${appliedMasteryLevel} activated! Your ${weaponType} deals __${(
+                      applicableMultiplier * 100
+                  ).toFixed(0)}%__ damage.`
+                : `\`➰\` Mastery Level ${appliedMasteryLevel} activated!`;
+
+            messages.push(masteryMessage);
+            debugMultipliers.push(
+                `Mastery Level ${appliedMasteryLevel} (${(
+                    applicableMultiplier * 100
+                ).toFixed(0)}%)`,
+            );
+            console.log(
+                `${username} Mastery Level ${appliedMasteryLevel} effect: ${weaponType} damage multiplied by ${applicableMultiplier} to ${attackPower}`,
+            );
         }
 
         if (equippedWeaponName.includes("Wolf's Gravestone")) {
