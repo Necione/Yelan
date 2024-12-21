@@ -49,7 +49,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 .setRequired(true)
                 .addChoices(bait.map((c) => ({ name: c, value: c }))),
         ),
-    only: { text: true, threads: true, voice: false, dms: false },
+    only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
     async execute(i, r) {
         locked.set(i.user);
@@ -102,10 +102,8 @@ export const fishCommand = buildCommand<SlashCommand>({
             );
         }
 
-        // Get the bait choice from the command arguments
         const baitChoice = i.options.getString("bait", true);
 
-        // Find the selected bait in the inventory
         const baitItem = stats.inventory.find(
             (item) => item.item === baitChoice,
         );
@@ -299,8 +297,7 @@ export const fishCommand = buildCommand<SlashCommand>({
         const timeBeforeFishBites =
             Math.random() * (maxTime - minTime) + minTime;
 
-        if (Math.random() <= 0.15) {
-            // 15% chance of encountering a monster >w<
+        if (Math.random() <= 0.2) {
             const monsterEmbed = await r.edit(
                 embedComment("A monster appears!", "Orange"),
             );
