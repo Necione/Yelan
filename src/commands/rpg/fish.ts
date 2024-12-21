@@ -29,6 +29,7 @@ import {
     selectFish,
     selectFishLength,
 } from "./handlers/fishHandler";
+import { startHunt } from "./handlers/huntHandler";
 
 const bait = make.array<string>([
     "Fruit Paste Bait",
@@ -48,7 +49,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 .setRequired(true)
                 .addChoices(bait.map((c) => ({ name: c, value: c }))),
         ),
-    only: { text: true, threads: true, voice: false, dms: false },
+    only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
     async execute(i, r) {
         locked.set(i.user);
@@ -59,6 +60,12 @@ export const fishCommand = buildCommand<SlashCommand>({
             return r.edit(
                 embedComment("Unable to find/create your user profile."),
             );
+        }
+
+        const fishCooldown = cooldowns.get(user, "fish");
+        if (!fishCooldown.status) {
+            locked.del(i.user.id);
+            return r.edit(embedComment(fishCooldown.message));
         }
 
         let stats = await syncStats(i.user.id);
@@ -95,10 +102,8 @@ export const fishCommand = buildCommand<SlashCommand>({
             );
         }
 
-        // Get the bait choice from the command arguments
         const baitChoice = i.options.getString("bait", true);
 
-        // Find the selected bait in the inventory
         const baitItem = stats.inventory.find(
             (item) => item.item === baitChoice,
         );
@@ -124,12 +129,6 @@ export const fishCommand = buildCommand<SlashCommand>({
         if (!stats) {
             locked.del(i.user.id);
             return r.edit(embedComment(`Unable to update your stats.`));
-        }
-
-        const fishCooldown = cooldowns.get(user, "fish");
-        if (!fishCooldown.status) {
-            locked.del(i.user.id);
-            return r.edit(embedComment(fishCooldown.message));
         }
 
         let fishToCatch = 1;
@@ -297,6 +296,53 @@ export const fishCommand = buildCommand<SlashCommand>({
         const maxTime = get.mins(1);
         const timeBeforeFishBites =
             Math.random() * (maxTime - minTime) + minTime;
+
+        if (Math.random() <= 0.2) {
+            const monsterEmbed = await r.edit(
+                embedComment("A monster appears!", "Orange"),
+            );
+            if (!monsterEmbed) {
+                return r.edit(
+                    embedComment("Unable to fetch the original message."),
+                );
+            }
+
+            await startHunt(monsterEmbed, i.user, ["Floating Hydro Fungus"], {
+                win: async () => {
+                    await r
+                        .edit({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle("Another Day Survived...")
+                                    .setDescription(
+                                        "You defeated the monster and continue fishing <a:loading:1184700865303552031>",
+                                    )
+                                    .setColor("Blue"),
+                            ],
+                            components: [],
+                        })
+                        .catch(noop);
+                },
+                lose: async () => {
+                    await cooldowns.set(user, "fish", get.hrs(1));
+                    locked.del(i.user.id);
+                    await r
+                        .edit({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle("Fishing Failure!")
+                                    .setDescription(
+                                        "You were defeated by the monster and lost your bait!",
+                                    )
+                                    .setColor("Red"),
+                            ],
+                            components: [],
+                        })
+                        .catch(noop);
+                    return;
+                },
+            });
+        }
 
         await sleep(timeBeforeFishBites);
 
