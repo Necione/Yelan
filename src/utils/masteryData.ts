@@ -26,7 +26,7 @@ export const masteryBenefits: Record<
             description: "Increase your Crit Value by 10% with the Sword.",
         },
         6: {
-            description: "Deal 150% damage when wielding the Sword.",
+            description: "Deal 125% damage when wielding the Sword.",
         },
         7: {
             specialSkill: "Perfect Parry",
@@ -49,7 +49,7 @@ export const masteryBenefits: Record<
             specialSkill: "Fortress",
         },
         3: {
-            description: "Deal 150% damage when wielding the Claymore.",
+            description: "Deal 125% damage when wielding the Claymore.",
         },
         4: {
             description: "Increase DEF Value by 25%.",
@@ -81,7 +81,7 @@ export const masteryBenefits: Record<
             specialSkill: "Quickdraw",
         },
         3: {
-            description: "Deal 150% damage when wielding the Bow.",
+            description: "Deal 125% damage when wielding the Bow.",
         },
         4: {
             description: "Increase Crit Value by 5% when wielding the Bow.",
