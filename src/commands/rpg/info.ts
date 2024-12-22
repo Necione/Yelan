@@ -408,6 +408,13 @@ export const info = buildCommand<SlashCommand>({
                 });
             }
 
+            if (fullWeaponName && fullWeaponName.includes("Aqua Simulacra")) {
+                embed.addFields({
+                    name: "Special Effect",
+                    value: "Put yourself in the hands of fate.",
+                });
+            }
+
             return r.edit({ embeds: [embed] });
         } else {
             return r.edit(

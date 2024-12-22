@@ -907,23 +907,23 @@ const baseWeapons: { [key: string]: WeaponData } = {
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/everlasting_moonglow.png",
     },
-    // Reworking
     "Aqua Simulacra": {
         name: "Aqua Simulacra",
         type: "Bow",
-        sellPrice: 25,
+        sellPrice: 100,
         attackPower: 0,
-        critChance: -100,
+        critChance: 0,
         critValue: 0,
         defValue: 0,
         defChance: 0,
         additionalHP: 0,
         additionalMana: 0,
-        minadventurerank: 5,
-        chestChance: 0,
+        minadventurerank: 29,
+        chestChance: 1,
         emoji: "<:Weapon_Aqua_Simulacra:1283303723082190902>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/aqua_simulacra.png",
     },
+    // Reworking
     "Staff of Homa": {
         name: "Staff of Homa",
         type: "Polearm",

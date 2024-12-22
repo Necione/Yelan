@@ -166,7 +166,7 @@ export async function handleHunt(
         currentPlayerHp = Math.floor(currentPlayerHp * 0.75);
     }
 
-    currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
+    currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP);
 
     if (!is.array(selectedMonsters)) {
         for (let encounter = 0; encounter < numberOfMonsters; encounter++) {

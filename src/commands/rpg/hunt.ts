@@ -1,8 +1,9 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, get } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
-import { getProfileByUserId } from "../../services";
+import { getProfileByUserId, syncStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
+import { startAquaHunt } from "./handlers/aqua/aquaHandler";
 import { startHunt } from "./handlers/huntHandler";
 
 export const hunt = buildCommand<SlashCommand>({
@@ -30,8 +31,28 @@ export const hunt = buildCommand<SlashCommand>({
             );
         }
 
+        const stats = await syncStats(i.user.id);
+
+        if (!stats) {
+            return r.edit(
+                embedComment(
+                    `No stats found for you, please set up your profile.`,
+                ),
+            );
+        }
+
         const stuckHelperTime = get.mins(5);
         await cooldowns.set(userWallet, "stuckHelper", stuckHelperTime);
-        await startHunt(message, i.user);
+
+        const equippedWeaponName = stats.equippedWeapon as string | undefined;
+
+        if (
+            equippedWeaponName &&
+            equippedWeaponName.includes("Aqua Simulacra")
+        ) {
+            await startAquaHunt(message, i.user);
+        } else {
+            await startHunt(message, i.user);
+        }
     },
 });
