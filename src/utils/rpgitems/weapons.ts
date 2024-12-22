@@ -899,7 +899,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         critValue: 0,
         defValue: -1000,
         defChance: -100,
-        additionalHP: 2500,
+        additionalHP: 1500,
         additionalMana: 15,
         minadventurerank: 29,
         chestChance: 1,
