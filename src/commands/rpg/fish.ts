@@ -306,9 +306,12 @@ export const fishCommand = buildCommand<SlashCommand>({
         const timeBeforeFishBites =
             Math.random() * (maxTime - minTime) + minTime;
 
-        if (Math.random() <= 1) {
+        if (Math.random() <= 0.2) {
             const monsterEmbed = await r.edit(
-                embedComment("A monster appears!", "Orange"),
+                embedComment(
+                    "While you were fishing, a monster appeared!",
+                    "Orange",
+                ),
             );
             if (!monsterEmbed) {
                 locked.del(i.user.id);
