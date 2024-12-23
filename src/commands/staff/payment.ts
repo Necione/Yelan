@@ -1,8 +1,15 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, formatNumber, is, noop } from "@elara-services/utils";
+import {
+    discord,
+    embedComment,
+    formatNumber,
+    is,
+    make,
+    noop,
+} from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
-import { SlashCommandBuilder } from "discord.js";
-import { roles } from "../../config";
+import { SlashCommandBuilder, type User } from "discord.js";
+import { isDev, roles } from "../../config";
 import { addBalance } from "../../services";
 import { getAmount, logs } from "../../utils";
 
@@ -32,54 +39,96 @@ export const payment = buildCommand<SlashCommand>({
                 .setRequired(false)
                 .setMinLength(1)
                 .setMaxLength(2000),
+        )
+        .addStringOption((o) =>
+            o
+                .setName(`other_users`)
+                .setDescription(
+                    `What is the other users? (mentions/ids separated by a space)`,
+                )
+                .setRequired(false),
         ),
     defer: { silent: false },
     async execute(i, r) {
         const user = i.options.getUser("user", true);
         const amount = i.options.getInteger("amount", true);
         const reason = i.options.getString("reason", false) || "your position";
-        if (user.bot) {
-            return r.edit(embedComment(`Bots don't have a user profile.`));
-        }
-        if (user.id === i.user.id) {
-            return r.edit(embedComment(`You can't pay yourself.`));
-        }
+        const ousers = i.options.getString("other_users", false) || "";
         if (!is.number(amount)) {
             return r.edit(embedComment(`The amount you provided is invalid.`));
         }
-        await addBalance(
-            user.id,
-            amount,
-            false,
-            `Via admin pay: \`@${i.user.username}\` (${i.user.id})\nReason: ${reason}`,
-            false,
-        );
+        const users = make.array<User>([user]);
+        if (user.bot) {
+            return r.edit(embedComment(`Bots don't have a user profile.`));
+        }
+        if (!isDev(i.user.id) && user.id === i.user.id) {
+            return r.edit(embedComment(`You can't pay yourself.`));
+        }
 
-        await logs.payments(
-            embedComment(
-                `### Payment\n- From: \`${i.user.username}\` (${
-                    i.user.id
-                })\n- To: \`${user.username}\` (${
-                    user.id
-                })\n- Amount: ${getAmount(amount)}\n- For: ${reason}`,
-                "Green",
-            ),
-        );
-        const dmed = await user
-            .send(
+        if (is.string(ousers)) {
+            for await (const id of ousers.split(" ")) {
+                const u = await discord.user(i.client, id, {
+                    fetch: true,
+                    mock: false,
+                });
+                if (!u || u.bot) {
+                    continue;
+                }
+                if (users.find((c) => c.id === u.id)) {
+                    continue;
+                }
+                if (user.id === i.user.id) {
+                    if (!isDev(i.user.id)) {
+                        continue;
+                    }
+                }
+                users.push(u);
+            }
+        }
+        if (!is.array(users)) {
+            return r.edit(
+                embedComment(`You provided no users to send the payment to.`),
+            );
+        }
+        const status = make.array<string>();
+        for await (const c of users) {
+            await addBalance(
+                c.id,
+                amount,
+                false,
+                `Via admin pay: \`@${i.user.username}\` (${i.user.id})\nReason: ${reason}`,
+                false,
+            );
+            await logs.payments(
                 embedComment(
-                    `You were paid ${getAmount(amount)} for:\n>>> ${reason}`,
+                    `### Payment\n- From: \`${i.user.username}\` (${
+                        i.user.id
+                    })\n- To: \`${c.username}\` (${
+                        c.id
+                    })\n- Amount: ${getAmount(amount)}\n- For: ${reason}`,
                     "Green",
                 ),
-            )
-            .catch(noop);
+            );
+            const dmed = await c
+                .send(
+                    embedComment(
+                        `You were paid ${getAmount(
+                            amount,
+                        )} for:\n>>> ${reason}`,
+                        "Green",
+                    ),
+                )
+                .catch(noop);
+            status.push(`\`${dmed ? "🟢" : "🔴"}\` - ${c.toString()}`);
+        }
+        if (!is.array(status)) {
+            return r.edit(embedComment(`No status on the dms...?`));
+        }
         return r.edit(
             embedComment(
                 `${customEmoji.a.z_coins} Paid (${formatNumber(amount)}) ${
                     texts.c.u
-                } to ${user.toString()}${
-                    dmed ? `` : `\n> They weren't messaged about getting paid`
-                }`,
+                } to:\n${status.map((c) => `- ${c}`).join("\n")}`,
                 "Green",
             ),
         );
