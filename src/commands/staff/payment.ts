@@ -1,11 +1,14 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import {
+    colors,
     discord,
     embedComment,
     formatNumber,
+    get,
     is,
     make,
     noop,
+    sleep,
 } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder, type User } from "discord.js";
@@ -111,6 +114,14 @@ export const payment = buildCommand<SlashCommand>({
             ),
         );
         for await (const c of users) {
+            await r.edit(
+                embedComment(
+                    `${
+                        customEmoji.a.z_arrow_blue
+                    } Paying ${c.toString()} and DMing them...`,
+                    colors.purple,
+                ),
+            );
             await addBalance(
                 c.id,
                 amount,
@@ -138,7 +149,16 @@ export const payment = buildCommand<SlashCommand>({
                     ),
                 )
                 .catch(noop);
-            status.push(`\`${dmed ? "🟢" : "🔴"}\` - ${c.toString()}`);
+            status.push(`\`${dmed ? "🟢" : "🔴"}\` ${c.toString()}`);
+            await r.edit(
+                embedComment(
+                    `${customEmoji.a.z_check} Paid ${c.toString()} and ${
+                        dmed ? "DMed them!" : "couldn't DM them. 😔"
+                    }`,
+                    "Green",
+                ),
+            );
+            await sleep(get.secs(1.5));
         }
         if (!is.array(status)) {
             return r.edit(embedComment(`No status on the dms...?`));
@@ -147,7 +167,7 @@ export const payment = buildCommand<SlashCommand>({
             embedComment(
                 `${customEmoji.a.z_coins} Paid (${formatNumber(amount)}) ${
                     texts.c.u
-                } to:\n${status.map((c) => `- ${c}`).join("\n")}`,
+                } to:\n${status.join("\n")}`,
                 "Green",
             ),
         );
