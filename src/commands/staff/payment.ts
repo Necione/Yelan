@@ -102,7 +102,9 @@ export const payment = buildCommand<SlashCommand>({
         const status = make.array<string>();
         await r.edit(
             embedComment(
-                `Adding ${getAmount(amount)} to (${formatNumber(
+                `${customEmoji.a.loading} Adding ${getAmount(
+                    amount,
+                )} to (${formatNumber(
                     users.length,
                 )}) users balance and sending the DMs, one moment...`,
                 "Yellow",
