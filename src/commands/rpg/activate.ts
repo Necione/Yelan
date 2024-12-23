@@ -6,7 +6,7 @@ import { skills } from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
 const forbiddenCombinations = [
-    ["Drain", "Leech"],
+    ["Drain", "Leech", "Absorption"],
     ["Crystallize", "Fatigue"],
     ["Wrath", "Sloth", "Pride", "Greed"],
 ];

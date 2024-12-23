@@ -649,6 +649,49 @@ export async function monsterAttack(
 
     let finalMonsterDamage = monsterDamage * damageReductionFactor;
 
+    const absorptionSkill = getUserSkillLevelData(stats, "Absorption");
+    if (absorptionSkill) {
+        const levelData = absorptionSkill.levelData || {};
+        const triggerChance = levelData.triggerChance || 0;
+        const triggered = Math.random() < triggerChance;
+
+        if (triggered) {
+            messages.push(
+                `\`♨️ ABSORPTION\` triggered! (Lv ${absorptionSkill.level})`,
+            );
+
+            if (absorptionSkill.level < 3) {
+                const halfDamage = finalMonsterDamage / 2;
+
+                const newHp = stats.hp + halfDamage;
+                stats.hp = Math.min(newHp, effectiveMaxHp);
+
+                finalMonsterDamage = halfDamage;
+                messages.push(
+                    `\`♨️\` Negated \`${halfDamage.toFixed(
+                        2,
+                    )}\` damage, and healed \`${halfDamage.toFixed(
+                        2,
+                    )}\` HP (capped at your effective max).`,
+                );
+            } else {
+                const absorbed = finalMonsterDamage;
+
+                const newHp = stats.hp + absorbed;
+                stats.hp = Math.min(newHp, effectiveMaxHp);
+
+                finalMonsterDamage = 0;
+                messages.push(
+                    `\`♨️\` Negated \`${absorbed.toFixed(
+                        2,
+                    )}\` damage, and healed \`${absorbed.toFixed(
+                        2,
+                    )}\` HP (capped at your effective max).`,
+                );
+            }
+        }
+    }
+
     const hasBackstep = skills.has(stats, "Backstep");
     const hasParry = skills.has(stats, "Parry");
     if (hasBackstep && Math.random() < 0.25) {

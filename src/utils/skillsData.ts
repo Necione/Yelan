@@ -18,6 +18,7 @@ export type SkillName =
     | "Growth"
     | "Vigor"
     | "Paladin"
+    | "Absorption"
     | "Drain"
     | "Pride"
     | "Fatigue"
@@ -605,6 +606,48 @@ export const skills = make.array<Skill>([
                 { item: "Lieutenant's Insignia", amount: 5 },
                 { item: "Chaos Oculus", amount: 5 },
                 { item: "Operative's Standard Pocket Watch", amount: 5 },
+            ],
+        },
+    },
+    {
+        name: "Absorption",
+        passive: false,
+        levels: [
+            {
+                level: 1,
+                description:
+                    "Negate X/2 and heal X HP equal to the monster's damage **45%** of the time.",
+                levelData: {
+                    triggerChance: 0.45,
+                },
+            },
+            {
+                level: 2,
+                description:
+                    "Negate X/2 and heal X HP equal to the monster's damage **50%** of the time.",
+                levelData: {
+                    triggerChance: 0.5,
+                },
+            },
+            {
+                level: 3,
+                description:
+                    "Negate X and heal X HP equal to the monster's damage **55%** of the time.",
+                levelData: {
+                    triggerChance: 0.55,
+                },
+            },
+        ],
+        emoji: "♨️",
+        requirements: {
+            adventureRank: 25,
+            rebirthsRequired: 6,
+            coins: 1000,
+            items: [
+                { item: "Tourbillon Device", amount: 3 },
+                { item: "Strange Sword Hilt", amount: 3 },
+                { item: "Spectral Heart", amount: 15 },
+                { item: "Slime Concentrate", amount: 15 },
             ],
         },
     },
