@@ -271,6 +271,7 @@ export async function handleHunt(
         monster.startingHp = initialMonsterHp;
 
         const initialPlayerHp = currentPlayerHp;
+        const effectiveMaxHp = currentPlayerHp;
 
         const createHealthBar = (
             current: number,
@@ -490,6 +491,7 @@ export async function handleHunt(
                     hasCrystallize,
                     hasFatigue,
                     monsterState,
+                    effectiveMaxHp,
                 ));
 
                 if (is.array(monsterMessages)) {

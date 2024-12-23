@@ -98,7 +98,9 @@ export async function handleAbyssBattle(
         );
 
         const initialMonsterHp = currentMonsterHp;
+
         const initialPlayerHp = currentPlayerHp;
+        const effectiveMaxHp = currentPlayerHp;
 
         const createHealthBar = (current: number, max: number, length = 20) => {
             current = Math.max(0, Math.min(current, max));
@@ -249,6 +251,7 @@ export async function handleAbyssBattle(
                     hasCrystallize,
                     hasFatigue,
                     monsterState,
+                    effectiveMaxHp,
                 );
 
                 currentPlayerHp = updatedPlayerHp;

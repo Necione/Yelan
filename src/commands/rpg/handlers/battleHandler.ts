@@ -439,6 +439,7 @@ export async function monsterAttack(
     hasCrystallize: boolean,
     hasFatigue: boolean,
     monsterState: MonsterState,
+    effectiveMaxHp: number,
 ): Promise<{
     currentPlayerHp: number;
     currentMonsterHp: number;
@@ -796,7 +797,7 @@ export async function monsterAttack(
 
             currentPlayerHp = Math.min(
                 currentPlayerHp + healAmount,
-                stats.maxHP,
+                effectiveMaxHp,
             );
 
             messages.push(
@@ -829,7 +830,7 @@ export async function monsterAttack(
 
             currentPlayerHp = Math.min(
                 currentPlayerHp + drainAmount,
-                stats.maxHP,
+                effectiveMaxHp,
             );
 
             messages.push(
@@ -841,7 +842,7 @@ export async function monsterAttack(
         }
     }
 
-    currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP);
+    currentPlayerHp = Math.min(currentPlayerHp, effectiveMaxHp);
     console.log(`${username} Player HP after healing: ${currentPlayerHp}`);
 
     const deathThreshold = getDeathThreshold(stats);
