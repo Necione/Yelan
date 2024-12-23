@@ -19,8 +19,8 @@ export default {
             chance: 90,
         },
     ],
-    baseHp: 8,
-    baseAtk: 6,
+    baseHp: 4,
+    baseAtk: 2,
     getStatsForadventureRank(adventureRank: number) {
         if (!limits.check(adventureRank)) {
             return null;

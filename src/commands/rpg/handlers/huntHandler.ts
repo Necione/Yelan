@@ -534,7 +534,7 @@ export async function handleHunt(
 
                 isPlayerTurn = true;
             }
-            await sleep(get.secs(1));
+            await sleep(get.secs(0.5));
 
             stats.hp = currentPlayerHp;
             await updateUserStats(stats.userId, { hp: { set: stats.hp } });
@@ -553,7 +553,7 @@ export async function handleHunt(
                     "hunt",
                 );
             } catch {
-                /* empty */
+                noop;
             }
             if (thread) {
                 await sendToChannel(thread.id, {
@@ -713,4 +713,56 @@ export async function startHunt(
     await handleHunt(message, stats, p, monsters, handlers);
 
     locked.del(user.id);
+}
+
+export async function startFishingEncounter(
+    message: Message,
+    user: User,
+    monsters?: string[],
+    handlers?: HuntHandlers,
+) {
+    const r = getMessageResponder(message);
+
+    const p = await getProfileByUserId(user.id);
+    if (!p) {
+        return r.edit(embedComment("Unable to find/create your user profile."));
+    }
+
+    const stats = await syncStats(user.id);
+    if (!stats) {
+        return r.edit(
+            embedComment("No stats found for you, please set up your profile."),
+        );
+    }
+
+    if (stats.hp <= 0) {
+        return r.edit(
+            embedComment("You don't have enough HP to fight any monsters!"),
+        );
+    }
+
+    let result: string | undefined;
+    const mergedHandlers: HuntHandlers = {
+        win: async (msg, thr, st, mons, hp, wallet) => {
+            if (handlers?.win) {
+                const val = await handlers.win(msg, thr, st, mons, hp, wallet);
+
+                if (typeof val === "string") {
+                    result = val;
+                }
+            }
+        },
+        lose: async (msg, thr, st, mon, hp, wallet) => {
+            if (handlers?.lose) {
+                const val = await handlers.lose(msg, thr, st, mon, hp, wallet);
+                if (typeof val === "string") {
+                    result = val;
+                }
+            }
+        },
+    };
+
+    await handleHunt(message, stats, p, monsters, mergedHandlers);
+
+    return result;
 }

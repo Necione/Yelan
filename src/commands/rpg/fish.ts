@@ -29,7 +29,7 @@ import {
     selectFish,
     selectFishLength,
 } from "./handlers/fishHandler";
-import { startHunt } from "./handlers/huntHandler";
+import { startFishingEncounter } from "./handlers/huntHandler";
 
 const bait = make.array<string>([
     "Fruit Paste Bait",
@@ -98,6 +98,15 @@ export const fishCommand = buildCommand<SlashCommand>({
             return r.edit(
                 embedComment(
                     "You cannot start a hunt while in The Spiral Abyss!",
+                ),
+            );
+        }
+
+        if (stats.hp <= 0) {
+            locked.del(i.user.id);
+            return r.edit(
+                embedComment(
+                    "You don't have enough HP to go on a fishing trip!",
                 ),
             );
         }
@@ -297,51 +306,66 @@ export const fishCommand = buildCommand<SlashCommand>({
         const timeBeforeFishBites =
             Math.random() * (maxTime - minTime) + minTime;
 
-        if (Math.random() <= 0.2) {
+        if (Math.random() <= 1) {
             const monsterEmbed = await r.edit(
                 embedComment("A monster appears!", "Orange"),
             );
             if (!monsterEmbed) {
+                locked.del(i.user.id);
                 return r.edit(
                     embedComment("Unable to fetch the original message."),
                 );
             }
 
-            await startHunt(monsterEmbed, i.user, ["Floating Hydro Fungus"], {
-                win: async () => {
-                    await r
-                        .edit({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setTitle("Another Day Survived...")
-                                    .setDescription(
-                                        "You defeated the monster and continue fishing <a:loading:1184700865303552031>",
-                                    )
-                                    .setColor("Blue"),
-                            ],
-                            components: [],
-                        })
-                        .catch(noop);
+            const outcome = await startFishingEncounter(
+                monsterEmbed,
+                i.user,
+                ["Floating Hydro Fungus"],
+                {
+                    win: async () => {
+                        await r
+                            .edit({
+                                embeds: [
+                                    new EmbedBuilder()
+                                        .setTitle("Another Day Survived...")
+                                        .setDescription(
+                                            "You defeated the monster!",
+                                        )
+                                        .setColor("Blue"),
+                                ],
+                                components: [],
+                            })
+                            .catch(noop);
+
+                        locked.del(i.user.id);
+                        return "win";
+                    },
+                    lose: async () => {
+                        await cooldowns.set(user, "fish", get.hrs(1));
+                        locked.del(i.user.id);
+                        await r
+                            .edit({
+                                embeds: [
+                                    new EmbedBuilder()
+                                        .setTitle("Fishing Failure!")
+                                        .setDescription(
+                                            "You were defeated by the monster and lost your bait!",
+                                        )
+                                        .setColor("Red"),
+                                ],
+                                components: [],
+                            })
+                            .catch(noop);
+
+                        locked.del(i.user.id);
+                        return "lose";
+                    },
                 },
-                lose: async () => {
-                    await cooldowns.set(user, "fish", get.hrs(1));
-                    locked.del(i.user.id);
-                    await r
-                        .edit({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setTitle("Fishing Failure!")
-                                    .setDescription(
-                                        "You were defeated by the monster and lost your bait!",
-                                    )
-                                    .setColor("Red"),
-                            ],
-                            components: [],
-                        })
-                        .catch(noop);
-                    return;
-                },
-            });
+            );
+
+            if (outcome === "win" || outcome === "lose") {
+                return;
+            }
         }
 
         await sleep(timeBeforeFishBites);

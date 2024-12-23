@@ -239,7 +239,7 @@ export const spell = buildCommand<SlashCommand>({
                         : "No spells in queue.";
 
                 const additionalDescription =
-                    "Skills are activated during a battle in the same order they are casted. Mana is restored at the end of battle.";
+                    "Spells are activated during a battle in the same order they are casted. Mana is restored at the end of battle.";
 
                 const availableSpellsEmbed = new EmbedBuilder()
                     .setColor("Blue")

@@ -9,6 +9,12 @@ import { MonsterElement, MonsterGroup } from "../../../utils/monsterHelper";
 import type { WeaponName, WeaponType } from "../../../utils/rpgitems/weapons";
 import { weapons } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
+import {
+    applyCrystallize,
+    applyElementalEffects,
+    applyFatigue,
+    applyLeechDrain,
+} from "./effectHandler";
 
 export type MonsterState = {
     displaced: boolean;
@@ -74,7 +80,7 @@ export async function playerAttack(
                     stats.maxHP,
                 );
                 messages.push(
-                    `\`✨\` Heal spell casted! Restored \`${healAmount} HP\``,
+                    `\`✨\` Heal spell casted! Restored \`${healAmount}\` HP`,
                 );
                 console.log(
                     `${username} Heal spell: Restored ${healAmount} HP`,
@@ -180,22 +186,33 @@ export async function playerAttack(
         const updateData: Prisma.UserStatsUpdateInput = {
             castQueue: { set: stats.castQueue },
         };
-
         if (spellName === "Heal") {
             updateData.hp = { set: currentPlayerHp };
         }
         if (spellName === "Fury") {
             updateData.attackPower = { set: stats.attackPower };
         }
-
         await updateUserStats(stats.userId, updateData);
     }
 
     if (isFishingMonster(monster)) {
-        messages.push(`\`🎣\` None of your skills will work while fishing`);
-        console.log(
-            `${username} Encountered fishing monster: No skills activated`,
+        messages.push(
+            "`🎣` This is a fishing monster. All your skills are disabled!",
         );
+        console.log(
+            `${username} Fishing monster encountered: skipping skill-based logic.`,
+        );
+
+        const baseAttack = stats.attackPower || 0;
+        currentMonsterHp = Math.max(currentMonsterHp - baseAttack, 0);
+
+        messages.push(
+            `\`⚔️\` You dealt \`${baseAttack.toFixed(
+                2,
+            )}\` basic damage to the ${monster.name} \`(FISHING)\``,
+        );
+        console.log(`${username} Fishing attack: Dealt ${baseAttack} damage`);
+
         return {
             currentMonsterHp,
             currentPlayerHp,
@@ -203,6 +220,8 @@ export async function playerAttack(
             monsterState,
         };
     }
+
+    const usernameLog = `[${stats.userId}]`;
 
     // eslint-disable-next-line prefer-const
     let { paladinSwapped, attackPower } = getEffectiveStats(stats);
@@ -213,7 +232,9 @@ export async function playerAttack(
             `\`🛡️\` Paladin skill activated! Your ATK and DEF Value have been swapped`,
         );
         debugMultipliers.push("Paladin Swapped (ATK and DEF)");
-        console.log(`${username} Paladin skill activated: ATK and DEF swapped`);
+        console.log(
+            `${usernameLog} Paladin skill activated: ATK and DEF swapped`,
+        );
     }
 
     if (hasWrath) {
@@ -223,7 +244,7 @@ export async function playerAttack(
         );
         debugMultipliers.push("Wrath (1.5x)");
         console.log(
-            `${username} Wrath skill activated: Attack power multiplied by 1.5 to ${attackPower}`,
+            `${usernameLog} Wrath skill: Attack power * 1.5 = ${attackPower}`,
         );
     }
 
@@ -231,17 +252,17 @@ export async function playerAttack(
         const poisonDamage = Math.floor(0.2 * monster.startingHp);
         currentMonsterHp = Math.max(currentMonsterHp - poisonDamage, 0);
         messages.push(
-            `\`💚\` Poisoned! The ${monster.name} loses \`${poisonDamage} HP\` due to poison`,
+            `\`💚\` Poisoned! The ${monster.name} loses \`${poisonDamage}\` HP due to poison`,
         );
         debugMultipliers.push(`Poison Damage (${poisonDamage} HP)`);
         console.log(
-            `${username} Poison effect: ${monster.name} loses ${poisonDamage} HP due to poison`,
+            `${usernameLog} Poison effect: -${poisonDamage} HP to ${monster.name}`,
         );
 
         if (currentMonsterHp === 0) {
             monsterState.poisoned = false;
             console.log(
-                `${username} Poison effect ended: ${monster.name} HP reached 0`,
+                `${usernameLog} Poison effect ended: monster HP is now 0`,
             );
         }
     }
@@ -256,7 +277,7 @@ export async function playerAttack(
             );
             debugMultipliers.push("Vigor (1.5x)");
             console.log(
-                `${username} Vigor skill activated: Attack power multiplied by 1.5 to ${attackPower}`,
+                `${usernameLog} Vigor skill: Attack power * 1.5 = ${attackPower}`,
             );
         }
     }
@@ -273,34 +294,27 @@ export async function playerAttack(
 
     let critChance = stats.critChance || 0;
     const critValue = stats.critValue || 1;
-
     const isNobushi = has("Nobushi", monster, true);
-
     if (isNobushi) {
         critChance = 0;
         messages.push(
             `\`👹\` The Ninja's Code prevents you from landing a critical hit`,
         );
-        console.log(`${username} Nobushi trait: Critical hits disabled`);
+        console.log(`${usernameLog} Nobushi trait: Crit disabled`);
     }
-
     const { isCrit, multiplier } = calculateCriticalHit(critChance, critValue);
     if (isCrit) {
         debugMultipliers.push(`Critical Hit (${multiplier}x)`);
-        console.log(
-            `${username} Critical Hit! Multiplier applied: ${multiplier}x`,
-        );
+        console.log(`${usernameLog} Critical hit! * ${multiplier}`);
     }
     attackPower *= multiplier;
 
     if (currentPlayerHp > stats.maxHP) {
         attackPower *= 0.5;
-        messages.push(
-            `\`💜\` You are poisoned due to **OVERHEAL**, and your damage has been halved`,
-        );
+        messages.push(`\`💜\` Overhealed! Your damage is halved`);
         debugMultipliers.push("Overheal (0.5x)");
         console.log(
-            `${username} Overheal: Attack power halved to ${attackPower}`,
+            `${usernameLog} Overheal penalty: Attack power halved => ${attackPower}`,
         );
     }
 
@@ -316,9 +330,8 @@ export async function playerAttack(
     const monsterDefended = defenseResult.monsterDefended;
     const damageReduced = defenseResult.damageReduced;
     monsterState = defenseResult.monsterState;
-
     if (attackMissed) {
-        console.log(`${username} Attack missed`);
+        console.log(`${usernameLog} Attack missed entirely`);
         return {
             currentMonsterHp,
             currentPlayerHp,
@@ -328,11 +341,9 @@ export async function playerAttack(
     }
 
     const vigilanceLevelData = getUserSkillLevelData(stats, "Vigilance");
-
     if (vigilanceLevelData && !vigilanceUsed) {
         const levelData = vigilanceLevelData.levelData || {};
         const secondAttackPercentage = levelData.secondAttackPercentage || 0;
-
         const vigilanceAttackPower = attackPower * secondAttackPercentage;
         currentMonsterHp -= vigilanceAttackPower;
         vigilanceUsed = true;
@@ -340,16 +351,18 @@ export async function playerAttack(
         messages.push(
             `\`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
                 2,
-            )}\` damage to the ${monster.name} \`✨ VIGILANCE\``,
+            )}\` bonus damage \`✨ VIGILANCE\``,
         );
-        debugMultipliers.push(`Vigilance (${secondAttackPercentage * 100}%)`);
+        debugMultipliers.push(
+            `Vigilance (+${(secondAttackPercentage * 100).toFixed(1)}%)`,
+        );
         console.log(
-            `${username} Vigilance activated: Additional ${vigilanceAttackPower} damage dealt`,
+            `${usernameLog} Vigilance: Extra ${vigilanceAttackPower} damage`,
         );
     }
+
     currentMonsterHp -= attackPower;
     debugMultipliers.push(`Final Attack Power (${attackPower})`);
-
     sendDamageMessage(
         attackPower,
         monster.name,
@@ -358,51 +371,46 @@ export async function playerAttack(
         damageReduced,
         messages,
     );
-
     console.log(
-        `${username} Damage Calculation: Multipliers - ${debugMultipliers.join(
+        `${usernameLog} Final Attack: ${attackPower}, multipliers= ${debugMultipliers.join(
             ", ",
-        )}, Final Damage - ${attackPower}`,
+        )}`,
     );
 
     const kindleLevelData = getUserSkillLevelData(stats, "Kindle");
-
-    if (kindleLevelData) {
+    if (kindleLevelData && !isFishingMonster(monster)) {
         const levelData = kindleLevelData.levelData || {};
         const damageBonus = levelData.damageBonus || 0;
 
         const kindleBonusDamage = stats.maxHP * damageBonus;
-        currentMonsterHp -= kindleBonusDamage;
+        currentMonsterHp = Math.max(currentMonsterHp - kindleBonusDamage, 0);
 
         messages.push(
-            `\`🔥\` You dealt an additional \`${kindleBonusDamage.toFixed(
+            `\`🔥\` The Kindle skill activates and deals an extra \`${kindleBonusDamage.toFixed(
                 2,
-            )}\` bonus damage with the Kindle skill`,
+            )}\` damage`,
         );
-        debugMultipliers.push(`Kindle Bonus (${damageBonus * 100}%)`);
+        debugMultipliers.push(`Kindle (${(damageBonus * 100).toFixed(0)}%)`);
         console.log(
-            `${username} Kindle skill: Additional ${kindleBonusDamage} damage dealt`,
+            `${usernameLog} Kindle skill: +${kindleBonusDamage} damage`,
         );
     }
 
     const spiceLevelData = getUserSkillLevelData(stats, "Spice");
-
-    if (spiceLevelData && currentMonsterHp > 0) {
+    if (spiceLevelData && currentMonsterHp > 0 && !isFishingMonster(monster)) {
         const levelData = spiceLevelData.levelData || {};
         const damageBonus = levelData.damageBonus || 0;
 
         const spiceDamageBonus = currentMonsterHp * damageBonus;
-        currentMonsterHp -= spiceDamageBonus;
+        currentMonsterHp = Math.max(currentMonsterHp - spiceDamageBonus, 0);
 
         messages.push(
-            `\`🌶️\` You dealt an additional \`${spiceDamageBonus.toFixed(
+            `\`🌶️\` The Spice skill activates and deals an extra \`${spiceDamageBonus.toFixed(
                 2,
-            )}\` bonus damage with the Spice skill`,
+            )}\` damage`,
         );
-        debugMultipliers.push(`Spice Bonus (${damageBonus * 100}%)`);
-        console.log(
-            `${username} Spice skill: Additional ${spiceDamageBonus} damage dealt`,
-        );
+        debugMultipliers.push(`Spice (${(damageBonus * 100).toFixed(0)}%)`);
+        console.log(`${usernameLog} Spice skill: +${spiceDamageBonus} damage`);
     }
 
     if (
@@ -412,21 +420,26 @@ export async function playerAttack(
     ) {
         currentMonsterHp = 1;
         monsterState.shieldUsed = true;
-        messages.push("`⛔` The Machine's Shield prevents it from dying");
-        console.log(
-            `${username} Machine Shield activated: Monster HP set to 1`,
+        messages.push(
+            "`⛔` The Machine's Shield prevents it from dying this turn!",
         );
+        console.log(`${usernameLog} Machine shield saved the monster at 1 HP`);
     }
 
     const deathThreshold = getDeathThreshold(stats);
     if (currentPlayerHp <= deathThreshold) {
         currentPlayerHp = deathThreshold;
         console.log(
-            `${username} Player HP below death threshold: Set to ${deathThreshold}`,
+            `${usernameLog} Player HP below threshold => set to ${deathThreshold}`,
         );
     }
 
-    return { currentMonsterHp, currentPlayerHp, vigilanceUsed, monsterState };
+    return {
+        currentMonsterHp,
+        currentPlayerHp,
+        vigilanceUsed,
+        monsterState,
+    };
 }
 
 export async function monsterAttack(
@@ -446,16 +459,42 @@ export async function monsterAttack(
 }> {
     const username = `[${stats.userId}]`;
 
-    if (typeof monsterState.fortressUsed === "undefined") {
-        monsterState.fortressUsed = false;
-    }
-
     if (monsterState.stunned) {
         messages.push(
             `\`💫\` The ${monster.name} is stunned and couldn't attack this turn`,
         );
-        console.log(`${username} ${monster.name} is stunned: Attack skipped`);
+        console.log(
+            `${username} ${monster.name} stunned => skip monster attack`,
+        );
         monsterState.stunned = false;
+        return { currentPlayerHp, currentMonsterHp };
+    }
+
+    if (isFishingMonster(monster)) {
+        const monsterStats = monster.getStatsForadventureRank(
+            stats.adventureRank,
+        );
+        if (!monsterStats) {
+            throw new Error(`Stats not found for monster: ${monster.name}`);
+        }
+        const monsterDamage = getRandomValue(
+            monsterStats.minDamage,
+            monsterStats.maxDamage,
+        );
+
+        currentPlayerHp -= monsterDamage;
+        messages.push(
+            `\`⚔️\` The ${monster.name} dealt \`${monsterDamage.toFixed(
+                2,
+            )}\` damage to you \`(FISHING)\``,
+        );
+        console.log(
+            `${username} Fishing monster => -${monsterDamage} HP to player`,
+        );
+
+        currentPlayerHp = Math.max(currentPlayerHp, getDeathThreshold(stats));
+        await updateUserStats(stats.userId, { hp: { set: currentPlayerHp } });
+
         return { currentPlayerHp, currentMonsterHp };
     }
 
@@ -473,37 +512,26 @@ export async function monsterAttack(
         messages.push(
             `\`🌿\` The ${monster.name} regenerated \`${regenAmount}\` HP!`,
         );
-        console.log(
-            `${username} ${monster.name} regenerated ${regenAmount} HP`,
-        );
+        console.log(`${username} ${monster.name} +${regenAmount} HP (Geo)`);
     }
 
     let monsterDamage = getRandomValue(
         monsterStats.minDamage,
         monsterStats.maxDamage,
     );
-    console.log(`${username} ${monster.name} base damage: ${monsterDamage}`);
+    console.log(`${username} ${monster.name} base damage => ${monsterDamage}`);
 
     switch (monster.mutationType) {
         case "Bloodthirsty":
             monsterDamage *= 2;
-            console.log(
-                `${username} Mutation Bloodthirsty: Damage doubled to ${monsterDamage}`,
-            );
+            console.log(`${username} Bloodthirsty => x2 => ${monsterDamage}`);
             break;
         case "Strange":
             monsterDamage *= 1.5;
-            console.log(
-                `${username} Mutation Strange: Damage multiplied by 1.5 to ${monsterDamage}`,
-            );
+            console.log(`${username} Strange => x1.5 => ${monsterDamage}`);
             break;
         case "Infected":
-            console.log(`${username} Mutation Infected: No damage change`);
-            break;
-        default:
-            console.log(
-                `${username} Mutation Type: ${monster.mutationType} - No damage change`,
-            );
+            console.log(`${username} Infected => no direct damage change`);
             break;
     }
 
@@ -511,14 +539,12 @@ export async function monsterAttack(
         if (!monsterState.isEnraged) {
             monsterState.isEnraged = true;
             monsterDamage *= 2;
-            messages.push(`\`🐲\` The ${monster.name} has become **enraged**`);
-            console.log(
-                `${username} ${monster.name} became enraged: Damage doubled to ${monsterDamage}`,
-            );
+            messages.push(`\`🐲\` The ${monster.name} became **enraged**!`);
+            console.log(`${username} enrage => x2 => ${monsterDamage}`);
         } else {
             monsterDamage *= 2;
             console.log(
-                `${username} ${monster.name} is already enraged: Damage doubled to ${monsterDamage}`,
+                `${username} monster already enraged => x2 => ${monsterDamage}`,
             );
         }
     }
@@ -531,27 +557,29 @@ export async function monsterAttack(
         }
         monsterDamage *= monsterState.dendroAttackMultiplier;
         messages.push(
-            `\`🍁\` The ${monster.name}'s **Dendro** element increases its attack power by __10%__`,
+            `\`🍁\` The ${
+                monster.name
+            } grows stronger! +10% Dendro attack (now x${monsterState.dendroAttackMultiplier.toFixed(
+                2,
+            )})`,
         );
         console.log(
-            `${username} Dendro element: Attack power multiplied by ${monsterState.dendroAttackMultiplier} to ${monsterDamage}`,
+            `${username} Dendro => x${monsterState.dendroAttackMultiplier.toFixed(
+                2,
+            )} => ${monsterDamage}`,
         );
     }
 
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
-
     let monsterCritChance = monster.critChance || 0;
     let monsterCritValue = monster.critValue || 1;
-
     if (equippedWeaponName && equippedWeaponName.includes("Absolution")) {
         monsterCritChance = 0;
         monsterCritValue = 1;
         messages.push(
-            `\`⚜️\` Your **Absolution** prevents enemies from landing Critical Hits on you`,
+            "`⚜️` Your Absolution negates the monster's critical hits",
         );
-        console.log(
-            `${username} Absolution equipped: Monster critical hits disabled`,
-        );
+        console.log(`${username} Absolution => monster crit disabled`);
     }
 
     const { isCrit, multiplier } = calculateCriticalHit(
@@ -559,207 +587,96 @@ export async function monsterAttack(
         monsterCritValue,
     );
     if (isCrit) {
-        console.log(
-            `${username} ${monster.name} landed a Critical Hit! Multiplier: ${multiplier}x`,
-        );
+        console.log(`${username} ${monster.name} crit => x${multiplier}`);
     }
     monsterDamage *= multiplier;
 
     if (hasCrystallize && !isFishingMonster(monster)) {
         const monsterTurn = Math.ceil(turnNumber / 2);
-
-        let damageMultiplier: number;
-        let effectDescription = "";
-
-        if (monsterTurn <= 6) {
-            const reductionPercent = 25 - Math.floor(monsterTurn - 1) * 5;
-            damageMultiplier = 1 - reductionPercent / 100;
-
-            monsterDamage *= damageMultiplier;
-
-            effectDescription = `\`🧊\` Crystallize reduces the ${monster.name}'s damage by __${reductionPercent}%__`;
-            console.log(
-                `${username} Crystallize active: Damage reduced by ${reductionPercent}% to ${monsterDamage}`,
-            );
-        } else {
-            const increasePercent = (monsterTurn - 6) * 5;
-            damageMultiplier = 1 + increasePercent / 100;
-
-            monsterDamage *= damageMultiplier;
-
-            effectDescription = `\`🧊\` Crystallize increases the ${monster.name}'s damage by __${increasePercent}%__`;
-            console.log(
-                `${username} Crystallize active: Damage increased by ${increasePercent}% to ${monsterDamage}`,
-            );
-        }
-
-        messages.push(effectDescription);
+        monsterDamage = applyCrystallize(
+            monsterDamage,
+            monsterTurn,
+            monster.name,
+            username,
+            messages,
+        );
     }
-
     if (hasFatigue && !isFishingMonster(monster)) {
         const monsterTurn = Math.ceil(turnNumber / 2);
-
-        let damageMultiplier: number;
-        let effectDescription = "";
-
-        const percentChange = 50 - (monsterTurn - 1) * 10;
-
-        if (percentChange >= 0) {
-            damageMultiplier = 1 + percentChange / 100;
-            effectDescription = `\`🐌\` Fatigue increases the ${monster.name}'s damage by __${percentChange}%__`;
-            console.log(
-                `${username} Fatigue active: Damage increased by ${percentChange}% to ${monsterDamage}`,
-            );
-        } else {
-            damageMultiplier = 1 + percentChange / 100;
-            effectDescription = `\`🐌\` Fatigue reduces the ${
-                monster.name
-            }'s damage by __${Math.abs(percentChange)}%__`;
-            console.log(
-                `${username} Fatigue active: Damage reduced by ${Math.abs(
-                    percentChange,
-                )}% to ${monsterDamage}`,
-            );
-        }
-
-        monsterDamage *= damageMultiplier;
-        messages.push(effectDescription);
+        monsterDamage = applyFatigue(
+            monsterDamage,
+            monsterTurn,
+            monster.name,
+            username,
+            messages,
+        );
     }
 
     const { defValue } = getEffectiveStats(stats);
-
     const defChance = stats.defChance || 0;
     let defended = false;
     let damageReduced = 0;
-
     if (monster.group !== "Machine") {
         defended = Math.random() * 100 < defChance;
-
         if (defended) {
-            const initialMonsterDamage = monsterDamage;
+            const pre = monsterDamage;
             monsterDamage = (100 * monsterDamage) / (defValue + 25);
-            damageReduced = initialMonsterDamage - monsterDamage;
+            damageReduced = pre - monsterDamage;
             console.log(
-                `${username} Player defended: Damage reduced by ${damageReduced} to ${monsterDamage}`,
+                `${username} defends => -${damageReduced} => ${monsterDamage}`,
             );
         }
     } else {
-        messages.push(
-            `\`⚙️\` The ${monster.name} ignores your defenses and deals **TRUE DAMAGE**`,
-        );
-        console.log(
-            `${username} Machine type: Defenses ignored, TRUE DAMAGE dealt`,
-        );
+        messages.push(`\`⚙️\` The ${monster.name} ignores your defenses`);
+        console.log(`${username} Machine => ignoring defenses`);
     }
 
     const hasVortexVanquisher =
         equippedWeaponName && equippedWeaponName.includes("Vortex Vanquisher");
-
     const damageReductionFactor = hasVortexVanquisher ? 0.5 : 1;
     if (hasVortexVanquisher) {
-        messages.push(
-            `\`🌀\` **Vortex Vanquisher** has reduced all damage taken by __50%__`,
-        );
-        console.log(
-            `${username} Vortex Vanquisher equipped: Damage reduced by 50%`,
-        );
+        messages.push("`🌀` Vortex Vanquisher => damage taken -50%");
+        console.log(`${username} Vortex => monsterDamage * 0.5`);
     }
 
-    if (
-        monster.element === MonsterElement.Electro &&
-        Math.random() < 0.5 &&
-        equippedWeaponName &&
-        !equippedWeaponName.includes("Everlasting Moonglow")
-    ) {
-        const surgeDamage = Math.ceil(monsterDamage * 0.5);
-        currentPlayerHp -= surgeDamage;
-        messages.push(
-            `\`⚔️\` The ${monster.name} dealt \`${surgeDamage}\` damage to you \`⚡ SURGE\``,
-        );
-        console.log(
-            `${username} Electro Surge: Dealt ${surgeDamage} damage to player`,
-        );
-    }
-
-    if (monster.element === MonsterElement.Pyro) {
-        const burnDamage = Math.ceil(
-            stats.maxHP * (0.03 + 0.01 * Math.floor(stats.adventureRank / 2)),
-        );
-        const reducedBurnDamage = burnDamage * damageReductionFactor;
-        currentPlayerHp -= reducedBurnDamage;
-        messages.push(
-            `\`🔥\` The ${monster.name} inflicted Burn! You took \`${reducedBurnDamage}\` Burn damage`,
-        );
-        console.log(
-            `${username} Pyro Burn: Took ${reducedBurnDamage} Burn damage`,
-        );
-    }
-
-    if (monster.element === MonsterElement.Hydro && Math.random() < 0.5) {
-        const splashDamage = Math.ceil(stats.hp * 0.1);
-        currentPlayerHp -= splashDamage;
-        messages.push(
-            `\`⚔️\` The ${monster.name} dealt \`${splashDamage}\` damage to you \`💦 SPLASH\``,
-        );
-        console.log(`${username} Hydro Splash: Took ${splashDamage} damage`);
-    }
-
-    if (monster.element === MonsterElement.Cryo && Math.random() < 0.5) {
-        const crippleDamage = Math.ceil(
-            stats.maxHP * (0.05 + 0.01 * Math.floor(stats.adventureRank / 2)),
-        );
-
-        const reducedCrippleDamage = Math.floor(
-            crippleDamage * damageReductionFactor,
-        );
-        currentPlayerHp -= reducedCrippleDamage;
-        messages.push(
-            `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${reducedCrippleDamage}\` Cripple damage`,
-        );
-        console.log(
-            `${username} Cryo Cripple: Took ${reducedCrippleDamage} Cripple damage`,
-        );
-    }
-
-    let reducedMonsterDamage = monsterDamage * damageReductionFactor;
-    console.log(
-        `${username} Monster Damage after reductions: ${reducedMonsterDamage}`,
+    monsterDamage = applyElementalEffects(
+        monster,
+        monsterDamage,
+        stats,
+        messages,
+        damageReductionFactor,
     );
+
+    let finalMonsterDamage = monsterDamage * damageReductionFactor;
 
     const hasBackstep = skills.has(stats, "Backstep");
     const hasParry = skills.has(stats, "Parry");
-
-    if (hasBackstep && Math.random() < 0.25 && !isFishingMonster(monster)) {
+    if (hasBackstep && Math.random() < 0.25) {
+        messages.push("`💨` You dodged the attack completely with Backstep");
+        console.log(`${username} Backstep => 0 dmg`);
+        finalMonsterDamage = 0;
+    } else if (hasParry && Math.random() < 0.2) {
+        const parried = finalMonsterDamage * 0.5;
+        finalMonsterDamage *= 0.5;
+        currentMonsterHp -= parried;
         messages.push(
-            `\`💨\` Backstep skill activated! You dodged the attack completely`,
+            `\`🎆\` Parry => you reflected \`${parried.toFixed(
+                2,
+            )}\` damage back to the ${monster.name}`,
         );
-        reducedMonsterDamage = 0;
-        console.log(`${username} Backstep skill activated: Dodged attack`);
-    } else {
-        if (hasParry && Math.random() < 0.2 && !isFishingMonster(monster)) {
-            const parriedDamage = reducedMonsterDamage * 0.5;
-            reducedMonsterDamage *= 0.5;
-            currentMonsterHp -= parriedDamage;
-            messages.push(
-                `\`🎆\` Parry skill activated! You parried __50%__ of the incoming damage \`(${parriedDamage.toFixed(
-                    2,
-                )})\`, dealing it back to the ${monster.name}`,
-            );
-            console.log(
-                `${username} Parry skill activated: Parried ${parriedDamage} damage back to ${monster.name}`,
-            );
-        }
+        console.log(
+            `${username} Parry => monster HP -${parried}, finalMonsterDamage => ${finalMonsterDamage}`,
+        );
     }
 
     let resistanceReduced = 0;
     const resistanceEffect = stats.activeEffects.find(
-        (effect) => effect.name === "Resistance" && effect.remainingUses > 0,
+        (eff) => eff.name === "Resistance" && eff.remainingUses > 0,
     );
     if (resistanceEffect) {
-        const initialDamage = reducedMonsterDamage;
-        reducedMonsterDamage *= resistanceEffect.effectValue;
-        resistanceReduced = initialDamage - reducedMonsterDamage;
-
+        const before = finalMonsterDamage;
+        finalMonsterDamage *= resistanceEffect.effectValue;
+        resistanceReduced = before - finalMonsterDamage;
         resistanceEffect.remainingUses -= 1;
         if (resistanceEffect.remainingUses <= 0) {
             stats.activeEffects = stats.activeEffects.filter(
@@ -768,100 +685,37 @@ export async function monsterAttack(
             console.log(`${username} Resistance effect expired`);
         }
         console.log(
-            `${username} Resistance effect: Damage reduced by ${resistanceReduced}`,
+            `${username} Resistance => -${resistanceReduced} => ${finalMonsterDamage}`,
         );
     }
 
-    currentPlayerHp -= reducedMonsterDamage;
-    console.log(
-        `${username} Took ${reducedMonsterDamage} damage from ${monster.name}`,
+    currentPlayerHp -= finalMonsterDamage;
+    console.log(`${username} took ${finalMonsterDamage} from ${monster.name}`);
+
+    currentPlayerHp = applyLeechDrain(
+        stats,
+        monster,
+        currentPlayerHp,
+        currentMonsterHp,
+        effectiveMaxHp,
+        messages,
     );
 
-    const leechLevelData = getUserSkillLevelData(stats, "Leech");
-    if (
-        leechLevelData &&
-        !isFishingMonster(monster) &&
-        !has(["Boss"], monster, true)
-    ) {
-        const levelData = leechLevelData.levelData || {};
-
-        const lifestealPercentage = levelData.lifestealPercentage || 0;
-        const triggerChance = levelData.triggerChance || 0;
-
-        const leechTriggered = Math.random() < triggerChance;
-
-        if (leechTriggered) {
-            const healAmount = Math.ceil(
-                monster.startingHp * lifestealPercentage,
-            );
-
-            currentPlayerHp = Math.min(
-                currentPlayerHp + healAmount,
-                effectiveMaxHp,
-            );
-
-            messages.push(
-                `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}`,
-            );
-            console.log(
-                `${username} Leech skill activated: Healed ${healAmount} HP from ${monster.name}`,
-            );
-        }
-    }
-
-    const drainLevelData = getUserSkillLevelData(stats, "Drain");
-    if (
-        drainLevelData &&
-        !isFishingMonster(monster) &&
-        !has(["Boss"], monster, true)
-    ) {
-        const levelData = drainLevelData.levelData || {};
-        const lifestealPercentage = levelData.lifestealPercentage || 0;
-        const triggerChance = levelData.triggerChance || 0;
-
-        const drainTriggered = Math.random() < triggerChance;
-
-        if (drainTriggered && currentMonsterHp > 0) {
-            const drainAmount = Math.ceil(
-                currentMonsterHp * lifestealPercentage,
-            );
-
-            currentMonsterHp = Math.max(currentMonsterHp - drainAmount, 0);
-
-            currentPlayerHp = Math.min(
-                currentPlayerHp + drainAmount,
-                effectiveMaxHp,
-            );
-
-            messages.push(
-                `\`🩸\` Drain skill activated! You drained \`${drainAmount}\` HP directly from the ${monster.name}`,
-            );
-            console.log(
-                `${username} Drain skill activated: Drained ${drainAmount} HP from ${monster.name}`,
-            );
-        }
-    }
-
     currentPlayerHp = Math.min(currentPlayerHp, effectiveMaxHp);
-    console.log(`${username} Player HP after healing: ${currentPlayerHp}`);
+    console.log(`${username} HP after => ${currentPlayerHp}`);
 
     const deathThreshold = getDeathThreshold(stats);
-
     if (currentPlayerHp <= deathThreshold) {
         if (skills.has(stats, "Fortress") && !monsterState.fortressUsed) {
             currentPlayerHp = 1;
-            messages.push(
-                "`💀` Fortress skill activated. You should've died this turn",
-            );
             monsterState.fortressUsed = true;
-            console.log(
-                `${username} Fortress skill activated: Player HP set to 1`,
+            messages.push(
+                "`💀` Fortress skill => you survived at 1 HP instead of dying!",
             );
+            console.log(`${username} Fortress => set HP = 1`);
         } else {
             currentPlayerHp = deathThreshold;
-            console.log(
-                `${username} Player HP below death threshold: Set to ${deathThreshold}`,
-            );
+            console.log(`${username} HP below threshold => ${deathThreshold}`);
         }
     }
 
@@ -870,36 +724,26 @@ export async function monsterAttack(
         activeEffects: { set: stats.activeEffects },
     });
 
-    let critText = "";
-    if (
-        isCrit &&
-        (!equippedWeaponName || !equippedWeaponName.includes("Absolution"))
-    ) {
-        critText = "`💢 CRIT`";
-    }
-
-    let defendText = "";
-    if (defended && damageReduced > 0) {
-        defendText = `\`🛡️ DEFENDED ${damageReduced.toFixed(2)}\``;
-    }
-
-    let resistText = "";
-    if (resistanceReduced > 0) {
-        resistText = `\`🌺 RESIST ${resistanceReduced.toFixed(2)}\``;
-    }
-
-    const finalDamageDealt = hasVortexVanquisher
-        ? reducedMonsterDamage
-        : monsterDamage;
+    const critText =
+        isCrit && !equippedWeaponName?.includes("Absolution")
+            ? "`💢 CRIT`"
+            : "";
+    const defendText =
+        defended && damageReduced > 0
+            ? `\`🛡️ DEFENDED ${damageReduced.toFixed(2)}\``
+            : "";
+    const resistText =
+        resistanceReduced > 0
+            ? `\`🌺 RESIST ${resistanceReduced.toFixed(2)}\``
+            : "";
 
     messages.push(
-        `\`⚔️\` The ${monster.name} dealt \`${finalDamageDealt.toFixed(
+        `\`⚔️\` The ${monster.name} dealt \`${finalMonsterDamage.toFixed(
             2,
         )}\` damage to you ${defendText} ${critText} ${resistText}`,
     );
-
     console.log(
-        `${username} Final Damage Dealt: ${finalDamageDealt}, Defended: ${defended}, Resistance Reduced: ${resistanceReduced}`,
+        `${username} finalMonsterDamage=${finalMonsterDamage}, defended=${defended}, resist=${resistanceReduced}`,
     );
 
     return { currentPlayerHp, currentMonsterHp };
@@ -1245,6 +1089,6 @@ function getEffectiveStats(stats: UserStats): {
     return { attackPower, defValue, paladinSwapped };
 }
 
-function isFishingMonster(monster: Monster): boolean {
+export function isFishingMonster(monster: Monster): boolean {
     return has("Fishing", monster, true);
 }

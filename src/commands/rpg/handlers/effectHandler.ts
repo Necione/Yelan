@@ -1,0 +1,199 @@
+import type { UserStats } from "@prisma/client";
+import { type Monster } from "../../../utils/hunt";
+import { MonsterElement } from "../../../utils/monsterHelper";
+import type { WeaponName } from "../../../utils/rpgitems/weapons";
+import { getUserSkillLevelData } from "../../../utils/skillsData";
+import { has, isFishingMonster } from "./battleHandler";
+
+export function applyElementalEffects(
+    monster: Monster,
+    monsterDamage: number,
+    stats: UserStats,
+    messages: string[],
+    damageReductionFactor: number,
+): number {
+    const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
+
+    if (
+        monster.element === MonsterElement.Electro &&
+        Math.random() < 0.5 &&
+        equippedWeaponName &&
+        !equippedWeaponName.includes("Everlasting Moonglow")
+    ) {
+        const surgeDamage = Math.ceil(monsterDamage * 0.5);
+        stats.hp -= surgeDamage;
+        messages.push(
+            `\`⚔️\` The ${monster.name} dealt \`${surgeDamage}\` damage to you \`⚡ SURGE\``,
+        );
+    }
+
+    if (monster.element === MonsterElement.Pyro) {
+        const burnDamage = Math.ceil(
+            stats.maxHP * (0.03 + 0.01 * Math.floor(stats.adventureRank / 2)),
+        );
+        const reducedBurnDamage = Math.ceil(burnDamage * damageReductionFactor);
+        stats.hp -= reducedBurnDamage;
+        messages.push(
+            `\`🔥\` The ${monster.name} inflicted Burn! You took \`${reducedBurnDamage}\` Burn damage`,
+        );
+    }
+
+    if (monster.element === MonsterElement.Hydro && Math.random() < 0.5) {
+        const splashDamage = Math.ceil(stats.hp * 0.1);
+        stats.hp -= splashDamage;
+        messages.push(
+            `\`⚔️\` The ${monster.name} dealt \`${splashDamage}\` damage to you \`💦 SPLASH\``,
+        );
+    }
+
+    if (monster.element === MonsterElement.Cryo && Math.random() < 0.5) {
+        const crippleDamage = Math.ceil(
+            stats.maxHP * (0.05 + 0.01 * Math.floor(stats.adventureRank / 2)),
+        );
+        const reducedCrippleDamage = Math.floor(
+            crippleDamage * damageReductionFactor,
+        );
+        stats.hp -= reducedCrippleDamage;
+        messages.push(
+            `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${reducedCrippleDamage}\` Cripple damage`,
+        );
+    }
+
+    return monsterDamage;
+}
+
+export function applyCrystallize(
+    monsterDamage: number,
+    monsterTurn: number,
+    monsterName: string,
+    username: string,
+    messages: string[],
+): number {
+    let damageMultiplier = 1;
+    let effectDescription = "";
+
+    if (monsterTurn <= 6) {
+        const reductionPercent = 25 - (monsterTurn - 1) * 5;
+        damageMultiplier = 1 - reductionPercent / 100;
+        effectDescription = `\`🧊\` Crystallize reduces the ${monsterName}'s damage by __${reductionPercent}%__`;
+        messages.push(effectDescription);
+        monsterDamage *= damageMultiplier;
+        console.log(
+            `${username} Crystallize => -${reductionPercent}% => ${monsterDamage}`,
+        );
+    } else {
+        const increasePercent = (monsterTurn - 6) * 5;
+        damageMultiplier = 1 + increasePercent / 100;
+        effectDescription = `\`🧊\` Crystallize increases the ${monsterName}'s damage by __${increasePercent}%__`;
+        messages.push(effectDescription);
+        monsterDamage *= damageMultiplier;
+        console.log(
+            `${username} Crystallize => +${increasePercent}% => ${monsterDamage}`,
+        );
+    }
+    return monsterDamage;
+}
+
+export function applyFatigue(
+    monsterDamage: number,
+    monsterTurn: number,
+    monsterName: string,
+    username: string,
+    messages: string[],
+): number {
+    const percentChange = 50 - (monsterTurn - 1) * 10;
+    let damageMultiplier = 1;
+    let effectDescription = "";
+
+    if (percentChange >= 0) {
+        damageMultiplier = 1 + percentChange / 100;
+        effectDescription = `\`🐌\` Fatigue increases the ${monsterName}'s damage by __${percentChange}%__`;
+        console.log(
+            `${username} Fatigue => +${percentChange}% => monsterDamage`,
+        );
+    } else {
+        damageMultiplier = 1 + percentChange / 100;
+        effectDescription = `\`🐌\` Fatigue reduces the ${monsterName}'s damage by __${Math.abs(
+            percentChange,
+        )}%__`;
+        console.log(
+            `${username} Fatigue => -${Math.abs(
+                percentChange,
+            )}% => monsterDamage`,
+        );
+    }
+    monsterDamage *= damageMultiplier;
+    messages.push(effectDescription);
+
+    return monsterDamage;
+}
+
+export function applyLeechDrain(
+    stats: UserStats,
+    monster: Monster,
+    currentPlayerHp: number,
+    currentMonsterHp: number,
+    effectiveMaxHp: number,
+    messages: string[],
+): number {
+    const username = `[${stats.userId}]`;
+
+    const leechLevelData = getUserSkillLevelData(stats, "Leech");
+    if (
+        leechLevelData &&
+        !isFishingMonster(monster) &&
+        !has(["Boss"], monster, true)
+    ) {
+        const levelData = leechLevelData.levelData || {};
+        const lifestealPercentage = levelData.lifestealPercentage || 0;
+        const triggerChance = levelData.triggerChance || 0;
+
+        const leechTriggered = Math.random() < triggerChance;
+        if (leechTriggered) {
+            const healAmount = Math.ceil(
+                monster.startingHp * lifestealPercentage,
+            );
+            currentPlayerHp = Math.min(
+                currentPlayerHp + healAmount,
+                effectiveMaxHp,
+            );
+            messages.push(
+                `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}`,
+            );
+            console.log(`${username} => Leech +${healAmount} HP`);
+        }
+    }
+
+    const drainLevelData = getUserSkillLevelData(stats, "Drain");
+    if (
+        drainLevelData &&
+        !isFishingMonster(monster) &&
+        !has(["Boss"], monster, true)
+    ) {
+        const levelData = drainLevelData.levelData || {};
+        const lifestealPercentage = levelData.lifestealPercentage || 0;
+        const triggerChance = levelData.triggerChance || 0;
+
+        const drainTriggered = Math.random() < triggerChance;
+        if (drainTriggered && currentMonsterHp > 0) {
+            const drainAmount = Math.ceil(
+                currentMonsterHp * lifestealPercentage,
+            );
+            currentMonsterHp = Math.max(currentMonsterHp - drainAmount, 0);
+
+            const newHp = Math.min(
+                currentPlayerHp + drainAmount,
+                effectiveMaxHp,
+            );
+            messages.push(
+                `\`🩸\` Drain skill activated! You drained \`${drainAmount}\` HP from the ${monster.name}`,
+            );
+            console.log(
+                `${username} => Drain +${drainAmount} HP => monster HP -${drainAmount}`,
+            );
+            return newHp;
+        }
+    }
+
+    return currentPlayerHp;
+}
