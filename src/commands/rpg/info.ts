@@ -15,6 +15,40 @@ import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 import { getUserSkillLevelData, skills } from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
+const specialEffects: Array<{
+    substring: string;
+    effect: string;
+}> = [
+    {
+        substring: "Absolution",
+        effect: "Enemies can never land a Critical Attack on you.",
+    },
+    {
+        substring: "Memory of Dust",
+        effect: "Keep hunting for another 500 HP after death.",
+    },
+    {
+        substring: "Wolf's Gravestone",
+        effect: "Deal 20% more damage per 1000 HP the monster has.",
+    },
+    {
+        substring: "Vortex Vanquisher",
+        effect: "Reduce all damage taken by 50%.",
+    },
+    {
+        substring: "Everlasting Moonglow",
+        effect: "Disable all Anemo and Electro elemental effects.",
+    },
+    {
+        substring: "Aqua Simulacra",
+        effect: "Put yourself in the hands of fate.",
+    },
+    {
+        substring: "Calamity Queller",
+        effect: "Monsters can no longer defend.",
+    },
+];
+
 export const info = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("info")
@@ -364,55 +398,13 @@ export const info = buildCommand<SlashCommand>({
                     value: statsDisplay,
                 });
 
-            if (fullWeaponName && fullWeaponName.includes("Absolution")) {
-                embed.addFields({
-                    name: "Special Effect",
-                    value: "Enemies can never land a Critical Attack on you.",
-                });
-            }
-
-            if (fullWeaponName && fullWeaponName.includes("Memory of Dust")) {
-                embed.addFields({
-                    name: "Special Effect",
-                    value: "Keep hunting for another 500 HP after death.",
-                });
-            }
-
-            if (
-                fullWeaponName &&
-                fullWeaponName.includes("Wolf's Gravestone")
-            ) {
-                embed.addFields({
-                    name: "Special Effect",
-                    value: "Deal 20% more damage per 1000 HP the monster has.",
-                });
-            }
-
-            if (
-                fullWeaponName &&
-                fullWeaponName.includes("Vortex Vanquisher")
-            ) {
-                embed.addFields({
-                    name: "Special Effect",
-                    value: "Reduce all damage taken by 50%.",
-                });
-            }
-
-            if (
-                fullWeaponName &&
-                fullWeaponName.includes("Everlasting Moonglow")
-            ) {
-                embed.addFields({
-                    name: "Special Effect",
-                    value: "Disable all Anemo and Electro elemental effects.",
-                });
-            }
-
-            if (fullWeaponName && fullWeaponName.includes("Aqua Simulacra")) {
-                embed.addFields({
-                    name: "Special Effect",
-                    value: "Put yourself in the hands of fate.",
-                });
+            for (const { substring, effect } of specialEffects) {
+                if (fullWeaponName.includes(substring)) {
+                    embed.addFields({
+                        name: "Special Effect",
+                        value: effect,
+                    });
+                }
             }
 
             return r.edit({ embeds: [embed] });

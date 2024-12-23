@@ -955,6 +955,7 @@ export function checkMonsterDefenses(
     let attackMissed = false;
     let monsterDefended = false;
     let damageReduced = 0;
+
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
 
     if (has("Agent", monster) && !monsterState.vanishedUsed) {
@@ -1018,11 +1019,20 @@ export function checkMonsterDefenses(
         );
     }
 
-    const monsterDefChance = monster.defChance || 0;
+    let monsterDefChance = monster.defChance || 0;
     const monsterDefValue = monster.defValue || 0;
 
-    const monsterDefendedCheck = Math.random() * 100 < monsterDefChance;
+    if (equippedWeaponName && equippedWeaponName.includes("Calamity Queller")) {
+        monsterDefChance = 0;
+        messages.push(
+            `\`🌊\` **Calamity Queller** prevents the ${monster.name} from defending`,
+        );
+        console.log(
+            `${username} Calamity Queller equipped => monster's defChance = 0`,
+        );
+    }
 
+    const monsterDefendedCheck = Math.random() * 100 < monsterDefChance;
     if (monsterDefendedCheck) {
         const initialAttackPower = attackPower;
         attackPower = (100 * attackPower) / (monsterDefValue + 25);
