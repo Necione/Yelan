@@ -242,6 +242,8 @@ model UserStats {
   maxMana                   Int            @default(20)
   hp                        Int            @default(100)
   maxHP                     Int            @default(100)
+  shield                    Int            @default(0)
+  maxShield                 Int            @default(0)
   baseAttack                Float          @default(5)
   attackPower               Float          @default(5)
   critChance                Float          @default(0)

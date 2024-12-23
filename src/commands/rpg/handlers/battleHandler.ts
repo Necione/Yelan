@@ -689,8 +689,11 @@ export async function monsterAttack(
         );
     }
 
-    currentPlayerHp -= finalMonsterDamage;
-    console.log(`${username} took ${finalMonsterDamage} from ${monster.name}`);
+    const leftover = applyShieldThenHp(stats, finalMonsterDamage);
+    currentPlayerHp -= leftover;
+    console.log(
+        `${username} took ${finalMonsterDamage} total damage (${leftover} to HP) from ${monster.name}. Shield now = ${stats.shield}`,
+    );
 
     currentPlayerHp = applyLeechDrain(
         stats,
@@ -1101,4 +1104,22 @@ function getEffectiveStats(stats: UserStats): {
 
 export function isFishingMonster(monster: Monster): boolean {
     return has("Fishing", monster, true);
+}
+
+export function applyShieldThenHp(
+    stats: UserStats,
+    incomingDamage: number,
+): number {
+    let leftover = incomingDamage;
+
+    if (stats.shield > 0) {
+        if (stats.shield >= leftover) {
+            stats.shield -= leftover;
+            leftover = 0;
+        } else {
+            leftover -= stats.shield;
+            stats.shield = 0;
+        }
+    }
+    return leftover;
 }

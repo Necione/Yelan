@@ -3,7 +3,7 @@ import { type Monster } from "../../../utils/hunt";
 import { MonsterElement } from "../../../utils/monsterHelper";
 import type { WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
-import { has, isFishingMonster } from "./battleHandler";
+import { applyShieldThenHp, has, isFishingMonster } from "./battleHandler";
 
 export function applyElementalEffects(
     monster: Monster,
@@ -21,7 +21,8 @@ export function applyElementalEffects(
         !equippedWeaponName.includes("Everlasting Moonglow")
     ) {
         const surgeDamage = Math.ceil(monsterDamage * 0.5);
-        stats.hp -= surgeDamage;
+        const leftoverSurge = applyShieldThenHp(stats, surgeDamage);
+        stats.hp -= leftoverSurge;
         messages.push(
             `\`⚔️\` The ${monster.name} dealt \`${surgeDamage}\` damage to you \`⚡ SURGE\``,
         );
@@ -32,7 +33,9 @@ export function applyElementalEffects(
             stats.maxHP * (0.03 + 0.01 * Math.floor(stats.adventureRank / 2)),
         );
         const reducedBurnDamage = Math.ceil(burnDamage * damageReductionFactor);
-        stats.hp -= reducedBurnDamage;
+
+        const leftover = applyShieldThenHp(stats, reducedBurnDamage);
+        stats.hp -= leftover;
         messages.push(
             `\`🔥\` The ${monster.name} inflicted Burn! You took \`${reducedBurnDamage}\` Burn damage`,
         );
@@ -40,7 +43,8 @@ export function applyElementalEffects(
 
     if (monster.element === MonsterElement.Hydro && Math.random() < 0.5) {
         const splashDamage = Math.ceil(stats.hp * 0.1);
-        stats.hp -= splashDamage;
+        const leftover = applyShieldThenHp(stats, splashDamage);
+        stats.hp -= leftover;
         messages.push(
             `\`⚔️\` The ${monster.name} dealt \`${splashDamage}\` damage to you \`💦 SPLASH\``,
         );
@@ -53,7 +57,8 @@ export function applyElementalEffects(
         const reducedCrippleDamage = Math.floor(
             crippleDamage * damageReductionFactor,
         );
-        stats.hp -= reducedCrippleDamage;
+        const leftover = applyShieldThenHp(stats, reducedCrippleDamage);
+        stats.hp -= leftover;
         messages.push(
             `\`❄️\` The ${monster.name} inflicted Cripple! You took \`${reducedCrippleDamage}\` Cripple damage`,
         );
