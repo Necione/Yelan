@@ -66,11 +66,15 @@ export const payment = buildCommand<SlashCommand>({
         }
 
         if (is.string(ousers)) {
-            for await (const id of ousers.split(" ")) {
-                const u = await discord.user(i.client, id, {
-                    fetch: true,
-                    mock: false,
-                });
+            for await (const id of ousers.split(/ |></g)) {
+                const u = await discord.user(
+                    i.client,
+                    id.replace(/<|@|>/g, ""),
+                    {
+                        fetch: true,
+                        mock: false,
+                    },
+                );
                 if (!u || u.bot) {
                     continue;
                 }
