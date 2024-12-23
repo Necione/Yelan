@@ -15,6 +15,7 @@ import {
     applyFatigue,
     applyLeechDrain,
 } from "./effectHandler";
+import { spellHandlers } from "./spellHandler";
 
 export type MonsterState = {
     displaced: boolean;
@@ -72,113 +73,27 @@ export async function playerAttack(
         const spellName = stats.castQueue[0];
         console.log(`${username} Casting spell: ${spellName}`);
 
-        switch (spellName) {
-            case "Heal": {
-                const healAmount = Math.floor(0.15 * stats.maxHP);
-                currentPlayerHp = Math.min(
-                    currentPlayerHp + healAmount,
-                    stats.maxHP,
-                );
-                messages.push(
-                    `\`✨\` Heal spell casted! Restored \`${healAmount}\` HP`,
-                );
-                console.log(
-                    `${username} Heal spell: Restored ${healAmount} HP`,
-                );
-                break;
-            }
+        const spellFn = spellHandlers[spellName];
 
-            case "Fury": {
-                stats.attackPower *= 2;
-                messages.push(
-                    `\`⚡\` Fury spell casted! Your next attack will deal double damage`,
-                );
-                console.log(
-                    `${username} Fury spell: Attack power doubled to ${stats.attackPower}`,
-                );
-                break;
-            }
+        if (spellFn) {
+            const result = await spellFn({
+                stats,
+                monster,
+                monsterState,
+                currentPlayerHp,
+                currentMonsterHp,
+                messages,
+            });
 
-            case "Burn": {
-                const burnDamage = Math.floor(0.5 * currentMonsterHp);
-                currentMonsterHp = Math.max(currentMonsterHp - burnDamage, 0);
-
-                messages.push(
-                    `\`🔥\` Burn spell casted! Dealt \`${burnDamage}\` damage to the ${monster.name}`,
-                );
-                console.log(
-                    `${username} Burn spell: Dealt ${burnDamage} damage to ${monster.name}`,
-                );
-                break;
-            }
-
-            case "Cripple": {
-                const crippleDamage = Math.floor(0.1 * monster.startingHp);
-                currentMonsterHp = Math.max(
-                    currentMonsterHp - crippleDamage,
-                    0,
-                );
-
-                messages.push(
-                    `\`❄️\` Cripple spell casted! Dealt \`${crippleDamage}\` damage to the ${monster.name}`,
-                );
-                console.log(
-                    `${username} Cripple spell: Dealt ${crippleDamage} damage to ${monster.name}`,
-                );
-                break;
-            }
-
-            case "Flare": {
-                const flareDamage = currentPlayerHp / 2;
-                currentMonsterHp = Math.max(currentMonsterHp - flareDamage, 0);
-                messages.push(
-                    `\`🎇\` Flare spell casted! Dealt \`${flareDamage}\` damage to the ${monster.name}`,
-                );
-                console.log(
-                    `${username} Flare spell: Dealt ${flareDamage} damage to ${monster.name}`,
-                );
-                break;
-            }
-
-            case "Stun": {
-                monsterState.stunned = true;
-                messages.push(
-                    `\`💫\` Stun spell casted! The enemy is stunned and will miss its next attack`,
-                );
-                console.log(
-                    `${username} Stun spell: ${monster.name} is stunned`,
-                );
-                break;
-            }
-
-            case "Poison": {
-                if (!monsterState.poisoned) {
-                    monsterState.poisoned = true;
-                    messages.push(
-                        `\`💚\` Poison spell casted! The ${monster.name} is poisoned and will lose __10%__ of its HP each turn`,
-                    );
-                    console.log(
-                        `${username} Poison spell: ${monster.name} is now poisoned`,
-                    );
-                } else {
-                    messages.push(
-                        `\`💚\` Poison spell casted again! The ${monster.name} is already poisoned`,
-                    );
-                    console.log(
-                        `${username} Poison spell: ${monster.name} was already poisoned`,
-                    );
-                }
-                break;
-            }
-
-            default:
-                messages.push(
-                    `\`❓\` The spell "${spellName}" was found but has no effect`,
-                );
-                console.log(
-                    `${username} Unknown spell: "${spellName}" has no effect`,
-                );
-                break;
+            currentPlayerHp = result.currentPlayerHp;
+            currentMonsterHp = result.currentMonsterHp;
+        } else {
+            messages.push(
+                `\`❓\` The spell "${spellName}" was found but has no effect`,
+            );
+            console.log(
+                `${username} Unknown spell: "${spellName}" has no effect`,
+            );
         }
 
         stats.castQueue.shift();
@@ -200,7 +115,7 @@ export async function playerAttack(
             "`🎣` This is a fishing monster. All your skills are disabled!",
         );
         console.log(
-            `${username} Fishing monster encountered: skipping skill-based logic.`,
+            `${username} Fishing monster => skipping skill-based logic.`,
         );
 
         const baseAttack = stats.attackPower || 0;
@@ -229,22 +144,18 @@ export async function playerAttack(
 
     if (paladinSwapped) {
         messages.push(
-            `\`🛡️\` Paladin skill activated! Your ATK and DEF Value have been swapped`,
+            "`🛡️` Paladin skill activated! Your ATK and DEF Value have been swapped",
         );
         debugMultipliers.push("Paladin Swapped (ATK and DEF)");
-        console.log(
-            `${usernameLog} Paladin skill activated: ATK and DEF swapped`,
-        );
+        console.log(`${usernameLog} Paladin => ATK and DEF swapped`);
     }
 
     if (hasWrath) {
         attackPower *= 1.5;
-        messages.push(
-            `\`💢\` Wrath skill activated! You deal __150%__ more damage`,
-        );
+        messages.push("`💢` Wrath skill => 150% more damage");
         debugMultipliers.push("Wrath (1.5x)");
         console.log(
-            `${usernameLog} Wrath skill: Attack power * 1.5 = ${attackPower}`,
+            `${usernameLog} Wrath => attackPower * 1.5 = ${attackPower}`,
         );
     }
 
@@ -252,18 +163,14 @@ export async function playerAttack(
         const poisonDamage = Math.floor(0.2 * monster.startingHp);
         currentMonsterHp = Math.max(currentMonsterHp - poisonDamage, 0);
         messages.push(
-            `\`💚\` Poisoned! The ${monster.name} loses \`${poisonDamage}\` HP due to poison`,
+            `\`💚\` Poisoned! The ${monster.name} loses \`${poisonDamage}\` HP`,
         );
-        debugMultipliers.push(`Poison Damage (${poisonDamage} HP)`);
-        console.log(
-            `${usernameLog} Poison effect: -${poisonDamage} HP to ${monster.name}`,
-        );
+        debugMultipliers.push(`Poison Damage (${poisonDamage})`);
+        console.log(`${usernameLog} Poison => -${poisonDamage} HP to monster`);
 
         if (currentMonsterHp === 0) {
             monsterState.poisoned = false;
-            console.log(
-                `${usernameLog} Poison effect ended: monster HP is now 0`,
-            );
+            console.log(`${usernameLog} Poison ended => monster HP 0`);
         }
     }
 
@@ -276,9 +183,7 @@ export async function playerAttack(
                 `\`💪\` Vigor skill activated! Your low HP grants you __150%__ more damage`,
             );
             debugMultipliers.push("Vigor (1.5x)");
-            console.log(
-                `${usernameLog} Vigor skill: Attack power * 1.5 = ${attackPower}`,
-            );
+            console.log(`${usernameLog} Vigor => x1.5 => ${attackPower}`);
         }
     }
 
@@ -305,7 +210,7 @@ export async function playerAttack(
     const { isCrit, multiplier } = calculateCriticalHit(critChance, critValue);
     if (isCrit) {
         debugMultipliers.push(`Critical Hit (${multiplier}x)`);
-        console.log(`${usernameLog} Critical hit! * ${multiplier}`);
+        console.log(`${usernameLog} CRIT => x${multiplier}`);
     }
     attackPower *= multiplier;
 
@@ -313,9 +218,7 @@ export async function playerAttack(
         attackPower *= 0.5;
         messages.push(`\`💜\` Overhealed! Your damage is halved`);
         debugMultipliers.push("Overheal (0.5x)");
-        console.log(
-            `${usernameLog} Overheal penalty: Attack power halved => ${attackPower}`,
-        );
+        console.log(`${usernameLog} Overheal => x0.5 => ${attackPower}`);
     }
 
     const defenseResult = checkMonsterDefenses(
@@ -330,6 +233,7 @@ export async function playerAttack(
     const monsterDefended = defenseResult.monsterDefended;
     const damageReduced = defenseResult.damageReduced;
     monsterState = defenseResult.monsterState;
+
     if (attackMissed) {
         console.log(`${usernameLog} Attack missed entirely`);
         return {
@@ -357,7 +261,7 @@ export async function playerAttack(
             `Vigilance (+${(secondAttackPercentage * 100).toFixed(1)}%)`,
         );
         console.log(
-            `${usernameLog} Vigilance: Extra ${vigilanceAttackPower} damage`,
+            `${usernameLog} Vigilance => +${vigilanceAttackPower} damage`,
         );
     }
 
@@ -372,9 +276,9 @@ export async function playerAttack(
         messages,
     );
     console.log(
-        `${usernameLog} Final Attack: ${attackPower}, multipliers= ${debugMultipliers.join(
+        `${usernameLog} Final Attack => ${attackPower}, multipliers= [${debugMultipliers.join(
             ", ",
-        )}`,
+        )}]`,
     );
 
     const kindleLevelData = getUserSkillLevelData(stats, "Kindle");
@@ -391,9 +295,7 @@ export async function playerAttack(
             )}\` damage`,
         );
         debugMultipliers.push(`Kindle (${(damageBonus * 100).toFixed(0)}%)`);
-        console.log(
-            `${usernameLog} Kindle skill: +${kindleBonusDamage} damage`,
-        );
+        console.log(`${usernameLog} Kindle => +${kindleBonusDamage} damage`);
     }
 
     const spiceLevelData = getUserSkillLevelData(stats, "Spice");
@@ -410,7 +312,7 @@ export async function playerAttack(
             )}\` damage`,
         );
         debugMultipliers.push(`Spice (${(damageBonus * 100).toFixed(0)}%)`);
-        console.log(`${usernameLog} Spice skill: +${spiceDamageBonus} damage`);
+        console.log(`${usernameLog} Spice => +${spiceDamageBonus} damage`);
     }
 
     if (
@@ -423,7 +325,7 @@ export async function playerAttack(
         messages.push(
             "`⛔` The Machine's Shield prevents it from dying this turn!",
         );
-        console.log(`${usernameLog} Machine shield saved the monster at 1 HP`);
+        console.log(`${usernameLog} Machine => shield at 1 HP`);
     }
 
     const deathThreshold = getDeathThreshold(stats);
