@@ -656,10 +656,6 @@ export async function monsterAttack(
         const triggered = Math.random() < triggerChance;
 
         if (triggered) {
-            messages.push(
-                `\`♨️ ABSORPTION\` triggered! (Lv ${absorptionSkill.level})`,
-            );
-
             if (absorptionSkill.level < 3) {
                 const halfDamage = finalMonsterDamage / 2;
 
@@ -668,11 +664,9 @@ export async function monsterAttack(
 
                 finalMonsterDamage = halfDamage;
                 messages.push(
-                    `\`♨️\` Negated \`${halfDamage.toFixed(
+                    `\`♨️\` Absorption negated \`${halfDamage.toFixed(
                         2,
-                    )}\` damage, and healed \`${halfDamage.toFixed(
-                        2,
-                    )}\` HP (capped at your effective max).`,
+                    )}\` damage, and healed \`${halfDamage.toFixed(2)}\` HP`,
                 );
             } else {
                 const absorbed = finalMonsterDamage;
@@ -682,11 +676,9 @@ export async function monsterAttack(
 
                 finalMonsterDamage = 0;
                 messages.push(
-                    `\`♨️\` Negated \`${absorbed.toFixed(
+                    `\`♨️\` Absorption negated \`${absorbed.toFixed(
                         2,
-                    )}\` damage, and healed \`${absorbed.toFixed(
-                        2,
-                    )}\` HP (capped at your effective max).`,
+                    )}\` damage, and healed \`${absorbed.toFixed(2)}\` HP`,
                 );
             }
         }
