@@ -20,11 +20,14 @@ export const thief = createEvent({
             catch: "event_catch",
             ignore: "event_ignore",
         };
+
+        const coinsLost = Math.floor(Math.random() * 201) + 100;
+
         const embed = new EmbedBuilder()
             .setTitle("A Thief Appears!")
             .setDescription(
                 `While traveling, a thief suddenly appears and attempts to steal ${getAmount(
-                    150,
+                    coinsLost,
                 )} from you! Do you want to try and catch him?`,
             )
             .setColor("Red");
@@ -52,8 +55,6 @@ export const thief = createEvent({
             users: [{ allow: true, id: stats.userId }],
             time: get.secs(10),
         });
-
-        const coinsLost = 150;
 
         if (!c) {
             await removeBalance(

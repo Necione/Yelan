@@ -29,8 +29,8 @@ export const traderEvent = createEvent({
     weight: 1,
     required: {
         min: {
-            rank: 15,
-            rebirths: 4,
+            rank: 25,
+            rebirths: 5,
         },
     },
     async execute(message, stats, userWallet) {

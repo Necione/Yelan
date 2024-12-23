@@ -710,7 +710,7 @@ export async function monsterAttack(
             currentPlayerHp = 1;
             monsterState.fortressUsed = true;
             messages.push(
-                "`💀` Fortress skill => you survived at 1 HP instead of dying!",
+                "`💀` Fortress skill activated! You should've died this turn",
             );
             console.log(`${username} Fortress => set HP = 1`);
         } else {
