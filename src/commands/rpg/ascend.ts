@@ -25,7 +25,12 @@ export const ascend = buildCommand<SlashCommand>({
         const focused = i.options.getFocused(true);
         const input = focused.value.toLowerCase();
 
-        const ascendableBaseWeapons = ["Harbinger of Dawn", "Messenger"];
+        const ascendableBaseWeapons = [
+            "Harbinger of Dawn",
+            "Messenger",
+            "Deathmatch",
+            "Lithic Blade",
+        ];
 
         const ascendableWeapons = Object.keys(weapons).filter((weaponName) => {
             const baseName = getBaseName(weaponName);
