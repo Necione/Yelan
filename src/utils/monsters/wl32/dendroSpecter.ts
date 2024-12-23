@@ -24,6 +24,12 @@ export default {
             maxAmount: 1,
             chance: 10,
         },
+        {
+            item: "Life Essence",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 10,
+        },
     ],
 
     critChance: 25,

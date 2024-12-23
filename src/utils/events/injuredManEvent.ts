@@ -21,6 +21,8 @@ const items = make.array<{ item: string; amount: number }>([
     { item: "Golden Crab", amount: 1 },
 ]);
 
+const coinAmount = Math.floor(Math.random() * (75 - 25 + 1)) + 25;
+
 export const injuredMan = createEvent({
     name: "injuredMan",
     weight: 1,
@@ -86,7 +88,7 @@ export const injuredMan = createEvent({
                 })
                 .catch(noop);
         }
-        const coinAmount = 50;
+
         if (userWallet.balance < coinAmount) {
             return message
                 .edit({
@@ -114,7 +116,7 @@ export const injuredMan = createEvent({
                     embeds: [
                         embed.setDescription(
                             `You gave the man ${getAmount(
-                                50,
+                                coinAmount,
                             )}. The man thanks you and gives you a \`${
                                 randomItem.item
                             }\` as a token of his appreciation.`,
@@ -129,7 +131,7 @@ export const injuredMan = createEvent({
                 embeds: [
                     embed.setDescription(
                         `You gave the man ${getAmount(
-                            50,
+                            coinAmount,
                         )}. The man thanks you and continues on his way.`,
                     ),
                 ],

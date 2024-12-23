@@ -77,7 +77,7 @@ export const secretCult = createEvent({
         if (outcome < 0.5) {
             effectName = "Regeneration";
             effectValue = 0.2;
-            remainingUses = 5;
+            remainingUses = 3;
             await message
                 .edit({
                     embeds: [
@@ -91,7 +91,7 @@ export const secretCult = createEvent({
         } else {
             effectName = "Resistance";
             effectValue = 0.8;
-            remainingUses = 10;
+            remainingUses = 7;
             await message
                 .edit({
                     embeds: [

@@ -22,7 +22,7 @@ function shuffleArray<T>(array: T[]): T[] {
     return array;
 }
 
-const accessFee = 200;
+const accessFee = Math.floor(Math.random() * (500 - 250 + 1)) + 250;
 
 export const traderEvent = createEvent({
     name: "traderEvent",

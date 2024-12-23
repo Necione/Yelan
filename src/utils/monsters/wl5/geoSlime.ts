@@ -27,7 +27,7 @@ export default {
         {
             item: "Slime Concentrate",
             minAmount: 1,
-            maxAmount: 2,
+            maxAmount: 1,
             chance: 50,
         },
         {

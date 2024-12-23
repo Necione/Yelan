@@ -19,7 +19,7 @@ export default {
         {
             item: "Firm Arrowhead",
             minAmount: 1,
-            maxAmount: 3,
+            maxAmount: 2,
             chance: 90,
         },
         {
@@ -31,7 +31,7 @@ export default {
         {
             item: "Weathered Arrowhead",
             minAmount: 1,
-            maxAmount: 2,
+            maxAmount: 1,
             chance: 50,
         },
         {

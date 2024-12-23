@@ -22,13 +22,13 @@ export default {
         {
             item: "Silver Raven Insignia",
             minAmount: 1,
-            maxAmount: 3,
+            maxAmount: 2,
             chance: 90,
         },
         {
             item: "Golden Raven Insignia",
             minAmount: 1,
-            maxAmount: 2,
+            maxAmount: 1,
             chance: 50,
         },
         {
