@@ -5,6 +5,13 @@ import { getUserStats, updateUserStats } from "../../services";
 import { weapons } from "../../utils/rpgitems/weapons";
 import { getBaseName, getPrefix } from "./handlers/utils";
 
+const ascendableBaseWeapons = [
+    "Harbinger of Dawn",
+    "Messenger",
+    "Deathmatch",
+    "Lithic Blade",
+];
+
 export const ascend = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("ascend")
@@ -24,13 +31,6 @@ export const ascend = buildCommand<SlashCommand>({
     async autocomplete(i) {
         const focused = i.options.getFocused(true);
         const input = focused.value.toLowerCase();
-
-        const ascendableBaseWeapons = [
-            "Harbinger of Dawn",
-            "Messenger",
-            "Deathmatch",
-            "Lithic Blade",
-        ];
 
         const ascendableWeapons = Object.keys(weapons).filter((weaponName) => {
             const baseName = getBaseName(weaponName);
@@ -87,7 +87,6 @@ export const ascend = buildCommand<SlashCommand>({
 
         const prefix = getPrefix(weaponName);
         const baseName = getBaseName(weaponName);
-        const ascendableBaseWeapons = ["Harbinger of Dawn", "Messenger"];
 
         if (!ascendableBaseWeapons.includes(baseName)) {
             return r
