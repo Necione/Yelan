@@ -64,7 +64,12 @@ export const payment = buildCommand<SlashCommand>({
         if (!isDev(i.user.id) && user.id === i.user.id) {
             return r.edit(embedComment(`You can't pay yourself.`));
         }
-
+        await r.edit(
+            embedComment(
+                `${customEmoji.a.loading} Fetching all of the users...`,
+                "Orange",
+            ),
+        );
         if (is.string(ousers)) {
             for await (const id of ousers.split(/ |></g)) {
                 const u = await discord.user(
@@ -95,6 +100,14 @@ export const payment = buildCommand<SlashCommand>({
             );
         }
         const status = make.array<string>();
+        await r.edit(
+            embedComment(
+                `Adding ${getAmount(amount)} to (${formatNumber(
+                    users.length,
+                )}) users balance and sending the DMs, one moment...`,
+                "Yellow",
+            ),
+        );
         for await (const c of users) {
             await addBalance(
                 c.id,
