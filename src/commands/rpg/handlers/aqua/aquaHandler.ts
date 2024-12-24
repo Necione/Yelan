@@ -270,8 +270,8 @@ function getBestHand(cards: Card[]): { rank: number; handName: string } {
 }
 
 function getCombinations<T>(array: T[], k: number): T[][] {
-    const results: T[][] = [];
-    const combination: T[] = [];
+    const results = make.array<T[]>();
+    const combination = make.array<T>();
 
     function backtrack(start: number) {
         if (combination.length === k) {
