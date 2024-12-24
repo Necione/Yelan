@@ -4,7 +4,7 @@ import {
     getUser,
     type SlashCommand,
 } from "@elara-services/botbuilder";
-import { discord, make, noop } from "@elara-services/utils";
+import { discord, make } from "@elara-services/utils";
 import { Colors, SlashCommandBuilder, type User } from "discord.js";
 import { roles } from "../../config";
 
@@ -51,8 +51,11 @@ export const dm = buildCommand<SlashCommand>({
         }
         const description = [];
         for await (const user of users.values()) {
-            const dm = await user.send({ content: message }).catch(noop);
-            description.push(`\`${dm ? "🟢" : "🔴"} ${user.username}\``);
+            const s = await i.client.dms.send({
+                userId: user.id,
+                body: { content: message },
+            });
+            description.push(`\`${s.status ? "🟢" : "🔴"} ${user.username}\``);
         }
 
         return r.edit({

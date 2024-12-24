@@ -1,5 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { discord, embedComment, field, noop } from "@elara-services/utils";
+import { discord, embedComment, field } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
@@ -132,15 +132,10 @@ export const pay: SlashCommand = {
         const fee = await getTax(amount, member);
 
         if (amount + fee > o.balance) {
-            const embed = new EmbedBuilder()
-                .setColor(0xff3333)
-                .setAuthor({
-                    name: interaction.user.username,
-                    iconURL: interaction.user.displayAvatarURL(),
-                })
-                .setDescription("You cannot afford this transaction.");
             locked.del([interaction.user.id, user.id]);
-            return responder.edit({ embeds: [embed] });
+            return responder.edit(
+                embedComment(`You can't afford this transaction.`),
+            );
         }
 
         if (checks.limit(userP, Math.floor(amount))) {
@@ -199,7 +194,10 @@ export const pay: SlashCommand = {
 
         locked.del([interaction.user.id, user.id]);
         await Promise.all([
-            user.send({ embeds: [dmEmbed] }).catch(noop),
+            interaction.client.dms.send({
+                userId: user.id,
+                body: { embeds: [dmEmbed] },
+            }),
             responder.edit({
                 embeds: [
                     new EmbedBuilder()

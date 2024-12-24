@@ -53,13 +53,14 @@ export const selfmute = buildCommand<SlashCommand>({
                 if (!member.communicationDisabledUntil) {
                     return;
                 }
-                await i.user
-                    .send(
-                        embedComment(
+                await i.client.dms
+                    .send({
+                        userId: i.user.id,
+                        body: embedComment(
                             `You muted yourself for ${format} go touch some grass and utilise this time in some productive work.\n## YOU WILL NOT BE UNMUTED, GO TOUCH GRASS OR SPAM AQUA AND ASK, DON'T OPEN TICKETS!`,
                             "Aqua",
                         ),
-                    )
+                    })
                     .catch(noop);
                 return r.edit(
                     embedComment(

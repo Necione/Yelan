@@ -7,7 +7,6 @@ import {
     get,
     is,
     make,
-    noop,
     sleep,
 } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
@@ -139,17 +138,14 @@ export const payment = buildCommand<SlashCommand>({
                     "Green",
                 ),
             );
-            const dmed = await c
-                .send(
-                    embedComment(
-                        `You were paid ${getAmount(
-                            amount,
-                        )} for:\n>>> ${reason}`,
-                        "Green",
-                    ),
-                )
-                .catch(noop);
-            status.push(`\`${dmed ? "🟢" : "🔴"}\` ${c.toString()}`);
+            const dmed = await i.client.dms.send({
+                userId: c.id,
+                body: embedComment(
+                    `You were paid ${getAmount(amount)} for:\n>>> ${reason}`,
+                    "Green",
+                ),
+            });
+            status.push(`\`${dmed.status ? "🟢" : "🔴"}\` ${c.toString()}`);
             await r.edit(
                 embedComment(
                     `${customEmoji.a.z_check} Paid ${c.toString()} and ${

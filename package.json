@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@elara-services/botbuilder": "^4.1.0",
+    "@elara-services/dms": "^1.0.4",
     "@elara-services/enka": "^1.0.7",
     "@elara-services/fetch": "^2.0.2",
     "@elara-services/invite": "^1.0.3",

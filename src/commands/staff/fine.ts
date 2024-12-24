@@ -66,15 +66,16 @@ export const fine = buildCommand<SlashCommand>({
             `Via a fine issued by \`@${i.user.username}\` (${i.user.id})\nReason: ${reason}`,
         );
         if (dm) {
-            await user
-                .send(
-                    embedComment(
+            await i.client.dms
+                .send({
+                    userId: user.id,
+                    body: embedComment(
                         `You've been fined for ${getAmount(
                             amount,
                         )}\n- Reason: ${reason}`,
                         Colors.Red,
                     ),
-                )
+                })
                 .catch(noop);
         }
 

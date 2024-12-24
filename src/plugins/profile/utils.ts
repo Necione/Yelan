@@ -5,7 +5,6 @@ import {
     embedComment,
     is,
     make,
-    noop,
     type ButtonOptions,
 } from "@elara-services/utils";
 import type { UserWallet } from "@prisma/client";
@@ -194,14 +193,15 @@ export async function fetchData(
         if (requestingMember?.id === user.id) {
             if (sendInDms) {
                 // Send the profile image to the user's DM
-                const sent = await user
-                    .send({
-                        content: "> This is your profile:",
-                        files: [{ name: "profile.png", attachment: data }],
-                    })
-                    .catch(noop);
+                const sent = await user.client.dms.send({
+                    userId: user.id,
+                    body: {
+                        content: `> This is your profile:`,
+                    },
+                    files: [{ name: "profile.png", data }],
+                });
 
-                if (!sent) {
+                if (!sent.status) {
                     return embedComment(
                         `I was unable to send your profile in DMs, make sure you have them enabled!`,
                     );

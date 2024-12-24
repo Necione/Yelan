@@ -3,7 +3,7 @@ import {
     getStr,
     type SlashCommand,
 } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, noop } from "@elara-services/utils";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { isDev, roles } from "../../config";
 import { addStrike } from "../../services";
@@ -58,23 +58,26 @@ export const addstrike = buildCommand<SlashCommand>({
         if (!data.status) {
             return r.edit(embedComment(data.message));
         }
-        await user
+        await i.client.dms
             .send({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xff5856)
-                        .setTitle("`🔥` You have received a strike!")
-                        .setDescription(
-                            `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${getAmount(
-                                data.fine,
-                            )}`,
-                        )
-                        .setFooter({
-                            text: `⚠️ You will be banned permanently at 5 Strikes`,
-                        }),
-                ],
+                userId: user.id,
+                body: {
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor(0xff5856)
+                            .setTitle("`🔥` You have received a strike!")
+                            .setDescription(
+                                `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${getAmount(
+                                    data.fine,
+                                )}`,
+                            )
+                            .setFooter({
+                                text: `⚠️ You will be banned permanently at 5 Strikes`,
+                            }),
+                    ],
+                },
             })
-            .catch(console.log);
+            .catch(noop);
 
         await logs.strikes({
             embeds: [
