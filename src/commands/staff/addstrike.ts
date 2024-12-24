@@ -58,23 +58,21 @@ export const addstrike = buildCommand<SlashCommand>({
         if (!data.status) {
             return r.edit(embedComment(data.message));
         }
-        await user
-            .send({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xff5856)
-                        .setTitle("`🔥` You have received a strike!")
-                        .setDescription(
-                            `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${getAmount(
-                                data.fine,
-                            )}`,
-                        )
-                        .setFooter({
-                            text: `⚠️ You will be banned permanently at 5 Strikes`,
-                        }),
-                ],
-            })
-            .catch(console.log);
+        await i.client.dms.user(user.id, {
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(0xff5856)
+                    .setTitle("`🔥` You have received a strike!")
+                    .setDescription(
+                        `You have been given a strike by a staff member for the following reason:\n\n*${reason}*\n\nAs a result, you have been fined ${getAmount(
+                            data.fine,
+                        )}`,
+                    )
+                    .setFooter({
+                        text: `⚠️ You will be banned permanently at 5 Strikes`,
+                    }),
+            ],
+        });
 
         await logs.strikes({
             embeds: [

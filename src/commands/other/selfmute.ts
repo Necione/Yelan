@@ -1,6 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { Duration } from "@elara-services/packages";
-import { embedComment, error, is, ms, noop } from "@elara-services/utils";
+import { embedComment, error, is, ms } from "@elara-services/utils";
 import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 export const selfmute = buildCommand<SlashCommand>({
@@ -53,14 +53,13 @@ export const selfmute = buildCommand<SlashCommand>({
                 if (!member.communicationDisabledUntil) {
                     return;
                 }
-                await i.user
-                    .send(
-                        embedComment(
-                            `You muted yourself for ${format} go touch some grass and utilise this time in some productive work.\n## YOU WILL NOT BE UNMUTED, GO TOUCH GRASS OR SPAM AQUA AND ASK, DON'T OPEN TICKETS!`,
-                            "Aqua",
-                        ),
-                    )
-                    .catch(noop);
+                await i.client.dms.user(
+                    i.user.id,
+                    embedComment(
+                        `You muted yourself for ${format} go touch some grass and utilise this time in some productive work.\n## YOU WILL NOT BE UNMUTED, GO TOUCH GRASS OR SPAM AQUA AND ASK, DON'T OPEN TICKETS!`,
+                        "Aqua",
+                    ),
+                );
                 return r.edit(
                     embedComment(
                         `You've been selfmuted for ${format}`,

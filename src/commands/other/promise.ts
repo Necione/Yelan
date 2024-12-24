@@ -117,27 +117,25 @@ export const promise = buildCommand<SlashCommand>({
         if (!data) {
             return r.edit(embedComment(`Unable to create the promise.`));
         }
-        await Promise.all([
-            i.user
-                .send(
-                    embedComment(
-                        `📝 You made a promise to someone:\n- Promise: ${promise}\n- User: ${user.toString()} \`@${
-                            user.username
-                        }\` (${user.id})`,
-                        "Yellow",
-                    ),
-                )
-                .catch(noop),
-            user
-                .send(
-                    embedComment(
-                        `📝 A promise was made to you:\n- Promise: ${promise}\n- User: ${i.user.toString()} \`@${
-                            i.user.username
-                        }\` (${i.user.id})`,
-                        "Yellow",
-                    ),
-                )
-                .catch(noop),
+        await i.client.dms.multiple([
+            {
+                userId: i.user.id,
+                body: embedComment(
+                    `📝 You made a promise to someone:\n- Promise: ${promise}\n- User: ${user.toString()} \`@${
+                        user.username
+                    }\` (${user.id})`,
+                    "Yellow",
+                ),
+            },
+            {
+                userId: user.id,
+                body: embedComment(
+                    `📝 A promise was made to you:\n- Promise: ${promise}\n- User: ${i.user.toString()} \`@${
+                        i.user.username
+                    }\` (${i.user.id})`,
+                    "Yellow",
+                ),
+            },
         ]);
         return r.edit(embedComment(`Your promise has been sent!`, "Green"));
     },

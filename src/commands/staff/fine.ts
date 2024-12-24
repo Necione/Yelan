@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, noop } from "@elara-services/utils";
+import { embedComment, is } from "@elara-services/utils";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { isDev, roles } from "../../config";
 import { removeBalance } from "../../services";
@@ -66,16 +66,15 @@ export const fine = buildCommand<SlashCommand>({
             `Via a fine issued by \`@${i.user.username}\` (${i.user.id})\nReason: ${reason}`,
         );
         if (dm) {
-            await user
-                .send(
-                    embedComment(
-                        `You've been fined for ${getAmount(
-                            amount,
-                        )}\n- Reason: ${reason}`,
-                        Colors.Red,
-                    ),
-                )
-                .catch(noop);
+            await i.client.dms.user(
+                user.id,
+                embedComment(
+                    `You've been fined for ${getAmount(
+                        amount,
+                    )}\n- Reason: ${reason}`,
+                    Colors.Red,
+                ),
+            );
         }
 
         await logs.fines({

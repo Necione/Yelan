@@ -4,7 +4,7 @@ import {
     getReason,
     getUser,
 } from "@elara-services/botbuilder";
-import { embedComment, is, noop, proper } from "@elara-services/utils";
+import { embedComment, is, proper } from "@elara-services/utils";
 import { EmbedBuilder } from "discord.js";
 import { isDev, roles } from "../../../../config";
 import { getProfileByUserId, updateUserProfile } from "../../../../services";
@@ -48,16 +48,15 @@ export const lock = buildCommand({
         }
         const type = p.locked ? false : true;
         if (shouldDM) {
-            await user
-                .send(
-                    embedComment(
-                        `Your user profile has been ${type ? "" : "un"}locked.${
-                            reason.length ? `\n\n### Reason: ${reason}` : ""
-                        }`,
-                        type ? "Red" : "Green",
-                    ),
-                )
-                .catch(noop);
+            await i.client.dms.user(
+                user.id,
+                embedComment(
+                    `Your user profile has been ${type ? "" : "un"}locked.${
+                        reason.length ? `\n\n### Reason: ${reason}` : ""
+                    }`,
+                    type ? "Red" : "Green",
+                ),
+            );
         }
         await Promise.all([
             logs.misc({

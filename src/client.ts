@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import { loadEvents } from "@elara-services/botbuilder";
+import { DMManager } from "@elara-services/dms";
 import { EnkaVerificationClient } from "@elara-services/enka/dist/verification";
 import type { InviteClient } from "@elara-services/invite";
 import { getFilesList, log, times } from "@elara-services/utils";
@@ -19,6 +20,7 @@ declare module "discord.js" {
         prefix?: string;
         enka: EnkaVerificationClient;
         invites: InviteClient;
+        dms: DMManager;
     }
 }
 
@@ -52,6 +54,14 @@ class BotClient extends Client {
         });
         if (!checkIfDeploy()) {
             this.enka = new EnkaVerificationClient(this);
+            this.dms = new DMManager(
+                process.env.TOKEN as string,
+                {
+                    url: process.env.DATABASE_URL as string,
+                    options: { dbName: "DMs" },
+                },
+                { offset: 0 },
+            );
             this.enka.onVerificationFinish(async (data, user) => {
                 const r = await getProfileByUserId(user.id);
                 if (!r) {
