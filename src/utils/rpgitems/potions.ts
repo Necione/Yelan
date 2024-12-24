@@ -4,10 +4,7 @@ import type { DropName } from "./drops";
 export const potions = {
     "Potion of Evasion": {
         solventOptions: ["Water"] as string[],
-        soluteOptions: [
-            ["Hunter's Sacrificial Knife"],
-            ["Hunter's Sacrificial Knife"],
-        ] as DropName[][],
+        soluteOptions: [["Hunter's Sacrificial Knife"]] as DropName[][],
         brewTime: get.mins(2),
         successRate: 0.8,
         effect: {
@@ -19,10 +16,7 @@ export const potions = {
     },
     "Greater Potion of Evasion": {
         solventOptions: ["Water"] as string[],
-        soluteOptions: [
-            ["Agent's Sacrificial Knife"],
-            ["Agent's Sacrificial Knife"],
-        ] as DropName[][],
+        soluteOptions: [["Agent's Sacrificial Knife"]] as DropName[][],
         brewTime: get.mins(2),
         successRate: 0.8,
         effect: {
@@ -34,10 +28,7 @@ export const potions = {
     },
     "Superior Potion of Evasion": {
         solventOptions: ["Water"] as string[],
-        soluteOptions: [
-            ["Inspector's Sacrificial Knife"],
-            ["Inspector's Sacrificial Knife"],
-        ] as DropName[][],
+        soluteOptions: [["Inspector's Sacrificial Knife"]] as DropName[][],
         brewTime: get.mins(2),
         successRate: 0.8,
         effect: {
