@@ -35,13 +35,6 @@ export const brew = buildCommand<SlashCommand>({
                 .setDescription("Optional second solute (from drops).")
                 .setAutocomplete(true)
                 .setRequired(false),
-        )
-        .addIntegerOption((option) =>
-            option
-                .setName("amount")
-                .setDescription("How many times to brew (batch size).")
-                .setRequired(false)
-                .setMinValue(1),
         ),
 
     async autocomplete(i) {
@@ -58,7 +51,8 @@ export const brew = buildCommand<SlashCommand>({
         const solvent = i.options.getString("solvent", false);
         const solute1 = i.options.getString("solute1", false);
         const solute2 = i.options.getString("solute2", false);
-        const amountToBrew = i.options.getInteger("amount", false) ?? 1;
+
+        const brewAmount = 1;
 
         const stats = await getUserStats(i.user.id);
         if (!stats) {
@@ -174,6 +168,7 @@ export const brew = buildCommand<SlashCommand>({
 
         let matchedKey: string | null = null;
         let brewTime = get.mins(1);
+
         for (const [potionName, potData] of Object.entries(potions)) {
             if (!potData.solventOptions.includes(solvent)) {
                 continue;
@@ -201,10 +196,10 @@ export const brew = buildCommand<SlashCommand>({
 
         for (const solute of userSolutes) {
             const invItem = stats.inventory.find((it) => it.item === solute);
-            if (!invItem || invItem.amount < amountToBrew) {
+            if (!invItem || invItem.amount < brewAmount) {
                 return r.edit(
                     embedComment(
-                        `You don't have enough **${solute}** to brew. Need \`${amountToBrew}x\`.`,
+                        `You don't have enough **${solute}** to brew. Need \`${brewAmount}x\`.`,
                     ),
                 );
             }
@@ -215,7 +210,7 @@ export const brew = buildCommand<SlashCommand>({
             if (!invItem) {
                 continue;
             }
-            invItem.amount -= amountToBrew;
+            invItem.amount -= brewAmount;
             if (invItem.amount <= 0) {
                 stats.inventory = stats.inventory.filter(
                     (i) => i.item !== solute,
@@ -226,7 +221,7 @@ export const brew = buildCommand<SlashCommand>({
         const finishTime = new Date(Date.now() + brewTime);
         stats.brewing.push({
             potionName: finalItemName,
-            amount: amountToBrew,
+            amount: brewAmount,
             finishTime,
         });
 

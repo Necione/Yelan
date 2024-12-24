@@ -2,6 +2,22 @@ import { get } from "@elara-services/utils";
 import type { DropName } from "./drops";
 
 export const potions = {
+    Wine: {
+        solventOptions: ["Water"] as string[],
+        soluteOptions: [
+            ["A Flower Yet to Bloom", "A Flower Yet to Bloom"],
+            ["Treasured Flower", "Treasured Flower"],
+            ["Wanderer's Blooming Flower", "Wanderer's Blooming Flower"],
+        ] as DropName[][],
+        brewTime: get.mins(2),
+        successRate: 0.8,
+        effect: {
+            name: "Weakness",
+            effectValue: -0.5,
+            time: 5,
+        },
+        outputAmount: 1,
+    },
     "Potion of Evasion": {
         solventOptions: ["Water"] as string[],
         soluteOptions: [["Hunter's Sacrificial Knife"]] as DropName[][],
