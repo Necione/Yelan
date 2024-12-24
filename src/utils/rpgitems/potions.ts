@@ -119,11 +119,11 @@ export const potions = {
         },
         outputAmount: 1,
     },
-    "Vile of Regeneration": {
+    "Vial of Regeneration": {
         solventOptions: ["Water"] as string[],
         soluteOptions: [["Slime Condensate"], ["Damaged Mask"]] as DropName[][],
         brewTime: get.mins(1),
-        successRate: 1,
+        successRate: 0.8,
         effect: {
             name: "Regeneration",
             effectValue: 0.1,
@@ -133,9 +133,9 @@ export const potions = {
     },
     "Minor Healing Potion": {
         solventOptions: ["Water"] as string[],
-        soluteOptions: [["Slime Condensate", "Damaged Mask"]] as DropName[][],
+        soluteOptions: [["Slime Concentrate", "Ominous Mask"]] as DropName[][],
         brewTime: get.mins(1),
-        successRate: 0.95,
+        successRate: 0.8,
         effect: {
             name: "Regeneration",
             effectValue: 0.2,
