@@ -2,6 +2,18 @@ import { get } from "@elara-services/utils";
 import type { DropName } from "./drops";
 
 export const potions = {
+    "Potion of Levitation": {
+        solventOptions: ["Water"] as string[],
+        soluteOptions: [["Mist Grass"], ["Mist Grass Wick"]] as DropName[][],
+        brewTime: get.mins(1),
+        successRate: 0.8,
+        effect: {
+            name: "Levitation",
+            effectValue: 1,
+            time: 1,
+        },
+        outputAmount: 1,
+    },
     "Lesser Strength Potion": {
         solventOptions: ["Water"] as string[],
         soluteOptions: [["Slime Secretions"], ["Stained Mask"]] as DropName[][],
@@ -119,11 +131,11 @@ export const potions = {
         },
         outputAmount: 1,
     },
-    "Vile of Regeneration": {
+    "Vial of Regeneration": {
         solventOptions: ["Water"] as string[],
         soluteOptions: [["Slime Condensate"], ["Damaged Mask"]] as DropName[][],
         brewTime: get.mins(1),
-        successRate: 1,
+        successRate: 0.8,
         effect: {
             name: "Regeneration",
             effectValue: 0.1,
@@ -133,9 +145,12 @@ export const potions = {
     },
     "Minor Healing Potion": {
         solventOptions: ["Water"] as string[],
-        soluteOptions: [["Slime Condensate", "Damaged Mask"]] as DropName[][],
+        soluteOptions: [
+            ["Slime Concentrate", "Slime Concentrate"],
+            ["Ominous Mask", "Ominous Mask"],
+        ] as DropName[][],
         brewTime: get.mins(1),
-        successRate: 0.95,
+        successRate: 0.8,
         effect: {
             name: "Regeneration",
             effectValue: 0.2,
@@ -353,7 +368,7 @@ export const potions = {
             ["Chaos Axis", "Chaos Circuit"],
             ["Chaos Oculus", "Chaos Core"],
         ] as DropName[][],
-        brewTime: get.secs(1),
+        brewTime: get.mins(10),
         successRate: 0.5,
         effect: {
             name: "Resistance",
