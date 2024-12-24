@@ -181,7 +181,6 @@ export const info = buildCommand<SlashCommand>({
                     stats,
                     skill.name,
                 );
-
                 const userSkillLevel = userSkillLevelData
                     ? userSkillLevelData.level
                     : 0;
@@ -189,6 +188,7 @@ export const info = buildCommand<SlashCommand>({
                 const embed = new EmbedBuilder()
                     .setColor("Aqua")
                     .setTitle(`\`${skill.emoji}\` ${skill.name} Skill Details`)
+                    .setThumbnail(skill.icon)
                     .setDescription(
                         skill.levels
                             .map((level) => {
