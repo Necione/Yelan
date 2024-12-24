@@ -2,6 +2,17 @@ import { get } from "@elara-services/utils";
 import type { DropName } from "./drops";
 
 export const potions = {
+    "Potion of Levitation": {
+        solventOptions: ["Water"] as string[],
+        soluteOptions: [["Mist Grass"], ["Mist Grass Wick"]] as DropName[][],
+        brewTime: get.mins(1),
+        successRate: 0.8,
+        effect: {
+            name: "Levitation",
+            time: 1,
+        },
+        outputAmount: 1,
+    },
     "Lesser Strength Potion": {
         solventOptions: ["Water"] as string[],
         soluteOptions: [["Slime Secretions"], ["Stained Mask"]] as DropName[][],
