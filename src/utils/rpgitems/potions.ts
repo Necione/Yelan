@@ -9,6 +9,7 @@ export const potions = {
         successRate: 0.8,
         effect: {
             name: "Levitation",
+            effectValue: 1,
             time: 1,
         },
         outputAmount: 1,
