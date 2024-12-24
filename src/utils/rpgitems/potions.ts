@@ -353,7 +353,7 @@ export const potions = {
             ["Chaos Axis", "Chaos Circuit"],
             ["Chaos Oculus", "Chaos Core"],
         ] as DropName[][],
-        brewTime: get.secs(1),
+        brewTime: get.mins(10),
         successRate: 0.5,
         effect: {
             name: "Resistance",
