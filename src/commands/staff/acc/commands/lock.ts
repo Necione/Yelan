@@ -48,15 +48,15 @@ export const lock = buildCommand({
         }
         const type = p.locked ? false : true;
         if (shouldDM) {
-            await i.client.dms.send({
-                userId: user.id,
-                body: embedComment(
+            await i.client.dms.user(
+                user.id,
+                embedComment(
                     `Your user profile has been ${type ? "" : "un"}locked.${
                         reason.length ? `\n\n### Reason: ${reason}` : ""
                     }`,
                     type ? "Red" : "Green",
                 ),
-            });
+            );
         }
         await Promise.all([
             logs.misc({

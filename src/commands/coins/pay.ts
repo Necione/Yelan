@@ -194,10 +194,7 @@ export const pay: SlashCommand = {
 
         locked.del([interaction.user.id, user.id]);
         await Promise.all([
-            interaction.client.dms.send({
-                userId: user.id,
-                body: { embeds: [dmEmbed] },
-            }),
+            interaction.client.dms.user(user.id, { embeds: [dmEmbed] }),
             responder.edit({
                 embeds: [
                     new EmbedBuilder()

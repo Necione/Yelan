@@ -1,10 +1,10 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import {
     colors,
-    discord,
     embedComment,
     formatNumber,
     get,
+    getUsersFromString,
     is,
     make,
     sleep,
@@ -73,27 +73,9 @@ export const payment = buildCommand<SlashCommand>({
             ),
         );
         if (is.string(ousers)) {
-            for await (const id of ousers.split(/ |></g)) {
-                const u = await discord.user(
-                    i.client,
-                    id.replace(/<|@|>/g, ""),
-                    {
-                        fetch: true,
-                        mock: false,
-                    },
-                );
-                if (!u || u.bot) {
-                    continue;
-                }
-                if (users.find((c) => c.id === u.id)) {
-                    continue;
-                }
-                if (user.id === i.user.id) {
-                    if (!isDev(i.user.id)) {
-                        continue;
-                    }
-                }
-                users.push(u);
+            const us = await getUsersFromString(i.client, ousers);
+            if (us.size) {
+                users.push(...us.values());
             }
         }
         if (!is.array(users)) {
@@ -138,13 +120,13 @@ export const payment = buildCommand<SlashCommand>({
                     "Green",
                 ),
             );
-            const dmed = await i.client.dms.send({
-                userId: c.id,
-                body: embedComment(
+            const dmed = await i.client.dms.user(
+                c.id,
+                embedComment(
                     `You were paid ${getAmount(amount)} for:\n>>> ${reason}`,
                     "Green",
                 ),
-            });
+            );
             status.push(`\`${dmed.status ? "🟢" : "🔴"}\` ${c.toString()}`);
             await r.edit(
                 embedComment(

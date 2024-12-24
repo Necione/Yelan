@@ -4,7 +4,7 @@ import {
     getUser,
     type SlashCommand,
 } from "@elara-services/botbuilder";
-import { discord, make } from "@elara-services/utils";
+import { getUsersFromString, make } from "@elara-services/utils";
 import { Colors, SlashCommandBuilder, type User } from "discord.js";
 import { roles } from "../../config";
 
@@ -38,25 +38,15 @@ export const dm = buildCommand<SlashCommand>({
         const other = i.options.getString("other_users", false);
         const users = make.array<User>([user]);
         if (other) {
-            const ids = other.split(" ");
-            for await (const id of ids) {
-                const u = await discord.user(i.client, id, {
-                    fetch: true,
-                    mock: false,
-                });
-                if (u && !u.bot) {
-                    users.push(u);
-                }
+            const us = await getUsersFromString(i.client, other);
+            if (us.size) {
+                users.push(...us.values());
             }
         }
-        const description = [];
-        for await (const user of users.values()) {
-            const s = await i.client.dms.send({
-                userId: user.id,
-                body: { content: message },
-            });
-            description.push(`\`${s.status ? "🟢" : "🔴"} ${user.username}\``);
-        }
+        const res = await i.client.dms.users(
+            users.map((c) => c.id),
+            { content: message },
+        );
 
         return r.edit({
             embeds: [
@@ -64,7 +54,15 @@ export const dm = buildCommand<SlashCommand>({
                     color: Colors.Aqua,
                     timestamp: new Date().toISOString(),
                     title: `DMs`,
-                    description: description.join("\n"),
+                    description: res
+                        .map(
+                            (c) =>
+                                `\`${c.status ? "🟢" : "🔴"} ${
+                                    users.find((u) => u.id === c.options.userId)
+                                        ?.username || "Unknown User??"
+                                }\``,
+                        )
+                        .join("\n"),
                 },
             ],
         });

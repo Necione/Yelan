@@ -193,14 +193,11 @@ export async function fetchData(
         if (requestingMember?.id === user.id) {
             if (sendInDms) {
                 // Send the profile image to the user's DM
-                const sent = await user.client.dms.send({
-                    userId: user.id,
-                    body: {
-                        content: `> This is your profile:`,
-                    },
-                    files: [{ name: "profile.png", data }],
-                });
-
+                const sent = await user.client.dms.user(
+                    user.id,
+                    { content: `> Your Profile:` },
+                    [{ name: "profile.png", data }],
+                );
                 if (!sent.status) {
                     return embedComment(
                         `I was unable to send your profile in DMs, make sure you have them enabled!`,
