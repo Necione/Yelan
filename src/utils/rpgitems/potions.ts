@@ -2,6 +2,51 @@ import { get } from "@elara-services/utils";
 import type { DropName } from "./drops";
 
 export const potions = {
+    "Potion of Evasion": {
+        solventOptions: ["Water"] as string[],
+        soluteOptions: [
+            ["Hunter's Sacrificial Knife"],
+            ["Hunter's Sacrificial Knife"],
+        ] as DropName[][],
+        brewTime: get.mins(2),
+        successRate: 0.8,
+        effect: {
+            name: "Evasion",
+            effectValue: 0.4,
+            time: 2,
+        },
+        outputAmount: 1,
+    },
+    "Greater Potion of Evasion": {
+        solventOptions: ["Water"] as string[],
+        soluteOptions: [
+            ["Agent's Sacrificial Knife"],
+            ["Agent's Sacrificial Knife"],
+        ] as DropName[][],
+        brewTime: get.mins(2),
+        successRate: 0.8,
+        effect: {
+            name: "Evasion",
+            effectValue: 0.6,
+            time: 3,
+        },
+        outputAmount: 1,
+    },
+    "Superior Potion of Evasion": {
+        solventOptions: ["Water"] as string[],
+        soluteOptions: [
+            ["Inspector's Sacrificial Knife"],
+            ["Inspector's Sacrificial Knife"],
+        ] as DropName[][],
+        brewTime: get.mins(2),
+        successRate: 0.8,
+        effect: {
+            name: "Evasion",
+            effectValue: 0.8,
+            time: 5,
+        },
+        outputAmount: 1,
+    },
     "Potion of Levitation": {
         solventOptions: ["Water"] as string[],
         soluteOptions: [["Mist Grass"], ["Mist Grass Wick"]] as DropName[][],

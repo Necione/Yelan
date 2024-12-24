@@ -577,7 +577,28 @@ export async function monsterAttack(
 
     const hasBackstep = skills.has(stats, "Backstep");
     const hasParry = skills.has(stats, "Parry");
-    if (hasBackstep && Math.random() < 0.25) {
+
+    const evasionEffect = stats.activeEffects.find(
+        (eff) => eff.name === "Evasion" && eff.remainingUses > 0,
+    );
+
+    if (evasionEffect && Math.random() < evasionEffect.effectValue) {
+        messages.push("`💨` You dodged the attack completely with Evasion");
+        debug(`${username} Evasion => 0 dmg`);
+        finalMonsterDamage = 0;
+
+        evasionEffect.remainingUses -= 1;
+
+        if (evasionEffect.remainingUses <= 0) {
+            stats.activeEffects = stats.activeEffects.filter(
+                (eff) => eff !== evasionEffect,
+            );
+            messages.push("`💨` Your Evasion effect has ended.");
+            debug(
+                `${username} Evasion effect ended => removed from activeEffects`,
+            );
+        }
+    } else if (hasBackstep && Math.random() < 0.25) {
         messages.push("`💨` You dodged the attack completely with Backstep");
         debug(`${username} Backstep => 0 dmg`);
         finalMonsterDamage = 0;
