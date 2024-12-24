@@ -133,7 +133,10 @@ export const potions = {
     },
     "Minor Healing Potion": {
         solventOptions: ["Water"] as string[],
-        soluteOptions: [["Slime Concentrate", "Ominous Mask"]] as DropName[][],
+        soluteOptions: [
+            ["Slime Concentrate", "Slime Concentrate"],
+            ["Ominous Mask", "Ominous Mask"],
+        ] as DropName[][],
         brewTime: get.mins(1),
         successRate: 0.8,
         effect: {
