@@ -254,6 +254,7 @@ model UserStats {
   inventory                 UserStatsInv[]
   skills                    UserSkill[]
   cooking                   UserCooking[]
+  brewing                   UserBrewing[]
   activeSkills              String[]       @default([])
   activeEffects             UserEffect[]
   requests                  UserRequest[]
@@ -343,6 +344,12 @@ type UserSkill {
 
 type UserCooking {
   recipeName String
+  amount     Int
+  finishTime DateTime
+}
+
+type UserBrewing {
+  potionName String
   amount     Int
   finishTime DateTime
 }

@@ -39,6 +39,7 @@ export const secretCult = createEvent({
                 ],
             })
             .catch(noop);
+
         const c = await awaitComponent(message, {
             filter: (int) => int.customId.startsWith("event_"),
             users: [{ allow: true, id: stats.userId }],
@@ -82,7 +83,7 @@ export const secretCult = createEvent({
                 .edit({
                     embeds: [
                         embed.setDescription(
-                            `The cult bestows a blessing upon you! You have gained **Regeneration** effect for the next **${remainingUses} hunts**.`,
+                            `The cult bestows a blessing upon you! You have gained **Regeneration** (Value=${effectValue}) for the next **${remainingUses} hunts**.`,
                         ),
                     ],
                     components: [],
@@ -96,7 +97,7 @@ export const secretCult = createEvent({
                 .edit({
                     embeds: [
                         embed.setDescription(
-                            `The cult bestows a blessing upon you! You have gained **Resistance** effect for the next **${remainingUses} rounds**.`,
+                            `The cult bestows a blessing upon you! You have gained **Resistance** (Value=${effectValue}) for the next **${remainingUses} rounds**.`,
                         ),
                     ],
                     components: [],
@@ -113,24 +114,31 @@ export const secretCult = createEvent({
         const updatedStats = await getUserStats(stats.userId);
         if (updatedStats) {
             updatedStats.activeEffects = updatedStats.activeEffects.filter(
-                (effect) => effect.remainingUses > 0,
+                (eff) => eff.remainingUses > 0,
             );
 
             const existingEffectIndex = updatedStats.activeEffects.findIndex(
-                (effect) => effect.name === effectName,
+                (eff) => eff.name === effectName,
             );
 
             if (existingEffectIndex !== -1) {
+                if (
+                    newEffect.effectValue >
+                    updatedStats.activeEffects[existingEffectIndex].effectValue
+                ) {
+                    updatedStats.activeEffects[
+                        existingEffectIndex
+                    ].effectValue = newEffect.effectValue;
+                }
+
                 updatedStats.activeEffects[existingEffectIndex].remainingUses +=
-                    remainingUses;
+                    newEffect.remainingUses;
             } else {
                 updatedStats.activeEffects.push(newEffect);
             }
 
             await updateUserStats(stats.userId, {
-                activeEffects: {
-                    set: updatedStats.activeEffects,
-                },
+                activeEffects: { set: updatedStats.activeEffects },
             });
         }
     },
