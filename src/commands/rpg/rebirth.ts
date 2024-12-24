@@ -42,12 +42,12 @@ export const rebirth = buildCommand<SlashCommand>({
         }
 
         const rebirthRequirements = [5, 10, 15, 20, 25, 30, 35, 40];
-        const requiredadventureRank = rebirthRequirements[stats.rebirths] || 50;
+        const requiredAdventureRank = rebirthRequirements[stats.rebirths] || 50;
 
-        if (stats.adventureRank < requiredadventureRank) {
+        if (stats.adventureRank < requiredAdventureRank) {
             return r.edit(
                 embedComment(
-                    `You must be Adventure Rank ${requiredadventureRank} or higher to rebirth.`,
+                    `You must be Adventure Rank ${requiredAdventureRank} or higher to rebirth.`,
                     "Red",
                 ),
             );
@@ -57,7 +57,7 @@ export const rebirth = buildCommand<SlashCommand>({
             .setColor("Yellow")
             .setTitle("Are you sure you want to Rebirth?")
             .setDescription(
-                "All your stats will be reset, and you will go back to Adventure Rank 1. All items in your bag will be sold.\n\nYou will get +50 Max HP and a higher selling price.",
+                "All your stats will be reset, and you will go back to Adventure Rank 1. All items in your bag will be sold.",
             )
             .setFooter({ text: "You have 10 seconds to confirm or cancel." });
 
@@ -112,12 +112,19 @@ export const rebirth = buildCommand<SlashCommand>({
         }
 
         if (confirmation.customId === "confirm_rebirth") {
-            await handleRebirth(i.user.id, stats, totalSellPrice);
+            const tokensAfterRebirth = await handleRebirth(
+                i.user.id,
+                stats,
+                totalSellPrice,
+            );
+
             await confirmation.update(
                 embedComment(
-                    `Rebirth complete! All stats and items have been reset.\nAll items have been sold for ${getAmount(
-                        totalSellPrice,
-                    )}`,
+                    `Rebirth complete! All stats and items have been reset.\n` +
+                        `All items have been sold for ${getAmount(
+                            totalSellPrice,
+                        )}.\n` +
+                        `You now have **${tokensAfterRebirth}** token(s) available to spend.`,
                     "Green",
                 ),
             );
@@ -132,6 +139,8 @@ async function handleRebirth(
     stats: UserStats,
     totalSellPrice: number,
 ) {
+    const newRebirthValue = (stats.rebirths || 0) + 1;
+
     const defaultStats: Partial<UserStats> = {
         adventureRank: 1,
         exp: 0,
@@ -153,8 +162,16 @@ async function handleRebirth(
         equippedSands: null,
         equippedGoblet: null,
         equippedCirclet: null,
-        rebirths: (stats.rebirths || 0) + 1,
+
+        rebirths: newRebirthValue,
+
+        totalTokensUsed: 0,
     };
+
+    const resetSkills = stats.skills.map((skill) => ({
+        ...skill,
+        level: 1,
+    }));
 
     const characters = (await getUserCharacters(userId)) as UserCharacter[];
 
@@ -184,8 +201,12 @@ async function handleRebirth(
     await Promise.all([
         updateUserStats(userId, {
             ...defaultStats,
+
+            skills: { set: resetSkills },
         }),
         addBalance(userId, totalSellPrice, true, "Rebirth - sold all items"),
         ...characterUpdates,
     ]);
+
+    return newRebirthValue;
 }
