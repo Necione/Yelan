@@ -238,7 +238,7 @@ export const rpg = buildCommand<SlashCommand>({
                 const effectsList = stats.activeEffects
                     .map(
                         (effect) =>
-                            `\`${effect.name}\`: ${effect.remainingUses} uses left`,
+                            `\`${effect.name}\` (Value=${effect.effectValue}): ${effect.remainingUses} uses left`,
                     )
                     .join("\n");
 

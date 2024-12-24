@@ -174,24 +174,31 @@ export const cursedWitch = createEvent({
         const updatedStats = await getUserStats(stats.userId);
         if (updatedStats) {
             updatedStats.activeEffects = updatedStats.activeEffects.filter(
-                (effect) => effect.remainingUses > 0,
+                (eff) => eff.remainingUses > 0,
             );
 
             const existingEffectIndex = updatedStats.activeEffects.findIndex(
-                (effect) => effect.name === effectName,
+                (eff) => eff.name === effectName,
             );
 
             if (existingEffectIndex !== -1) {
+                if (
+                    newEffect.effectValue >
+                    updatedStats.activeEffects[existingEffectIndex].effectValue
+                ) {
+                    updatedStats.activeEffects[
+                        existingEffectIndex
+                    ].effectValue = newEffect.effectValue;
+                }
+
                 updatedStats.activeEffects[existingEffectIndex].remainingUses +=
-                    remainingUses;
+                    newEffect.remainingUses;
             } else {
                 updatedStats.activeEffects.push(newEffect);
             }
 
             await updateUserStats(stats.userId, {
-                activeEffects: {
-                    set: updatedStats.activeEffects,
-                },
+                activeEffects: { set: updatedStats.activeEffects },
             });
         }
     },

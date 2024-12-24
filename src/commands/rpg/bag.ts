@@ -15,6 +15,7 @@ import { drops } from "../../utils/rpgitems/drops";
 import { fish } from "../../utils/rpgitems/fish";
 import { food } from "../../utils/rpgitems/food";
 import { misc } from "../../utils/rpgitems/misc";
+import { potions } from "../../utils/rpgitems/potions";
 import { weapons } from "../../utils/rpgitems/weapons";
 
 const artifactTypeEmojis: { [key in ArtifactType]: string } = {
@@ -49,6 +50,7 @@ export const bag = buildCommand<SlashCommand>({
                     { name: "Food", value: "Food" },
                     { name: "Fish", value: "Fish" },
                     { name: "Baits", value: "Baits" },
+                    { name: "Potions", value: "Potions" },
                 ),
         )
         .addStringOption((option) =>
@@ -118,6 +120,9 @@ export const bag = buildCommand<SlashCommand>({
                 break;
             case "Baits":
                 filteredItems = items.filter((item) => item.item in bait);
+                break;
+            case "Potions":
+                filteredItems = items.filter((item) => item.item in potions);
                 break;
             case "All":
             default:

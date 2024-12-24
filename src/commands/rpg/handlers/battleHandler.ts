@@ -869,6 +869,30 @@ export function applyAttackModifiers(
         }
     }
 
+    const strengthEffect = stats.activeEffects.find(
+        (eff) => eff.name === "Strength" && eff.remainingUses > 0,
+    );
+    if (strengthEffect) {
+        const multiplier = strengthEffect.effectValue;
+        attackPower *= multiplier;
+        messages.push(
+            `\`💪\` Strength effect activated! Your attack is __x${multiplier.toFixed(
+                2,
+            )}__ this turn`,
+        );
+        debugMultipliers.push(`Strength (${multiplier}x)`);
+        console.log(`${username} Strength => x${multiplier} => ${attackPower}`);
+
+        strengthEffect.remainingUses -= 1;
+        if (strengthEffect.remainingUses <= 0) {
+            stats.activeEffects = stats.activeEffects.filter(
+                (e) => e !== strengthEffect,
+            );
+            messages.push("`💪` Strength effect ended");
+            console.log(`${username} Strength ended => removed activeEffects`);
+        }
+    }
+
     console.log(
         `${username} Final Attack Power after modifiers: ${attackPower}, Multipliers applied: ${debugMultipliers.join(
             ", ",
