@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, make } from "@elara-services/utils";
+import { embedComment, is, make, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     createDefaultCharacterForUser,
@@ -417,14 +417,7 @@ export const rpg = buildCommand<SlashCommand>({
             }
         }
 
-        return pager.run(i, i.user).catch((error) => {
-            console.error("Error running pager:", error);
-            r.edit(
-                embedComment(
-                    "An error occurred while displaying your RPG stats.",
-                ),
-            );
-        });
+        return pager.run(i, i.user).catch(noop);
     },
 });
 

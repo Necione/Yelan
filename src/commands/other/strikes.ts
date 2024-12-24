@@ -10,6 +10,7 @@ import {
     embedComment,
     formatNumber,
     is,
+    noop,
     proper,
     time,
 } from "@elara-services/utils";
@@ -151,6 +152,6 @@ export const strikes = buildCommand<SlashCommand>({
                 ],
             });
         }
-        return pager.run(i, i.user).catch(console.log);
+        return pager.run(i, i.user).catch(noop);
     },
 });

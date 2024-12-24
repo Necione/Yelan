@@ -2,6 +2,7 @@ import { getRandomValue, is, make } from "@elara-services/utils";
 import type { Prisma, UserStats } from "@prisma/client";
 import { skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
+import { debug } from "../../../utils";
 import { weaponAdvantages, type Monster } from "../../../utils/hunt";
 import { masteryBenefits } from "../../../utils/masteryData";
 import { calculateMasteryLevel } from "../../../utils/masteryHelper";
@@ -71,7 +72,7 @@ export async function playerAttack(
 
     if (stats.castQueue.length > 0) {
         const spellName = stats.castQueue[0];
-        console.log(`${username} Casting spell: ${spellName}`);
+        debug(`${username} Casting spell: ${spellName}`);
 
         const spellFn = spellHandlers[spellName];
 
@@ -91,9 +92,7 @@ export async function playerAttack(
             messages.push(
                 `\`❓\` The spell "${spellName}" was found but has no effect`,
             );
-            console.log(
-                `${username} Unknown spell: "${spellName}" has no effect`,
-            );
+            debug(`${username} Unknown spell: "${spellName}" has no effect`);
         }
 
         stats.castQueue.shift();
@@ -114,9 +113,7 @@ export async function playerAttack(
         messages.push(
             "`🎣` This is a fishing monster. All your skills are disabled!",
         );
-        console.log(
-            `${username} Fishing monster => skipping skill-based logic.`,
-        );
+        debug(`${username} Fishing monster => skipping skill-based logic.`);
 
         const baseAttack = stats.attackPower || 0;
         currentMonsterHp = Math.max(currentMonsterHp - baseAttack, 0);
@@ -126,7 +123,7 @@ export async function playerAttack(
                 2,
             )}\` basic damage to the ${monster.name} \`(FISHING)\``,
         );
-        console.log(`${username} Fishing attack: Dealt ${baseAttack} damage`);
+        debug(`${username} Fishing attack: Dealt ${baseAttack} damage`);
 
         return {
             currentMonsterHp,
@@ -147,16 +144,14 @@ export async function playerAttack(
             "`🛡️` Paladin skill activated! Your ATK and DEF Value have been swapped",
         );
         debugMultipliers.push("Paladin Swapped (ATK and DEF)");
-        console.log(`${usernameLog} Paladin => ATK and DEF swapped`);
+        debug(`${usernameLog} Paladin => ATK and DEF swapped`);
     }
 
     if (hasWrath) {
         attackPower *= 1.5;
         messages.push("`💢` Wrath skill => 150% more damage");
         debugMultipliers.push("Wrath (1.5x)");
-        console.log(
-            `${usernameLog} Wrath => attackPower * 1.5 = ${attackPower}`,
-        );
+        debug(`${usernameLog} Wrath => attackPower * 1.5 = ${attackPower}`);
     }
 
     if (monsterState.poisoned) {
@@ -166,11 +161,11 @@ export async function playerAttack(
             `\`💚\` Poisoned! The ${monster.name} loses \`${poisonDamage}\` HP`,
         );
         debugMultipliers.push(`Poison Damage (${poisonDamage})`);
-        console.log(`${usernameLog} Poison => -${poisonDamage} HP to monster`);
+        debug(`${usernameLog} Poison => -${poisonDamage} HP to monster`);
 
         if (currentMonsterHp === 0) {
             monsterState.poisoned = false;
-            console.log(`${usernameLog} Poison ended => monster HP 0`);
+            debug(`${usernameLog} Poison ended => monster HP 0`);
         }
     }
 
@@ -183,7 +178,7 @@ export async function playerAttack(
                 `\`💪\` Vigor skill activated! Your low HP grants you __150%__ more damage`,
             );
             debugMultipliers.push("Vigor (1.5x)");
-            console.log(`${usernameLog} Vigor => x1.5 => ${attackPower}`);
+            debug(`${usernameLog} Vigor => x1.5 => ${attackPower}`);
         }
     }
 
@@ -205,12 +200,12 @@ export async function playerAttack(
         messages.push(
             `\`👹\` The Ninja's Code prevents you from landing a critical hit`,
         );
-        console.log(`${usernameLog} Nobushi trait: Crit disabled`);
+        debug(`${usernameLog} Nobushi trait: Crit disabled`);
     }
     const { isCrit, multiplier } = calculateCriticalHit(critChance, critValue);
     if (isCrit) {
         debugMultipliers.push(`Critical Hit (${multiplier}x)`);
-        console.log(`${usernameLog} CRIT => x${multiplier}`);
+        debug(`${usernameLog} CRIT => x${multiplier}`);
     }
     attackPower *= multiplier;
 
@@ -218,7 +213,7 @@ export async function playerAttack(
         attackPower *= 0.5;
         messages.push(`\`💜\` Overhealed! Your damage is halved`);
         debugMultipliers.push("Overheal (0.5x)");
-        console.log(`${usernameLog} Overheal => x0.5 => ${attackPower}`);
+        debug(`${usernameLog} Overheal => x0.5 => ${attackPower}`);
     }
 
     const defenseResult = checkMonsterDefenses(
@@ -235,7 +230,7 @@ export async function playerAttack(
     monsterState = defenseResult.monsterState;
 
     if (attackMissed) {
-        console.log(`${usernameLog} Attack missed entirely`);
+        debug(`${usernameLog} Attack missed entirely`);
         return {
             currentMonsterHp,
             currentPlayerHp,
@@ -260,9 +255,7 @@ export async function playerAttack(
         debugMultipliers.push(
             `Vigilance (+${(secondAttackPercentage * 100).toFixed(1)}%)`,
         );
-        console.log(
-            `${usernameLog} Vigilance => +${vigilanceAttackPower} damage`,
-        );
+        debug(`${usernameLog} Vigilance => +${vigilanceAttackPower} damage`);
     }
 
     currentMonsterHp -= attackPower;
@@ -275,7 +268,7 @@ export async function playerAttack(
         damageReduced,
         messages,
     );
-    console.log(
+    debug(
         `${usernameLog} Final Attack => ${attackPower}, multipliers= [${debugMultipliers.join(
             ", ",
         )}]`,
@@ -295,7 +288,7 @@ export async function playerAttack(
             )}\` damage`,
         );
         debugMultipliers.push(`Kindle (${(damageBonus * 100).toFixed(0)}%)`);
-        console.log(`${usernameLog} Kindle => +${kindleBonusDamage} damage`);
+        debug(`${usernameLog} Kindle => +${kindleBonusDamage} damage`);
     }
 
     const spiceLevelData = getUserSkillLevelData(stats, "Spice");
@@ -312,7 +305,7 @@ export async function playerAttack(
             )}\` damage`,
         );
         debugMultipliers.push(`Spice (${(damageBonus * 100).toFixed(0)}%)`);
-        console.log(`${usernameLog} Spice => +${spiceDamageBonus} damage`);
+        debug(`${usernameLog} Spice => +${spiceDamageBonus} damage`);
     }
 
     if (
@@ -325,13 +318,13 @@ export async function playerAttack(
         messages.push(
             "`⛔` The Machine's Shield prevents it from dying this turn!",
         );
-        console.log(`${usernameLog} Machine => shield at 1 HP`);
+        debug(`${usernameLog} Machine => shield at 1 HP`);
     }
 
     const deathThreshold = getDeathThreshold(stats);
     if (currentPlayerHp <= deathThreshold) {
         currentPlayerHp = deathThreshold;
-        console.log(
+        debug(
             `${usernameLog} Player HP below threshold => set to ${deathThreshold}`,
         );
     }
@@ -365,9 +358,7 @@ export async function monsterAttack(
         messages.push(
             `\`💫\` The ${monster.name} is stunned and couldn't attack this turn`,
         );
-        console.log(
-            `${username} ${monster.name} stunned => skip monster attack`,
-        );
+        debug(`${username} ${monster.name} stunned => skip monster attack`);
         monsterState.stunned = false;
         return { currentPlayerHp, currentMonsterHp };
     }
@@ -390,9 +381,7 @@ export async function monsterAttack(
                 2,
             )}\` damage to you \`(FISHING)\``,
         );
-        console.log(
-            `${username} Fishing monster => -${monsterDamage} HP to player`,
-        );
+        debug(`${username} Fishing monster => -${monsterDamage} HP to player`);
 
         currentPlayerHp = Math.max(currentPlayerHp, getDeathThreshold(stats));
         await updateUserStats(stats.userId, { hp: { set: currentPlayerHp } });
@@ -414,26 +403,26 @@ export async function monsterAttack(
         messages.push(
             `\`🌿\` The ${monster.name} regenerated \`${regenAmount}\` HP!`,
         );
-        console.log(`${username} ${monster.name} +${regenAmount} HP (Geo)`);
+        debug(`${username} ${monster.name} +${regenAmount} HP (Geo)`);
     }
 
     let monsterDamage = getRandomValue(
         monsterStats.minDamage,
         monsterStats.maxDamage,
     );
-    console.log(`${username} ${monster.name} base damage => ${monsterDamage}`);
+    debug(`${username} ${monster.name} base damage => ${monsterDamage}`);
 
     switch (monster.mutationType) {
         case "Bloodthirsty":
             monsterDamage *= 2;
-            console.log(`${username} Bloodthirsty => x2 => ${monsterDamage}`);
+            debug(`${username} Bloodthirsty => x2 => ${monsterDamage}`);
             break;
         case "Strange":
             monsterDamage *= 1.5;
-            console.log(`${username} Strange => x1.5 => ${monsterDamage}`);
+            debug(`${username} Strange => x1.5 => ${monsterDamage}`);
             break;
         case "Infected":
-            console.log(`${username} Infected => no direct damage change`);
+            debug(`${username} Infected => no direct damage change`);
             break;
     }
 
@@ -442,10 +431,10 @@ export async function monsterAttack(
             monsterState.isEnraged = true;
             monsterDamage *= 2;
             messages.push(`\`🐲\` The ${monster.name} became **enraged**!`);
-            console.log(`${username} enrage => x2 => ${monsterDamage}`);
+            debug(`${username} enrage => x2 => ${monsterDamage}`);
         } else {
             monsterDamage *= 2;
-            console.log(
+            debug(
                 `${username} monster already enraged => x2 => ${monsterDamage}`,
             );
         }
@@ -465,7 +454,7 @@ export async function monsterAttack(
                 2,
             )})`,
         );
-        console.log(
+        debug(
             `${username} Dendro => x${monsterState.dendroAttackMultiplier.toFixed(
                 2,
             )} => ${monsterDamage}`,
@@ -481,7 +470,7 @@ export async function monsterAttack(
         messages.push(
             "`⚜️` Your Absolution negates the monster's critical hits",
         );
-        console.log(`${username} Absolution => monster crit disabled`);
+        debug(`${username} Absolution => monster crit disabled`);
     }
 
     const { isCrit, multiplier } = calculateCriticalHit(
@@ -489,7 +478,7 @@ export async function monsterAttack(
         monsterCritValue,
     );
     if (isCrit) {
-        console.log(`${username} ${monster.name} crit => x${multiplier}`);
+        debug(`${username} ${monster.name} crit => x${multiplier}`);
     }
     monsterDamage *= multiplier;
 
@@ -524,13 +513,13 @@ export async function monsterAttack(
             const pre = monsterDamage;
             monsterDamage = (100 * monsterDamage) / (defValue + 25);
             damageReduced = pre - monsterDamage;
-            console.log(
+            debug(
                 `${username} defends => -${damageReduced} => ${monsterDamage}`,
             );
         }
     } else {
         messages.push(`\`⚙️\` The ${monster.name} ignores your defenses`);
-        console.log(`${username} Machine => ignoring defenses`);
+        debug(`${username} Machine => ignoring defenses`);
     }
 
     const hasVortexVanquisher =
@@ -538,7 +527,7 @@ export async function monsterAttack(
     const damageReductionFactor = hasVortexVanquisher ? 0.5 : 1;
     if (hasVortexVanquisher) {
         messages.push("`🌀` Vortex Vanquisher => damage taken -50%");
-        console.log(`${username} Vortex => monsterDamage * 0.5`);
+        debug(`${username} Vortex => monsterDamage * 0.5`);
     }
 
     monsterDamage = applyElementalEffects(
@@ -590,7 +579,7 @@ export async function monsterAttack(
     const hasParry = skills.has(stats, "Parry");
     if (hasBackstep && Math.random() < 0.25) {
         messages.push("`💨` You dodged the attack completely with Backstep");
-        console.log(`${username} Backstep => 0 dmg`);
+        debug(`${username} Backstep => 0 dmg`);
         finalMonsterDamage = 0;
     } else if (hasParry && Math.random() < 0.2) {
         const parried = finalMonsterDamage * 0.5;
@@ -601,7 +590,7 @@ export async function monsterAttack(
                 2,
             )}\` damage back to the ${monster.name}`,
         );
-        console.log(
+        debug(
             `${username} Parry => monster HP -${parried}, finalMonsterDamage => ${finalMonsterDamage}`,
         );
     }
@@ -619,16 +608,16 @@ export async function monsterAttack(
             stats.activeEffects = stats.activeEffects.filter(
                 (eff) => eff !== resistanceEffect,
             );
-            console.log(`${username} Resistance effect expired`);
+            debug(`${username} Resistance effect expired`);
         }
-        console.log(
+        debug(
             `${username} Resistance => -${resistanceReduced} => ${finalMonsterDamage}`,
         );
     }
 
     const leftover = applyShieldThenHp(stats, finalMonsterDamage);
     currentPlayerHp -= leftover;
-    console.log(
+    debug(
         `${username} took ${finalMonsterDamage} total damage (${leftover} to HP) from ${monster.name}. Shield now = ${stats.shield}`,
     );
 
@@ -642,7 +631,7 @@ export async function monsterAttack(
     );
 
     currentPlayerHp = Math.min(currentPlayerHp, effectiveMaxHp);
-    console.log(`${username} HP after => ${currentPlayerHp}`);
+    debug(`${username} HP after => ${currentPlayerHp}`);
 
     const deathThreshold = getDeathThreshold(stats);
     if (currentPlayerHp <= deathThreshold) {
@@ -652,10 +641,10 @@ export async function monsterAttack(
             messages.push(
                 "`💀` Fortress skill activated! You should've died this turn",
             );
-            console.log(`${username} Fortress => set HP = 1`);
+            debug(`${username} Fortress => set HP = 1`);
         } else {
             currentPlayerHp = deathThreshold;
-            console.log(`${username} HP below threshold => ${deathThreshold}`);
+            debug(`${username} HP below threshold => ${deathThreshold}`);
         }
     }
 
@@ -682,7 +671,7 @@ export async function monsterAttack(
             2,
         )}\` damage to you ${defendText} ${critText} ${resistText}`,
     );
-    console.log(
+    debug(
         `${username} finalMonsterDamage=${finalMonsterDamage}, defended=${defended}, resist=${resistanceReduced}`,
     );
 
@@ -716,7 +705,7 @@ export function applyAttackModifiers(
             `\`🗡️\` Backstab skill activated! You deal __150%__ more DMG`,
         );
         debugMultipliers.push("Backstab (1.5x)");
-        console.log(
+        debug(
             `${username} Backstab skill activated: Attack power multiplied by 1.5 to ${attackPower}`,
         );
     }
@@ -728,7 +717,7 @@ export function applyAttackModifiers(
             `\`〽️\` You are displaced! Your attack power is reduced by __80%__`,
         );
         debugMultipliers.push("Displaced (0.2x)");
-        console.log(
+        debug(
             `${username} Displaced: Attack power reduced by 80% to ${attackPower}`,
         );
     }
@@ -746,7 +735,7 @@ export function applyAttackModifiers(
         debugMultipliers.push(
             `Weakness (${(weaknessEffect.effectValue * 100).toFixed(0)}%)`,
         );
-        console.log(
+        debug(
             `${username} Weakness effect: Attack power multiplied by ${
                 1 + weaknessEffect.effectValue
             } to ${attackPower}`,
@@ -774,7 +763,7 @@ export function applyAttackModifiers(
                 `\`⚔️\` **${weaponType}** advantage! You deal __110%__ more DMG to **${monster.group}**`,
             );
             debugMultipliers.push(`${weaponType} Advantage (1.1x)`);
-            console.log(
+            debug(
                 `${username} Weapon advantage: ${weaponType} multiplier applied, attack power is now ${attackPower}`,
             );
         }
@@ -822,7 +811,7 @@ export function applyAttackModifiers(
                     applicableMultiplier * 100
                 ).toFixed(0)}%)`,
             );
-            console.log(
+            debug(
                 `${username} Mastery Level ${appliedMasteryLevel} effect: ${weaponType} damage multiplied by ${applicableMultiplier} to ${attackPower}`,
             );
         }
@@ -840,7 +829,7 @@ export function applyAttackModifiers(
                 debugMultipliers.push(
                     `Wolf's Gravestone (${damageMultiplier * 100}%)`,
                 );
-                console.log(
+                debug(
                     `${username} Wolf's Gravestone effect: Damage multiplied by ${damageMultiplier} to ${attackPower}`,
                 );
             }
@@ -856,7 +845,7 @@ export function applyAttackModifiers(
             `\`⚡\` Fury effect activated! Your attack deals double damage this turn`,
         );
         debugMultipliers.push("Fury Effect (2x)");
-        console.log(
+        debug(
             `${username} Fury effect: Attack power doubled to ${attackPower}`,
         );
 
@@ -865,7 +854,7 @@ export function applyAttackModifiers(
             stats.activeEffects = stats.activeEffects.filter(
                 (effect) => effect !== furyEffect,
             );
-            console.log(`${username} Fury effect expired`);
+            debug(`${username} Fury effect expired`);
         }
     }
 
@@ -881,7 +870,7 @@ export function applyAttackModifiers(
             )}__ this turn`,
         );
         debugMultipliers.push(`Strength (${multiplier}x)`);
-        console.log(`${username} Strength => x${multiplier} => ${attackPower}`);
+        debug(`${username} Strength => x${multiplier} => ${attackPower}`);
 
         strengthEffect.remainingUses -= 1;
         if (strengthEffect.remainingUses <= 0) {
@@ -889,11 +878,11 @@ export function applyAttackModifiers(
                 (e) => e !== strengthEffect,
             );
             messages.push("`💪` Strength effect ended");
-            console.log(`${username} Strength ended => removed activeEffects`);
+            debug(`${username} Strength ended => removed activeEffects`);
         }
     }
 
-    console.log(
+    debug(
         `${username} Final Attack Power after modifiers: ${attackPower}, Multipliers applied: ${debugMultipliers.join(
             ", ",
         )}`,
@@ -928,7 +917,7 @@ export function checkMonsterDefenses(
         messages.push(
             `\`👤\` The ${monster.name} has vanished, dodging your attack`,
         );
-        console.log(
+        debug(
             `${username} Agent trait: ${monster.name} has vanished and dodged the attack`,
         );
     }
@@ -943,7 +932,7 @@ export function checkMonsterDefenses(
             `\`💫\` The ${monster.name} stunned you! You missed your attack`,
         );
         attackMissed = true;
-        console.log(
+        debug(
             `${username} Electro element: ${monster.name} stunned the player, attack missed`,
         );
     }
@@ -958,7 +947,7 @@ export function checkMonsterDefenses(
             `\`💨\` The ${monster.name} dodged your attack with its Anemo agility`,
         );
         attackMissed = true;
-        console.log(
+        debug(
             `${username} Anemo element: ${monster.name} dodged the attack with agility`,
         );
     }
@@ -968,7 +957,7 @@ export function checkMonsterDefenses(
             `\`👑\` The ${monster.name} dodged your attack with its superior agility`,
         );
         attackMissed = true;
-        console.log(
+        debug(
             `${username} Boss trait: ${monster.name} dodged the attack with superior agility`,
         );
     }
@@ -978,7 +967,7 @@ export function checkMonsterDefenses(
         messages.push(
             `\`〽️\` The ${monster.name} displaced you! You will deal __80%__ less damage next turn`,
         );
-        console.log(
+        debug(
             `${username} Fatui trait: ${monster.name} displaced the player, attack power will be reduced next turn`,
         );
     }
@@ -991,7 +980,7 @@ export function checkMonsterDefenses(
         messages.push(
             `\`🌊\` **Calamity Queller** prevents the ${monster.name} from defending`,
         );
-        console.log(
+        debug(
             `${username} Calamity Queller equipped => monster's defChance = 0`,
         );
     }
@@ -1002,7 +991,7 @@ export function checkMonsterDefenses(
         attackPower = (100 * attackPower) / (monsterDefValue + 25);
         damageReduced = initialAttackPower - attackPower;
         monsterDefended = true;
-        console.log(
+        debug(
             `${username} ${monster.name} defended: Damage reduced by ${damageReduced} to ${attackPower}`,
         );
     }

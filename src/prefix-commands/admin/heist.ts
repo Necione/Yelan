@@ -59,12 +59,7 @@ async function handleHeistFailure(
             .edit(userId, {
                 SendMessages: null,
             })
-            .catch((error) =>
-                console.error(
-                    `Failed to reset permissions for user ${userId}`,
-                    error,
-                ),
-            );
+            .catch(noop);
     }
 
     await heistChannel
@@ -798,12 +793,7 @@ export const heist: PrefixCommand = {
                         .create(userId, {
                             SendMessages: true,
                         })
-                        .catch((error) =>
-                            console.error(
-                                `Failed to set permissions for user ${userId}`,
-                                error,
-                            ),
-                        );
+                        .catch(noop);
                 }
 
                 const participantsMention = Array.from(participants.keys())

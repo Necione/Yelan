@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment } from "@elara-services/utils";
+import { embedComment, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats } from "../../services";
 import { getPaginatedMessage } from "../../utils";
@@ -154,11 +154,6 @@ export const skillsCommand = buildCommand<SlashCommand>({
         pager.pages.push({ embeds: [page1] });
         pager.pages.push({ embeds: [page2] });
 
-        return pager.run(i, i.user).catch((error: Error) => {
-            console.error("Error running pager:", error);
-            r.edit(
-                embedComment("An error occurred while displaying your skills."),
-            );
-        });
+        return pager.run(i, i.user).catch(noop);
     },
 });

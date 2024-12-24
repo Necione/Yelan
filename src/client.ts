@@ -74,7 +74,7 @@ class BotClient extends Client {
                 return;
             });
             loadEvents(this, getFilesList(events));
-            this.login(process.env.TOKEN).catch(console.error);
+            this.login(process.env.TOKEN).catch(log);
         }
     }
 }

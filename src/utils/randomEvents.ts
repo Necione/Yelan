@@ -1,6 +1,7 @@
 import { is } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
 import type { Message } from "discord.js";
+import { debug } from ".";
 import "./events";
 import { events, type RPGEvent } from "./events/utils";
 
@@ -39,13 +40,13 @@ export async function handleRandomEvent(
         }
     }
 
-    console.log(
+    debug(
         "Eligible Events:",
         eligibleEvents.map((event) => event.name),
     );
 
     if (eligibleEvents.length === 0) {
-        console.log("No eligible events found for the user.");
+        debug("No eligible events found for the user.");
         return;
     }
 
@@ -57,12 +58,12 @@ export async function handleRandomEvent(
         }
     });
 
-    console.log(`Total events in weighted list: ${weightedList.length}`);
+    debug(`Total events in weighted list: ${weightedList.length}`);
 
     const randomIndex = Math.floor(Math.random() * weightedList.length);
     const selectedEvent = weightedList[randomIndex];
 
-    console.log("Selected Event:", selectedEvent.name);
+    debug("Selected Event:", selectedEvent.name);
 
     if (selectedEvent) {
         return selectedEvent.execute(message, stats, userWallet);

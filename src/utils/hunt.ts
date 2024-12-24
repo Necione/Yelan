@@ -1,6 +1,7 @@
 import { getRandomValue, is, log, make } from "@elara-services/utils";
 import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
+import { debug } from ".";
 import { locationGroupWeights } from "./locationGroupWeights";
 import { type MonsterElement, MonsterGroup } from "./monsterHelper";
 import type { WeaponType } from "./rpgitems/weapons";
@@ -204,7 +205,7 @@ export async function getRandomMonster(
     }
 
     if (typeof selectedMonster.getStatsForadventureRank !== "function") {
-        console.error(
+        debug(
             `getStatsForadventureRank is not a function for monster: ${selectedMonster.name}`,
         );
         return null;

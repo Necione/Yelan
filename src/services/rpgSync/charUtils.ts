@@ -1,6 +1,7 @@
 import { make, noop } from "@elara-services/utils";
 import type { Prisma, UserCharacter } from "@prisma/client";
 import { prisma } from "../../prisma";
+import { debug } from "../../utils";
 import { calculateSetBonuses } from "../../utils/artifactHelper";
 import { chars, type CharsName } from "../../utils/charHelper";
 import type {
@@ -37,13 +38,13 @@ export async function syncCharacter(
 ): Promise<UserCharacter | null> {
     const character = await getCharacterById(characterId);
     if (!character) {
-        console.error(`Character with ID "${characterId}" not found.`);
+        debug(`Character with ID "${characterId}" not found.`);
         return null;
     }
 
     const baseData = chars[character.name as CharsName];
     if (!baseData) {
-        console.error(`Base data for character "${character.name}" not found.`);
+        debug(`Base data for character "${character.name}" not found.`);
         return character;
     }
 
@@ -230,7 +231,7 @@ export async function createDefaultCharacterForUser(
 ): Promise<UserCharacter | null> {
     const characterData = chars[characterName];
     if (!characterData) {
-        console.error(`Character data for "${characterName}" not found.`);
+        debug(`Character data for "${characterName}" not found.`);
         return null;
     }
     return await prisma.userCharacter

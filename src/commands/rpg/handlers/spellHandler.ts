@@ -1,4 +1,5 @@
 import { type UserStats } from "@prisma/client";
+import { debug } from "../../../utils";
 import { type Monster } from "../../../utils/hunt";
 import { type MonsterState } from "./battleHandler";
 
@@ -23,7 +24,7 @@ export const spellHandlers: Record<string, SpellHandler> = {
         messages.push(
             `\`✨\` Heal spell casted! Restored \`${healAmount}\` HP`,
         );
-        console.log(`[${stats.userId}] Heal spell: Restored ${healAmount} HP`);
+        debug(`[${stats.userId}] Heal spell: Restored ${healAmount} HP`);
 
         return { currentPlayerHp, currentMonsterHp };
     },
@@ -33,7 +34,7 @@ export const spellHandlers: Record<string, SpellHandler> = {
         messages.push(
             "`⚡` Fury spell casted! Your next attack will deal double damage",
         );
-        console.log(
+        debug(
             `[${stats.userId}] Fury spell: Attack power doubled to ${stats.attackPower}`,
         );
 
@@ -53,7 +54,7 @@ export const spellHandlers: Record<string, SpellHandler> = {
         messages.push(
             `\`🔥\` Burn spell casted! Dealt \`${burnDamage}\` damage to the ${monster.name}`,
         );
-        console.log(
+        debug(
             `[${stats.userId}] Burn spell: Dealt ${burnDamage} damage to ${monster.name}`,
         );
 
@@ -73,7 +74,7 @@ export const spellHandlers: Record<string, SpellHandler> = {
         messages.push(
             `\`❄️\` Cripple spell casted! Dealt \`${crippleDamage}\` damage to the ${monster.name}`,
         );
-        console.log(
+        debug(
             `[${stats.userId}] Cripple spell: Dealt ${crippleDamage} damage to ${monster.name}`,
         );
 
@@ -93,7 +94,7 @@ export const spellHandlers: Record<string, SpellHandler> = {
         messages.push(
             `\`🎇\` Flare spell casted! Dealt \`${flareDamage}\` damage to the ${monster.name}`,
         );
-        console.log(
+        debug(
             `[${stats.userId}] Flare spell: Dealt ${flareDamage} damage to ${monster.name}`,
         );
 
@@ -113,7 +114,7 @@ export const spellHandlers: Record<string, SpellHandler> = {
         messages.push(
             "`💫` Stun spell casted! The enemy is stunned and will miss its next attack",
         );
-        console.log(`[${stats.userId}] Stun spell: ${monster.name} is stunned`);
+        debug(`[${stats.userId}] Stun spell: ${monster.name} is stunned`);
 
         return {
             currentPlayerHp,
@@ -135,14 +136,14 @@ export const spellHandlers: Record<string, SpellHandler> = {
             messages.push(
                 `\`💚\` Poison spell casted! The ${monster.name} is poisoned and will lose __10%__ of its HP each turn`,
             );
-            console.log(
+            debug(
                 `[${stats.userId}] Poison spell: ${monster.name} is now poisoned`,
             );
         } else {
             messages.push(
                 `\`💚\` Poison spell casted again! The ${monster.name} is already poisoned`,
             );
-            console.log(
+            debug(
                 `[${stats.userId}] Poison spell: ${monster.name} was already poisoned`,
             );
         }

@@ -27,10 +27,11 @@ module.exports = {
         "object-shorthand": "error",
         "sonarjs/prefer-immediate-return": "error",
         "@typescript-eslint/consistent-type-imports": "error",
+        "no-console": "error",
 
         // You change this and I will cut your nuts off with a butterknife.
         '@typescript-eslint/no-explicit-any': "error",
-        
+
         "no-async-promise-executor": 0,
         "@typescript-eslint/ban-ts-comment": 0,
     },

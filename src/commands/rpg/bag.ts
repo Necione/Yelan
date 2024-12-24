@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { chunk, embedComment, is, make } from "@elara-services/utils";
+import { chunk, embedComment, is, make, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/rpgSync/userStats";
@@ -209,11 +209,6 @@ export const bag = buildCommand<SlashCommand>({
             pager.pages.push({ embeds: [embed] });
         }
 
-        return pager.run(i, i.user).catch((error) => {
-            console.error("Error running pager:", error);
-            r.edit(
-                embedComment("An error occurred while displaying your bag."),
-            );
-        });
+        return pager.run(i, i.user).catch(noop);
     },
 });

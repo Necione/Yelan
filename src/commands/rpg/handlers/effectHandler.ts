@@ -1,4 +1,5 @@
 import type { UserStats } from "@prisma/client";
+import { debug } from "../../../utils";
 import { type Monster } from "../../../utils/hunt";
 import { MonsterElement } from "../../../utils/monsterHelper";
 import type { WeaponName } from "../../../utils/rpgitems/weapons";
@@ -83,7 +84,7 @@ export function applyCrystallize(
         effectDescription = `\`🧊\` Crystallize reduces the ${monsterName}'s damage by __${reductionPercent}%__`;
         messages.push(effectDescription);
         monsterDamage *= damageMultiplier;
-        console.log(
+        debug(
             `${username} Crystallize => -${reductionPercent}% => ${monsterDamage}`,
         );
     } else {
@@ -92,7 +93,7 @@ export function applyCrystallize(
         effectDescription = `\`🧊\` Crystallize increases the ${monsterName}'s damage by __${increasePercent}%__`;
         messages.push(effectDescription);
         monsterDamage *= damageMultiplier;
-        console.log(
+        debug(
             `${username} Crystallize => +${increasePercent}% => ${monsterDamage}`,
         );
     }
@@ -113,15 +114,13 @@ export function applyFatigue(
     if (percentChange >= 0) {
         damageMultiplier = 1 + percentChange / 100;
         effectDescription = `\`🐌\` Fatigue increases the ${monsterName}'s damage by __${percentChange}%__`;
-        console.log(
-            `${username} Fatigue => +${percentChange}% => monsterDamage`,
-        );
+        debug(`${username} Fatigue => +${percentChange}% => monsterDamage`);
     } else {
         damageMultiplier = 1 + percentChange / 100;
         effectDescription = `\`🐌\` Fatigue reduces the ${monsterName}'s damage by __${Math.abs(
             percentChange,
         )}%__`;
-        console.log(
+        debug(
             `${username} Fatigue => -${Math.abs(
                 percentChange,
             )}% => monsterDamage`,
@@ -165,7 +164,7 @@ export function applyLeechDrain(
             messages.push(
                 `\`💖\` Leech skill activated! You healed \`${healAmount}\` HP from the ${monster.name}`,
             );
-            console.log(`${username} => Leech +${healAmount} HP`);
+            debug(`${username} => Leech +${healAmount} HP`);
         }
     }
 
@@ -193,7 +192,7 @@ export function applyLeechDrain(
             messages.push(
                 `\`🩸\` Drain skill activated! You drained \`${drainAmount}\` HP from the ${monster.name}`,
             );
-            console.log(
+            debug(
                 `${username} => Drain +${drainAmount} HP => monster HP -${drainAmount}`,
             );
             return newHp;

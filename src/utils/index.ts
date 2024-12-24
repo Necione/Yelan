@@ -444,3 +444,12 @@ export function getAmount(
 }
 
 export { texts };
+
+export function debug(...args: unknown[]) {
+    if (isMainBot) {
+        // Do not remove this for the main bot, the logs channel is fucking useless with all of the pointless logs going to it right now.
+        // Logging anything to the console should be for locally only not on prod. so stop fucking using console.log/console.error, use this for debugging
+        return;
+    }
+    log(`[DEBUGGER]: `, ...args);
+}
