@@ -9,7 +9,6 @@ import {
     mutableGlobals,
     userLockedData,
 } from "../../../../utils";
-import { images } from "../../../../utils/images";
 
 export const join = buildCommand<SubCommand>({
     subCommand: (b) => b.setName(`join`).setDescription(`Join the game`),
@@ -66,7 +65,6 @@ export const join = buildCommand<SubCommand>({
         const embed = new EmbedBuilder()
             .setColor(0x7bff85)
             .setTitle(`You have joined the next Russian Roulette game!`)
-            .setThumbnail(images.commands.rr.join)
             .setDescription(
                 `Players in the game: ${rrPlayersList}\nCurrent Reward: ${getAmount(
                     mutableGlobals.rr.reward,

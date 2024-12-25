@@ -62,7 +62,6 @@ export const hilo: SlashCommand = {
         const embed = new EmbedBuilder()
             .setTitle("Higher or Lower")
             .setColor("#FF9141")
-            .setThumbnail("https://file.coffee/u/JbA-bjCCma7O45G-9ANSX.png")
             .setDescription(
                 `Your bet is ${getAmount(
                     amount,
@@ -100,7 +99,6 @@ export const hilo: SlashCommand = {
             locked.del(interaction.user.id);
             const resultEmbed = new EmbedBuilder()
                 .setTitle("Hi-Lo Result")
-                .setThumbnail("https://file.coffee/u/JbA-bjCCma7O45G-9ANSX.png")
                 .setDescription(
                     `You took too long to make a choice. You lost ${getAmount(
                         amount,

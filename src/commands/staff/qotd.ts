@@ -2,7 +2,6 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder, type Message } from "discord.js";
 import { channels, roles } from "../../config";
-import { images } from "../../utils/images";
 
 export const qotd = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -49,7 +48,6 @@ export const qotd = buildCommand<SlashCommand>({
                     {
                         author: {
                             name: `Daily Question #${num}`,
-                            icon_url: images.commands.qotd.author,
                         },
                         color: 0x7a9bff,
                         description: `## **${question}**\n> Answer the question in the thread below\n\nSuggestions: <#1177883495687782481>\nTurn on/off pings: <id:customize>`,
