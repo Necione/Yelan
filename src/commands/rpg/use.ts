@@ -112,16 +112,16 @@ export const usePotion = buildCommand<SlashCommand>({
         );
 
         if (existingEffectIndex !== -1) {
-            if (
-                newEffect.effectValue >
-                stats.activeEffects[existingEffectIndex].effectValue
-            ) {
-                stats.activeEffects[existingEffectIndex].effectValue =
-                    newEffect.effectValue;
+            const existingEffect = stats.activeEffects[existingEffectIndex];
+
+            if (newEffect.effectValue > existingEffect.effectValue) {
+                existingEffect.effectValue = newEffect.effectValue;
             }
 
-            stats.activeEffects[existingEffectIndex].remainingUses +=
-                newEffect.remainingUses;
+            existingEffect.remainingUses = Math.max(
+                existingEffect.remainingUses,
+                newEffect.remainingUses,
+            );
         } else {
             stats.activeEffects.push(newEffect);
         }

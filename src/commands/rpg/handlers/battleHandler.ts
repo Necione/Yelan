@@ -149,7 +149,9 @@ export async function playerAttack(
 
     if (hasWrath) {
         attackPower *= 1.5;
-        messages.push("`💢` Wrath skill => 150% more damage");
+        messages.push(
+            "`💢` The Wrath skill makes you deal __150%__ more damage",
+        );
         debugMultipliers.push("Wrath (1.5x)");
         debug(`${usernameLog} Wrath => attackPower * 1.5 = ${attackPower}`);
     }
@@ -823,8 +825,8 @@ export function applyAttackModifiers(
             const masteryMessage = benefitDescription
                 ? `\`➰\` Mastery Level ${appliedMasteryLevel} activated! Your ${weaponType} deals __${(
                       applicableMultiplier * 100
-                  ).toFixed(0)}%__ damage.`
-                : `\`➰\` Mastery Level ${appliedMasteryLevel} activated!`;
+                  ).toFixed(0)}%__ damage`
+                : `\`➰\` Mastery Level ${appliedMasteryLevel} activated`;
 
             messages.push(masteryMessage);
             debugMultipliers.push(
