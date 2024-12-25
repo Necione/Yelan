@@ -37,6 +37,7 @@ export interface Skill {
     name: SkillName;
     passive: boolean;
     emoji: string;
+    icon: string;
     levels: SkillLevel[];
     requirements?: {
         adventureRank: number;
@@ -77,6 +78,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "✨",
+        icon: "https://lh.elara.workers.dev/rpg/skills/vigilance.png",
         requirements: {
             adventureRank: 2,
             coins: 100,
@@ -119,6 +121,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "💖",
+        icon: "https://lh.elara.workers.dev/rpg/skills/leech.png",
         requirements: {
             adventureRank: 3,
             coins: 150,
@@ -152,6 +155,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "⭐",
+        icon: "https://lh.elara.workers.dev/rpg/skills/totem.png",
         requirements: {
             adventureRank: 1,
             coins: 100,
@@ -180,6 +184,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🌙",
+        icon: "https://lh.elara.workers.dev/rpg/skills/insomnia.png",
         requirements: {
             adventureRank: 4,
             coins: 150,
@@ -219,6 +224,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "💥",
+        icon: "https://lh.elara.workers.dev/rpg/skills/kindle.png",
         requirements: {
             adventureRank: 5,
             coins: 200,
@@ -239,6 +245,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "💸",
+        icon: "https://lh.elara.workers.dev/rpg/skills/scrounge.png",
         requirements: {
             adventureRank: 3,
             coins: 250,
@@ -270,6 +277,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "⚡",
+        icon: "https://lh.elara.workers.dev/rpg/skills/energize.png",
         requirements: {
             adventureRank: 5,
             coins: 250,
@@ -301,6 +309,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🎣",
+        icon: "https://lh.elara.workers.dev/rpg/skills/lure.png",
         requirements: {
             adventureRank: 5,
             rebirthsRequired: 1,
@@ -339,6 +348,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "💫",
+        icon: "https://lh.elara.workers.dev/rpg/skills/distraction.png",
         requirements: {
             adventureRank: 10,
             coins: 300,
@@ -355,6 +365,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🔪",
+        icon: "https://lh.elara.workers.dev/rpg/skills/backstab.png",
         requirements: {
             adventureRank: 10,
             rebirthsRequired: 1,
@@ -375,6 +386,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🌱",
+        icon: "https://lh.elara.workers.dev/rpg/skills/growth.png",
         requirements: {
             adventureRank: 10,
             rebirthsRequired: 2,
@@ -395,6 +407,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🐌",
+        icon: "https://lh.elara.workers.dev/rpg/skills/fatigue.png",
         requirements: {
             adventureRank: 10,
             rebirthsRequired: 2,
@@ -416,6 +429,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🧊",
+        icon: "https://lh.elara.workers.dev/rpg/skills/crystallize.png",
         requirements: {
             adventureRank: 10,
             rebirthsRequired: 2,
@@ -437,6 +451,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "💪",
+        icon: "https://lh.elara.workers.dev/rpg/skills/vigor.png",
         requirements: {
             adventureRank: 10,
             rebirthsRequired: 2,
@@ -458,6 +473,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🎷",
+        icon: "https://lh.elara.workers.dev/rpg/skills/taunt.png",
         requirements: {
             adventureRank: 15,
             rebirthsRequired: 3,
@@ -480,6 +496,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🛡️",
+        icon: "https://lh.elara.workers.dev/rpg/skills/paladin.png",
         requirements: {
             adventureRank: 10,
             rebirthsRequired: 2,
@@ -500,6 +517,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "💤",
+        icon: "https://lh.elara.workers.dev/rpg/skills/sloth.png",
         requirements: {
             adventureRank: 15,
             rebirthsRequired: 2,
@@ -522,6 +540,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "💢",
+        icon: "https://lh.elara.workers.dev/rpg/skills/wrath.png",
         requirements: {
             adventureRank: 15,
             rebirthsRequired: 2,
@@ -566,6 +585,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🩸",
+        icon: "https://lh.elara.workers.dev/rpg/skills/drain.png",
         requirements: {
             adventureRank: 20,
             rebirthsRequired: 4,
@@ -598,6 +618,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🌶️",
+        icon: "https://lh.elara.workers.dev/rpg/skills/spice.png",
         requirements: {
             adventureRank: 20,
             rebirthsRequired: 4,
@@ -639,6 +660,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "♨️",
+        icon: "https://lh.elara.workers.dev/rpg/skills/absorption.png",
         requirements: {
             adventureRank: 25,
             rebirthsRequired: 6,
@@ -662,6 +684,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🏅",
+        icon: "https://lh.elara.workers.dev/rpg/skills/pride.png",
         requirements: {
             adventureRank: 15,
             rebirthsRequired: 6,
@@ -684,6 +707,7 @@ export const skills = make.array<Skill>([
             },
         ],
         emoji: "🖤",
+        icon: "https://lh.elara.workers.dev/rpg/skills/greed.png",
         requirements: {
             adventureRank: 25,
             rebirthsRequired: 6,

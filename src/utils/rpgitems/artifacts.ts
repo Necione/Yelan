@@ -317,7 +317,7 @@ export const artifacts = {
     "Conductor's Top Hat": {
         type: "Circlet",
         artifactSet: "Wanderer's Troupe",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 5,
         critChance: 10,
         critValue: 0.05,
@@ -395,7 +395,7 @@ export const artifacts = {
     "Maiden's Distant Love": {
         type: "Flower",
         artifactSet: "Maiden Beloved",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 0,
         critChance: -50,
         critValue: 0,
@@ -408,7 +408,7 @@ export const artifacts = {
     "Maiden's Heart-Stricken Infatuation": {
         type: "Plume",
         artifactSet: "Maiden Beloved",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 0,
         critChance: 0,
         critValue: 0,
@@ -421,7 +421,7 @@ export const artifacts = {
     "Maiden's Passing Youth": {
         type: "Sands",
         artifactSet: "Maiden Beloved",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 0,
         critChance: 0,
         critValue: -2.5,
@@ -434,7 +434,7 @@ export const artifacts = {
     "Maiden's Fleeting Leisure": {
         type: "Goblet",
         artifactSet: "Maiden Beloved",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: -25,
         critChance: 0,
         critValue: 0,
@@ -447,7 +447,7 @@ export const artifacts = {
     "Maiden's Fading Beauty": {
         type: "Circlet",
         artifactSet: "Maiden Beloved",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 0,
         critChance: 0,
         critValue: 0,
@@ -460,7 +460,7 @@ export const artifacts = {
     "Gladiator's Nostalgia": {
         type: "Flower",
         artifactSet: "Gladiator's Finale",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 5,
         critChance: 8,
         critValue: 0,
@@ -473,7 +473,7 @@ export const artifacts = {
     "Gladiator's Destiny": {
         type: "Plume",
         artifactSet: "Gladiator's Finale",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 4,
         critChance: 0,
         critValue: 0.125,
@@ -486,7 +486,7 @@ export const artifacts = {
     "Gladiator's Longing": {
         type: "Sands",
         artifactSet: "Gladiator's Finale",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 10,
         critChance: 0,
         critValue: -0.5,
@@ -499,7 +499,7 @@ export const artifacts = {
     "Gladiator's Intoxication": {
         type: "Goblet",
         artifactSet: "Gladiator's Finale",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 0,
         critChance: -10,
         critValue: 0.125,
@@ -512,7 +512,7 @@ export const artifacts = {
     "Gladiator's Triumphus": {
         type: "Circlet",
         artifactSet: "Gladiator's Finale",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 4,
         critChance: 8,
         critValue: 0.25,
@@ -525,7 +525,7 @@ export const artifacts = {
     "Thundersoother's Heart": {
         type: "Flower",
         artifactSet: "Thundersoother",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 3,
         critChance: 5,
         critValue: 0,
@@ -538,7 +538,7 @@ export const artifacts = {
     "Thundersoother's Plume": {
         type: "Plume",
         artifactSet: "Thundersoother",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 2,
         critChance: 0,
         critValue: 0.075,
@@ -551,7 +551,7 @@ export const artifacts = {
     "Hour of Soothing Thunder": {
         type: "Sands",
         artifactSet: "Thundersoother",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: -5,
         critChance: 10,
         critValue: -0.2,
@@ -564,7 +564,7 @@ export const artifacts = {
     "Thundersoother's Goblet": {
         type: "Goblet",
         artifactSet: "Thundersoother",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: -5,
         critChance: -5,
         critValue: 0.06,
@@ -577,7 +577,7 @@ export const artifacts = {
     "Thundersoother's Diadem": {
         type: "Circlet",
         artifactSet: "Thundersoother",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 0,
         critChance: 0,
         critValue: 0,
@@ -642,7 +642,7 @@ export const artifacts = {
     "Thunder Summoner's Crown": {
         type: "Circlet",
         artifactSet: "Thundering Fury",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 10,
         critChance: 15,
         critValue: 0.125,
@@ -707,7 +707,7 @@ export const artifacts = {
     "Royal Masque": {
         type: "Circlet",
         artifactSet: "Noblesse Oblige",
-        sellPrice: 20,
+        sellPrice: 15,
         attackPower: 15,
         critChance: 20,
         critValue: 0.08,
@@ -785,7 +785,7 @@ export const artifacts = {
     "Snowswept Memory": {
         type: "Flower",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: 10,
         critChance: 5,
         critValue: 0.15,
@@ -798,7 +798,7 @@ export const artifacts = {
     "Icebreaker's Resolve": {
         type: "Plume",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: 15,
         critChance: 10,
         critValue: 0.1,
@@ -811,7 +811,7 @@ export const artifacts = {
     "Frozen Homeland's Demise": {
         type: "Sands",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: -10,
         critChance: 5,
         critValue: 0.4,
@@ -824,7 +824,7 @@ export const artifacts = {
     "Frost-Weaved Dignity": {
         type: "Goblet",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: 5,
         critChance: 5,
         critValue: 0.12,
@@ -837,7 +837,7 @@ export const artifacts = {
     "Broken Rime's Echo": {
         type: "Circlet",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: 5,
         critChance: 20,
         critValue: 0.25,
@@ -850,7 +850,7 @@ export const artifacts = {
     "Sea-Dyed Blossom": {
         type: "Flower",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: 7,
         critChance: 5,
         critValue: 0.05,
@@ -863,7 +863,7 @@ export const artifacts = {
     "Deep Palace's Plume": {
         type: "Plume",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: -25,
         critChance: 15,
         critValue: 0.08,
@@ -876,7 +876,7 @@ export const artifacts = {
     "Cowry of Parting": {
         type: "Sands",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: -20,
         critChance: -10,
         critValue: -0.25,
@@ -889,7 +889,7 @@ export const artifacts = {
     "Pearl Cage": {
         type: "Goblet",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: -10,
         critChance: 5,
         critValue: 0.15,
@@ -902,7 +902,7 @@ export const artifacts = {
     "Crown of Watatsumi": {
         type: "Circlet",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 30,
+        sellPrice: 25,
         attackPower: -25,
         critChance: 25,
         critValue: 0.1,
