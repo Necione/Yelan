@@ -8,4 +8,3 @@ export * from "./secretCultEvent";
 export * from "./thiefEvent";
 export * from "./traderEvent";
 export * from "./travellerEvent";
-

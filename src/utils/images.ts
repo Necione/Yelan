@@ -1,9 +1,5 @@
 export const images = {
     commands: {
-        qotd: {
-            // TODO: Replace this with the actual image
-            author: ``,
-        },
         profile: {
             frame: "https://lh.elara.workers.dev/frames/main.png",
             background: `https://lh.elara.workers.dev/profiles/backgrounds/main.png`,
