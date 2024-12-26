@@ -1,5 +1,5 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { field, formatNumber } from "@elara-services/utils";
+import { field, formatNumber, make } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import {
     EmbedBuilder,
@@ -15,7 +15,7 @@ import {
     userLockedData,
 } from "../../utils";
 
-const highRollerRequirement = 1_000_000;
+export const highRollerRequirement = 1_000_000;
 
 export const stats: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -60,7 +60,7 @@ export const stats: SlashCommand = {
                 .map((c) => `${customEmoji.a.z_arrow_blue} ${c}`)
                 .join("\n");
         }
-        const fields: APIEmbedField[] = [];
+        const fields = make.array<APIEmbedField>();
         const highRoller = interaction.guild.roles.resolve(roles.highRoller);
         if (!highRoller?.members.has(user.id)) {
             const getPercent = percentage(wagered, highRollerRequirement);

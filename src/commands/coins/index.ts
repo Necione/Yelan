@@ -13,6 +13,6 @@ export { rps } from "./rps";
 export * from "./rr";
 export * from "./shoot";
 export * from "./slots";
-export * from "./stats";
+export { stats } from "./stats";
 export * from "./trade";
 export * from "./vault";

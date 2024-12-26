@@ -3,6 +3,7 @@ export * from "./edit";
 export * from "./left";
 export * from "./limit";
 export * from "./lock";
+export * from "./perks";
 export * from "./remove";
 export * from "./reset";
 export * from "./restore";
