@@ -371,7 +371,7 @@ export const unequip = buildCommand<SlashCommand>({
             const before = { ...character };
 
             if (itemName === "All") {
-                let stats = await getUserStats(i.user.id);
+                const stats = await getUserStats(i.user.id);
                 if (!stats) {
                     return r.edit(
                         embedComment(
@@ -455,7 +455,7 @@ export const unequip = buildCommand<SlashCommand>({
             }
 
             if (character.equippedWeapon === itemName) {
-                let stats = await getUserStats(i.user.id);
+                const stats = await getUserStats(i.user.id);
                 if (!stats) {
                     return r.edit(
                         embedComment(
