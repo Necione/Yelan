@@ -156,15 +156,14 @@ async function handleRebirth(
         location: "Liyue Harbor",
         inventory: [],
         beatenBosses: [],
+        castQueue: [],
         equippedWeapon: null,
         equippedFlower: null,
         equippedPlume: null,
         equippedSands: null,
         equippedGoblet: null,
         equippedCirclet: null,
-
         rebirths: newRebirthValue,
-
         totalTokensUsed: 0,
     };
 
