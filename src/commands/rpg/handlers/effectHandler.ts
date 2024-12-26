@@ -157,7 +157,7 @@ export function applyLeechDrain(
     if (
         leechLevelData &&
         !isFishingMonster(monster) &&
-        !has(["Boss"], monster, true)
+        !has(["Boss", "Beast"], monster, true)
     ) {
         const levelData = leechLevelData.levelData || {};
         const lifestealPercentage = levelData.lifestealPercentage || 0;
@@ -183,7 +183,7 @@ export function applyLeechDrain(
     if (
         drainLevelData &&
         !isFishingMonster(monster) &&
-        !has(["Boss"], monster, true)
+        !has(["Boss", "Beast"], monster, true)
     ) {
         const levelData = drainLevelData.levelData || {};
         const lifestealPercentage = levelData.lifestealPercentage || 0;

@@ -8,6 +8,7 @@ export enum MonsterGroup {
     Machine = "Machine",
     Eremite = "Eremite",
     Specter = "Specter",
+    Beast = "Beast",
     Fishing = "Fishing",
     Boss = "Boss",
 }
