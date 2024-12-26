@@ -30,7 +30,9 @@ export const perks = buildCommand({
                         })),
                     ),
             ),
-    locked: { roles: roles.main },
+    locked: {
+        roles: [...roles.main, roles.headmod],
+    },
     defer: { silent: false },
     async execute(i, r) {
         if (!i.inCachedGuild() || !i.channel) {
