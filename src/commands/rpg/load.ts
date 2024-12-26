@@ -146,6 +146,8 @@ export const load = buildCommand<SlashCommand>({
             equippedCirclet: loadout.equippedCirclet
                 ? { set: loadout.equippedCirclet }
                 : { set: null },
+
+            castQueue: { set: [] },
         });
 
         const updatedStats = await syncStats(userId);
