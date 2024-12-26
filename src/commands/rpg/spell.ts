@@ -30,14 +30,8 @@ export const spell = buildCommand<SlashCommand>({
                     .respond([{ name: "No stats found.", value: "n/a" }])
                     .catch(noop);
             }
-            if (!stats) {
-                return i
-                    .respond([{ name: "Failed to sync stats.", value: "n/a" }])
-                    .catch(noop);
-            }
 
             const catalystMasteryPoints = stats.masteryCatalyst || 0;
-
             const availableSpells = getAvailableSpells(catalystMasteryPoints);
 
             const filteredSpells = availableSpells.filter((spell) =>
@@ -161,6 +155,17 @@ export const spell = buildCommand<SlashCommand>({
                     return r.edit({ embeds: [noWeaponEmbed] });
                 }
 
+                if (stats.castQueue.length >= 25) {
+                    const queueFullEmbed = new EmbedBuilder()
+                        .setColor("Red")
+                        .setTitle("Spell Queue Full")
+                        .setDescription(
+                            `You cannot add more spells to your cast queue. The maximum limit is **25**.`,
+                        );
+
+                    return r.edit({ embeds: [queueFullEmbed] });
+                }
+
                 if (stats.mana < spell.cost) {
                     const insufficientManaEmbed = new EmbedBuilder()
                         .setColor("Red")
@@ -208,12 +213,14 @@ export const spell = buildCommand<SlashCommand>({
                 }
 
                 const catalystMasteryPoints = stats.masteryCatalyst || 0;
-
                 const availableSpells = getAvailableSpells(
                     catalystMasteryPoints,
                 );
 
-                if (!is.array(availableSpells)) {
+                if (
+                    !is.array(availableSpells) ||
+                    availableSpells.length === 0
+                ) {
                     const noSpellsEmbed = new EmbedBuilder()
                         .setColor("Yellow")
                         .setTitle("No Available Spells")
@@ -239,7 +246,7 @@ export const spell = buildCommand<SlashCommand>({
                         : "No spells in queue.";
 
                 const additionalDescription =
-                    "Spells are activated during a battle in the same order they are casted. Mana is restored at the end of battle.";
+                    "Spells are activated during a battle in the same order they are cast. Mana is restored at the end of battle.";
 
                 const availableSpellsEmbed = new EmbedBuilder()
                     .setColor("Blue")
