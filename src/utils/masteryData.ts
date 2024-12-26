@@ -128,13 +128,14 @@ export const masteryBenefits: Record<
     },
     Catalyst: {
         1: {
-            description: "Increase your Maximum Mana by 10.",
+            description: "Increase your Maximum Mana by 10",
         },
         2: {
             description: "Unlock the spells `Poison`, `Flare`",
         },
         3: {
-            description: "Increase your Maximum Mana by 20.",
+            description:
+                "Increase your Maximum Mana by 20 + unlock spell `Suffocate`",
         },
         4: {
             description: "Restore 50 - 75% of your max mana after hunts.",
@@ -152,7 +153,7 @@ export const masteryBenefits: Record<
             description: "Unlock the spell `Full Heal`",
         },
         9: {
-            description: "Deal 200% damage when wielding the Catalyst.",
+            description: "Deal 200% damage when wielding the Catalyst",
         },
         10: {
             specialSkill: "Soulstealer",

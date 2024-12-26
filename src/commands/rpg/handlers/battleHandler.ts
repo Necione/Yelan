@@ -27,6 +27,7 @@ export type MonsterState = {
     dendroAttackMultiplier?: number;
     isEnraged?: boolean;
     fortressUsed?: boolean;
+    isSuffocated?: boolean;
 };
 
 export function getDeathThreshold(stats: UserStats): number {
@@ -537,6 +538,7 @@ export async function monsterAttack(
     monsterDamage = applyElementalEffects(
         monster,
         monsterDamage,
+        monsterState,
         stats,
         messages,
         damageReductionFactor,

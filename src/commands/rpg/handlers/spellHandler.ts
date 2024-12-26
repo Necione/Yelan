@@ -154,4 +154,29 @@ export const spellHandlers: Record<string, SpellHandler> = {
             monsterState,
         };
     },
+
+    Suffocate: async ({
+        monster,
+        monsterState,
+        currentPlayerHp,
+        currentMonsterHp,
+        messages,
+    }) => {
+        if (!monsterState.isSuffocated) {
+            monsterState.isSuffocated = true;
+            messages.push(
+                `\`💊\` Suffocate spell casted! The ${monster.name} can no longer deal elemental damage`,
+            );
+        } else {
+            messages.push(
+                `\`💊\` Suffocate spell casted again! The ${monster.name} is already suffocated`,
+            );
+        }
+
+        return {
+            currentPlayerHp,
+            currentMonsterHp,
+            monsterState,
+        };
+    },
 };

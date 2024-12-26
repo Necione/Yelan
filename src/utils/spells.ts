@@ -45,6 +45,12 @@ export const spells: Record<string, Spell> = {
         cost: 25,
         requiredMasteryLevel: 2,
     },
+    Suffocate: {
+        spellName: "Suffocate",
+        description: "Disable all elemental damage.",
+        cost: 25,
+        requiredMasteryLevel: 3,
+    },
 };
 
 export function getAvailableSpells(points: number): Spell[] {

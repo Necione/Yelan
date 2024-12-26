@@ -4,11 +4,13 @@ import { type Monster } from "../../../utils/hunt";
 import { MonsterElement } from "../../../utils/monsterHelper";
 import type { WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
+import type { MonsterState } from "./battleHandler";
 import { applyShieldThenHp, has, isFishingMonster } from "./battleHandler";
 
 export function applyElementalEffects(
     monster: Monster,
     monsterDamage: number,
+    monsterState: MonsterState,
     stats: UserStats,
     messages: string[],
     damageReductionFactor: number,
@@ -17,6 +19,7 @@ export function applyElementalEffects(
 
     if (
         monster.element === MonsterElement.Electro &&
+        !monsterState.isSuffocated &&
         Math.random() < 0.5 &&
         equippedWeaponName &&
         !equippedWeaponName.includes("Everlasting Moonglow")
@@ -29,7 +32,7 @@ export function applyElementalEffects(
         );
     }
 
-    if (monster.element === MonsterElement.Pyro) {
+    if (monster.element === MonsterElement.Pyro && !monsterState.isSuffocated) {
         const burnDamage = Math.ceil(
             stats.maxHP * (0.03 + 0.01 * Math.floor(stats.adventureRank / 2)),
         );
@@ -42,7 +45,11 @@ export function applyElementalEffects(
         );
     }
 
-    if (monster.element === MonsterElement.Hydro && Math.random() < 0.5) {
+    if (
+        monster.element === MonsterElement.Hydro &&
+        !monsterState.isSuffocated &&
+        Math.random() < 0.5
+    ) {
         const splashDamage = Math.ceil(stats.hp * 0.1);
         const leftover = applyShieldThenHp(stats, splashDamage);
         stats.hp -= leftover;
@@ -51,7 +58,11 @@ export function applyElementalEffects(
         );
     }
 
-    if (monster.element === MonsterElement.Cryo && Math.random() < 0.5) {
+    if (
+        monster.element === MonsterElement.Cryo &&
+        !monsterState.isSuffocated &&
+        Math.random() < 0.5
+    ) {
         const crippleDamage = Math.ceil(
             stats.maxHP * (0.05 + 0.01 * Math.floor(stats.adventureRank / 2)),
         );
