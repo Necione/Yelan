@@ -28,6 +28,7 @@ import {
     updateUserStats,
 } from "../../../services";
 import { cooldowns, locked } from "../../../utils";
+import type { MutationType } from "../../../utils/hunt";
 import {
     getEncounterDescription,
     getMonsterByName,
@@ -39,7 +40,7 @@ import {
 import { calculateMasteryLevel } from "../../../utils/masteryHelper";
 import { elementEmojis } from "../../../utils/monsterHelper";
 import { handleRandomEvent } from "../../../utils/randomEvents";
-import { type WeaponName, weapons } from "../../../utils/rpgitems/weapons";
+import { weapons, type WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {
     getDeathThreshold,
@@ -209,17 +210,21 @@ export async function handleHunt(
             const isMutated =
                 !preventMutation && Math.random() * 100 < actualMutationChance;
 
+            const mutationTypes: MutationType[] = [
+                "Bloodthirsty",
+                "Strange",
+                "Infected",
+            ];
+
+            if (stats.rebirths >= 6) {
+                mutationTypes.push("Demonic");
+            }
+
             if (isMutated) {
-                const mutationTypes = [
-                    "Bloodthirsty",
-                    "Strange",
-                    "Infected",
-                ] as const;
                 const chosenMutation =
                     mutationTypes[
                         Math.floor(Math.random() * mutationTypes.length)
                     ];
-
                 monster.mutationType = chosenMutation;
 
                 switch (chosenMutation) {
@@ -231,6 +236,9 @@ export async function handleHunt(
                         break;
                     case "Infected":
                         monster.name = `Infected ${monster.name}`;
+                        break;
+                    case "Demonic":
+                        monster.name = `Demonic ${monster.name}`;
                         break;
                 }
             }
@@ -263,7 +271,10 @@ export async function handleHunt(
 
         if (monster.mutationType === "Strange") {
             currentMonsterHp = Math.floor(currentMonsterHp * 1.5);
-        } else if (monster.mutationType === "Infected") {
+        } else if (
+            monster.mutationType === "Infected" ||
+            monster.mutationType === "Demonic"
+        ) {
             currentMonsterHp = Math.floor(currentMonsterHp * 2);
         }
 

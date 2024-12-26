@@ -36,6 +36,10 @@ const specialEffects: Array<{
         effect: "Reduce all damage taken by 50%.",
     },
     {
+        substring: "Amos' Bow",
+        effect: "Triple your ATK, but you can no longer crit.",
+    },
+    {
         substring: "Everlasting Moonglow",
         effect: "Disable all Anemo and Electro elemental effects.",
     },

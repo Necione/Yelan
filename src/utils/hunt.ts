@@ -6,6 +6,8 @@ import { locationGroupWeights } from "./locationGroupWeights";
 import { type MonsterElement, MonsterGroup } from "./monsterHelper";
 import type { WeaponType } from "./rpgitems/weapons";
 
+export type MutationType = "Bloodthirsty" | "Strange" | "Infected" | "Demonic";
+
 export interface Monster {
     startingHp: number;
     name: string;
@@ -20,7 +22,7 @@ export interface Monster {
     minadventurerank: number;
     image: string;
     isMutated?: boolean;
-    mutationType?: "Bloodthirsty" | "Strange" | "Infected";
+    mutationType?: MutationType;
     drops: {
         item: string;
         minAmount: number;

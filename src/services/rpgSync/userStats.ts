@@ -179,6 +179,12 @@ export async function syncStats(userId: string) {
         }
     }
 
+    if (stats.equippedWeapon && stats.equippedWeapon.includes("Amos' Bow")) {
+        totalStats.attackPower *= 3;
+        totalStats.critChance = 0;
+        totalStats.critValue = 0;
+    }
+
     totalStats.attackPower = Math.max(0, totalStats.attackPower);
     totalStats.critChance = Math.max(0, totalStats.critChance);
     totalStats.critValue = Math.max(0, totalStats.critValue);

@@ -427,6 +427,10 @@ export async function monsterAttack(
         case "Infected":
             debug(`${username} Infected => no direct damage change`);
             break;
+        case "Demonic":
+            monsterDamage *= 2;
+            debug(`${username} Demonic => x2 => ${monsterDamage}`);
+            break;
     }
 
     if (turnNumber > 50) {
@@ -907,6 +911,13 @@ export function applyAttackModifiers(
             messages.push("`💪` Strength effect ended");
             debug(`${username} Strength ended => removed activeEffects`);
         }
+    }
+
+    if (monster.mutationType === "Demonic") {
+        attackPower *= 0.6;
+        messages.push("`🎭` A sense of pressure reduces your damage by 40%");
+        debugMultipliers.push("Demonic Pressure (0.6x)");
+        debug(`${username} Demonic => Attack Power * 0.6 = ${attackPower}`);
     }
 
     debug(
