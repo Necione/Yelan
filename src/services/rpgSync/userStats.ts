@@ -234,6 +234,14 @@ export async function syncStats(userId: string) {
         needsUpdate = true;
     }
 
+    if (stats.equippedWeapon) {
+        const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
+        if (equippedWeapon && equippedWeapon.type !== "Catalyst") {
+            updateData.castQueue = { set: [] };
+            needsUpdate = true;
+        }
+    }
+
     if (needsUpdate) {
         return await updateUserStats(userId, updateData);
     }

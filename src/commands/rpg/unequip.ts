@@ -159,12 +159,10 @@ export const unequip = buildCommand<SlashCommand>({
                     value: "All",
                 });
 
-                if (character.equippedWeapon) {
-                    equippedItems.push({
-                        name: character.equippedWeapon,
-                        value: character.equippedWeapon,
-                    });
-                }
+                equippedItems.push({
+                    name: character.equippedWeapon || "No Weapon Equipped",
+                    value: character.equippedWeapon || "No Weapon Equipped",
+                });
 
                 for (const type of artifactTypes) {
                     const field = `equipped${type}` as keyof typeof character;
@@ -222,6 +220,14 @@ export const unequip = buildCommand<SlashCommand>({
             const beforeStats = { ...stats };
 
             if (itemName === "All") {
+                if (stats.castQueue.length > 0 && stats.equippedWeapon) {
+                    return r.edit(
+                        embedComment(
+                            `You cannot unequip your weapon while you have spells in your queue.`,
+                        ),
+                    );
+                }
+
                 const updates: Partial<{
                     equippedWeapon: null;
                     equippedFlower: null;
@@ -244,7 +250,7 @@ export const unequip = buildCommand<SlashCommand>({
 
                 if (Object.keys(updates).length === 0) {
                     return r.edit(
-                        embedComment(`You have no items equipped to unequip.`),
+                        embedComment("You have no items equipped to unequip."),
                     );
                 }
 
@@ -365,6 +371,23 @@ export const unequip = buildCommand<SlashCommand>({
             const before = { ...character };
 
             if (itemName === "All") {
+                let stats = await getUserStats(i.user.id);
+                if (!stats) {
+                    return r.edit(
+                        embedComment(
+                            `No stats found for you, please set up your profile.`,
+                        ),
+                    );
+                }
+
+                if (stats.castQueue.length > 0 && character.equippedWeapon) {
+                    return r.edit(
+                        embedComment(
+                            `You cannot unequip your weapon while you have spells in your queue.`,
+                        ),
+                    );
+                }
+
                 const updates: Partial<{
                     equippedWeapon: null;
                     equippedFlower: null;
@@ -414,7 +437,7 @@ export const unequip = buildCommand<SlashCommand>({
                 const setBonusMessages = getCharacterSetBonusMessages(
                     before,
                     updatedChar as UserCharacter,
-                    "activated",
+                    "deactivated",
                 );
 
                 return r.edit(
@@ -432,6 +455,23 @@ export const unequip = buildCommand<SlashCommand>({
             }
 
             if (character.equippedWeapon === itemName) {
+                let stats = await getUserStats(i.user.id);
+                if (!stats) {
+                    return r.edit(
+                        embedComment(
+                            `No stats found for you, please set up your profile.`,
+                        ),
+                    );
+                }
+
+                if (stats.castQueue.length > 0) {
+                    return r.edit(
+                        embedComment(
+                            `You cannot unequip your weapon while you have spells in your queue.`,
+                        ),
+                    );
+                }
+
                 await updateUserCharacter(character.id, {
                     equippedWeapon: null,
                 });
@@ -494,7 +534,7 @@ export const unequip = buildCommand<SlashCommand>({
                 const setBonusMessages = getCharacterSetBonusMessages(
                     before,
                     updatedChar as UserCharacter,
-                    "activated",
+                    "deactivated",
                 );
 
                 return r.edit(
