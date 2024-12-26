@@ -197,7 +197,7 @@ export async function playerAttack(
     let critChance = stats.critChance || 0;
     const critValue = stats.critValue || 1;
     const isNobushi = has("Nobushi", monster, true);
-    if (isNobushi) {
+    if (isNobushi && !monsterState.poisoned) {
         critChance = 0;
         messages.push(
             `\`👹\` The Ninja's Code prevents you from landing a critical hit`,
@@ -528,7 +528,9 @@ export async function monsterAttack(
         equippedWeaponName && equippedWeaponName.includes("Vortex Vanquisher");
     const damageReductionFactor = hasVortexVanquisher ? 0.5 : 1;
     if (hasVortexVanquisher) {
-        messages.push("`🌀` Vortex Vanquisher => damage taken -50%");
+        messages.push(
+            "`🌀` Vortex Vanquisher reduces your damage taken by __-50%__",
+        );
         debug(`${username} Vortex => monsterDamage * 0.5`);
     }
 
@@ -934,7 +936,11 @@ export function checkMonsterDefenses(
 
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
 
-    if (has("Agent", monster) && !monsterState.vanishedUsed) {
+    if (
+        has("Agent", monster) &&
+        !monsterState.poisoned &&
+        !monsterState.vanishedUsed
+    ) {
         attackMissed = true;
         monsterState.vanishedUsed = true;
         messages.push(

@@ -13,6 +13,7 @@ const adviceArray = [
     "Upgrade your skills with the `/upgrade` command using tokens. You get a token every rebirth.",
     "Jade Parcels will heal 100% of your HP, you should make some, they're delicious!",
     "You can brew all sorts of potions with Chaos Devices and Chaos Cores.",
+    "Casting the Poison spell with a Catalyst stops special effects like a Nobushi's discipline or a Fatui Agent's Vanish.",
 ];
 
 const rumorArray = [
