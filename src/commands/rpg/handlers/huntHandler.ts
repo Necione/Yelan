@@ -305,16 +305,16 @@ export async function handleHunt(
 
         const deathThreshold = getDeathThreshold(stats);
 
-        let embedColor: ColorResolvable = 0xb84df1;
-        if (monster.mutationType === "Bloodthirsty") {
-            embedColor = 0xb40000;
-        }
-        if (monster.mutationType === "Strange") {
-            embedColor = 0x658e4d;
-        }
-        if (monster.mutationType === "Infected") {
-            embedColor = 0x88349b;
-        }
+        const mutationColors: Record<MutationType, ColorResolvable> = {
+            Bloodthirsty: 0xb40000,
+            Strange: 0x658e4d,
+            Infected: 0x88349b,
+            Demonic: 0x28282b,
+        };
+
+        const embedColor: ColorResolvable = monster.mutationType
+            ? mutationColors[monster.mutationType] || 0xb84df1
+            : 0xb84df1;
 
         let displayedMonsterName = monster.name;
         const element = monster.element;

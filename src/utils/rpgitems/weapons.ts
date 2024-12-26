@@ -939,6 +939,22 @@ const baseWeapons: { [key: string]: WeaponData } = {
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/everlasting_moonglow.png",
     },
+    "The First Great Magic": {
+        name: "The First Great Magic",
+        type: "Bow",
+        sellPrice: 100,
+        attackPower: 50,
+        critChance: 10,
+        critValue: 1.5,
+        defValue: 50,
+        defChance: 5,
+        additionalHP: -250,
+        additionalMana: 0,
+        minadventurerank: 30,
+        chestChance: 0.5,
+        emoji: "<:Weapon_The_First_Great_Magic:1321734222255493203>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/magic.png",
+    },
     "Calamity Queller": {
         name: "Calamity Queller",
         type: "Polearm",

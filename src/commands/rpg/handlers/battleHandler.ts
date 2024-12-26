@@ -71,6 +71,11 @@ export async function playerAttack(
 }> {
     const username = `[${stats.userId}]`;
 
+    const equippedWeaponName = (stats.equippedWeapon ?? "").toLowerCase();
+    const isFirstGreatMagic = equippedWeaponName.includes(
+        "The First Great Magic",
+    );
+
     if (stats.castQueue.length > 0) {
         const spellName = stats.castQueue[0];
         debug(`${username} Casting spell: ${spellName}`);
@@ -176,12 +181,25 @@ export async function playerAttack(
     if (hasVigor) {
         const hpPercentage = (currentPlayerHp / stats.maxHP) * 100;
         if (hpPercentage < 25) {
-            attackPower *= 1.5;
+            let vigorMultiplier = 1.5;
+
+            if (isFirstGreatMagic) {
+                vigorMultiplier *= 2;
+                messages.push(
+                    "`🎩` The First Great Magic doubles your Vigor effect!",
+                );
+            }
+
+            attackPower *= vigorMultiplier;
             messages.push(
-                `\`💪\` Vigor skill activated! Your low HP grants you __150%__ more damage`,
+                `\`💪\` Vigor skill activated! Your low HP grants you __${(
+                    vigorMultiplier * 100
+                ).toFixed(0)}%__ more damage`,
             );
-            debugMultipliers.push("Vigor (1.5x)");
-            debug(`${usernameLog} Vigor => x1.5 => ${attackPower}`);
+            debugMultipliers.push(`Vigor (${vigorMultiplier}x)`);
+            debug(
+                `${usernameLog} Vigor => x${vigorMultiplier} => ${attackPower}`,
+            );
         }
     }
 
@@ -246,7 +264,16 @@ export async function playerAttack(
     if (vigilanceLevelData && !vigilanceUsed) {
         const levelData = vigilanceLevelData.levelData || {};
         const secondAttackPercentage = levelData.secondAttackPercentage || 0;
-        const vigilanceAttackPower = attackPower * secondAttackPercentage;
+
+        let vigilanceAttackPower = attackPower * secondAttackPercentage;
+
+        if (isFirstGreatMagic) {
+            vigilanceAttackPower *= 2;
+            messages.push(
+                "`🎩` The First Great Magic doubles your Vigilance damage!",
+            );
+        }
+
         currentMonsterHp -= vigilanceAttackPower;
         vigilanceUsed = true;
 
@@ -258,7 +285,6 @@ export async function playerAttack(
         debugMultipliers.push(
             `Vigilance (+${(secondAttackPercentage * 100).toFixed(1)}%)`,
         );
-        debug(`${usernameLog} Vigilance => +${vigilanceAttackPower} damage`);
     }
 
     currentMonsterHp -= attackPower;
@@ -282,7 +308,15 @@ export async function playerAttack(
         const levelData = kindleLevelData.levelData || {};
         const damageBonus = levelData.damageBonus || 0;
 
-        const kindleBonusDamage = stats.maxHP * damageBonus;
+        let kindleBonusDamage = stats.maxHP * damageBonus;
+
+        if (isFirstGreatMagic) {
+            kindleBonusDamage *= 2;
+            messages.push(
+                "`🎩` The First Great Magic doubles your Kindle damage!",
+            );
+        }
+
         currentMonsterHp = Math.max(currentMonsterHp - kindleBonusDamage, 0);
 
         messages.push(
@@ -291,7 +325,6 @@ export async function playerAttack(
             )}\` damage`,
         );
         debugMultipliers.push(`Kindle (${(damageBonus * 100).toFixed(0)}%)`);
-        debug(`${usernameLog} Kindle => +${kindleBonusDamage} damage`);
     }
 
     const spiceLevelData = getUserSkillLevelData(stats, "Spice");
@@ -299,7 +332,15 @@ export async function playerAttack(
         const levelData = spiceLevelData.levelData || {};
         const damageBonus = levelData.damageBonus || 0;
 
-        const spiceDamageBonus = currentMonsterHp * damageBonus;
+        let spiceDamageBonus = currentMonsterHp * damageBonus;
+
+        if (isFirstGreatMagic) {
+            spiceDamageBonus *= 2;
+            messages.push(
+                "`🎩` The First Great Magic doubles your Spice damage!",
+            );
+        }
+
         currentMonsterHp = Math.max(currentMonsterHp - spiceDamageBonus, 0);
 
         messages.push(
@@ -308,7 +349,6 @@ export async function playerAttack(
             )}\` damage`,
         );
         debugMultipliers.push(`Spice (${(damageBonus * 100).toFixed(0)}%)`);
-        debug(`${usernameLog} Spice => +${spiceDamageBonus} damage`);
     }
 
     if (

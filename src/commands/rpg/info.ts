@@ -48,6 +48,10 @@ const specialEffects: Array<{
         effect: "Put yourself in the hands of fate.",
     },
     {
+        substring: "The First Great Magic",
+        effect: "Double all skill-related damage (Vigilance, Kindle, Vigor, etc).",
+    },
+    {
         substring: "Calamity Queller",
         effect: "Monsters can no longer defend.",
     },
