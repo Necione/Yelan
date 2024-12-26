@@ -135,6 +135,7 @@ export const perks = buildCommand({
                     user.id,
                     embedComment(
                         `Congrats, you've been granted the \`High Roller\` perk.\n-# The role and daily limit increase were given.`,
+                        "Green",
                     ),
                 );
                 return r.edit(
