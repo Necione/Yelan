@@ -719,6 +719,25 @@ export async function monsterAttack(
         }
     }
 
+    if (monster.mutationType === "Demonic" && Math.random() < 0.5) {
+        const stolen = Math.floor(currentPlayerHp * 0.2);
+
+        const deathThreshold = getDeathThreshold(stats);
+        currentPlayerHp = Math.max(currentPlayerHp - stolen, deathThreshold);
+
+        currentMonsterHp = Math.min(
+            currentMonsterHp + stolen,
+            monster.startingHp,
+        );
+
+        messages.push(
+            `\`👿\` The demonic ${monster.name} steals \`${stolen}\` HP from you!`,
+        );
+        debug(
+            `${username} Demonic => player HP -${stolen}, monster HP +${stolen}`,
+        );
+    }
+
     await updateUserStats(stats.userId, {
         hp: { set: currentPlayerHp },
         activeEffects: { set: stats.activeEffects },
