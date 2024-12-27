@@ -10,6 +10,10 @@ const ascendableBaseWeapons = [
     "Messenger",
     "Deathmatch",
     "Lithic Blade",
+    "The Halberd",
+    "Cinnabar Spindle",
+    "The Alley Flash",
+    "The Widsith",
 ];
 
 export const ascend = buildCommand<SlashCommand>({
@@ -60,6 +64,7 @@ export const ascend = buildCommand<SlashCommand>({
 
         return i.respond(filtered.slice(0, 25)).catch(noop);
     },
+
     async execute(i, r) {
         const weaponName = i.options.getString("weapon", true);
 
@@ -82,6 +87,17 @@ export const ascend = buildCommand<SlashCommand>({
         if (stats.isHunting) {
             return r
                 .edit(embedComment("You cannot ascend weapons while hunting!"))
+                .catch(noop);
+        }
+
+        const adventureRank = Number(stats.adventureRank);
+        if (adventureRank < 20) {
+            return r
+                .edit(
+                    embedComment(
+                        `You need to be at least **AR 20** to ascend weapons.`,
+                    ),
+                )
                 .catch(noop);
         }
 
