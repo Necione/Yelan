@@ -18,6 +18,25 @@ import { calculateFishingLevel } from "./handlers/fishHandler";
 
 const categories = make.array<string>(["General", "Fishing"]);
 
+function generateShieldBar(
+    shield: number,
+    maxShield: number,
+    barLength: number = 20,
+): string {
+    if (maxShield <= 0) {
+        return ``;
+    }
+
+    const proportion = Math.min(shield / maxShield, 1);
+    const filledLength = Math.round(proportion * barLength);
+    const emptyLength = barLength - filledLength;
+
+    const filledBar = "█".repeat(filledLength);
+    const emptyBar = "░".repeat(emptyLength);
+
+    return `🏵️ Shield: \`${shield}/${maxShield}\` | ${filledBar}${emptyBar}`;
+}
+
 export const rpg = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("rpg")
@@ -208,7 +227,8 @@ export const rpg = buildCommand<SlashCommand>({
                               }%\` | 🛡️ DEF Value: \`${stats.defValue.toFixed(
                                   2,
                               )}\`\n`
-                            : ""),
+                            : "") +
+                        `${generateShieldBar(stats.shield, stats.maxShield)}\n`,
                 })
                 .addFields({
                     name: "Cooldowns",

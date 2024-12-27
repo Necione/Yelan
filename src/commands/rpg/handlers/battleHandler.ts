@@ -740,6 +740,7 @@ export async function monsterAttack(
 
     await updateUserStats(stats.userId, {
         hp: { set: currentPlayerHp },
+        shield: { set: stats.shield },
         activeEffects: { set: stats.activeEffects },
     });
 

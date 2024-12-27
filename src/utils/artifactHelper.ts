@@ -69,6 +69,7 @@ export function calculateSetBonuses(equippedArtifacts: {
     [slot in ArtifactType]?: ArtifactName;
 }): {
     attackPowerPercentage: number;
+    maxManaPercentage: number;
     critChance: number;
     critValuePercentage: number;
     maxHPPercentage: number;
@@ -78,6 +79,7 @@ export function calculateSetBonuses(equippedArtifacts: {
 } {
     const bonuses = {
         attackPowerPercentage: 0,
+        maxManaPercentage: 0,
         critChance: 0,
         critValuePercentage: 0,
         maxHPPercentage: 0,
@@ -200,6 +202,11 @@ function describeSetBonus(setName: string, bonusType: "2pc" | "4pc"): string {
                     `⚔️ Attack Power increased by ${(value * 100).toFixed(2)}%`,
                 );
                 break;
+            case "maxManaPercentage":
+                descriptions.push(
+                    `✨ Max Mana increased by ${(value * 100).toFixed(2)}%`,
+                );
+                break;
             case "critChance":
                 descriptions.push(`🎯 Crit Rate increased by ${value}%`);
                 break;
@@ -256,6 +263,7 @@ export function calculateCharacterStatChanges(
             label: "💥 Crit Value",
             isMultiplier: true,
         },
+        { key: "maxMana" as const, label: "✨ Max Mana" },
         { key: "maxHP" as const, label: "❤️ Max HP" },
         { key: "defChance" as const, label: "🛡️ DEF Rate", isPercentage: true },
         { key: "defValue" as const, label: "🛡️ DEF Value" },

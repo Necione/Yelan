@@ -122,6 +122,7 @@ export async function syncStats(userId: string) {
             totalStats.defChance += artifact.defChance || 0;
             totalStats.defValue += artifact.defValue || 0;
             totalStats.maxHP += artifact.maxHP || 0;
+            totalStats.maxMana += artifact.additionalMana || 0;
             totalStats.healEffectiveness || 0;
         }
     }
@@ -257,6 +258,7 @@ function applySetBonuses(
         defChance: number;
         defValue: number;
         maxHP: number;
+        maxMana: number;
         healEffectiveness: number;
     },
     bonuses: { [key: string]: number },
@@ -274,6 +276,9 @@ function applySetBonuses(
                 break;
             case "maxHPPercentage":
                 totalStats.maxHP += totalStats.maxHP * value;
+                break;
+            case "maxManaPercentage":
+                totalStats.maxMana += totalStats.maxMana * value;
                 break;
             case "defChance":
                 totalStats.defChance += value;
