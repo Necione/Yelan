@@ -113,10 +113,10 @@ export const masteryBenefits: Record<
             description: "Increase effectiveness of all healing skills.",
         },
         3: {
-            specialSkill: "Thrust",
+            description: "Deal 150% damage when wielding the Polearm.",
         },
         4: {
-            description: "Deal 200% damage when wielding the Polearm.",
+            specialSkill: "Sting",
         },
         5: {
             description:

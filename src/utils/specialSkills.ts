@@ -8,7 +8,7 @@ export type SpecialSkillName =
     | "Fortress"
     | "Fear"
     | "Soulstealer"
-    | "Thrust"
+    | "Sting"
     | "Sniper"
     | "Quickdraw"
     | "Focus"
@@ -75,9 +75,10 @@ export const specialSkills = make.array<SpecialSkill>([
             "Attack twice on the second turn, dealing 25% of your ATK.",
     },
     {
-        skillName: "Thrust",
-        emoji: "👊🏻",
-        description: "Every attack deals 10% DMG to the next monster too.",
+        skillName: "Sting",
+        emoji: "🦂",
+        description:
+            "Have a 20% to stun the monster, and simultaneously heal 20% of your Max HP",
     },
     {
         skillName: "Peer",

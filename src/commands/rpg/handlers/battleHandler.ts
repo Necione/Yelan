@@ -145,6 +145,27 @@ export async function playerAttack(
     let { paladinSwapped, attackPower } = getEffectiveStats(stats);
     const debugMultipliers: string[] = [];
 
+    if (skills.has(stats, "Sting")) {
+        const stingChance = 0.2;
+        if (Math.random() < stingChance) {
+            monsterState.stunned = true;
+
+            const healAmount = Math.floor(stats.maxHP * 0.2);
+            currentPlayerHp = Math.min(
+                currentPlayerHp + healAmount,
+                stats.maxHP,
+            );
+
+            messages.push(
+                `\`🦂\` **Sting** activated! You stunned the ${monster.name} and healed yourself for \`${healAmount}\` HP.`,
+            );
+
+            debug(
+                `${username} Sting activated: Stunned ${monster.name} and healed for ${healAmount} HP.`,
+            );
+        }
+    }
+
     if (paladinSwapped) {
         messages.push(
             "`🛡️` Paladin skill activated! Your ATK and DEF Value have been swapped",
