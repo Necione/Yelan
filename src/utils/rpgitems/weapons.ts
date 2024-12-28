@@ -1106,6 +1106,22 @@ const baseWeapons: { [key: string]: WeaponData } = {
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/asc/the_widsith.png",
     },
+    "✪ Dull Blade": {
+        name: "✪ Dull Blade",
+        type: "Sword",
+        sellPrice: 0,
+        attackPower: 750,
+        critChance: 90,
+        critValue: 3.5,
+        defValue: 450,
+        defChance: 90,
+        additionalHP: 600,
+        additionalMana: 0,
+        minadventurerank: 50,
+        chestChance: 0,
+        emoji: "<:Weapon_Dull_Blade_2nd:1322473719083438121>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/asc/dull_blade.png",
+    },
 };
 
 const prefixes: {
