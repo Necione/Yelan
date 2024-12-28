@@ -11,8 +11,8 @@ export default {
     maxExp: 60,
     minadventurerank: 24,
     image: "https://lh.elara.workers.dev/rpg/monsters/hitsukeban.png",
-    critChance: 50,
-    critValue: 2,
+    critChance: 25,
+    critValue: 1.75,
     defchance: 90,
     defValue: 300,
     drops: [
@@ -30,7 +30,7 @@ export default {
         },
     ],
     baseHp: 25,
-    baseAtk: 15,
+    baseAtk: 16,
     getStatsForadventureRank(adventureRank: number) {
         if (!limits.check(adventureRank)) {
             return null;

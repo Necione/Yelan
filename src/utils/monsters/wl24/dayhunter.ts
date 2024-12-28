@@ -30,8 +30,8 @@ export default {
     critValue: 1.5,
     defChance: 75,
     defValue: 200,
-    baseHp: 16,
-    baseAtk: 9,
+    baseHp: 18,
+    baseAtk: 16,
     getStatsForadventureRank(adventureRank: number) {
         if (!limits.check(adventureRank)) {
             return null;

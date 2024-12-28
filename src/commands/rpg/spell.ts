@@ -38,12 +38,30 @@ export const spell = buildCommand<SlashCommand>({
                 spell.spellName.toLowerCase().includes(input.toLowerCase()),
             );
 
-            const choices = filteredSpells.slice(0, 25).map((spell) => ({
+            if ("clear".startsWith(input.toLowerCase())) {
+                filteredSpells.push({
+                    spellName: "Clear",
+                    description: "Clear your current spell casting queue",
+                    cost: 0,
+                    requiredMasteryLevel: 0,
+                });
+            }
+
+            const choices = filteredSpells.slice(0, 24).map((spell) => ({
                 name: spell.spellName,
                 value: spell.spellName,
             }));
 
-            if (!is.array(choices)) {
+            if (
+                !choices.some(
+                    (choice) => choice.value.toLowerCase() === "clear",
+                ) &&
+                input === ""
+            ) {
+                choices.push({ name: "Clear", value: "Clear" });
+            }
+
+            if (!is.array(choices) || choices.length === 0) {
                 return i
                     .respond([
                         { name: "No matching spells found.", value: "n/a" },
@@ -64,6 +82,45 @@ export const spell = buildCommand<SlashCommand>({
             const spellName = i.options.getString("cast", false);
 
             if (spellName) {
+                if (spellName.toLowerCase() === "clear") {
+                    const userId = i.user.id;
+
+                    const stats = await syncStats(userId);
+                    if (!stats) {
+                        return r.edit(
+                            embedComment(
+                                `No stats found for you, please set up your profile.`,
+                            ),
+                        );
+                    }
+
+                    if (stats.castQueue.length === 0) {
+                        const emptyQueueEmbed = new EmbedBuilder()
+                            .setColor("Yellow")
+                            .setTitle("Cast Queue Already Empty")
+                            .setDescription(
+                                `Your spell casting queue is already empty.`,
+                            );
+
+                        return r.edit({ embeds: [emptyQueueEmbed] });
+                    }
+
+                    stats.castQueue = [];
+
+                    await updateUserStats(userId, {
+                        castQueue: { set: stats.castQueue },
+                    });
+
+                    const clearedEmbed = new EmbedBuilder()
+                        .setColor("Green")
+                        .setTitle("Spell Queue Cleared")
+                        .setDescription(
+                            `Your spell casting queue has been successfully cleared.`,
+                        );
+
+                    return r.edit({ embeds: [clearedEmbed] });
+                }
+
                 const userId = i.user.id;
 
                 const userProfile = await getProfileByUserId(userId);
