@@ -32,6 +32,7 @@ import {
 import { startFishingEncounter } from "./handlers/huntHandler";
 
 
+
 const bait = make.array<string>([
     "Fruit Paste Bait",
     "Redrot Bait",
