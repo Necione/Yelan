@@ -165,6 +165,7 @@ model UserWallet {
   dailyStats       DailyStats[]
   roles            Roles[]
   starrail         Int?          @default(0)
+  boosters         Int           @default(0)
   // `strike` will be the new field for strikes, it will continue an array-object 
   strike           Strikes[]
 }
@@ -183,18 +184,18 @@ type Roles {
 }
 
 model Loadout {
-  id                String         @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String
-  name              String
-  isPrivate         Boolean        @default(true)
-  equippedWeapon    String?
-  equippedFlower    String?
-  equippedPlume     String?
-  equippedSands     String?
-  equippedGoblet    String?
-  equippedCirclet   String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String
+  name            String
+  isPrivate       Boolean  @default(true)
+  equippedWeapon  String?
+  equippedFlower  String?
+  equippedPlume   String?
+  equippedSands   String?
+  equippedGoblet  String?
+  equippedCirclet String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@unique([userId, name], name: "user_loadout_unique")
 }
