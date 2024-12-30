@@ -19,9 +19,8 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
 } from "discord.js";
-import { debug } from "util";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
-import { cooldowns, locked } from "../../utils";
+import { cooldowns, debug, locked } from "../../utils";
 import { type FishData, fishList } from "../../utils/rpgitems/fish";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../utils/skillsData";
