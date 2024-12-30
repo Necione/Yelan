@@ -8,6 +8,7 @@ import { specialSkills } from "../../utils/specialSkills";
 const forbiddenCombinations = [
     ["Drain", "Leech", "Absorption"],
     ["Crystallize", "Fatigue"],
+    ["Pacifist", "Taunt"],
     ["Wrath", "Sloth", "Pride", "Greed"],
 ];
 

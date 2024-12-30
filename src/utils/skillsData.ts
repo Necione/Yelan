@@ -13,6 +13,7 @@ export type SkillName =
     | "Lure"
     | "Distraction"
     | "Taunt"
+    | "Pacifist"
     | "Backstab"
     | "Crystallize"
     | "Growth"
@@ -481,6 +482,28 @@ export const skills = make.array<Skill>([
             items: [
                 { item: "Ley Line Sprout", amount: 5 },
                 { item: "Weathered Arrowhead", amount: 3 },
+                { item: "Slime Concentrate", amount: 10 },
+            ],
+        },
+    },
+    {
+        name: "Pacifist",
+        passive: false,
+        levels: [
+            {
+                level: 1,
+                description: "Encounter 1 less monster per hunt.",
+            },
+        ],
+        emoji: "🕊️",
+        icon: "https://lh.elara.workers.dev/rpg/skills/pacifist.png",
+        requirements: {
+            adventureRank: 25,
+            rebirthsRequired: 5,
+            coins: 1000,
+            items: [
+                { item: "Spectral Heart", amount: 5 },
+                { item: "Concealed Unguis", amount: 3 },
                 { item: "Slime Concentrate", amount: 10 },
             ],
         },

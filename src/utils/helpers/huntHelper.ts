@@ -4,7 +4,7 @@ import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import { debug } from "..";
 import { locationGroupWeights } from "../locationGroupWeights";
-import type { WeaponName, WeaponType } from "../rpgitems/weapons";
+import type { WeaponType } from "../rpgitems/weapons";
 import { getUserSkillLevelData } from "../skillsData";
 import { calculateMasteryLevel } from "./masteryHelper";
 import { type MonsterElement, MonsterGroup } from "./monsterHelper";
@@ -491,12 +491,22 @@ export async function generateNextHuntMonsters(
                 : 3;
 
     const tauntSkill = getUserSkillLevelData(stats, "Taunt");
+    const pacifistSkill = getUserSkillLevelData(stats, "Pacifist");
+
     if (
         tauntSkill &&
         tauntSkill.level > 0 &&
         stats.activeSkills.includes("Taunt")
     ) {
         numberOfMonsters += 1;
+    }
+
+    if (
+        pacifistSkill &&
+        pacifistSkill.level > 0 &&
+        stats.activeSkills.includes("Pacifist")
+    ) {
+        numberOfMonsters -= 1;
     }
 
     const monstersEncountered: Monster[] = [];
@@ -535,15 +545,10 @@ export async function generateNextHuntMonsters(
         const mutationChance = Math.min(stats.rebirths * 5, 100);
         let preventMutation = false;
 
-        const equippedWeaponName = stats.equippedWeapon as
-            | WeaponName
-            | undefined;
-        if (equippedWeaponName?.includes("Polearm")) {
-            const masteryPoints = stats.masteryPolearm || 0;
-            const polearmMastery = calculateMasteryLevel(masteryPoints);
-            if (polearmMastery.numericLevel >= 5) {
-                preventMutation = true;
-            }
+        const polearmMasteryPoints = stats.masteryPolearm || 0;
+        const polearmMastery = calculateMasteryLevel(polearmMasteryPoints);
+        if (polearmMastery.numericLevel >= 5) {
+            preventMutation = true;
         }
 
         const isMutated =

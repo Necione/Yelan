@@ -321,9 +321,14 @@ export async function handleHunt(
 
         const startingMessages = make.array<string>();
         const tauntSkill = getUserSkillLevelData(stats, "Taunt");
+        const pacifistSkill = getUserSkillLevelData(stats, "Pacifist");
 
         if (tauntSkill && tauntSkill.level > 0) {
             startingMessages.push("`🎷` The **Taunt** skill is active");
+        }
+
+        if (pacifistSkill && pacifistSkill.level > 0) {
+            startingMessages.push("`🕊️` The **Pacifist** skill is active");
         }
 
         if (isWieldingPolearm && polearmMasteryLevel >= 1) {
