@@ -290,29 +290,33 @@ export async function playerAttack(
 
     const vigilanceLevelData = getUserSkillLevelData(stats, "Vigilance");
     if (vigilanceLevelData && !vigilanceUsed) {
-        const levelData = vigilanceLevelData.levelData || {};
-        const secondAttackPercentage = levelData.secondAttackPercentage || 0;
+        if (!has("Fatui", monster, true)) {
+            const levelData = vigilanceLevelData.levelData || {};
+            const secondAttackPercentage =
+                levelData.secondAttackPercentage || 0;
 
-        let vigilanceAttackPower = attackPower * secondAttackPercentage;
+            let vigilanceAttackPower = attackPower * secondAttackPercentage;
+            if (isFirstGreatMagic) {
+                vigilanceAttackPower *= 2;
+                messages.push(
+                    "`🎩` The First Great Magic doubles your Vigilance damage!",
+                );
+            }
 
-        if (isFirstGreatMagic) {
-            vigilanceAttackPower *= 2;
+            currentMonsterHp -= vigilanceAttackPower;
+            vigilanceUsed = true;
+
             messages.push(
-                "`🎩` The First Great Magic doubles your Vigilance damage!",
+                `\`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
+                    2,
+                )}\` bonus damage \`✨ VIGILANCE\``,
             );
+            debugMultipliers.push(
+                `Vigilance (+${(secondAttackPercentage * 100).toFixed(1)}%)`,
+            );
+        } else {
+            messages.push("`⚠️` Vigilance skill does not work on this monster");
         }
-
-        currentMonsterHp -= vigilanceAttackPower;
-        vigilanceUsed = true;
-
-        messages.push(
-            `\`⚔️\` You dealt \`${vigilanceAttackPower.toFixed(
-                2,
-            )}\` bonus damage \`✨ VIGILANCE\``,
-        );
-        debugMultipliers.push(
-            `Vigilance (+${(secondAttackPercentage * 100).toFixed(1)}%)`,
-        );
     }
 
     currentMonsterHp -= attackPower;
@@ -332,51 +336,62 @@ export async function playerAttack(
     );
 
     const kindleLevelData = getUserSkillLevelData(stats, "Kindle");
-    if (kindleLevelData && !isFishingMonster(monster)) {
-        const levelData = kindleLevelData.levelData || {};
-        const damageBonus = levelData.damageBonus || 0;
+    if (kindleLevelData) {
+        if (!isFishingMonster(monster) && !has("Human", monster, true)) {
+            const levelData = kindleLevelData.levelData || {};
+            const damageBonus = levelData.damageBonus || 0;
 
-        let kindleBonusDamage = stats.maxHP * damageBonus;
+            let kindleBonusDamage = stats.maxHP * damageBonus;
+            if (isFirstGreatMagic) {
+                kindleBonusDamage *= 2;
+                messages.push(
+                    "`🎩` The First Great Magic doubles your Kindle damage!",
+                );
+            }
 
-        if (isFirstGreatMagic) {
-            kindleBonusDamage *= 2;
-            messages.push(
-                "`🎩` The First Great Magic doubles your Kindle damage!",
+            currentMonsterHp = Math.max(
+                currentMonsterHp - kindleBonusDamage,
+                0,
             );
+
+            messages.push(
+                `\`🔥\` The Kindle skill activates and deals an extra \`${kindleBonusDamage.toFixed(
+                    2,
+                )}\` damage`,
+            );
+            debugMultipliers.push(
+                `Kindle (${(damageBonus * 100).toFixed(0)}%)`,
+            );
+        } else {
+            messages.push("`⚠️` Kindle skill does not work on this monster");
         }
-
-        currentMonsterHp = Math.max(currentMonsterHp - kindleBonusDamage, 0);
-
-        messages.push(
-            `\`🔥\` The Kindle skill activates and deals an extra \`${kindleBonusDamage.toFixed(
-                2,
-            )}\` damage`,
-        );
-        debugMultipliers.push(`Kindle (${(damageBonus * 100).toFixed(0)}%)`);
     }
 
     const spiceLevelData = getUserSkillLevelData(stats, "Spice");
-    if (spiceLevelData && currentMonsterHp > 0 && !isFishingMonster(monster)) {
-        const levelData = spiceLevelData.levelData || {};
-        const damageBonus = levelData.damageBonus || 0;
+    if (spiceLevelData && currentMonsterHp > 0) {
+        if (!isFishingMonster(monster) && !has("Human", monster, true)) {
+            const levelData = spiceLevelData.levelData || {};
+            const damageBonus = levelData.damageBonus || 0;
 
-        let spiceDamageBonus = currentMonsterHp * damageBonus;
+            let spiceDamageBonus = currentMonsterHp * damageBonus;
+            if (isFirstGreatMagic) {
+                spiceDamageBonus *= 2;
+                messages.push(
+                    "`🎩` The First Great Magic doubles your Spice damage!",
+                );
+            }
 
-        if (isFirstGreatMagic) {
-            spiceDamageBonus *= 2;
+            currentMonsterHp = Math.max(currentMonsterHp - spiceDamageBonus, 0);
+
             messages.push(
-                "`🎩` The First Great Magic doubles your Spice damage!",
+                `\`🌶️\` The Spice skill activates and deals an extra \`${spiceDamageBonus.toFixed(
+                    2,
+                )}\` damage`,
             );
+            debugMultipliers.push(`Spice (${(damageBonus * 100).toFixed(0)}%)`);
+        } else {
+            messages.push("`⚠️` Spice skill does not work on this monster");
         }
-
-        currentMonsterHp = Math.max(currentMonsterHp - spiceDamageBonus, 0);
-
-        messages.push(
-            `\`🌶️\` The Spice skill activates and deals an extra \`${spiceDamageBonus.toFixed(
-                2,
-            )}\` damage`,
-        );
-        debugMultipliers.push(`Spice (${(damageBonus * 100).toFixed(0)}%)`);
     }
 
     if (
@@ -562,7 +577,7 @@ export async function monsterAttack(
         monsterDamage = applyCrystallize(
             monsterDamage,
             monsterTurn,
-            monster.name,
+            monster,
             username,
             messages,
         );
@@ -572,7 +587,7 @@ export async function monsterAttack(
         monsterDamage = applyFatigue(
             monsterDamage,
             monsterTurn,
-            monster.name,
+            monster,
             username,
             messages,
         );
