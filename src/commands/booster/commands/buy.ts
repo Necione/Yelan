@@ -19,7 +19,7 @@ import {
     type ButtonInteraction,
     type Interaction,
 } from "discord.js";
-import { channels } from "../../../config";
+import { channels, roles } from "../../../config";
 import {
     addBalance,
     getProfileByUserId,
@@ -51,8 +51,9 @@ export const buy = buildCommand<SubCommand>({
                         ...boosterPrices
                             .sort((a, b) => b.price - a.price)
                             .map((x) => ({
-                                name: `${x.name} (${formatNumber(x.price)} ${texts.c.u
-                                    })`,
+                                name: `${x.name} (${formatNumber(x.price)} ${
+                                    texts.c.u
+                                })`,
                                 value: x.name,
                             })),
                     )
@@ -92,13 +93,17 @@ export const buy = buildCommand<SubCommand>({
             });
         }
 
-        const amount = (userProfile.boosters || 0);
+        const amount = userProfile.boosters || 0;
         if (amount >= 3) {
             locked.del(i.user.id);
-            return r.edit(embedComment(`You've bought too many coin boosters today, your limit will reset at midnight PT`));
+            return r.edit(
+                embedComment(
+                    `You've bought too many coin boosters today, your limit will reset at midnight PT`,
+                ),
+            );
         }
 
-        const ignore = false; // i.member.roles.cache.hasAny(...roles.main);
+        const ignore = i.member.roles.cache.hasAny(...roles.main);
         if (!ignore) {
             // Check if there is already active boosters
             const activeBoosters = await getActiveCoinBoosters();
@@ -108,7 +113,9 @@ export const buy = buildCommand<SubCommand>({
                 return r.edit({ embeds: [boostersLimitExceeded()] });
             }
             await updateUserProfile(i.user.id, {
-                boosters: is.number(userProfile.boosters) ? { increment: 1 } : { set: 1 }
+                boosters: is.number(userProfile.boosters)
+                    ? { increment: 1 }
+                    : { set: 1 },
             });
         }
         const addedBooster = await addCoinBooster({
