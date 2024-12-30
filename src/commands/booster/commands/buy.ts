@@ -94,8 +94,8 @@ export const buy = buildCommand<SubCommand>({
 
         // Check if there is already active boosters
         const activeBoosters = await getActiveCoinBoosters();
-        // Only allow 6 boosters at a time
-        if (activeBoosters.length >= 6) {
+        // Only allow 3 boosters at a time
+        if (activeBoosters.length >= 3) {
             if (!i.member.roles.cache.hasAny(...roles.main)) {
                 locked.del(i.user.id);
                 return r.edit({ embeds: [boostersLimitExceeded()] });
