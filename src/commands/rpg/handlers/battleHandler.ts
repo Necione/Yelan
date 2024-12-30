@@ -740,7 +740,7 @@ export async function monsterAttack(
         }
     }
 
-    if (monster.mutationType === "Demonic" && Math.random() < 0.5) {
+    if (monster.mutationType === "Demonic") {
         const stolen = Math.floor(currentPlayerHp * 0.2);
 
         const deathThreshold = getDeathThreshold(stats);

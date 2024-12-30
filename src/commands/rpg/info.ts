@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, make, noop } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, getUserStats, syncStats } from "../../services";
 import {
@@ -9,10 +10,16 @@ import {
     weaponAdvantages,
 } from "../../utils/hunt";
 import { getCommonLocationsForGroup } from "../../utils/locationUtils";
+import { masteryBenefits } from "../../utils/masteryData";
 import { MonsterGroup } from "../../utils/monsterHelper";
 import type { WeaponType } from "../../utils/rpgitems/weapons";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
-import { getUserSkillLevelData, skills } from "../../utils/skillsData";
+import {
+    getUserSkillLevelData,
+    skills,
+    skillsMap,
+    type SkillName,
+} from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
 const specialEffects: Array<{
@@ -93,11 +100,11 @@ export const info = buildCommand<SlashCommand>({
         if (type === "skill") {
             const allOptions = [
                 ...skills.map((skill) => ({
-                    name: `${skill.name}`,
+                    name: skill.name,
                     value: skill.name,
                 })),
                 ...specialSkills.map((special) => ({
-                    name: `${special.skillName}`,
+                    name: special.skillName,
                     value: special.skillName,
                 })),
             ];
@@ -113,8 +120,8 @@ export const info = buildCommand<SlashCommand>({
             }
 
             const monsterNames = monsters.map((monster) => monster.name);
-            const filteredNames = monsterNames.filter((name) =>
-                name.toLowerCase().includes(searchTerm),
+            const filteredNames = monsterNames.filter((mn) =>
+                mn.toLowerCase().includes(searchTerm),
             );
 
             if (!is.array(filteredNames)) {
@@ -125,16 +132,16 @@ export const info = buildCommand<SlashCommand>({
 
             return i
                 .respond(
-                    filteredNames.slice(0, 25).map((name) => ({
-                        name,
-                        value: name,
+                    filteredNames.slice(0, 25).map((mn) => ({
+                        name: mn,
+                        value: mn,
                     })),
                 )
                 .catch(noop);
         } else if (type === "weapon") {
             const weaponNames = Object.keys(weapons);
-            const filteredNames = weaponNames.filter((name) =>
-                name.toLowerCase().includes(searchTerm),
+            const filteredNames = weaponNames.filter((wn) =>
+                wn.toLowerCase().includes(searchTerm),
             );
 
             if (!is.array(filteredNames)) {
@@ -145,9 +152,9 @@ export const info = buildCommand<SlashCommand>({
 
             return i
                 .respond(
-                    filteredNames.slice(0, 25).map((name) => ({
-                        name,
-                        value: name,
+                    filteredNames.slice(0, 25).map((wn) => ({
+                        name: wn,
+                        value: wn,
                     })),
                 )
                 .catch(noop);
@@ -161,11 +168,10 @@ export const info = buildCommand<SlashCommand>({
 
         if (type === "skill") {
             const stats = await getUserStats(i.user.id);
-
             if (!stats) {
                 return r.edit(
                     embedComment(
-                        `No stats found for you, please set up your profile.`,
+                        "No stats found for you, please set up your profile.",
                     ),
                 );
             }
@@ -193,6 +199,42 @@ export const info = buildCommand<SlashCommand>({
                     ? userSkillLevelData.level
                     : 0;
 
+                const skillData = skillsMap[skill.name as SkillName];
+
+                let requirementsText = "No requirements";
+                if (skillData?.requirements) {
+                    const reqs = [];
+                    if (skillData.requirements.rebirthsRequired) {
+                        reqs.push(
+                            `> **Rebirths:** \`${skillData.requirements.rebirthsRequired}\``,
+                        );
+                    }
+                    if (skillData.requirements.adventureRank) {
+                        reqs.push(
+                            `> **Adventure Rank:** \`${skillData.requirements.adventureRank}\``,
+                        );
+                    }
+                    if (skillData.requirements.coins) {
+                        reqs.push(
+                            `> **Coins:** \`${skillData.requirements.coins}\` ${texts.c.u}`,
+                        );
+                    }
+                    if (skillData.requirements.items?.length) {
+                        reqs.push(
+                            `> **Items:**` +
+                                skillData.requirements.items
+                                    .map(
+                                        (item) =>
+                                            `\`${item.amount}x\` ${item.item}`,
+                                    )
+                                    .join(", "),
+                        );
+                    }
+                    if (reqs.length > 0) {
+                        requirementsText = reqs.join("\n");
+                    }
+                }
+
                 const embed = new EmbedBuilder()
                     .setColor("Aqua")
                     .setTitle(`\`${skill.emoji}\` ${skill.name} Skill Details`)
@@ -209,20 +251,35 @@ export const info = buildCommand<SlashCommand>({
                             })
                             .join("\n\n"),
                     )
+                    .addFields({
+                        name: "Unlock Requirements",
+                        value: requirementsText,
+                    })
                     .setFooter({
-                        text: `Use /learn to learn or upgrade this skill.`,
+                        text: "/learn | /upgrade",
                     });
 
                 return r.edit({ embeds: [embed] });
             } else {
+                const masteryInfo = findMasteryForSkill(skill.skillName);
+                let requirementsText = "Unknown mastery requirement";
+
+                if (masteryInfo) {
+                    requirementsText = `> Unlocked by **${masteryInfo.weaponType}** mastery level \`${masteryInfo.levelRequired}\``;
+                } else {
+                    requirementsText =
+                        "This special skill does not appear to be tied to a known mastery. *(Might be hidden or event-based)*";
+                }
+
                 const embed = new EmbedBuilder()
                     .setColor("Gold")
                     .setTitle(
                         `\`${skill.emoji}\` ${skill.skillName} Special Skill`,
                     )
                     .setDescription(skill.description)
-                    .setFooter({
-                        text: "Special skills are unlocked through mastery levels.",
+                    .addFields({
+                        name: "Unlock Requirements",
+                        value: requirementsText,
                     });
 
                 return r.edit({ embeds: [embed] });
@@ -235,7 +292,6 @@ export const info = buildCommand<SlashCommand>({
             const monster = monsters.find(
                 (m) => m.name.toLowerCase() === name.toLowerCase(),
             );
-
             if (!monster) {
                 return r.edit(
                     embedComment(
@@ -249,9 +305,8 @@ export const info = buildCommand<SlashCommand>({
                 MonsterGroup.Human;
 
             let commonLocations = getCommonLocationsForGroup(group, 3);
-
             commonLocations = commonLocations.filter(
-                (location) => location !== "Default",
+                (loc) => loc !== "Default",
             );
 
             const dropsList = monster.drops
@@ -329,7 +384,6 @@ export const info = buildCommand<SlashCommand>({
 
             const weaponName = name as WeaponName;
             const selectedWeapon = weapons[weaponName];
-
             if (!selectedWeapon) {
                 const weaponNotFoundEmbed = new EmbedBuilder()
                     .setColor("Red")
@@ -341,8 +395,8 @@ export const info = buildCommand<SlashCommand>({
             }
 
             const fullWeaponName = selectedWeapon.name;
-
             const weaponStats = make.array<string>();
+
             for (const [key, value] of Object.entries(selectedWeapon)) {
                 if (
                     [
@@ -382,7 +436,6 @@ export const info = buildCommand<SlashCommand>({
 
             const weaponType = selectedWeapon.type as WeaponType;
             const effectiveGroups = weaponAdvantages[weaponType] || [];
-
             const advantageDisplay =
                 effectiveGroups.length > 0
                     ? effectiveGroups
@@ -428,4 +481,23 @@ export const info = buildCommand<SlashCommand>({
 
 function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function findMasteryForSkill(specialSkillName: string) {
+    for (const weaponTypeKey of Object.keys(masteryBenefits)) {
+        const levelMap = masteryBenefits[weaponTypeKey as WeaponType];
+        for (const [lvlStr, benefitObj] of Object.entries(levelMap)) {
+            if (
+                benefitObj.specialSkill &&
+                benefitObj.specialSkill.toLowerCase() ===
+                    specialSkillName.toLowerCase()
+            ) {
+                return {
+                    weaponType: weaponTypeKey,
+                    levelRequired: Number(lvlStr),
+                };
+            }
+        }
+    }
+    return null;
 }
