@@ -12,6 +12,7 @@ import {
     snowflakes,
 } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
+import { debug } from "console";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -218,17 +219,11 @@ export const fishCommand = buildCommand<SlashCommand>({
                 const newTimesFishedForLevel =
                     (stats.timesFishedForLevel || 0) + 1;
 
-                const { levelUp, requiredFishesForNextLevel } =
+                const { levelUp, requiredFishesForNextLevel, validLevel } =
                     calculateFishingLevel(
                         stats.fishingLevel,
                         newTimesFishedForLevel,
                     );
-
-                latestRequiredFishesForNextLevel = requiredFishesForNextLevel;
-
-                if (levelUp) {
-                    totalLevelUps += 1;
-                }
 
                 const updateData: Prisma.UserStatsUpdateInput = {
                     timesFished: { set: newTimesFished },
@@ -236,7 +231,28 @@ export const fishCommand = buildCommand<SlashCommand>({
                     longestFish: { set: newLongestFish },
                     lifetimeFishCaught: { set: newLifetimeFishCaught },
                     inventory: { set: stats.inventory },
-                };
+                    };
+
+                if (!validLevel) {
+                    console.error(`Invalid fishing level detected for user ${i.user.id}: ${stats.fishingLevel}`);
+                    stats.fishingLevel = 1;
+                    stats.timesFishedForLevel = 0;
+                }
+
+                latestRequiredFishesForNextLevel = requiredFishesForNextLevel;
+
+                if (levelUp) {
+                    totalLevelUps += 1;
+                    if (stats.fishingLevel + 1 <= 100) {
+                        updateData.fishingLevel = { increment: 1 };
+                    }
+                    updateData.timesFishedForLevel = { set: 0 };
+                }
+                if (levelUp || !validLevel) {
+                    debug(`Fishing level update for ${i.user.id}: ${stats.fishingLevel} -> ${stats.fishingLevel + (levelUp ? 1 : 0)}`);
+                }
+
+               
 
                 if (isLegendary) {
                     updateData.legendariesCaught = {
@@ -244,16 +260,10 @@ export const fishCommand = buildCommand<SlashCommand>({
                     };
                 }
 
-                if (levelUp) {
-                    updateData.fishingLevel = { increment: 1 };
-                    updateData.timesFishedForLevel = { set: 0 };
-                }
-
                 stats = await updateUserStats(i.user.id, updateData);
                 if (!stats) {
-                    return;
+                    return;}
                 }
-            }
 
             const caughtEmbed = new EmbedBuilder()
                 .setTitle(`You caught ${fishToCatch} fish!`)
@@ -538,7 +548,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                 const newTimesFishedForLevel =
                     (stats.timesFishedForLevel || 0) + 1;
 
-                const { levelUp, requiredFishesForNextLevel } =
+                const { levelUp, requiredFishesForNextLevel, validLevel } =
                     calculateFishingLevel(
                         stats.fishingLevel,
                         newTimesFishedForLevel,
@@ -564,9 +574,8 @@ export const fishCommand = buildCommand<SlashCommand>({
                     };
                 }
 
-                if (levelUp) {
-                    updateData.fishingLevel = { increment: 1 };
-                    updateData.timesFishedForLevel = { set: 0 };
+                if (levelUp || !validLevel) {
+                    debug(`Fishing level update for ${i.user.id}: ${stats.fishingLevel} -> ${stats.fishingLevel + (levelUp ? 1 : 0)}`);
                 }
 
                 stats = await updateUserStats(i.user.id, updateData);
