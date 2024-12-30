@@ -71,8 +71,7 @@ export const specialSkills = make.array<SpecialSkill>([
     {
         skillName: "Sharpshooter",
         emoji: "🏹",
-        description:
-            "Deal 110% more damage per turn.",
+        description: "Deal 110% more damage per turn.",
     },
     {
         skillName: "Sting",
