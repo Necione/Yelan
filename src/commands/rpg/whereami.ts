@@ -1,8 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, log } from "@elara-services/utils";
+import { embedComment } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
-import { locked } from "../../utils";
+import { debug, locked } from "../../utils";
 import {
     getAvailableDirections,
     getCurrentMap,
@@ -85,10 +85,10 @@ export const whereami = buildCommand<SlashCommand>({
                     abyssCoordY: { set: currentY },
                     currentAbyssFloor: { set: currentFloor },
                 });
-                log(`Starting Position Set to: (${currentX}, ${currentY})`);
+                debug(`Starting Position Set to: (${currentX}, ${currentY})`);
             }
 
-            log(
+            debug(
                 `Current Position on Floor ${currentFloor}: (${currentX}, ${currentY})`,
             );
 
@@ -111,7 +111,7 @@ export const whereami = buildCommand<SlashCommand>({
 
             locked.del(i.user.id);
         } catch (error) {
-            log("Error in /whereami command:", error);
+            debug("Error in /whereami command:", error);
             locked.del(i.user.id);
             await r.edit(
                 embedComment(

@@ -5,18 +5,18 @@ import {
     get,
     getRandomValue,
     is,
-    log,
     make,
+    noop,
 } from "@elara-services/utils";
 import type { UserStats } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
 import { ButtonStyle, EmbedBuilder } from "discord.js";
 import { addItemToInventory } from "../../../services";
+import { debug } from "../../../utils";
 import { generateChestLoot, generateRawMaterials } from "../../../utils/chest";
 import type { ArtifactName } from "../../../utils/rpgitems/artifacts";
 import type { DropName } from "../../../utils/rpgitems/drops";
 import type { WeaponName } from "../../../utils/rpgitems/weapons";
-const noop = (...args: unknown[]) => log(`[EXPLORE_HANDLER]: ERROR`, ...args);
 
 export async function handleChest(
     i: ChatInputCommandInteraction,
@@ -130,7 +130,7 @@ export async function handleChest(
             })
             .catch(noop);
     } catch (err) {
-        log(`[HANDLE:CHEST]: ${i.user.tag} (${i.user.id})`, err);
+        debug(`[HANDLE:CHEST]: ${i.user.tag} (${i.user.id})`, err);
     }
 }
 
@@ -165,6 +165,6 @@ export async function handleMaterials(i: ChatInputCommandInteraction) {
             );
         }
     } catch (err) {
-        log(`[HANDLE:TRAP]: ${i.user.tag} (${i.user.id})`, err);
+        debug(`[HANDLE:TRAP]: ${i.user.tag} (${i.user.id})`, err);
     }
 }

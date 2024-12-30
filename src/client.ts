@@ -10,6 +10,8 @@ import moment from "moment-timezone";
 import * as events from "./events";
 import { checkIfDeploy } from "./scripts/checks";
 import { getProfileByUserId, updateRankedUID } from "./services";
+import { debug } from "./utils";
+
 if (process.env.timeZone) {
     moment.tz.setDefault(process.env.timeZone);
     times.timeZone = process.env.timeZone;
@@ -67,7 +69,7 @@ class BotClient extends Client {
                 if (!r) {
                     return;
                 }
-                log(
+                debug(
                     `[UID: FINISH]: ${user.tag} (${user.id}) set as ${data.uid}`,
                 );
                 await updateRankedUID(user.id, parseInt(data.uid));

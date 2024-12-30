@@ -1,4 +1,4 @@
-import { getRandomValue, is, log, make } from "@elara-services/utils";
+import { getRandomValue, is, make } from "@elara-services/utils";
 import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import { debug } from ".";
@@ -62,7 +62,7 @@ async function loadMonsters(dir: string) {
                     monsters.push(monster);
                 }
             } catch (error) {
-                log(`Error loading monster from file: ${fullPath}`, error);
+                debug(`Error loading monster from file: ${fullPath}`, error);
             }
         }
     }
@@ -238,7 +238,7 @@ export async function getRandomMonster(
 
         return monsterInstance;
     } else {
-        log(
+        debug(
             `Stats for Adventure Rank ${adventureRank} not found for monster: ${selectedMonster.name}`,
         );
         return null;
@@ -304,7 +304,7 @@ async function loadAbyssMonsters(dir: string) {
                     abyssMonsters.push(abyssMonster);
                 }
             } catch (error) {
-                log(
+                debug(
                     `Error loading abyss monster from file: ${fullPath}`,
                     error,
                 );
@@ -319,7 +319,7 @@ export async function initializeAbyssMonsters() {
     if (!abyssMonstersLoaded) {
         await loadAbyssMonsters(abyssMonstersDir);
         abyssMonstersLoaded = true;
-        log(`Total abyss monsters loaded: ${abyssMonsters.length}`);
+        debug(`Total abyss monsters loaded: ${abyssMonsters.length}`);
     }
 }
 
@@ -389,12 +389,12 @@ export async function getMonsterByName(
     const monster = monsters.find((monster) => monster.name === name);
 
     if (!monster) {
-        log(`Monster with name "${name}" not found.`);
+        debug(`Monster with name "${name}" not found.`);
         return null;
     }
 
     if (typeof monster.getStatsForadventureRank !== "function") {
-        log(
+        debug(
             `getStatsForadventureRank is not a function for monster: ${monster.name}`,
         );
         return null;
@@ -414,12 +414,12 @@ export async function getMonsterByName(
             startingHp: stats.minHp,
         };
 
-        log(
+        debug(
             `Created MonsterInstance for ${monster.name} at Adventure Rank ${selectedadventureRank}.`,
         );
         return monsterInstance;
     } else {
-        log(
+        debug(
             `Stats for Adventure Rank ${selectedadventureRank} not found for monster: ${monster.name}`,
         );
         return null;

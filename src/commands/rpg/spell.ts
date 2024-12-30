@@ -1,7 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, is, log, noop } from "@elara-services/utils";
+import { embedComment, is, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
+import { debug } from "../../utils";
 import { calculateMasteryLevel } from "../../utils/masteryHelper";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 import { getAvailableSpells, spells, type Spell } from "../../utils/spells";
@@ -71,7 +72,7 @@ export const spell = buildCommand<SlashCommand>({
 
             return i.respond(choices).catch(noop);
         } catch (error) {
-            log("Error in spell autocomplete:", error);
+            debug("Error in spell autocomplete:", error);
             return i
                 .respond([{ name: "Error fetching spells.", value: "n/a" }])
                 .catch(noop);
@@ -315,7 +316,7 @@ export const spell = buildCommand<SlashCommand>({
                 return r.edit({ embeds: [availableSpellsEmbed] });
             }
         } catch (error) {
-            log("Error executing /spell command:", error);
+            debug("Error executing /spell command:", error);
 
             const errorEmbed = new EmbedBuilder()
                 .setColor("Red")

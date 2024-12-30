@@ -1,8 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, log, noop } from "@elara-services/utils";
+import { embedComment, get, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, getUserStats } from "../../services";
-import { cooldowns, locked } from "../../utils";
+import { cooldowns, debug, locked } from "../../utils";
 import { getUserSkillLevelData } from "../../utils/skillsData";
 import { handleChest, handleMaterials } from "./handlers/exploreHandler";
 
@@ -100,7 +100,7 @@ export const explore = buildCommand<SlashCommand>({
 
             locked.del(i.user.id);
         } catch (err) {
-            log(`[RPG:EXPLORE]: ERROR`, err);
+            debug(`[RPG:EXPLORE]: ERROR`, err);
         }
     },
 });

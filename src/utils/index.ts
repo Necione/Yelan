@@ -76,7 +76,7 @@ export async function updateInvitesCache(
 ) {
     const g = await client.guilds.fetch(mainServerId).catch(noop);
     if (!g) {
-        return log(
+        return debug(
             `[UPDATE:INVITE:CACHE]: Unable to fetch the main server (${mainServerId})`,
         );
     }
@@ -91,7 +91,7 @@ export async function updateInvitesCache(
         return true;
     });
     if (!r.status) {
-        return log(r.message);
+        return debug(r.message);
     }
     if (fromInterval) {
         inviteCacheUpdates.last = new Date().toISOString();

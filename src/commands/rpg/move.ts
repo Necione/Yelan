@@ -1,12 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import {
-    embedComment,
-    get,
-    log,
-    make,
-    noop,
-    sleep,
-} from "@elara-services/utils";
+import { embedComment, get, make, noop, sleep } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
@@ -14,7 +7,7 @@ import {
     syncStats,
     updateUserStats,
 } from "../../services";
-import { locked } from "../../utils";
+import { debug, locked } from "../../utils";
 import { handleAbyssChest } from "./abyssHelpers/abyssChest";
 import { handleAbyssBattle } from "./abyssHelpers/abyssHandler";
 import { handleTrap } from "./abyssHelpers/abyssTrap";
@@ -185,13 +178,13 @@ export const move = buildCommand<SlashCommand>({
                     abyssCoordY: { set: currentY },
                     currentAbyssFloor: { set: currentFloor },
                 });
-                log(`Starting Position Set to: (${currentX}, ${currentY})`);
+                debug(`Starting Position Set to: (${currentX}, ${currentY})`);
             }
 
             let newX = currentX;
             let newY = currentY;
 
-            log(
+            debug(
                 `Current Position on Floor ${currentFloor}: (${currentX}, ${currentY})`,
             );
 
@@ -213,7 +206,7 @@ export const move = buildCommand<SlashCommand>({
                     return r.edit(embedComment("Invalid direction.", "Red"));
             }
 
-            log(
+            debug(
                 `Attempting to move ${direction} to: (${newX}, ${newY}) on Floor ${currentFloor}`,
             );
 
@@ -232,7 +225,7 @@ export const move = buildCommand<SlashCommand>({
             const rowIndex = currentMap.length - 1 - newY;
             const cell = currentMap[rowIndex][newX].toLowerCase();
 
-            log(
+            debug(
                 `Accessing Map Cell at rowIndex: ${rowIndex}, x: ${newX} with cell: '${cell}'`,
             );
 
@@ -465,7 +458,7 @@ export const move = buildCommand<SlashCommand>({
                 locked.del(i.user.id);
             }
         } catch (error) {
-            log("Error in /move command:", error);
+            debug("Error in /move command:", error);
             locked.del(i.user.id);
             await r.edit(
                 embedComment(

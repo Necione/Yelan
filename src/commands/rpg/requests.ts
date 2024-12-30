@@ -5,7 +5,6 @@ import {
     embedComment,
     get,
     is,
-    log,
     noop,
 } from "@elara-services/utils";
 import { texts } from "@liyueharbor/econ";
@@ -22,7 +21,7 @@ import {
     removeBalance,
     updateUserStats,
 } from "../../services";
-import { getAmount } from "../../utils";
+import { debug, getAmount } from "../../utils";
 import { getRandomDrop } from "../../utils/chest";
 
 type UserRequest = {
@@ -276,7 +275,7 @@ export const requests = buildCommand<SlashCommand>({
                 await r.edit({ embeds: [embed.toJSON()] });
             }
         } catch (error) {
-            log("Error executing /requests command:", error);
+            debug("Error executing /requests command:", error);
             await r.edit(
                 embedComment(
                     "An error occurred while processing your request. Please try again later.",
