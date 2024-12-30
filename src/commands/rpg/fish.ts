@@ -235,7 +235,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                     };
 
                 if (!validLevel) {
-                    console.error(`Invalid fishing level detected for user ${i.user.id}: ${stats.fishingLevel}`);
+                    debug(`Invalid fishing level detected for user ${i.user.id}: ${stats.fishingLevel}`);
                     stats.fishingLevel = 1;
                     stats.timesFishedForLevel = 0;
                 }
