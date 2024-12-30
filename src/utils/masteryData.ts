@@ -128,20 +128,20 @@ export const masteryBenefits: Record<
     },
     Catalyst: {
         1: {
-            description: "Increase your Maximum Mana by 10",
+            specialSkill: "Peer",
         },
         2: {
-            description: "Unlock the spells `Poison`, `Flare`",
+            description: "Increase your Maximum Mana by 10",
         },
         3: {
+            description: "Unlock the spells `Poison`, `Flare`",
+        },
+        4: {
             description:
                 "Increase your Maximum Mana by 20 + unlock spell `Suffocate`",
         },
-        4: {
-            description: "Restore 50 - 75% of your max mana after hunts.",
-        },
         5: {
-            specialSkill: "Peer",
+            description: "Restore 50 - 75% of your max mana after hunts.",
         },
         6: {
             description: "Unlock the spell `Distract`",
