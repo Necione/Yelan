@@ -76,7 +76,8 @@ export const specialSkills = make.array<SpecialSkill>([
     {
         skillName: "Sting",
         emoji: "🦂",
-        description: "Have a 20% to stun the monster, and simultaneously heal 20% of your Max HP",
+        description:
+            "Have a 20% to stun the monster, and simultaneously heal 20% of your Max HP",
     },
     {
         skillName: "Peer",
