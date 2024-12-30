@@ -11,11 +11,14 @@ jobs:
           cache: "npm"
       - name: Install deps
         run: npm i
+      - name: Fixer
+        run: npm run fix && git add . && git commit -m "Prettier + Linter" && git push
+      - name: Puller
+        run: git pull 
+      
       - name: ESLint
         run: npm run lint
       - name: Prettier
         run: npm run pc
       - name: Build Code
         run: npm run build
-      - name: Fixer
-        run: npm run fix && git add . && git commit -m "Prettier + Linter" && git push
