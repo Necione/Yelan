@@ -6,7 +6,7 @@ export default {
     startingHp: 0,
     name: "Scorpion",
     group: MonsterGroup.Beast,
-    element: MonsterElement.Pyro,
+    element: MonsterElement.Electro,
     minExp: 75,
     maxExp: 100,
     minadventurerank: 32,

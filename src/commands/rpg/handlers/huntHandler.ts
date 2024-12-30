@@ -643,6 +643,13 @@ export async function startHunt(
             ),
         );
     }
+
+    if (monsters && monsters.length > 0) {
+        await updateUserStats(user.id, {
+            nextHunt: { set: [] },
+        });
+    }
+
     await updateUserStats(user.id, { isHunting: { set: true } });
     await handleHunt(message, stats, p, monsters, handlers);
 

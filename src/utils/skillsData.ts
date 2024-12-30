@@ -71,9 +71,9 @@ export const skills = make.array<Skill>([
             {
                 level: 3,
                 description:
-                    "Attack twice at the start of battle, the second attack dealing **70%** of your ATK.",
+                    "Attack twice at the start of battle, the second attack dealing **90%** of your ATK.",
                 levelData: {
-                    secondAttackPercentage: 0.7,
+                    secondAttackPercentage: 0.9,
                 },
             },
         ],
@@ -603,17 +603,17 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Deal **10%** of the monster's HP as bonus damage per turn.",
+                    "Deal **15%** of the monster's current HP as bonus damage per turn.",
                 levelData: {
-                    damageBonus: 0.1,
+                    damageBonus: 0.15,
                 },
             },
             {
                 level: 2,
                 description:
-                    "Deal **20%** of the monster's HP as bonus damage per turn.",
+                    "Deal **30%** of the monster's current HP as bonus damage per turn.",
                 levelData: {
-                    damageBonus: 0.2,
+                    damageBonus: 0.3,
                 },
             },
         ],
