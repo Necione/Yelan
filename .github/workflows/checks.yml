@@ -17,3 +17,5 @@ jobs:
         run: npm run pc
       - name: Build Code
         run: npm run build
+      - name: Fixer
+        run: npm run fix && git add . && git commit -m "Prettier + Linter" && git push
