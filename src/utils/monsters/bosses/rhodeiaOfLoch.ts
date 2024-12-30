@@ -1,4 +1,4 @@
-import { MonsterGroup } from "../../monsterHelper";
+import { MonsterGroup } from "../../helpers/monsterHelper";
 
 export default {
     startingHp: 0,

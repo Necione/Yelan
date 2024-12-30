@@ -1,15 +1,19 @@
 import { getRandomValue, is, make } from "@elara-services/utils";
+import { type UserStats } from "@prisma/client";
 import { readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
-import { debug } from ".";
-import { locationGroupWeights } from "./locationGroupWeights";
+import { debug } from "..";
+import { locationGroupWeights } from "../locationGroupWeights";
+import type { WeaponName, WeaponType } from "../rpgitems/weapons";
+import { getUserSkillLevelData } from "../skillsData";
+import { calculateMasteryLevel } from "./masteryHelper";
 import { type MonsterElement, MonsterGroup } from "./monsterHelper";
-import type { WeaponType } from "./rpgitems/weapons";
 
 export type MutationType = "Bloodthirsty" | "Strange" | "Infected" | "Demonic";
 
 export interface Monster {
     startingHp: number;
+    baseName: string;
     name: string;
     group: MonsterGroup;
     element: MonsterElement;
@@ -68,7 +72,7 @@ async function loadMonsters(dir: string) {
     }
 }
 
-const monstersDir = resolve(__dirname, "./monsters");
+const monstersDir = resolve(__dirname, "./../monsters");
 
 export async function initializeMonsters() {
     if (!monstersLoaded) {
@@ -445,3 +449,127 @@ export const weaponAdvantages: { [key in WeaponType]?: MonsterGroup[] } = {
     Bow: [MonsterGroup.Human, MonsterGroup.Abyss],
     Rod: [MonsterGroup.Slime],
 };
+
+export async function generateNextHuntMonsters(
+    stats: UserStats,
+): Promise<Monster[]> {
+    await initializeMonsters();
+
+    const bossEncounters: Record<number, string> = {
+        5: "Electro Hypostasis",
+        10: "Cryo Regisvine",
+        15: "Rhodeia of Loch",
+        20: "Primo Geovishap",
+    };
+    let isBossEncounter = false;
+    let bossName = "";
+
+    if (
+        bossEncounters[stats.adventureRank] &&
+        !stats.beatenBosses.includes(bossEncounters[stats.adventureRank])
+    ) {
+        isBossEncounter = true;
+        bossName = bossEncounters[stats.adventureRank];
+    }
+
+    let numberOfMonsters = isBossEncounter
+        ? 1
+        : stats.adventureRank <= 5
+          ? 1
+          : stats.adventureRank <= 15
+            ? Math.random() < 0.75
+                ? 2
+                : 1
+            : stats.adventureRank <= 25
+              ? Math.random() < 0.75
+                  ? 2
+                  : 3
+              : stats.adventureRank <= 35
+                ? Math.random() < 0.5
+                    ? 2
+                    : 3
+                : 3;
+
+    const tauntSkill = getUserSkillLevelData(stats, "Taunt");
+    if (
+        tauntSkill &&
+        tauntSkill.level > 0 &&
+        stats.activeSkills.includes("Taunt")
+    ) {
+        numberOfMonsters += 1;
+    }
+
+    const monstersEncountered: Monster[] = [];
+
+    for (let i = 0; i < numberOfMonsters; i++) {
+        let monster: Monster | null;
+
+        if (isBossEncounter) {
+            monster = await getMonsterByName(bossName);
+            if (!monster) {
+                break;
+            }
+        } else {
+            monster = await getRandomMonster(
+                stats.adventureRank,
+                stats.location,
+                {
+                    startingHp: stats.hp,
+                    attackPower: stats.attackPower,
+                    critChance: stats.critChance,
+                    critValue: stats.critValue,
+                    defChance: stats.defChance,
+                    defValue: stats.defValue,
+                    maxHp: stats.maxHP,
+                    rebirths: stats.rebirths,
+                },
+            );
+        }
+        if (!monster) {
+            continue;
+        }
+
+        const baseName = monster.name;
+        monster.baseName = baseName;
+
+        const mutationChance = Math.min(stats.rebirths * 5, 100);
+        let preventMutation = false;
+
+        const equippedWeaponName = stats.equippedWeapon as
+            | WeaponName
+            | undefined;
+        if (equippedWeaponName?.includes("Polearm")) {
+            const masteryPoints = stats.masteryPolearm || 0;
+            const polearmMastery = calculateMasteryLevel(masteryPoints);
+            if (polearmMastery.numericLevel >= 5) {
+                preventMutation = true;
+            }
+        }
+
+        const isMutated =
+            !preventMutation && Math.random() * 100 < mutationChance;
+        if (isMutated) {
+            const mutationTypes: MutationType[] = [
+                "Bloodthirsty",
+                "Strange",
+                "Infected",
+            ];
+            if (stats.rebirths >= 6) {
+                mutationTypes.push("Demonic");
+            }
+            const chosen =
+                mutationTypes[Math.floor(Math.random() * mutationTypes.length)];
+
+            monster.mutationType = chosen;
+
+            monster.name = `${chosen} ${monster.name}`;
+        }
+
+        monstersEncountered.push(monster);
+        if (isBossEncounter) {
+            break;
+        }
+    }
+
+    return monstersEncountered;
+}

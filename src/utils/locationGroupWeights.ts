@@ -1,4 +1,4 @@
-import { MonsterGroup } from "./monsterHelper";
+import { MonsterGroup } from "./helpers/monsterHelper";
 
 export const locationGroupWeights: {
     [location: string]: { [group in MonsterGroup]?: number };

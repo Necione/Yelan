@@ -1,5 +1,5 @@
 import { limits } from "..";
-import { MonsterElement, MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../helpers/monsterHelper";
 import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {

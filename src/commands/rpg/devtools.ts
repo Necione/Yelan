@@ -20,10 +20,10 @@ export const devtools = buildCommand<SlashCommand>({
                 .setDescription("Choose an option.")
                 .setRequired(true)
                 .addChoices(
-                    { name: "Unstuck Hunting", value: "unstuck" },
-                    { name: "Export Data", value: "export_data" },
+                    { name: "unstuck", value: "unstuck" },
+                    { name: "export_data", value: "export_data" },
                     { name: "exp_calc", value: "exp_calc" },
-                    { name: "Reset your HP", value: "explode" },
+                    { name: "explode", value: "explode" },
                 ),
         )
         .setDMPermission(false),

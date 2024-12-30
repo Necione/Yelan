@@ -17,7 +17,7 @@ import {
     calculateStatChanges,
     getCharacterSetBonusMessages,
     getSetBonusMessages,
-} from "../../utils/artifactHelper";
+} from "../../utils/helpers/artifactHelper";
 import type { ArtifactName } from "../../utils/rpgitems/artifacts";
 import { artifacts, getArtifactType } from "../../utils/rpgitems/artifacts";
 import type { WeaponName } from "../../utils/rpgitems/weapons";

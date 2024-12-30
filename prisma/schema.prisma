@@ -236,6 +236,7 @@ model UserCharacter {
 model UserStats {
   id                        String         @id @default(auto()) @map("_id") @db.ObjectId
   userId                    String         @unique
+  nextHunt                  String[]       @default([])
   rebirths                  Int            @default(0)
   totalTokensUsed           Int            @default(0)
   mana                      Int            @default(20)

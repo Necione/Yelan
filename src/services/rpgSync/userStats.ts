@@ -14,7 +14,7 @@ import type { Prisma, UserStats } from "@prisma/client";
 import type { Client, TextChannel, User } from "discord.js";
 import { prisma } from "../../prisma";
 import { cooldowns } from "../../utils";
-import { calculateMasteryLevel } from "../../utils/masteryHelper";
+import { calculateMasteryLevel } from "../../utils/helpers/masteryHelper";
 import type {
     ArtifactSetName,
     ArtifactType,

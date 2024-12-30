@@ -35,8 +35,8 @@ import {
     getRandomMonster,
     initializeMonsters,
     type Monster,
-} from "../../../../utils/hunt";
-import { elementEmojis } from "../../../../utils/monsterHelper";
+} from "../../../../utils/helpers/huntHelper";
+import { elementEmojis } from "../../../../utils/helpers/monsterHelper";
 import { handleRandomEvent } from "../../../../utils/randomEvents";
 import { getUserSkillLevelData } from "../../../../utils/skillsData";
 import { getDeathThreshold } from "../battleHandler";

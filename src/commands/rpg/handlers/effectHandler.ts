@@ -1,7 +1,7 @@
 import type { UserStats } from "@prisma/client";
 import { debug } from "../../../utils";
-import { type Monster } from "../../../utils/hunt";
-import { MonsterElement } from "../../../utils/monsterHelper";
+import { type Monster } from "../../../utils/helpers/huntHelper";
+import { MonsterElement } from "../../../utils/helpers/monsterHelper";
 import type { WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
 import type { MonsterState } from "./battleHandler";

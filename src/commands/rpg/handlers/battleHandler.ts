@@ -3,10 +3,16 @@ import type { Prisma, UserStats } from "@prisma/client";
 import { skills } from "../../../plugins/other/utils";
 import { updateUserStats } from "../../../services";
 import { debug } from "../../../utils";
-import { weaponAdvantages, type Monster } from "../../../utils/hunt";
+import {
+    weaponAdvantages,
+    type Monster,
+} from "../../../utils/helpers/huntHelper";
+import { calculateMasteryLevel } from "../../../utils/helpers/masteryHelper";
+import {
+    MonsterElement,
+    MonsterGroup,
+} from "../../../utils/helpers/monsterHelper";
 import { masteryBenefits } from "../../../utils/masteryData";
-import { calculateMasteryLevel } from "../../../utils/masteryHelper";
-import { MonsterElement, MonsterGroup } from "../../../utils/monsterHelper";
 import type { WeaponName, WeaponType } from "../../../utils/rpgitems/weapons";
 import { weapons } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
@@ -59,6 +65,7 @@ export async function playerAttack(
     monster: Monster,
     currentPlayerHp: number,
     currentMonsterHp: number,
+    effectiveMaxHp: number,
     vigilanceUsed: boolean,
     monsterState: MonsterState,
     messages: string[],
@@ -153,7 +160,7 @@ export async function playerAttack(
             const healAmount = Math.floor(stats.maxHP * 0.2);
             currentPlayerHp = Math.min(
                 currentPlayerHp + healAmount,
-                stats.maxHP,
+                effectiveMaxHp,
             );
 
             messages.push(

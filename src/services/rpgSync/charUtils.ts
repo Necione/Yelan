@@ -2,8 +2,8 @@ import { make, noop } from "@elara-services/utils";
 import type { Prisma, UserCharacter } from "@prisma/client";
 import { prisma } from "../../prisma";
 import { debug } from "../../utils";
-import { calculateSetBonuses } from "../../utils/artifactHelper";
-import { chars, type CharsName } from "../../utils/charHelper";
+import { calculateSetBonuses } from "../../utils/helpers/artifactHelper";
+import { chars, type CharsName } from "../../utils/helpers/charHelper";
 import type {
     ArtifactName,
     ArtifactType,

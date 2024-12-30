@@ -11,16 +11,16 @@ import {
     sleep,
 } from "@elara-services/utils";
 import type { UserStats, UserWallet } from "@prisma/client";
-import type {
-    ButtonInteraction,
-    ChatInputCommandInteraction,
-    ColorResolvable,
-    Message,
-    PublicThreadChannel,
-    ThreadChannel,
-    User,
+import {
+    EmbedBuilder,
+    type ButtonInteraction,
+    type ChatInputCommandInteraction,
+    type ColorResolvable,
+    type Message,
+    type PublicThreadChannel,
+    type ThreadChannel,
+    type User,
 } from "discord.js";
-import { EmbedBuilder } from "discord.js";
 import { sendToChannel, skills } from "../../../plugins/other/utils";
 import {
     getProfileByUserId,
@@ -28,17 +28,16 @@ import {
     updateUserStats,
 } from "../../../services";
 import { cooldowns, locked } from "../../../utils";
-import type { MutationType } from "../../../utils/hunt";
+import type { MutationType } from "../../../utils/helpers/huntHelper";
 import {
+    generateNextHuntMonsters,
     getEncounterDescription,
     getMonsterByName,
     getMonstersByName,
-    getRandomMonster,
-    initializeMonsters,
     type Monster,
-} from "../../../utils/hunt";
-import { calculateMasteryLevel } from "../../../utils/masteryHelper";
-import { elementEmojis } from "../../../utils/monsterHelper";
+} from "../../../utils/helpers/huntHelper";
+import { calculateMasteryLevel } from "../../../utils/helpers/masteryHelper";
+import { elementEmojis } from "../../../utils/helpers/monsterHelper";
 import { handleRandomEvent } from "../../../utils/randomEvents";
 import { weapons, type WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
@@ -80,17 +79,52 @@ export async function handleHunt(
     handlers?: HuntHandlers,
 ) {
     const start = Date.now();
-    let selectedMonsters = make.array<Monster>();
-    if (is.array(selectedMonstersByName)) {
-        selectedMonsters = await getMonstersByName(selectedMonstersByName);
+
+    if (Math.random() < 0.2) {
+        await updateUserStats(stats.userId, { isHunting: false });
+        await handleRandomEvent(message, stats, userWallet);
+        return;
     }
-    if (!is.array(selectedMonsters)) {
-        if (Math.random() < 0.2) {
-            await updateUserStats(stats.userId, { isHunting: false });
-            await handleRandomEvent(message, stats, userWallet);
-            return;
+
+    let useNextHunt = false;
+    let selectedMonsters: Monster[] = [];
+
+    if (stats.nextHunt && stats.nextHunt.length > 0) {
+        const parsedMonsters = await Promise.all(
+            stats.nextHunt.map(async (rawName) => {
+                const [baseName, mutation] = rawName.split("|");
+                const monster = await getMonsterByName(baseName.trim());
+                if (!monster) {
+                    return null;
+                }
+
+                if (mutation) {
+                    monster.mutationType = mutation as MutationType;
+                    monster.name = `${mutation} ${monster.name}`;
+                }
+                return monster;
+            }),
+        );
+        const validMonsters = parsedMonsters.filter(
+            (m) => m !== null,
+        ) as Monster[];
+        if (validMonsters.length > 0) {
+            selectedMonsters = validMonsters;
+
+            await updateUserStats(stats.userId, { nextHunt: { set: [] } });
+            useNextHunt = true;
         }
-        await initializeMonsters();
+    }
+
+    if (!useNextHunt && is.array(selectedMonstersByName)) {
+        selectedMonsters = await getMonstersByName(selectedMonstersByName);
+        if (selectedMonsters.length > 0) {
+            useNextHunt = true;
+        }
+    }
+
+    if (!useNextHunt || selectedMonsters.length === 0) {
+        selectedMonsters = await generateNextHuntMonsters(stats);
     }
 
     const bossEncounters: { [key: number]: string } = {
@@ -99,46 +133,18 @@ export async function handleHunt(
         15: "Rhodeia of Loch",
         20: "Primo Geovishap",
     };
-
-    const currentadventureRank = stats.adventureRank;
     let isBossEncounter = false;
     let bossName = "";
 
     if (
-        bossEncounters[currentadventureRank] &&
-        !stats.beatenBosses.includes(bossEncounters[currentadventureRank])
+        bossEncounters[stats.adventureRank] &&
+        !stats.beatenBosses.includes(bossEncounters[stats.adventureRank])
     ) {
         isBossEncounter = true;
-        bossName = bossEncounters[currentadventureRank];
+        bossName = bossEncounters[stats.adventureRank];
     }
 
-    let numberOfMonsters = isBossEncounter
-        ? 1
-        : stats.adventureRank <= 5
-          ? 1
-          : stats.adventureRank <= 15
-            ? Math.random() < 0.75
-                ? 2
-                : 1
-            : stats.adventureRank <= 25
-              ? Math.random() < 0.75
-                  ? 2
-                  : 3
-              : stats.adventureRank <= 35
-                ? Math.random() < 0.5
-                    ? 2
-                    : 3
-                : 3;
-
-    const tauntSkill = getUserSkillLevelData(stats, "Taunt");
-
-    if (tauntSkill && tauntSkill.level > 0) {
-        numberOfMonsters += 1;
-    }
-
-    const monstersEncountered = is.array(selectedMonsters)
-        ? selectedMonsters
-        : make.array<Monster>();
+    const monstersEncountered = selectedMonsters;
 
     let currentPlayerHp = stats.hp;
 
@@ -149,7 +155,6 @@ export async function handleHunt(
     const weaponType = equippedWeaponName
         ? weapons[equippedWeaponName]?.type
         : undefined;
-
     const isWieldingPolearm = weaponType === "Polearm";
     const masteryPoints = stats.masteryPolearm || 0;
     const polearmMastery = calculateMasteryLevel(masteryPoints);
@@ -158,98 +163,13 @@ export async function handleHunt(
     if (isWieldingPolearm && polearmMasteryLevel >= 1) {
         currentPlayerHp = Math.floor(currentPlayerHp * 1.1);
     }
-
     if (hasSloth) {
         currentPlayerHp = Math.floor(currentPlayerHp * 1.25);
     }
-
     if (hasWrath) {
         currentPlayerHp = Math.floor(currentPlayerHp * 0.75);
     }
-
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
-
-    if (!is.array(selectedMonsters)) {
-        for (let encounter = 0; encounter < numberOfMonsters; encounter++) {
-            let monster: Monster | null;
-
-            if (isBossEncounter) {
-                monster = await getMonsterByName(bossName);
-                if (!monster) {
-                    throw new Error(`Monster not found: ${bossName}`);
-                }
-            } else {
-                monster = await getRandomMonster(
-                    stats.adventureRank,
-                    stats.location,
-                    {
-                        startingHp: stats.hp,
-                        attackPower: stats.attackPower,
-                        critChance: stats.critChance,
-                        critValue: stats.critValue,
-                        defChance: stats.defChance,
-                        defValue: stats.defValue,
-                        maxHp: stats.maxHP,
-                        rebirths: stats.rebirths,
-                    },
-                );
-            }
-
-            if (!monster) {
-                return;
-            }
-
-            const mutationChance = stats.rebirths * 5;
-            const actualMutationChance = Math.min(mutationChance, 100);
-
-            let preventMutation = false;
-            if (isWieldingPolearm && polearmMasteryLevel >= 5) {
-                preventMutation = true;
-            }
-
-            const isMutated =
-                !preventMutation && Math.random() * 100 < actualMutationChance;
-
-            const mutationTypes: MutationType[] = [
-                "Bloodthirsty",
-                "Strange",
-                "Infected",
-            ];
-
-            if (stats.rebirths >= 6) {
-                mutationTypes.push("Demonic");
-            }
-
-            if (isMutated) {
-                const chosenMutation =
-                    mutationTypes[
-                        Math.floor(Math.random() * mutationTypes.length)
-                    ];
-                monster.mutationType = chosenMutation;
-
-                switch (chosenMutation) {
-                    case "Bloodthirsty":
-                        monster.name = `Bloodthirsty ${monster.name}`;
-                        break;
-                    case "Strange":
-                        monster.name = `Strange ${monster.name}`;
-                        break;
-                    case "Infected":
-                        monster.name = `Infected ${monster.name}`;
-                        break;
-                    case "Demonic":
-                        monster.name = `Demonic ${monster.name}`;
-                        break;
-                }
-            }
-
-            monstersEncountered.push(monster);
-
-            if (isBossEncounter) {
-                break;
-            }
-        }
-    }
 
     let currentMonsterIndex = 0;
 
@@ -259,6 +179,7 @@ export async function handleHunt(
             monster.name,
             stats.location,
         );
+
         const monsterStats = monster.getStatsForadventureRank(
             stats.adventureRank,
         );
@@ -399,6 +320,7 @@ export async function handleHunt(
         let turnNumber = 1;
 
         const startingMessages = make.array<string>();
+        const tauntSkill = getUserSkillLevelData(stats, "Taunt");
 
         if (tauntSkill && tauntSkill.level > 0) {
             startingMessages.push("`🎷` The **Taunt** skill is active");
@@ -443,6 +365,7 @@ export async function handleHunt(
                     monster,
                     currentPlayerHp,
                     currentMonsterHp,
+                    effectiveMaxHp,
                     vigilanceUsed,
                     monsterState,
                     playerMessages,

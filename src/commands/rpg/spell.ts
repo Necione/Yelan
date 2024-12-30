@@ -3,7 +3,7 @@ import { embedComment, is, noop } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { debug } from "../../utils";
-import { calculateMasteryLevel } from "../../utils/masteryHelper";
+import { calculateMasteryLevel } from "../../utils/helpers/masteryHelper";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 import { getAvailableSpells, spells, type Spell } from "../../utils/spells";
 

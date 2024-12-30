@@ -10,8 +10,8 @@ import {
     syncStats,
 } from "../../services";
 import { cooldowns, getPaginatedMessage } from "../../utils";
-import { chars, type CharsName } from "../../utils/charHelper";
-import { formatChange } from "../../utils/hunt";
+import { chars, type CharsName } from "../../utils/helpers/charHelper";
+import { formatChange } from "../../utils/helpers/huntHelper";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 import { calculateFishingLevel } from "./handlers/fishHandler";

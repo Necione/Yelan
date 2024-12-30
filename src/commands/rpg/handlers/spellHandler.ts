@@ -1,6 +1,6 @@
 import { type UserStats } from "@prisma/client";
 import { debug } from "../../../utils";
-import { type Monster } from "../../../utils/hunt";
+import { type Monster } from "../../../utils/helpers/huntHelper";
 import { type MonsterState } from "./battleHandler";
 
 type SpellHandler = (params: {

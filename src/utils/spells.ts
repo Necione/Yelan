@@ -1,4 +1,4 @@
-import { calculateMasteryLevel } from "./masteryHelper";
+import { calculateMasteryLevel } from "./helpers/masteryHelper";
 
 export interface Spell {
     spellName: string;

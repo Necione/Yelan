@@ -1,16 +1,16 @@
 import { make } from "@elara-services/utils";
 import type { UserCharacter, UserStats } from "@prisma/client";
-import { formatChange } from "./hunt";
 import type {
     ArtifactName,
     ArtifactSetName,
     ArtifactType,
-} from "./rpgitems/artifacts";
+} from "./../rpgitems/artifacts";
 import {
     artifacts,
     artifactSets,
     getArtifactSetBonuses,
-} from "./rpgitems/artifacts";
+} from "./../rpgitems/artifacts";
+import { formatChange } from "./huntHelper";
 
 export function calculateStatChanges(
     beforeStats: UserStats,

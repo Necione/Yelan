@@ -20,7 +20,7 @@ import {
     getMonsterByName,
     initializeMonsters,
     type Monster,
-} from "../../../utils/hunt";
+} from "../../../utils/helpers/huntHelper";
 import { monsterAttack, playerAttack } from "../handlers/battleHandler";
 import { handleAbyssDefeat, handleAbyssVictory } from "../handlers/conditions";
 import { floor1Monsters, floor2Monsters } from "./monsterSets";
@@ -191,6 +191,7 @@ export async function handleAbyssBattle(
                     monster,
                     currentPlayerHp,
                     currentMonsterHp,
+                    effectiveMaxHp,
                     vigilanceUsed,
                     monsterState,
                     playerMessages,

@@ -10,7 +10,7 @@ import {
 import {
     calculateStatChanges,
     getSetBonusMessages,
-} from "../../utils/artifactHelper";
+} from "../../utils/helpers/artifactHelper";
 
 export const load = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()

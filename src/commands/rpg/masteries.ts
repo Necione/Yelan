@@ -2,8 +2,11 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, make } from "@elara-services/utils";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
+import {
+    calculateMasteryLevel,
+    toRoman,
+} from "../../utils/helpers/masteryHelper";
 import { masteryBenefits } from "../../utils/masteryData";
-import { calculateMasteryLevel, toRoman } from "../../utils/masteryHelper";
 import { type WeaponType } from "../../utils/rpgitems/weapons";
 import {
     type SpecialSkillName,

@@ -9,8 +9,8 @@ import {
     updateUserStats,
 } from "../../../services";
 import { cooldowns, texts } from "../../../utils";
-import { calculateDrop, type Monster } from "../../../utils/hunt";
-import { calculateMasteryLevel } from "../../../utils/masteryHelper";
+import { calculateDrop, type Monster } from "../../../utils/helpers/huntHelper";
+import { calculateMasteryLevel } from "../../../utils/helpers/masteryHelper";
 import { weapons, type WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {

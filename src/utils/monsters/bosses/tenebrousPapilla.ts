@@ -1,4 +1,4 @@
-import { MonsterElement, MonsterGroup } from "../../monsterHelper";
+import { MonsterElement, MonsterGroup } from "../../helpers/monsterHelper";
 
 export default {
     startingHp: 0,

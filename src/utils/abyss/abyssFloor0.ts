@@ -1,5 +1,5 @@
 import { make } from "@elara-services/utils";
-import { type AbyssMonster } from "../hunt";
+import { type AbyssMonster } from "../helpers/huntHelper";
 
 export const abyssFloor0Monsters = make.array<AbyssMonster>([
     {

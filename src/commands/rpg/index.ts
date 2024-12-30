@@ -31,6 +31,7 @@ export * from "./rpg";
 export * from "./save";
 export * from "./sell";
 export * from "./skills";
+export * from "./special";
 export * from "./spell";
 export { travel } from "./travel";
 export * from "./unequip";
