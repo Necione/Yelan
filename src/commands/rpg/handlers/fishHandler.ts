@@ -1,15 +1,26 @@
 import type { FishData } from "../../../utils/rpgitems/fish";
 
+interface FishingLevelResult {
+    levelUp: boolean;
+    requiredFishesForNextLevel: number;
+    validLevel: boolean;
+}
+
 export function calculateFishingLevel(
     currentLevel: number,
-    timesFishedForLevel: number,
-) {
+    timesFishedForLevel: number
+): FishingLevelResult {
     let requiredFishes = 5 * Math.pow(1.2, currentLevel - 1);
     requiredFishes = Math.round(requiredFishes);
 
     const levelUp = timesFishedForLevel >= requiredFishes;
+    const validLevel = currentLevel > 0 && currentLevel <= 100;
 
-    return { levelUp, requiredFishesForNextLevel: requiredFishes };
+    return { 
+        levelUp, 
+        requiredFishesForNextLevel: requiredFishes,
+        validLevel 
+    };
 }
 
 export function selectFishLength() {
