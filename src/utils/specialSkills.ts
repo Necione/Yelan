@@ -10,7 +10,7 @@ export type SpecialSkillName =
     | "Soulstealer"
     | "Sting"
     | "Sniper"
-    | "Quickdraw"
+    | "Sharpshooter"
     | "Focus"
     | "Peer";
 
@@ -66,13 +66,13 @@ export const specialSkills = make.array<SpecialSkill>([
     {
         skillName: "Focus",
         emoji: "🍀",
-        description: "Increase Crit Rate exponentially duing battle.",
+        description: "For every X% HP lost gain X% Crit Rate.",
     },
     {
-        skillName: "Quickdraw",
+        skillName: "Sharpshooter",
         emoji: "🏹",
         description:
-            "Attack twice on the second turn, dealing 25% of your ATK.",
+            "Deal 110% more damage per turn.",
     },
     {
         skillName: "Sting",

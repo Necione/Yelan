@@ -78,19 +78,19 @@ export const masteryBenefits: Record<
             description: "Deal 110% damage when wielding the Bow.",
         },
         2: {
-            specialSkill: "Quickdraw",
-        },
-        3: {
             description: "Deal 125% damage when wielding the Bow.",
         },
+        3: {
+            specialSkill: "Sharpshooter",
+        },
         4: {
-            description: "Increase Crit Value by 5% when wielding the Bow.",
+            description: "Increase Crit Value by 10% when wielding the Bow.",
         },
         5: {
-            description: "Deal 150% damage when wielding the Bow.",
+            specialSkill: "Focus",
         },
         6: {
-            specialSkill: "Focus",
+            description: "Deal 150% damage when wielding the Bow.",
         },
         7: {
             description: "Deal 200% damage when wielding the Bow.",
