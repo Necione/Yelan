@@ -551,23 +551,25 @@ export async function generateNextHuntMonsters(
             preventMutation = true;
         }
 
-        const isMutated =
-            !preventMutation && Math.random() * 100 < mutationChance;
-        if (isMutated) {
+        const canMutate = Math.random() * 100 < mutationChance;
+        if (canMutate) {
             const mutationTypes: MutationType[] = [
                 "Bloodthirsty",
                 "Strange",
                 "Infected",
             ];
+
             if (stats.rebirths >= 6) {
                 mutationTypes.push("Demonic");
             }
+
             const chosen =
                 mutationTypes[Math.floor(Math.random() * mutationTypes.length)];
 
-            monster.mutationType = chosen;
-
-            monster.name = `${chosen} ${monster.name}`;
+            if (chosen === "Demonic" || !preventMutation) {
+                monster.mutationType = chosen;
+                monster.name = `${chosen} ${monster.name}`;
+            }
         }
 
         monstersEncountered.push(monster);
