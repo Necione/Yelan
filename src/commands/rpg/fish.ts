@@ -12,7 +12,6 @@ import {
     snowflakes,
 } from "@elara-services/utils";
 import type { Prisma } from "@prisma/client";
-import { debug } from "console";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -20,6 +19,7 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
 } from "discord.js";
+import { debug } from "util";
 import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
 import { type FishData, fishList } from "../../utils/rpgitems/fish";
@@ -31,6 +31,7 @@ import {
     selectFishLength,
 } from "./handlers/fishHandler";
 import { startHunt } from "./handlers/huntHandler";
+
 
 const bait = make.array<string>([
     "Fruit Paste Bait",
