@@ -17,6 +17,7 @@ import {
 import { getAmount } from "../../utils";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
 import { drops, type DropName } from "../../utils/rpgitems/drops";
+import { fish, type FishName } from "../../utils/rpgitems/fish";
 import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 
 export const rebirth = buildCommand<SlashCommand>({
@@ -42,12 +43,12 @@ export const rebirth = buildCommand<SlashCommand>({
         }
 
         const rebirthRequirements = [5, 10, 15, 20, 25, 30, 35, 40];
-        const requiredadventureRank = rebirthRequirements[stats.rebirths] || 50;
+        const requiredAdventureRank = rebirthRequirements[stats.rebirths] || 50;
 
-        if (stats.adventureRank < requiredadventureRank) {
+        if (stats.adventureRank < requiredAdventureRank) {
             return r.edit(
                 embedComment(
-                    `You must be Adventure Rank ${requiredadventureRank} or higher to rebirth.`,
+                    `You must be Adventure Rank ${requiredAdventureRank} or higher to rebirth.`,
                     "Red",
                 ),
             );
@@ -90,7 +91,8 @@ export const rebirth = buildCommand<SlashCommand>({
             const itemData =
                 drops[item.item as DropName] ||
                 weapons[item.item as WeaponName] ||
-                artifacts[item.item as ArtifactName];
+                artifacts[item.item as ArtifactName] ||
+                fish[item.item as FishName];
 
             if (itemData) {
                 const baseSellPrice = itemData.sellPrice * item.amount;
