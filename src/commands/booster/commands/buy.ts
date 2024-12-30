@@ -94,7 +94,6 @@ export const buy = buildCommand<SubCommand>({
 
         // Check if there is already active boosters
         const activeBoosters = await getActiveCoinBoosters();
-
         // Only allow 6 boosters at a time
         if (activeBoosters.length >= 6) {
             if (!i.member.roles.cache.hasAny(...roles.main)) {

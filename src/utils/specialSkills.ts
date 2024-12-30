@@ -44,8 +44,7 @@ export const specialSkills = make.array<SpecialSkill>([
     {
         skillName: "Fortress",
         emoji: "💀",
-        description:
-            "The next attack that kills you leaves you at 1 HP instead",
+        description: "The next attack that kills you leaves you at 1 HP instead",
     },
     {
         skillName: "Fear",
@@ -55,8 +54,7 @@ export const specialSkills = make.array<SpecialSkill>([
     {
         skillName: "Soulstealer",
         emoji: "🖤",
-        description:
-            "Steal the soul of a killed monster. That monster will battle in your place next hunt until it dies.",
+        description: "Steal the soul of a killed monster. That monster will battle in your place next hunt until it dies.",
     },
     {
         skillName: "Sniper",
@@ -76,8 +74,7 @@ export const specialSkills = make.array<SpecialSkill>([
     {
         skillName: "Sting",
         emoji: "🦂",
-        description:
-            "Have a 20% to stun the monster, and simultaneously heal 20% of your Max HP",
+        description: "Have a 20% to stun the monster, and simultaneously heal 20% of your Max HP",
     },
     {
         skillName: "Peer",
