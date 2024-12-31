@@ -101,7 +101,11 @@ export const activate = buildCommand<SlashCommand>({
         }
 
         if (activeSkills.includes(skillName)) {
-            if (skillName === "Stealth" && stats.nextHunt) {
+            if (
+                skillName === "Stealth" &&
+                stats.nextHunt &&
+                Object.keys(stats.nextHunt).length > 0
+            ) {
                 return r.edit(
                     embedComment(
                         `You cannot deactivate this skill at the moment.`,
