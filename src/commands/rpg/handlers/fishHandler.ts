@@ -8,7 +8,7 @@ interface FishingLevelResult {
 
 export function calculateFishingLevel(
     currentLevel: number,
-    timesFishedForLevel: number
+    timesFishedForLevel: number,
 ): FishingLevelResult {
     let requiredFishes = 5 * Math.pow(1.2, currentLevel - 1);
     requiredFishes = Math.round(requiredFishes);
@@ -16,10 +16,10 @@ export function calculateFishingLevel(
     const levelUp = timesFishedForLevel >= requiredFishes;
     const validLevel = currentLevel > 0 && currentLevel <= 100;
 
-    return { 
-        levelUp, 
+    return {
+        levelUp,
         requiredFishesForNextLevel: requiredFishes,
-        validLevel 
+        validLevel,
     };
 }
 

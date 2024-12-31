@@ -31,8 +31,6 @@ import {
 } from "./handlers/fishHandler";
 import { startFishingEncounter } from "./handlers/huntHandler";
 
-
-
 const bait = make.array<string>([
     "Fruit Paste Bait",
     "Redrot Bait",
@@ -232,10 +230,12 @@ export const fishCommand = buildCommand<SlashCommand>({
                     longestFish: { set: newLongestFish },
                     lifetimeFishCaught: { set: newLifetimeFishCaught },
                     inventory: { set: stats.inventory },
-                    };
+                };
 
                 if (!validLevel) {
-                    debug(`Invalid fishing level detected for user ${i.user.id}: ${stats.fishingLevel}`);
+                    debug(
+                        `Invalid fishing level detected for user ${i.user.id}: ${stats.fishingLevel}`,
+                    );
                     stats.fishingLevel = 1;
                     stats.timesFishedForLevel = 0;
                 }
@@ -250,10 +250,12 @@ export const fishCommand = buildCommand<SlashCommand>({
                     updateData.timesFishedForLevel = { set: 0 };
                 }
                 if (levelUp || !validLevel) {
-                    debug(`Fishing level update for ${i.user.id}: ${stats.fishingLevel} -> ${stats.fishingLevel + (levelUp ? 1 : 0)}`);
+                    debug(
+                        `Fishing level update for ${i.user.id}: ${
+                            stats.fishingLevel
+                        } -> ${stats.fishingLevel + (levelUp ? 1 : 0)}`,
+                    );
                 }
-
-               
 
                 if (isLegendary) {
                     updateData.legendariesCaught = {
@@ -263,8 +265,9 @@ export const fishCommand = buildCommand<SlashCommand>({
 
                 stats = await updateUserStats(i.user.id, updateData);
                 if (!stats) {
-                    return;}
+                    return;
                 }
+            }
 
             const caughtEmbed = new EmbedBuilder()
                 .setTitle(`You caught ${fishToCatch} fish!`)
@@ -576,7 +579,11 @@ export const fishCommand = buildCommand<SlashCommand>({
                 }
 
                 if (levelUp || !validLevel) {
-                    debug(`Fishing level update for ${i.user.id}: ${stats.fishingLevel} -> ${stats.fishingLevel + (levelUp ? 1 : 0)}`);
+                    debug(
+                        `Fishing level update for ${i.user.id}: ${
+                            stats.fishingLevel
+                        } -> ${stats.fishingLevel + (levelUp ? 1 : 0)}`,
+                    );
                 }
 
                 stats = await updateUserStats(i.user.id, updateData);
