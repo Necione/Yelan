@@ -101,6 +101,14 @@ export const activate = buildCommand<SlashCommand>({
         }
 
         if (activeSkills.includes(skillName)) {
+            if (skillName === "Stealth" && stats.nextHunt) {
+                return r.edit(
+                    embedComment(
+                        `You cannot deactivate this skill at the moment.`,
+                    ),
+                );
+            }
+
             activeSkills = activeSkills.filter((skill) => skill !== skillName);
             await updateUserStats(i.user.id, {
                 activeSkills: { set: activeSkills },
@@ -110,7 +118,6 @@ export const activate = buildCommand<SlashCommand>({
                 embedComment(`The skill "${skillName}" has been deactivated.`),
             );
         }
-
         for (const combo of forbiddenCombinations) {
             if (combo.includes(skillName)) {
                 const conflictingSkills = combo.filter(

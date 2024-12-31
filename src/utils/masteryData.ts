@@ -119,8 +119,7 @@ export const masteryBenefits: Record<
             specialSkill: "Sting",
         },
         5: {
-            description:
-                "Never encounter mutated monsters when wielding the Polearm.",
+            specialSkill: "Stealth",
         },
         10: {
             description: "Deal 500% damage when wielding the Polearm.",

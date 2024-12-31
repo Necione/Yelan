@@ -12,6 +12,7 @@ export type SpecialSkillName =
     | "Sniper"
     | "Sharpshooter"
     | "Focus"
+    | "Stealth"
     | "Peer";
 
 export interface SpecialSkill {
@@ -40,6 +41,11 @@ export const specialSkills = make.array<SpecialSkill>([
         skillName: "Bolster",
         emoji: "🥊",
         description: "Deal 300% damage on your first hit in a battle",
+    },
+    {
+        skillName: "Stealth",
+        emoji: "🦢",
+        description: "Never encounter a mutated monster.",
     },
     {
         skillName: "Fortress",

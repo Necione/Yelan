@@ -6,7 +6,6 @@ import { debug } from "..";
 import { locationGroupWeights } from "../locationGroupWeights";
 import type { WeaponType } from "../rpgitems/weapons";
 import { getUserSkillLevelData } from "../skillsData";
-import { calculateMasteryLevel } from "./masteryHelper";
 import { type MonsterElement, MonsterGroup } from "./monsterHelper";
 
 export type MutationType = "Bloodthirsty" | "Strange" | "Infected" | "Demonic";
@@ -542,15 +541,12 @@ export async function generateNextHuntMonsters(
         const baseName = monster.name;
         monster.baseName = baseName;
 
-        const mutationChance = Math.min(stats.rebirths * 5, 100);
         let preventMutation = false;
-
-        const polearmMasteryPoints = stats.masteryPolearm || 0;
-        const polearmMastery = calculateMasteryLevel(polearmMasteryPoints);
-        if (polearmMastery.numericLevel >= 5) {
+        if (stats.activeSkills.includes("Stealth")) {
             preventMutation = true;
         }
 
+        const mutationChance = Math.min(stats.rebirths * 5, 100);
         const canMutate = Math.random() * 100 < mutationChance;
         if (canMutate) {
             const mutationTypes: MutationType[] = [
@@ -558,11 +554,9 @@ export async function generateNextHuntMonsters(
                 "Strange",
                 "Infected",
             ];
-
             if (stats.rebirths >= 6) {
                 mutationTypes.push("Demonic");
             }
-
             const chosen =
                 mutationTypes[Math.floor(Math.random() * mutationTypes.length)];
 

@@ -342,9 +342,9 @@ export const skills = make.array<Skill>([
             },
             {
                 level: 3,
-                description: "Go first **95%** of the time when hunting.",
+                description: "Always go first when hunting.",
                 levelData: {
-                    priority: 0.95,
+                    priority: 1,
                 },
             },
         ],
