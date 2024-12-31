@@ -968,6 +968,35 @@ export function applyAttackModifiers(
                 );
             }
         }
+
+        if (
+            equippedWeaponName &&
+            equippedWeaponName.includes("Ha­ran Gep­paku Fu­tsu")
+        ) {
+            const unassignedPoints = Math.max(
+                (stats.alchemyProgress ?? 0) - (stats.totalAssigned ?? 0),
+                0,
+            );
+
+            if (unassignedPoints > 0) {
+                const damageMultiplier = 1 + unassignedPoints / 100;
+                attackPower *= damageMultiplier;
+
+                messages.push(
+                    `\`🌕\` Ha­ran Gep­paku Fu­tsu effect! You deal __${(
+                        damageMultiplier * 100
+                    ).toFixed(
+                        0,
+                    )}%__ more damage for having **${unassignedPoints}** unassigned alchemy points`,
+                );
+                debugMultipliers.push(
+                    `Ha­ran Gep­paku Fu­tsu +${unassignedPoints}% DMG`,
+                );
+                debug(
+                    `${username} Ha­ran Gep­paku Fu­tsu effect => +${unassignedPoints}% => ${attackPower}`,
+                );
+            }
+        }
     }
 
     const furyEffect = stats.activeEffects.find(

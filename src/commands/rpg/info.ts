@@ -59,6 +59,10 @@ const specialEffects: Array<{
         effect: "Double all skill-related damage (Vigilance, Kindle, Vigor, etc).",
     },
     {
+        substring: "Ha­ran Gep­paku Fu­tsu",
+        effect: "For every X unassigned alchemy points, deal X% more damage.",
+    },
+    {
         substring: "Calamity Queller",
         effect: "Monsters can no longer defend.",
     },
