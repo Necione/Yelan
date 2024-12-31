@@ -59,7 +59,7 @@ const specialEffects: Array<{
         effect: "Double all skill-related damage (Vigilance, Kindle, Vigor, etc).",
     },
     {
-        substring: "Ha­ran Gep­paku Fu­tsu",
+        substring: "Haran Geppaku Futsu",
         effect: "For every X unassigned alchemy points, deal X% more damage.",
     },
     {
