@@ -138,9 +138,13 @@ export const ninjaChallenge = createEvent({
                     .catch(noop);
 
                 if (fightMessage) {
-                    await startHunt(fightMessage, interaction.user, [
-                        randomNinja,
-                    ]);
+                    await startHunt(
+                        fightMessage,
+                        interaction.user,
+                        [randomNinja],
+                        undefined,
+                        true,
+                    );
                 }
             } else {
                 await message.reply(

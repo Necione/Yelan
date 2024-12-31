@@ -119,7 +119,13 @@ export const cursedWitch = createEvent({
                     .catch(noop);
 
                 if (msg) {
-                    await startHunt(msg, c.user, [chosenMonster]);
+                    await startHunt(
+                        msg,
+                        c.user,
+                        [chosenMonster],
+                        undefined,
+                        true,
+                    );
                 }
             } else {
                 await message.reply(

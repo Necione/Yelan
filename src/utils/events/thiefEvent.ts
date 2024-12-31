@@ -149,7 +149,13 @@ export const thief = createEvent({
                 .catch(noop);
 
             if (msg) {
-                await startHunt(msg, c.user, [randomThiefMonster]);
+                await startHunt(
+                    msg,
+                    c.user,
+                    [randomThiefMonster],
+                    undefined,
+                    true,
+                );
             }
         } else {
             await message.reply(

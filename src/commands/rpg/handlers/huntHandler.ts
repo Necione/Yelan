@@ -77,19 +77,28 @@ export async function handleHunt(
     userWallet: UserWallet,
     selectedMonstersByName?: string[],
     handlers?: HuntHandlers,
+    eventTriggered = false,
 ) {
     const start = Date.now();
 
-    if (Math.random() < 0.2) {
+    if (!eventTriggered && Math.random() < 0.2) {
         await updateUserStats(stats.userId, { isHunting: false });
         await handleRandomEvent(message, stats, userWallet);
+        eventTriggered = true;
         return;
     }
 
     let useNextHunt = false;
     let selectedMonsters: Monster[] = [];
 
-    if (stats.nextHunt && stats.nextHunt.length > 0) {
+    if (is.array(selectedMonstersByName) && selectedMonstersByName.length > 0) {
+        selectedMonsters = await getMonstersByName(selectedMonstersByName);
+        if (selectedMonsters.length > 0) {
+            useNextHunt = true;
+        }
+    }
+
+    if (!useNextHunt && stats.nextHunt && stats.nextHunt.length > 0) {
         const parsedMonsters = await Promise.all(
             stats.nextHunt.map(async (rawName) => {
                 const [baseName, mutation] = rawName.split("|");
@@ -97,7 +106,6 @@ export async function handleHunt(
                 if (!monster) {
                     return null;
                 }
-
                 if (mutation) {
                     monster.mutationType = mutation as MutationType;
                     monster.name = `${mutation} ${monster.name}`;
@@ -105,20 +113,10 @@ export async function handleHunt(
                 return monster;
             }),
         );
-        const validMonsters = parsedMonsters.filter(
-            (m) => m !== null,
-        ) as Monster[];
+        const validMonsters = parsedMonsters.filter(Boolean) as Monster[];
         if (validMonsters.length > 0) {
             selectedMonsters = validMonsters;
-
             await updateUserStats(stats.userId, { nextHunt: { set: [] } });
-            useNextHunt = true;
-        }
-    }
-
-    if (!useNextHunt && is.array(selectedMonstersByName)) {
-        selectedMonsters = await getMonstersByName(selectedMonstersByName);
-        if (selectedMonsters.length > 0) {
             useNextHunt = true;
         }
     }
@@ -584,6 +582,7 @@ export async function startHunt(
     user: User,
     monsters?: string[],
     handlers?: HuntHandlers,
+    skipRandomEvent = false,
 ) {
     const r = getMessageResponder(message);
     locked.set(user, "hunt");
@@ -656,7 +655,7 @@ export async function startHunt(
     }
 
     await updateUserStats(user.id, { isHunting: { set: true } });
-    await handleHunt(message, stats, p, monsters, handlers);
+    await handleHunt(message, stats, p, monsters, handlers, skipRandomEvent);
 
     locked.del(user.id);
 }
