@@ -95,9 +95,6 @@ export const baccarat = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
     async execute(interaction, responder) {
-        if (!interaction.deferred) {
-            return;
-        }
         locked.set(interaction);
         const betAmount = interaction.options.getInteger("bet", true);
         const playerChoice = interaction.options.getString("winner", true);
@@ -147,6 +144,7 @@ export const baccarat = buildCommand<SlashCommand>({
         const e = new EmbedBuilder()
             .setTitle("`🎩` Baccarat Game")
             .setColor(Colors.Green);
+
         let didPlayerWin = false;
         for (const v of ["player", "banker"] as const) {
             if (result === v && playerChoice === v) {
