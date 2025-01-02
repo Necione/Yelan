@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, make } from "@elara-services/utils";
+import { embedComment, getRandom, make } from "@elara-services/utils";
 import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { channels } from "../../config";
 import { addBalance, getProfileByUserId, removeBalance } from "../../services";
@@ -41,26 +41,23 @@ const cardValues: Record<CardKey, number> = {
     K: 0,
     A: 1,
 };
+const cards = make.array<CardKey>([
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "J",
+    "Q",
+    "K",
+    "A",
+]);
 
-const drawCard = () => {
-    const cards = make.array<CardKey>([
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "J",
-        "Q",
-        "K",
-        "A",
-    ]);
-    return cards[Math.floor(Math.random() * cards.length)];
-};
-
+const drawCard = () => getRandom(cards);
 const getCardValue = (card: CardKey) => cardValues[card];
 
 const getHandValue = (cards: CardKey[]) => {
