@@ -1,6 +1,6 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
 import { field, formatNumber, make } from "@elara-services/utils";
-import { customEmoji } from "@liyueharbor/econ";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import {
     EmbedBuilder,
     SlashCommandBuilder,
@@ -77,7 +77,7 @@ export const stats: SlashCommand = {
                         `✦ High Roller`,
                         `Need to wager ${getAmount(
                             highRollerRequirement,
-                        )} (**${getPercent.toFixed(0)}%** done)`,
+                        )} (**${getPercent.toFixed(2)}%** done)`,
                     ),
                 );
             }
@@ -94,7 +94,7 @@ export const stats: SlashCommand = {
                     .setFooter({ text: `ID: ${user.id}` })
                     .addFields(
                         {
-                            name: "✦ Mora",
+                            name: `✦ ${texts.c.u}`,
                             value: map([
                                 `Earned: ${formatNumber(
                                     data.balanceAdded || 0,
