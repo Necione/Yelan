@@ -89,7 +89,7 @@ export async function handleHunt(
     }
 
     let useNextHunt = false;
-    let selectedMonsters: Monster[] = [];
+    let selectedMonsters = make.array<Monster>();
 
     if (is.array(selectedMonstersByName) && selectedMonstersByName.length > 0) {
         selectedMonsters = await getMonstersByName(selectedMonstersByName);

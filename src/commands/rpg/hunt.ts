@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get } from "@elara-services/utils";
+import { embedComment, get, is } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
@@ -14,10 +14,12 @@ export const hunt = buildCommand<SlashCommand>({
     only: { text: true, threads: false, voice: false, dms: false },
     defer: { silent: false },
     async execute(i, r) {
+        locked.set(i.user);
         const message = await r.edit(
             embedComment(`\`⚔️\` You continue your adventure...`, "Orange"),
         );
         if (!message) {
+            locked.del(i.user.id);
             return r.edit(
                 embedComment("Unable to fetch the original message."),
             );
@@ -34,25 +36,26 @@ export const hunt = buildCommand<SlashCommand>({
         const stats = await syncStats(i.user.id);
 
         if (!stats) {
+            locked.del(i.user.id);
             return r.edit(
                 embedComment(
                     `No stats found for you, please set up your profile.`,
                 ),
             );
         }
+        await cooldowns.set(userWallet, "stuckHelper", get.mins(5));
 
-        const stuckHelperTime = get.mins(5);
-        await cooldowns.set(userWallet, "stuckHelper", stuckHelperTime);
-
-        const equippedWeaponName = stats.equippedWeapon as string | undefined;
+        const equippedWeaponName = stats.equippedWeapon ?? "";
 
         if (
-            equippedWeaponName &&
+            is.string(equippedWeaponName) &&
             equippedWeaponName.includes("Aqua Simulacra")
         ) {
             await startAquaHunt(message, i.user);
+            locked.del(i.user.id);
         } else {
             await startHunt(message, i.user);
+            locked.del(i.user.id);
         }
     },
 });
