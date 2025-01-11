@@ -13,7 +13,8 @@
         "pf": "prettier --write src/**/*.ts",
         "pc": "prettier --check src/**/*.ts",
         "fix": "eslint . --fix && npm run pf",
-        "push": "npm run fix && git add . && git commit -m . && git push"
+        "push": "npm run fix && git add . && git commit -m . && git push",
+        "vps": "npm run fix && git add . && git commit -m \"[deploy] - Updated code\" && git push"
     },
     "keywords": [
         "typescript",
