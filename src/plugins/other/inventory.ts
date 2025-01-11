@@ -100,9 +100,7 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
                     .setDescription(
                         `- Name: ${c.name}\n- Rarity: ${
                             find.rarity || "Normal"
-                        }\n- Price: \`${find.price} ${
-                            texts.c.u
-                        }\`\n\n- Status: ${
+                        }\n- Price: \`${getAmount(find.price)}\`\n- Status: ${
                             find.canGet ? "Obtainable" : "Unobtainable"
                         }\n- Collected: ${formatNumber(
                             c.count,
