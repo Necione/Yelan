@@ -102,7 +102,9 @@ export async function onInventoryInteraction(i: AnySelectMenuInteraction) {
                             find.rarity || "Normal"
                         }\n- Price: \`${find.price} ${
                             texts.c.u
-                        }\`\n- Collected: ${formatNumber(
+                        }\`\n\n- Status: ${
+                            find.canGet ? "Obtainable" : "Unobtainable"
+                        }\n- Collected: ${formatNumber(
                             c.count,
                         )}\n- Duplicates: ${formatNumber(c.count - 1)}`,
                     )
