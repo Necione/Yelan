@@ -125,6 +125,7 @@ export const channels = {
 };
 
 export const roles = {
+    general: "1073418273913327636",
     admin: "1073408549075570779",
     levels: [
         "1073123463725854720",

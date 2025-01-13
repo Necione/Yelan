@@ -1,8 +1,11 @@
-import { buildCommand, getUser } from "@elara-services/botbuilder";
+import { buildCommand, getBool, getUser } from "@elara-services/botbuilder";
 import {
+    discord,
     embedComment,
     get,
     getConfirmPrompt,
+    is,
+    make,
     noop,
 } from "@elara-services/utils";
 import { mainServerId, roles } from "../../../../config";
@@ -30,6 +33,13 @@ export const transfer = buildCommand({
                     name: "user",
                     description: `What's their new account?`,
                 }),
+            )
+            .addBooleanOption((o) =>
+                getBool(o, {
+                    name: "include_roles",
+                    required: true,
+                    description: `Should I transfer their roles as well? (Removes roles from the old account as well)`,
+                }),
             ),
     locked: { roles: roles.main },
     defer: { silent: true },
@@ -40,11 +50,27 @@ export const transfer = buildCommand({
         levels.client = i.client;
         const oldUser = i.options.getUser("old_user", true);
         const user = i.options.getUser("user", true);
+        const includeRoles = i.options.getBoolean("include_roles", true);
         if (oldUser.bot || user.bot) {
             return r.edit(
                 embedComment(`One of the users you provided is a bot account.`),
             );
         }
+        const mainGuild =
+            i.client.guilds.resolve(mainServerId) ||
+            (await i.client.guilds.fetch(mainServerId).catch(noop));
+        if (!mainGuild) {
+            return r.edit(
+                embedComment(`Unable to find the main server's data.`),
+            );
+        }
+        const oldMember = await discord.member(
+            mainGuild,
+            oldUser.id,
+            true,
+            false,
+        );
+        const newMember = await discord.member(mainGuild, user.id, true, false);
         const op = (await getProfileByUserId(oldUser.id)) as Response;
         if (!op) {
             return r.edit(
@@ -67,6 +93,29 @@ export const transfer = buildCommand({
         }
         if (!col.deferred) {
             await col.deferUpdate().catch(noop);
+        }
+        if (oldMember && newMember && includeRoles) {
+            const list = make.array<string>();
+            for (const role of oldMember.roles.cache.values()) {
+                if (
+                    newMember.roles.cache.has(role.id) ||
+                    role.id === mainGuild.id ||
+                    role.id === i.guildId
+                ) {
+                    continue;
+                }
+                list.push(role.id);
+            }
+            if (is.array(list)) {
+                await newMember.roles.add(list).catch(noop);
+            }
+            await oldMember.roles
+                .remove(
+                    oldMember.roles.cache.filter(
+                        (c) => c.id !== i.guildId || c.id !== roles.general,
+                    ),
+                )
+                .catch(noop);
         }
         const msg = await logs.backup({
             content: `> \`${i.user.displayName}\` (${
