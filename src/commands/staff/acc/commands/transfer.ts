@@ -150,6 +150,7 @@ export const transfer = buildCommand({
         }
         delete op.id;
         op.userId = user.id;
+        op["updatedAt"] = new Date().toISOString();
         await Promise.all([
             prisma.userWallet
                 .upsert({

@@ -116,6 +116,7 @@ export const restore = buildCommand({
             return;
         }
         delete obj.id;
+        obj["updatedAt"] = new Date().toISOString();
         await prisma.userWallet
             .upsert({
                 where: {

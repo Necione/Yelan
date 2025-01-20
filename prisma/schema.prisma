@@ -169,6 +169,7 @@ model UserWallet {
   boosters         Int           @default(0)
   // `strike` will be the new field for strikes, it will continue an array-object 
   strike           Strikes[]
+  updatedAt        String        @default("")
 }
 
 model DailyCommand {

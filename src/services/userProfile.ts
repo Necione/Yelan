@@ -34,7 +34,12 @@ export async function updateUserProfile(
         return prisma.userWallet
             .update({
                 where: { userId },
-                data: profile,
+                data: {
+                    ...profile,
+                    updatedAt: {
+                        set: new Date().toISOString(),
+                    },
+                },
             })
             .then((data) => res(data))
             .catch(async (e) => {
@@ -201,6 +206,7 @@ export async function getProfileByUserId(userId: string) {
     return await prisma.userWallet.upsert({
         create: {
             userId,
+            updatedAt: new Date().toISOString(),
         },
         update: {},
         where: {
