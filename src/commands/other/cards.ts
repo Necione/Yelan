@@ -9,7 +9,7 @@ import {
 import { customEmoji, texts } from "@liyueharbor/econ";
 import type { UserWallet } from "@prisma/client";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { mainServerId } from "../../config";
+import { devId, mainServerId } from "../../config";
 import { getAllUserProfiles, getProfileByUserId } from "../../services";
 import { getCollectables } from "../../services/bot";
 import { getPaginatedMessage, getRandomImage } from "../../utils";
@@ -62,6 +62,9 @@ export const cards = buildCommand<SlashCommand>({
                 where: {
                     collectables: {
                         isEmpty: false,
+                    },
+                    userId: {
+                        notIn: [devId],
                     },
                 },
             });
