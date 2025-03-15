@@ -860,7 +860,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     "Amos' Bow": {
         name: "Amos' Bow",
         type: "Bow",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 25,
         critChance: 0,
         critValue: 0,
@@ -876,7 +876,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     Absolution: {
         name: "Absolution",
         type: "Sword",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 45,
         critChance: 25,
         critValue: 2,
@@ -892,7 +892,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     "Wolf's Gravestone": {
         name: "Wolf's Gravestone",
         type: "Claymore",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 55,
         critChance: 20,
         critValue: 1.75,
@@ -909,7 +909,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     "Memory of Dust": {
         name: "Memory of Dust",
         type: "Catalyst",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 40,
         critChance: 20,
         critValue: 1.5,
@@ -925,7 +925,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     "Everlasting Moonglow": {
         name: "Everlasting Moonglow",
         type: "Catalyst",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 5,
         critChance: 0,
         critValue: 0,
@@ -942,7 +942,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     "The First Great Magic": {
         name: "The First Great Magic",
         type: "Bow",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 50,
         critChance: 10,
         critValue: 1.5,
@@ -958,7 +958,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     "Haran Geppaku Futsu": {
         name: "Haran Geppaku Futsu",
         type: "Sword",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 50,
         critChance: -40,
         critValue: 1.5,
@@ -974,7 +974,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
     "Calamity Queller": {
         name: "Calamity Queller",
         type: "Polearm",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 50,
         critChance: 10,
         critValue: 2,

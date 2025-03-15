@@ -913,7 +913,7 @@ export const artifacts = {
     "Witch's Flower of Blaze": {
         type: "Flower",
         artifactSet: "Crimson Witch of Flames",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 15,
         critChance: 10,
         critValue: 0.1,
@@ -927,7 +927,7 @@ export const artifacts = {
     "Witch's Ever-Burning Plume": {
         type: "Plume",
         artifactSet: "Crimson Witch of Flames",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 20,
         critChance: 10,
         critValue: 0.1,
@@ -941,7 +941,7 @@ export const artifacts = {
     "Witch's End Time": {
         type: "Sands",
         artifactSet: "Crimson Witch of Flames",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 2,
         critChance: 10,
         critValue: 0.15,
@@ -955,7 +955,7 @@ export const artifacts = {
     "Witch's Heart Flames": {
         type: "Goblet",
         artifactSet: "Crimson Witch of Flames",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 17,
         critChance: 10,
         critValue: 0.2,
@@ -969,7 +969,7 @@ export const artifacts = {
     "Witch's Scorching Hat": {
         type: "Circlet",
         artifactSet: "Crimson Witch of Flames",
-        sellPrice: 100,
+        sellPrice: 50,
         attackPower: 25,
         critChance: 10,
         critValue: 0.25,
@@ -983,7 +983,7 @@ export const artifacts = {
     "Snowswept Memory": {
         type: "Flower",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: 10,
         critChance: 5,
         critValue: 0.15,
@@ -997,7 +997,7 @@ export const artifacts = {
     "Icebreaker's Resolve": {
         type: "Plume",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: 15,
         critChance: 10,
         critValue: 0.1,
@@ -1011,7 +1011,7 @@ export const artifacts = {
     "Frozen Homeland's Demise": {
         type: "Sands",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: -10,
         critChance: 5,
         critValue: 0.4,
@@ -1025,7 +1025,7 @@ export const artifacts = {
     "Frost-Weaved Dignity": {
         type: "Goblet",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: 5,
         critChance: 5,
         critValue: 0.12,
@@ -1039,7 +1039,7 @@ export const artifacts = {
     "Broken Rime's Echo": {
         type: "Circlet",
         artifactSet: "Blizzard Strayer",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: 5,
         critChance: 10,
         critValue: 0.25,
@@ -1053,7 +1053,7 @@ export const artifacts = {
     "Sea-Dyed Blossom": {
         type: "Flower",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: 7,
         critChance: 5,
         critValue: 0.05,
@@ -1067,7 +1067,7 @@ export const artifacts = {
     "Deep Palace's Plume": {
         type: "Plume",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: -25,
         critChance: 10,
         critValue: 0.08,
@@ -1081,7 +1081,7 @@ export const artifacts = {
     "Cowry of Parting": {
         type: "Sands",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: -20,
         critChance: -10,
         critValue: -0.25,
@@ -1095,7 +1095,7 @@ export const artifacts = {
     "Pearl Cage": {
         type: "Goblet",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: -10,
         critChance: 5,
         critValue: 0.15,
@@ -1109,7 +1109,7 @@ export const artifacts = {
     "Crown of Watatsumi": {
         type: "Circlet",
         artifactSet: "Ocean-Hued Clam",
-        sellPrice: 25,
+        sellPrice: 20,
         attackPower: -25,
         critChance: 15,
         critValue: 0.1,

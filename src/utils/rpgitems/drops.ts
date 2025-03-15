@@ -176,7 +176,7 @@ export const drops = {
         rarity: 1,
     },
     "Sergeant's Insignia": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 1,
         maxAmount: 2,
         minadventurerank: 11,
@@ -184,7 +184,7 @@ export const drops = {
         rarity: 2,
     },
     "Lieutenant's Insignia": {
-        sellPrice: 30,
+        sellPrice: 20,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 11,
@@ -200,7 +200,7 @@ export const drops = {
         rarity: 1,
     },
     "Crystal Prism": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 1,
         maxAmount: 2,
         minadventurerank: 11,
@@ -208,7 +208,7 @@ export const drops = {
         rarity: 2,
     },
     "Polarizing Prism": {
-        sellPrice: 30,
+        sellPrice: 20,
         minAmount: 1,
         maxAmount: 2,
         minadventurerank: 11,
@@ -224,7 +224,7 @@ export const drops = {
         rarity: 1,
     },
     "Mist Grass": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 1,
         maxAmount: 2,
         minadventurerank: 11,
@@ -232,7 +232,7 @@ export const drops = {
         rarity: 2,
     },
     "Mist Grass Wick": {
-        sellPrice: 30,
+        sellPrice: 20,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 11,
@@ -248,7 +248,7 @@ export const drops = {
         rarity: 1,
     },
     "Agent's Sacrificial Knife": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 1,
         maxAmount: 2,
         minadventurerank: 11,
@@ -256,7 +256,7 @@ export const drops = {
         rarity: 2,
     },
     "Inspector's Sacrificial Knife": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 1,
         maxAmount: 2,
         minadventurerank: 11,
@@ -280,7 +280,7 @@ export const drops = {
         rarity: 2,
     },
     "Wanderer's Blooming Flower": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 1,
         maxAmount: 2,
         minadventurerank: 11,
@@ -336,7 +336,7 @@ export const drops = {
         rarity: 3,
     },
     "Chaos Gear": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 0,
         maxAmount: 0,
         minadventurerank: 1,
@@ -344,7 +344,7 @@ export const drops = {
         rarity: 1,
     },
     "Chaos Axis": {
-        sellPrice: 30,
+        sellPrice: 20,
         minAmount: 0,
         maxAmount: 0,
         minadventurerank: 1,
@@ -360,7 +360,7 @@ export const drops = {
         rarity: 3,
     },
     "Old Handguard": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 20,
@@ -368,7 +368,7 @@ export const drops = {
         rarity: 1,
     },
     "Kageuchi Handguard": {
-        sellPrice: 30,
+        sellPrice: 20,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 20,
@@ -384,7 +384,7 @@ export const drops = {
         rarity: 3,
     },
     "Old Operative's Pocket Watch": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 20,
@@ -392,7 +392,7 @@ export const drops = {
         rarity: 1,
     },
     "Operative's Standard Pocket Watch": {
-        sellPrice: 30,
+        sellPrice: 20,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 20,
@@ -400,7 +400,7 @@ export const drops = {
         rarity: 2,
     },
     "Operative's Constancy": {
-        sellPrice: 40,
+        sellPrice: 30,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 20,
@@ -408,7 +408,7 @@ export const drops = {
         rarity: 3,
     },
     "Spectral Husk": {
-        sellPrice: 25,
+        sellPrice: 15,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 26,
@@ -416,7 +416,7 @@ export const drops = {
         rarity: 1,
     },
     "Spectral Heart": {
-        sellPrice: 30,
+        sellPrice: 20,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 26,
@@ -424,7 +424,7 @@ export const drops = {
         rarity: 2,
     },
     "Concealed Claw": {
-        sellPrice: 30,
+        sellPrice: 20,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 30,
@@ -432,7 +432,7 @@ export const drops = {
         rarity: 1,
     },
     "Concealed Unguis": {
-        sellPrice: 40,
+        sellPrice: 30,
         minAmount: 1,
         maxAmount: 1,
         minadventurerank: 30,
