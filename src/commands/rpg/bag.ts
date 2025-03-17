@@ -94,11 +94,6 @@ export const bag = buildCommand<SlashCommand>({
             return r.edit(embedComment("Your inventory is empty."));
         }
 
-        const totalItems = items.reduce(
-            (acc, item) => acc + (item.amount || 0),
-            0,
-        );
-
         const category = i.options.getString("category");
         const sortOption = i.options.getString("sort") || "Alphabetical";
 
@@ -179,9 +174,6 @@ export const bag = buildCommand<SlashCommand>({
         const chunks = chunk(groupedItems, 10);
         const pager = getPaginatedMessage();
         const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
-        const footerText = `Total Items: ${totalItems}/1000${
-            totalItems >= 1000 ? " (Max Reached)" : ""
-        }`;
 
         for (const c of chunks) {
             const embed = new EmbedBuilder()
@@ -213,8 +205,7 @@ export const bag = buildCommand<SlashCommand>({
                             return displayItem;
                         })
                         .join("\n"),
-                )
-                .setFooter({ text: footerText });
+                );
             pager.pages.push({ embeds: [embed] });
         }
 
