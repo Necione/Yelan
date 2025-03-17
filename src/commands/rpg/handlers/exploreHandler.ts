@@ -11,7 +11,7 @@ import {
 import type { UserStats } from "@prisma/client";
 import type { ChatInputCommandInteraction } from "discord.js";
 import { ButtonStyle, EmbedBuilder } from "discord.js";
-import { addItemToInventory } from "../../../services";
+import { addItemToInventory, getUserStats } from "../../../services";
 import { debug } from "../../../utils";
 import { generateChestLoot, generateRawMaterials } from "../../../utils/chest";
 import type { ArtifactName } from "../../../utils/rpgitems/artifacts";
@@ -103,16 +103,33 @@ export async function handleChest(
 
         const selectedChestIndex = parseInt(c.customId.split("_")[1]) - 1;
         const selectedChest = chestLoots[selectedChestIndex];
+        let inventoryFull = false;
 
         if (is.array(selectedChest.loot)) {
-            await addItemToInventory(i.user.id, selectedChest.loot);
+            const originalStats = await getUserStats(i.user.id);
+            const updatedStats = await addItemToInventory(
+                i.user.id,
+                selectedChest.loot,
+            );
+
+            if (
+                updatedStats &&
+                originalStats &&
+                JSON.stringify(updatedStats.inventory) ===
+                    JSON.stringify(originalStats.inventory)
+            ) {
+                inventoryFull = true;
+            }
         }
 
         const lootDescription =
             selectedChest.loot.length > 0
                 ? selectedChest.loot
                       .map((item) => `\`${item.amount}x\` ${item.item}`)
-                      .join(", ")
+                      .join(", ") +
+                  (inventoryFull
+                      ? "\n\n📦 **Bag Full** - Items could not be collected"
+                      : "")
                 : "No items";
 
         await i
@@ -137,28 +154,40 @@ export async function handleChest(
 export async function handleMaterials(i: ChatInputCommandInteraction) {
     try {
         const { materials } = generateRawMaterials();
+        let inventoryFull = false;
 
         if (is.array(materials)) {
-            await addItemToInventory(
+            const originalStats = await getUserStats(i.user.id);
+            const itemsToAdd = materials.map((material) => ({
+                item: material.item,
+                amount: material.amount,
+            }));
+
+            const updatedStats = await addItemToInventory(
                 i.user.id,
-                materials.map((material) => ({
-                    item: material.item,
-                    amount: material.amount,
-                })),
+                itemsToAdd,
             );
+
+            if (
+                updatedStats &&
+                originalStats &&
+                JSON.stringify(updatedStats.inventory) ===
+                    JSON.stringify(originalStats.inventory)
+            ) {
+                inventoryFull = true;
+            }
 
             const materialsList = materials
                 .map((material) => `\`${material.amount}x\` ${material.item}`)
                 .join(", ");
 
-            await i
-                .editReply(
-                    embedComment(
-                        `You gathered raw materials while exploring!\nYou found ${materialsList}.`,
-                        "Green",
-                    ),
-                )
-                .catch(noop);
+            let description = `You gathered raw materials while exploring!\nYou found ${materialsList}.`;
+            if (inventoryFull) {
+                description +=
+                    "\n\n📦 **Bag Full** - Items could not be collected";
+            }
+
+            await i.editReply(embedComment(description, "Green")).catch(noop);
         } else {
             return i.editReply(
                 embedComment(`Unable to find any raw materials.`),

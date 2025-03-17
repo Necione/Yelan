@@ -353,9 +353,15 @@ export const addItemToInventory = async (
     }
 
     let inventory = stats.inventory as InventoryItem[];
-
     if (!is.array(inventory)) {
         inventory = [];
+    }
+
+    const currentTotal = inventory.reduce((sum, item) => sum + item.amount, 0);
+    const incomingTotal = items.reduce((sum, item) => sum + item.amount, 0);
+
+    if (currentTotal + incomingTotal > 1000) {
+        return stats;
     }
 
     if (is.array(items)) {
@@ -387,6 +393,7 @@ export const addItemToInventory = async (
         },
     });
 };
+
 export const removeItemFromInventory = async (
     userId: string,
     itemName: string,

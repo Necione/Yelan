@@ -77,7 +77,26 @@ export async function handleVictory(
         const drops = calculateDrop(monster.drops);
         if (Array.isArray(drops)) {
             dropsCollected = dropsCollected.concat(drops);
-            await addItemToInventory(stats.userId, drops);
+        }
+    }
+
+    let inventoryFull = false;
+    if (dropsCollected.length > 0) {
+        const originalStats = await addItemToInventory(
+            stats.userId,
+            dropsCollected,
+        );
+        if (
+            !originalStats ||
+            JSON.stringify(originalStats.inventory) ===
+                JSON.stringify(stats.inventory)
+        ) {
+            inventoryFull = true;
+            dropsCollected = [];
+            finalEmbed.addFields({
+                name: "📦 Bag Full",
+                value: "You couldn't pick up any of the drops!",
+            });
         }
     }
 
@@ -262,7 +281,7 @@ export async function handleVictory(
         });
     }
 
-    if (dropsCollected.length > 0) {
+    if (dropsCollected.length > 0 && !inventoryFull) {
         const dropsDescription = dropsCollected
             .map((drop) => `\`${drop.amount}x\` ${drop.item}`)
             .join(", ");
