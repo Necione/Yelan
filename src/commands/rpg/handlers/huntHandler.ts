@@ -226,7 +226,6 @@ export async function handleHunt(
 
         const mutationColors: Record<MutationType, ColorResolvable> = {
             Bloodthirsty: 0xb40000,
-            Hard: 0xff8ad1,
             Strange: 0x658e4d,
             Infected: 0x88349b,
             Demonic: 0x28282b,

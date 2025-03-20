@@ -440,7 +440,6 @@ export async function handleAquaHunt(
                     "Bloodthirsty",
                     "Strange",
                     "Infected",
-                    "Hard",
                 ] as const;
                 const chosenMutation =
                     mutationTypes[

@@ -510,11 +510,6 @@ export async function monsterAttack(
         case "Infected":
             debug(`${username} Infected => no direct damage change`);
             break;
-        case "Hard":
-            currentMonsterHp *= 2;
-            monster.startingHp *= 2;
-            debug(`${username} Hard => hard I guess`);
-            break;
         case "Demonic":
             monsterDamage *= 2;
             debug(`${username} Demonic => x2 => ${monsterDamage}`);
@@ -1152,11 +1147,7 @@ export function checkMonsterDefenses(
     }
 
     let monsterDefChance = monster.defChance || 0;
-    let monsterDefValue = monster.defValue || 0;
-    if (monster.mutationType === "Hard") {
-        monsterDefChance *= 1.5;
-        monsterDefValue *= 2;
-    }
+    const monsterDefValue = monster.defValue || 0;
 
     if (equippedWeaponName && equippedWeaponName.includes("Calamity Queller")) {
         monsterDefChance = 0;
