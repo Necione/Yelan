@@ -8,7 +8,12 @@ import type { WeaponType } from "../rpgitems/weapons";
 import { getUserSkillLevelData } from "../skillsData";
 import { type MonsterElement, MonsterGroup } from "./monsterHelper";
 
-export type MutationType = "Bloodthirsty" | "Strange" | "Infected" | "Demonic";
+export type MutationType =
+    | "Bloodthirsty"
+    | "Strange"
+    | "Infected"
+    | "Hard"
+    | "Demonic";
 
 export interface Monster {
     startingHp: number;
@@ -553,6 +558,7 @@ export async function generateNextHuntMonsters(
                 "Bloodthirsty",
                 "Strange",
                 "Infected",
+                "Hard",
             ];
             if (stats.rebirths >= 6) {
                 mutationTypes.push("Demonic");
