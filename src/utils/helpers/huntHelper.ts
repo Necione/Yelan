@@ -256,7 +256,7 @@ export async function getRandomMonster(
 export function getEncounterDescription(monster: MonsterInstance) {
     const lines = make.array<string>();
 
-    if (is.number(monster.critChance)) {
+    if (is.number(monster.critChance) && monster.critChance > 0) {
         lines.push(
             `🎯 Crit Rate: \`${Math.min(
                 100,
@@ -265,7 +265,7 @@ export function getEncounterDescription(monster: MonsterInstance) {
         );
     }
 
-    if (is.number(monster.critValue)) {
+    if (is.number(monster.critValue) && monster.critValue > 0) {
         lines.push(
             `💥 Crit Value: \`${Math.min(3.0, monster.critValue).toFixed(
                 2,
@@ -273,7 +273,7 @@ export function getEncounterDescription(monster: MonsterInstance) {
         );
     }
 
-    if (is.number(monster.defChance)) {
+    if (is.number(monster.defChance) && monster.defChance > 0) {
         lines.push(
             `🛡️ Defense Rate: \`${Math.min(
                 100,
@@ -282,7 +282,7 @@ export function getEncounterDescription(monster: MonsterInstance) {
         );
     }
 
-    if (is.number(monster.defValue)) {
+    if (is.number(monster.defValue) && monster.defValue > 0) {
         lines.push(`🔰 Defense Value: \`${monster.defValue}\``);
     }
 
@@ -297,6 +297,10 @@ export function getEncounterDescription(monster: MonsterInstance) {
     }
     if (["Boss", "Beast", "Eremite"].includes(monster.group)) {
         lines.push(`🧬 Immune to Leech skill`);
+    }
+
+    if (lines.length === 0) {
+        return "A mysterious creature appears before you...";
     }
 
     return lines.join("\n");
