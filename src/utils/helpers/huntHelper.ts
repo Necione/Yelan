@@ -255,15 +255,9 @@ export async function getRandomMonster(
 
 export function getEncounterDescription(monster: MonsterInstance) {
     const lines = [
-        `🎯 Crit Rate: \`${Math.min(
-            100,
-            Math.round(monster.critChance * 100),
-        )}%\``,
+        `🎯 Crit Rate: \`${Math.min(100, Math.round(monster.critChance))}%\``,
         `💥 Crit Value: \`${Math.min(3.0, monster.critValue).toFixed(2)}x\``,
-        `🛡️ Defense Rate: \`${Math.min(
-            100,
-            Math.round(monster.defChance * 100),
-        )}%\``,
+        `🛡️ Defense Rate: \`${Math.min(100, Math.round(monster.defChance))}%\``,
         `🔰 Defense Value: \`${monster.defValue}\``,
     ];
 
