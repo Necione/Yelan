@@ -107,12 +107,10 @@ export const skillsCommand = buildCommand<SlashCommand>({
                   .join("\n")
             : "You have not unlocked any special skills yet.";
 
-        const embedColor = stats.abyssMode ? "#f7b420" : "Aqua";
-
         const pager = getPaginatedMessage();
 
         const page1 = new EmbedBuilder()
-            .setColor(embedColor)
+            .setColor(0xf7b420)
             .setTitle(`${i.user.username}'s Skills (Page 1)`)
             .setThumbnail(`https://lh.elara.workers.dev/rpg/skills.png`)
             .setDescription(
@@ -132,7 +130,7 @@ export const skillsCommand = buildCommand<SlashCommand>({
             );
 
         const page2 = new EmbedBuilder()
-            .setColor(embedColor)
+            .setColor(0xf7b420)
             .setTitle(`${i.user.username}'s Skills (Page 2)`)
             .setThumbnail(i.user.displayAvatarURL())
             .setDescription(

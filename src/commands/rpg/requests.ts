@@ -119,12 +119,12 @@ export const requests = buildCommand<SlashCommand>({
 
                 const embed = new EmbedBuilder()
                     .setTitle("`📋` Your Current Requests")
-                    .setColor("Blue")
+                    .setColor(0x9695e3)
                     .setDescription(
                         `Total requests completed: \`${stats.lifetimeRequestsCompleted}\``,
                     )
                     .setThumbnail(
-                        "https://lh.elara.workers.dev/rpg/requests.png",
+                        "https://lh.elara.workers.dev/rpg/requests2.png",
                     );
 
                 stats.requests.forEach((req) => {
@@ -269,7 +269,7 @@ export const requests = buildCommand<SlashCommand>({
 
                 const embed = new EmbedBuilder()
                     .setTitle("`✅` Request Completed!")
-                    .setColor("Green")
+                    .setColor(0x9695e3)
                     .setDescription(`You received ${getAmount(coinReward)}!`);
 
                 await r.edit({ embeds: [embed.toJSON()] });
