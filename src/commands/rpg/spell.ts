@@ -97,7 +97,7 @@ export const spell = buildCommand<SlashCommand>({
 
                     if (stats.castQueue.length === 0) {
                         const emptyQueueEmbed = new EmbedBuilder()
-                            .setColor("Yellow")
+                            .setColor(0xecd9fc)
                             .setTitle("Cast Queue Already Empty")
                             .setDescription(
                                 `Your spell casting queue is already empty.`,
@@ -113,7 +113,7 @@ export const spell = buildCommand<SlashCommand>({
                     });
 
                     const clearedEmbed = new EmbedBuilder()
-                        .setColor("Green")
+                        .setColor(0xecd9fc)
                         .setTitle("Spell Queue Cleared")
                         .setDescription(
                             `Your spell casting queue has been successfully cleared.`,
@@ -155,7 +155,7 @@ export const spell = buildCommand<SlashCommand>({
                 const spell: Spell | undefined = spells[spellName];
                 if (!spell) {
                     const invalidSpellEmbed = new EmbedBuilder()
-                        .setColor("Red")
+                        .setColor(0xecd9fc)
                         .setTitle("Invalid Spell")
                         .setDescription(`Spell "${spellName}" does not exist.`);
 
@@ -168,7 +168,7 @@ export const spell = buildCommand<SlashCommand>({
 
                 if (!isSpellAvailable) {
                     const insufficientMasteryEmbed = new EmbedBuilder()
-                        .setColor("Red")
+                        .setColor(0xecd9fc)
                         .setTitle("Mastery Level Too Low")
                         .setDescription(
                             `You need **Catalyst Mastery Level ${spell.requiredMasteryLevel}** to cast "${spellName}".\n\n- **Your Level**: ${numericMasteryLevel}`,
@@ -183,7 +183,7 @@ export const spell = buildCommand<SlashCommand>({
 
                     if (!equippedWeapon) {
                         const weaponNotFoundEmbed = new EmbedBuilder()
-                            .setColor("Red")
+                            .setColor(0xecd9fc)
                             .setTitle("Weapon Not Found")
                             .setDescription(
                                 `Your equipped weapon could not be found.`,
@@ -194,7 +194,7 @@ export const spell = buildCommand<SlashCommand>({
 
                     if (equippedWeapon.type !== "Catalyst") {
                         const wrongWeaponTypeEmbed = new EmbedBuilder()
-                            .setColor("Red")
+                            .setColor(0xecd9fc)
                             .setTitle("Wrong Weapon Type")
                             .setDescription(
                                 `You must have a **Catalyst** equipped to cast spells.`,
@@ -204,7 +204,7 @@ export const spell = buildCommand<SlashCommand>({
                     }
                 } else {
                     const noWeaponEmbed = new EmbedBuilder()
-                        .setColor("Red")
+                        .setColor(0xecd9fc)
                         .setTitle("No Weapon Equipped")
                         .setDescription(
                             `You must equip a **Catalyst** as your weapon to cast spells.`,
@@ -215,7 +215,7 @@ export const spell = buildCommand<SlashCommand>({
 
                 if (stats.castQueue.length >= 25) {
                     const queueFullEmbed = new EmbedBuilder()
-                        .setColor("Red")
+                        .setColor(0xecd9fc)
                         .setTitle("Spell Queue Full")
                         .setDescription(
                             `You cannot add more spells to your cast queue. The maximum limit is **25**.`,
@@ -226,7 +226,7 @@ export const spell = buildCommand<SlashCommand>({
 
                 if (stats.mana < spell.cost) {
                     const insufficientManaEmbed = new EmbedBuilder()
-                        .setColor("Red")
+                        .setColor(0xecd9fc)
                         .setTitle("Insufficient Mana")
                         .setDescription(
                             `You don't have enough mana to cast "${spellName}".\n\n- **Cost**: ${spell.cost} Mana\n- **Your Mana**: ${stats.mana}/${stats.maxMana}`,
@@ -244,11 +244,20 @@ export const spell = buildCommand<SlashCommand>({
                 });
 
                 const spellCastEmbed = new EmbedBuilder()
-                    .setColor("Green")
+                    .setColor(0xecd9fc)
                     .setTitle("Spell Casted")
+                    .setThumbnail(
+                        `https://lh.elara.workers.dev/rpg/spellicon.png`,
+                    )
                     .setDescription(
                         `You have casted \`${spellName}\`. It has been added to your spell queue.\n- **Remaining Mana**: ${stats.mana}/${stats.maxMana}`,
-                    );
+                    )
+                    .addFields({
+                        name: "Current Cast Queue",
+                        value: stats.castQueue
+                            .map((spell) => `**${spell}**`)
+                            .join(", "),
+                    });
 
                 return r.edit({ embeds: [spellCastEmbed] });
             } else {
@@ -280,7 +289,7 @@ export const spell = buildCommand<SlashCommand>({
                     availableSpells.length === 0
                 ) {
                     const noSpellsEmbed = new EmbedBuilder()
-                        .setColor("Yellow")
+                        .setColor(0xecd9fc)
                         .setTitle("No Available Spells")
                         .setDescription(
                             `You currently have no spells available. Increase your mastery level to unlock new spells.`,
@@ -307,10 +316,24 @@ export const spell = buildCommand<SlashCommand>({
                     "Spells are activated during a battle in the same order they are cast. Mana is restored at the end of battle.";
 
                 const availableSpellsEmbed = new EmbedBuilder()
-                    .setColor("Blue")
+                    .setColor(0xecd9fc)
                     .setTitle(`${i.user.username}'s Spells`)
-                    .setDescription(
-                        `**Available Spells:**\n${spellsList}\n\n**Current Cast Queue:**\n${castQueueDisplay}\n\n${additionalDescription}`,
+                    .setThumbnail(
+                        `https://lh.elara.workers.dev/rpg/spellicon.png`,
+                    )
+                    .addFields(
+                        {
+                            name: "Available Spells",
+                            value: spellsList,
+                        },
+                        {
+                            name: "Current Cast Queue",
+                            value: castQueueDisplay,
+                        },
+                        {
+                            name: "‎",
+                            value: additionalDescription,
+                        },
                     );
 
                 return r.edit({ embeds: [availableSpellsEmbed] });

@@ -171,40 +171,80 @@ export const bag = buildCommand<SlashCommand>({
             groupedItems.sort((a, b) => b.amount - a.amount);
         }
 
-        const chunks = chunk(groupedItems, 10);
+        const chunks = chunk(groupedItems, 20);
         const pager = getPaginatedMessage();
         const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
 
         for (const c of chunks) {
+            const leftColumn = c.slice(0, 10);
+            const rightColumn = c.slice(10, 20);
+
             const embed = new EmbedBuilder()
                 .setColor(embedColor)
                 .setTitle(
                     `${i.user.username}'s Inventory - ${category} (${sortOption})`,
                 )
-                .setDescription(
-                    c
-                        .map((item) => {
-                            let displayItem = `\`${item.amount}x\` ${item.item}`;
-                            if (item.item in artifacts) {
-                                const artifactType = getArtifactType(
-                                    item.item as ArtifactName,
-                                );
-                                if (artifactType) {
-                                    const emoji =
-                                        artifactTypeEmojis[artifactType];
-                                    if (emoji) {
-                                        displayItem += ` (${emoji})`;
+                .addFields(
+                    {
+                        name: "‎",
+                        value:
+                            leftColumn
+                                .map((item) => {
+                                    let displayItem = `\`${item.amount}x\` ${item.item}`;
+                                    if (item.item in artifacts) {
+                                        const artifactType = getArtifactType(
+                                            item.item as ArtifactName,
+                                        );
+                                        if (artifactType) {
+                                            const emoji =
+                                                artifactTypeEmojis[
+                                                    artifactType
+                                                ];
+                                            if (emoji) {
+                                                displayItem += ` (${emoji})`;
+                                            }
+                                        }
+                                    } else if (
+                                        item.item in fish &&
+                                        item.metadata?.length
+                                    ) {
+                                        displayItem += ` (${item.metadata.length} cm)`;
                                     }
-                                }
-                            } else if (
-                                item.item in fish &&
-                                item.metadata?.length
-                            ) {
-                                displayItem += ` (${item.metadata.length} cm)`;
-                            }
-                            return displayItem;
-                        })
-                        .join("\n"),
+                                    return displayItem;
+                                })
+                                .join("\n") || "Empty",
+                        inline: true,
+                    },
+                    {
+                        name: "‎",
+                        value:
+                            rightColumn
+                                .map((item) => {
+                                    let displayItem = `\`${item.amount}x\` ${item.item}`;
+                                    if (item.item in artifacts) {
+                                        const artifactType = getArtifactType(
+                                            item.item as ArtifactName,
+                                        );
+                                        if (artifactType) {
+                                            const emoji =
+                                                artifactTypeEmojis[
+                                                    artifactType
+                                                ];
+                                            if (emoji) {
+                                                displayItem += ` (${emoji})`;
+                                            }
+                                        }
+                                    } else if (
+                                        item.item in fish &&
+                                        item.metadata?.length
+                                    ) {
+                                        displayItem += ` (${item.metadata.length} cm)`;
+                                    }
+                                    return displayItem;
+                                })
+                                .join("\n") || "Empty",
+                        inline: true,
+                    },
                 )
                 .setFooter({
                     text: `Total Items: ${totalItemCount}/${stats.inventoryCap}`,

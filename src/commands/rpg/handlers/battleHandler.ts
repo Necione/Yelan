@@ -153,11 +153,11 @@ export async function playerAttack(
     const debugMultipliers: string[] = [];
 
     if (skills.has(stats, "Sting")) {
-        const stingChance = 0.2;
+        const stingChance = 0.15;
         if (Math.random() < stingChance) {
             monsterState.stunned = true;
 
-            const healAmount = Math.floor(stats.maxHP * 0.2);
+            const healAmount = Math.floor(stats.maxHP * 0.15);
             currentPlayerHp = Math.min(
                 currentPlayerHp + healAmount,
                 effectiveMaxHp,
