@@ -55,8 +55,9 @@ export const csv = buildCommand<SlashCommand>({
         }
 
         const resultEmbed = new EmbedBuilder()
-            .setColor("Blue")
+            .setColor(0xffb391)
             .setTitle(`${targetUser.username}'s Rebirth Sell Value`)
+            .setThumbnail(`https://lh.elara.workers.dev/rpg/rebirthstuff.png`)
             .setDescription(
                 `If ${
                     targetUser.username

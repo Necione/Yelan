@@ -107,14 +107,14 @@ export const skillsCommand = buildCommand<SlashCommand>({
                   .join("\n")
             : "You have not unlocked any special skills yet.";
 
-        const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
+        const embedColor = stats.abyssMode ? "#f7b420" : "Aqua";
 
         const pager = getPaginatedMessage();
 
         const page1 = new EmbedBuilder()
             .setColor(embedColor)
             .setTitle(`${i.user.username}'s Skills (Page 1)`)
-            .setThumbnail(i.user.displayAvatarURL())
+            .setThumbnail(`https://lh.elara.workers.dev/rpg/skills.png`)
             .setDescription(
                 `- Use </learn:1282044626408308736> to learn new skills.\n- Use </activate:1284399993897353292> to enable/disable a skill.\n- Use </upgrade:1310180403385991250> to level up a skill.`,
             )

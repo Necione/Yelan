@@ -276,7 +276,10 @@ export const alchemy = buildCommand<SlashCommand>({
                             `Alchemist Rank: ${alchemyRankWithEmoji}${deityInfo}\n` +
                                 `${essenceDisplay}`,
                         )
-                        .setColor(0x4b52bb)
+                        .setColor(0xcae67d)
+                        .setThumbnail(
+                            `https://lh.elara.workers.dev/rpg/alchem.png`,
+                        )
                         .addFields(
                             {
                                 name: "Assigned Bonuses",
