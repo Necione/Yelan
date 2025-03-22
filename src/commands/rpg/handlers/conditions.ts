@@ -277,7 +277,17 @@ export async function handleVictory(
             value: "Your inventory is full, please sell some items to make space.",
         });
     } else if (dropsCollected.length > 0) {
-        const dropsDescription = dropsCollected
+        const mergedDrops = dropsCollected.reduce((acc, drop) => {
+            const existingDrop = acc.find((d) => d.item === drop.item);
+            if (existingDrop) {
+                existingDrop.amount += drop.amount;
+            } else {
+                acc.push({ ...drop });
+            }
+            return acc;
+        }, [] as ItemDrop[]);
+
+        const dropsDescription = mergedDrops
             .map((drop) => `\`${drop.amount}x\` ${drop.item}`)
             .join(", ");
         finalEmbed.addFields({

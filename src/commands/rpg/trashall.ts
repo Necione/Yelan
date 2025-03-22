@@ -7,7 +7,9 @@ import { weapons, type WeaponName } from "../../utils/rpgitems/weapons";
 export const trashall = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("trashall")
-        .setDescription("[RPG] Remove all Worthless weapons from your inventory")
+        .setDescription(
+            "[RPG] Remove all Worthless weapons from your inventory",
+        )
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
