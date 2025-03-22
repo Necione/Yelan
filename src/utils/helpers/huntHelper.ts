@@ -256,7 +256,7 @@ export async function getRandomMonster(
 export function getEncounterDescription(monster: MonsterInstance) {
     const lines = make.array<string>();
 
-    if (typeof monster.critChance === "number" && monster.critChance > 0) {
+    if (is.number(monster.critChance) && monster.critChance > 0) {
         lines.push(
             `🎯 Crit Rate: \`${Math.min(
                 100,
@@ -265,7 +265,7 @@ export function getEncounterDescription(monster: MonsterInstance) {
         );
     }
 
-    if (typeof monster.critValue === "number" && monster.critValue > 0) {
+    if (is.number(monster.critValue) && monster.critValue > 0) {
         lines.push(
             `💥 Crit Value: \`${Math.min(3.0, monster.critValue).toFixed(
                 2,
@@ -273,7 +273,7 @@ export function getEncounterDescription(monster: MonsterInstance) {
         );
     }
 
-    if (typeof monster.defChance === "number" && monster.defChance > 0) {
+    if (is.number(monster.defChance) && monster.defChance > 0) {
         lines.push(
             `🛡️ Defense Rate: \`${Math.min(
                 100,
@@ -282,7 +282,7 @@ export function getEncounterDescription(monster: MonsterInstance) {
         );
     }
 
-    if (typeof monster.defValue === "number" && monster.defValue > 0) {
+    if (is.number(monster.defValue) && monster.defValue > 0) {
         lines.push(`🔰 Defense Value: \`${monster.defValue}\``);
     }
 

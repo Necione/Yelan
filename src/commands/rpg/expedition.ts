@@ -277,16 +277,14 @@ export const expedition = buildCommand<SlashCommand>({
                 startTime.getTime() + expeditionTimes[currentType] * 1000;
             const now = Date.now();
             if (now < endTime) {
-                const secondsLeft = Math.floor((endTime - now) / 1000);
+                const endTimestamp = Math.floor(endTime / 1000);
                 return r.edit(
                     embedComment(
                         `${
                             character.nickname
                                 ? `${character.nickname} (${character.name})`
                                 : character.name
-                        } is still on an expedition!\nTime left: ${getDurationString(
-                            secondsLeft,
-                        )}`,
+                        } is still on an expedition!\nThey will return <t:${endTimestamp}:R>`,
                     ),
                 );
             }

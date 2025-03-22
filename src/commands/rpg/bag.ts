@@ -184,71 +184,68 @@ export const bag = buildCommand<SlashCommand>({
                 .setTitle(
                     `${i.user.username}'s Inventory - ${category} (${sortOption})`,
                 )
-                .addFields(
-                    {
-                        name: "‎",
-                        value:
-                            leftColumn
-                                .map((item) => {
-                                    let displayItem = `\`${item.amount}x\` ${item.item}`;
-                                    if (item.item in artifacts) {
-                                        const artifactType = getArtifactType(
-                                            item.item as ArtifactName,
-                                        );
-                                        if (artifactType) {
-                                            const emoji =
-                                                artifactTypeEmojis[
-                                                    artifactType
-                                                ];
-                                            if (emoji) {
-                                                displayItem += ` (${emoji})`;
-                                            }
+                .addFields({
+                    name: "‎",
+                    value:
+                        leftColumn
+                            .map((item) => {
+                                let displayItem = `\`${item.amount}x\` ${item.item}`;
+                                if (item.item in artifacts) {
+                                    const artifactType = getArtifactType(
+                                        item.item as ArtifactName,
+                                    );
+                                    if (artifactType) {
+                                        const emoji =
+                                            artifactTypeEmojis[artifactType];
+                                        if (emoji) {
+                                            displayItem += ` (${emoji})`;
                                         }
-                                    } else if (
-                                        item.item in fish &&
-                                        item.metadata?.length
-                                    ) {
-                                        displayItem += ` (${item.metadata.length} cm)`;
                                     }
-                                    return displayItem;
-                                })
-                                .join("\n") || "Empty",
-                        inline: true,
-                    },
-                    {
-                        name: "‎",
-                        value:
-                            rightColumn
-                                .map((item) => {
-                                    let displayItem = `\`${item.amount}x\` ${item.item}`;
-                                    if (item.item in artifacts) {
-                                        const artifactType = getArtifactType(
-                                            item.item as ArtifactName,
-                                        );
-                                        if (artifactType) {
-                                            const emoji =
-                                                artifactTypeEmojis[
-                                                    artifactType
-                                                ];
-                                            if (emoji) {
-                                                displayItem += ` (${emoji})`;
-                                            }
-                                        }
-                                    } else if (
-                                        item.item in fish &&
-                                        item.metadata?.length
-                                    ) {
-                                        displayItem += ` (${item.metadata.length} cm)`;
-                                    }
-                                    return displayItem;
-                                })
-                                .join("\n") || "Empty",
-                        inline: true,
-                    },
-                )
-                .setFooter({
-                    text: `Total Items: ${totalItemCount}/${stats.inventoryCap}`,
+                                } else if (
+                                    item.item in fish &&
+                                    item.metadata?.length
+                                ) {
+                                    displayItem += ` (${item.metadata.length} cm)`;
+                                }
+                                return displayItem;
+                            })
+                            .join("\n") || "Empty",
+                    inline: true,
                 });
+
+            if (rightColumn.length > 0) {
+                embed.addFields({
+                    name: "‎",
+                    value: rightColumn
+                        .map((item) => {
+                            let displayItem = `\`${item.amount}x\` ${item.item}`;
+                            if (item.item in artifacts) {
+                                const artifactType = getArtifactType(
+                                    item.item as ArtifactName,
+                                );
+                                if (artifactType) {
+                                    const emoji =
+                                        artifactTypeEmojis[artifactType];
+                                    if (emoji) {
+                                        displayItem += ` (${emoji})`;
+                                    }
+                                }
+                            } else if (
+                                item.item in fish &&
+                                item.metadata?.length
+                            ) {
+                                displayItem += ` (${item.metadata.length} cm)`;
+                            }
+                            return displayItem;
+                        })
+                        .join("\n"),
+                    inline: true,
+                });
+            }
+
+            embed.setFooter({
+                text: `Total Items: ${totalItemCount}/${stats.inventoryCap}`,
+            });
             pager.pages.push({ embeds: [embed] });
         }
 
