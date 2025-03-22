@@ -256,6 +256,8 @@ model UserStats {
   defValue                  Float          @default(0)
   healEffectiveness         Float          @default(0)
   inventory                 UserStatsInv[]
+  inventoryCap              Int            @default(1000)
+  scatteredStarsUsed        Int            @default(0)
   skills                    UserSkill[]
   cooking                   UserCooking[]
   brewing                   UserBrewing[]

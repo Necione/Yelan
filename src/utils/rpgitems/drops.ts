@@ -439,6 +439,22 @@ export const drops = {
         chestChance: 1,
         rarity: 2,
     },
+    "Desiccated Shell": {
+        sellPrice: 20,
+        minAmount: 1,
+        maxAmount: 1,
+        minadventurerank: 32,
+        chestChance: 1,
+        rarity: 1,
+    },
+    "Sturdy Shell": {
+        sellPrice: 30,
+        minAmount: 1,
+        maxAmount: 1,
+        minadventurerank: 32,
+        chestChance: 1,
+        rarity: 2,
+    },
     "Life Essence": {
         sellPrice: 1,
         minAmount: 0,
@@ -453,6 +469,14 @@ export const drops = {
         maxAmount: 1,
         minadventurerank: 10,
         chestChance: 0,
+        rarity: 3,
+    },
+    "Scattered Star": {
+        sellPrice: 10,
+        minAmount: 1,
+        maxAmount: 1,
+        minadventurerank: 15,
+        chestChance: 1,
         rarity: 3,
     },
 };

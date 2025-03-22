@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { chunk, embedComment, is, make, noop } from "@elara-services/utils";
+import { type UserStatsInv } from "@prisma/client";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId } from "../../services";
 import { syncStats } from "../../services/rpgSync/userStats";
@@ -24,12 +25,6 @@ const artifactTypeEmojis: { [key in ArtifactType]: string } = {
     Sands: "⏳",
     Goblet: "🍷",
     Circlet: "👑",
-};
-
-type GroupItem = {
-    amount: number;
-    item: string;
-    metadata: { length: number | null; star: number | null } | null;
 };
 
 export const bag = buildCommand<SlashCommand>({
@@ -143,7 +138,7 @@ export const bag = buildCommand<SlashCommand>({
             );
         }
 
-        const groupedItemsMap = make.map<string, GroupItem>();
+        const groupedItemsMap = make.map<string, UserStatsInv>();
 
         for (const item of filteredItems) {
             let key = item.item;
@@ -211,7 +206,9 @@ export const bag = buildCommand<SlashCommand>({
                         })
                         .join("\n"),
                 )
-                .setFooter({ text: `Total Items: ${totalItemCount}/1000` });
+                .setFooter({
+                    text: `Total Items: ${totalItemCount}/${stats.inventoryCap}`,
+                });
             pager.pages.push({ embeds: [embed] });
         }
 

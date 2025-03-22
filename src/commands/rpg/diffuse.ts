@@ -221,6 +221,33 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
+        if (itemName === "Scattered Star") {
+            const updatedInventory = stats.inventory
+                .map((c) => {
+                    if (c.item === itemName) {
+                        c.amount = Math.floor(c.amount - amountToDiffuse);
+                    }
+                    return c;
+                })
+                .filter((c) => c.amount > 0);
+
+            const newScatteredStarsUsed =
+                (stats.scatteredStarsUsed || 0) + amountToDiffuse;
+            const inventoryIncrease = amountToDiffuse * 200;
+
+            await updateUserStats(i.user.id, {
+                inventory: { set: updatedInventory },
+                scatteredStarsUsed: { set: newScatteredStarsUsed },
+            });
+
+            return r.edit(
+                embedComment(
+                    `You diffused \`${amountToDiffuse}x\` **Scattered Star** and increased your inventory capacity by \`${inventoryIncrease}\` slots!`,
+                    "Green",
+                ),
+            );
+        }
+
         if (itemName in misc) {
             const baitAmount = amountToDiffuse;
 

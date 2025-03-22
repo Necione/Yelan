@@ -33,6 +33,7 @@ const otherItems = make.array<{ item: string; amount: number }>([
     { item: "Mist Grass Wick", amount: 3 },
     { item: "Polarizing Prism", amount: 3 },
     { item: "Redrot Bait", amount: 20 },
+    { item: "Wormhole Rune", amount: 1 },
 ]);
 
 export const merchant = createEvent({

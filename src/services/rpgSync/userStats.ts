@@ -74,6 +74,18 @@ export async function syncStats(userId: string) {
         maxMana: calculatedBaseMana,
     };
 
+    let needsUpdate = false;
+    const updateData: Prisma.UserStatsUpdateInput = {};
+
+    const baseInventoryCap = 1000 + stats.rebirths * 500;
+    const totalInventoryCap =
+        baseInventoryCap + (stats.scatteredStarsUsed || 0) * 200;
+
+    if (stats.inventoryCap !== totalInventoryCap) {
+        updateData.inventoryCap = { set: totalInventoryCap };
+        needsUpdate = true;
+    }
+
     const catalystMasteryPoints = stats.masteryCatalyst || 0;
     const catalystMastery = calculateMasteryLevel(catalystMasteryPoints);
     const catalystManaBonuses: { [level: number]: number } = {
@@ -185,18 +197,6 @@ export async function syncStats(userId: string) {
         totalStats.critChance = 0;
         totalStats.critValue = 0;
     }
-
-    totalStats.attackPower = Math.max(0, totalStats.attackPower);
-    totalStats.critChance = Math.min(100, Math.max(0, totalStats.critChance));
-    totalStats.critValue = Math.min(3.0, Math.max(1.0, totalStats.critValue));
-    totalStats.defChance = Math.min(100, Math.max(0, totalStats.defChance));
-    totalStats.defValue = Math.max(0, totalStats.defValue);
-    totalStats.maxHP = Math.floor(totalStats.maxHP);
-    totalStats.healEffectiveness = Math.max(0, totalStats.healEffectiveness);
-    totalStats.maxMana = Math.floor(totalStats.maxMana);
-
-    let needsUpdate = false;
-    const updateData: Prisma.UserStatsUpdateInput = {};
 
     if (stats.maxMana !== totalStats.maxMana) {
         updateData.maxMana = { set: totalStats.maxMana };
@@ -361,7 +361,7 @@ export const addItemToInventory = async (
     let totalItems = inventory.reduce((sum, item) => sum + item.amount, 0);
     const itemsToAdd = items.reduce((sum, item) => sum + item.amount, 0);
 
-    if (totalItems + itemsToAdd > 1000) {
+    if (totalItems + itemsToAdd > stats.inventoryCap) {
         return false;
     }
 
