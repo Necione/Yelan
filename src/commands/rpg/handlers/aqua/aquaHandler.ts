@@ -35,6 +35,7 @@ import {
     getRandomMonster,
     initializeMonsters,
     type Monster,
+    type MonsterInstance,
 } from "../../../../utils/helpers/huntHelper";
 import { elementEmojis } from "../../../../utils/helpers/monsterHelper";
 import { handleRandomEvent } from "../../../../utils/randomEvents";
@@ -473,16 +474,21 @@ export async function handleAquaHunt(
 
     const handleMonsterBattle = async (thread?: PublicThreadChannel<false>) => {
         const monster = monstersEncountered[currentMonsterIndex];
-        const selectedDescription = getEncounterDescription(
-            monster.name,
-            stats.location,
-        );
         const monsterStats = monster.getStatsForadventureRank(
             stats.adventureRank,
         );
         if (!monsterStats) {
             throw new Error(`Stats not found for monster: ${monster.name}`);
         }
+        const monsterInstance: MonsterInstance = {
+            ...monster,
+            minHp: monsterStats.minHp,
+            maxHp: monsterStats.maxHp,
+            minDamage: monsterStats.minDamage,
+            maxDamage: monsterStats.maxDamage,
+        };
+
+        const selectedDescription = getEncounterDescription(monsterInstance);
         let currentMonsterHp = Math.floor(
             getRandomValue(monsterStats.minHp, monsterStats.maxHp),
         );

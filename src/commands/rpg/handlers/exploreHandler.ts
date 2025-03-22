@@ -105,30 +105,35 @@ export async function handleChest(
         const selectedChest = chestLoots[selectedChestIndex];
 
         if (is.array(selectedChest.loot)) {
-            await addItemToInventory(i.user.id, selectedChest.loot);
+            const added = await addItemToInventory(
+                i.user.id,
+                selectedChest.loot,
+            );
+
+            const lootDescription =
+                selectedChest.loot.length > 0
+                    ? selectedChest.loot
+                          .map((item) => `\`${item.amount}x\` ${item.item}`)
+                          .join(", ")
+                    : "No items";
+
+            await i
+                .editReply({
+                    embeds: [
+                        embed.setDescription(
+                            `You chose **Chest ${
+                                selectedChestIndex + 1
+                            }** *(Rarity: ${selectedChest.rarity})*\n\n${
+                                added
+                                    ? `It contained the following items:\n${lootDescription}`
+                                    : "Your inventory is full! No items were added."
+                            }`,
+                        ),
+                    ],
+                    components: [],
+                })
+                .catch(noop);
         }
-
-        const lootDescription =
-            selectedChest.loot.length > 0
-                ? selectedChest.loot
-                      .map((item) => `\`${item.amount}x\` ${item.item}`)
-                      .join(", ")
-                : "No items";
-
-        await i
-            .editReply({
-                embeds: [
-                    embed.setDescription(
-                        `You chose **Chest ${
-                            selectedChestIndex + 1
-                        }** *(Rarity: ${
-                            selectedChest.rarity
-                        })*\n\nIt contained the following items:\n${lootDescription}`,
-                    ),
-                ],
-                components: [],
-            })
-            .catch(noop);
     } catch (err) {
         debug(`[HANDLE:CHEST]: ${i.user.tag} (${i.user.id})`, err);
     }
@@ -139,7 +144,7 @@ export async function handleMaterials(i: ChatInputCommandInteraction) {
         const { materials } = generateRawMaterials();
 
         if (is.array(materials)) {
-            await addItemToInventory(
+            const added = await addItemToInventory(
                 i.user.id,
                 materials.map((material) => ({
                     item: material.item,
@@ -154,7 +159,9 @@ export async function handleMaterials(i: ChatInputCommandInteraction) {
             await i
                 .editReply(
                     embedComment(
-                        `You gathered raw materials while exploring!\nYou found ${materialsList}.`,
+                        added
+                            ? `You gathered raw materials while exploring!\nYou found ${materialsList}.`
+                            : `Your inventory is full! No materials were added.`,
                         "Green",
                     ),
                 )

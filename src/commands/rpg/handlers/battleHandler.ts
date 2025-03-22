@@ -514,6 +514,9 @@ export async function monsterAttack(
             monsterDamage *= 2;
             debug(`${username} Demonic => x2 => ${monsterDamage}`);
             break;
+        case "Hard":
+            debug(`${username} Hard => HP doubled at start`);
+            break;
     }
 
     if (turnNumber > 50) {

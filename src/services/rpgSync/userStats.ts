@@ -187,9 +187,9 @@ export async function syncStats(userId: string) {
     }
 
     totalStats.attackPower = Math.max(0, totalStats.attackPower);
-    totalStats.critChance = Math.max(0, totalStats.critChance);
-    totalStats.critValue = Math.max(0, totalStats.critValue);
-    totalStats.defChance = Math.max(0, totalStats.defChance);
+    totalStats.critChance = Math.min(100, Math.max(0, totalStats.critChance));
+    totalStats.critValue = Math.min(3.0, Math.max(1.0, totalStats.critValue));
+    totalStats.defChance = Math.min(100, Math.max(0, totalStats.defChance));
     totalStats.defValue = Math.max(0, totalStats.defValue);
     totalStats.maxHP = Math.floor(totalStats.maxHP);
     totalStats.healEffectiveness = Math.max(0, totalStats.healEffectiveness);
@@ -358,6 +358,13 @@ export const addItemToInventory = async (
         inventory = [];
     }
 
+    let totalItems = inventory.reduce((sum, item) => sum + item.amount, 0);
+    const itemsToAdd = items.reduce((sum, item) => sum + item.amount, 0);
+
+    if (totalItems + itemsToAdd > 1000) {
+        return false;
+    }
+
     if (is.array(items)) {
         for (const i of items) {
             const existingItem = inventory.find(
@@ -372,11 +379,13 @@ export const addItemToInventory = async (
                 existingItem.amount = Math.floor(
                     existingItem.amount + i.amount,
                 );
+                totalItems += i.amount;
             } else {
                 if (!i.id) {
                     i.id = snowflakes.generate();
                 }
                 inventory.push(i);
+                totalItems += i.amount;
             }
         }
     }
@@ -387,6 +396,7 @@ export const addItemToInventory = async (
         },
     });
 };
+
 export const removeItemFromInventory = async (
     userId: string,
     itemName: string,

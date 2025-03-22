@@ -94,6 +94,11 @@ export const bag = buildCommand<SlashCommand>({
             return r.edit(embedComment("Your inventory is empty."));
         }
 
+        const totalItemCount = items.reduce(
+            (sum, item) => sum + item.amount,
+            0,
+        );
+
         const category = i.options.getString("category");
         const sortOption = i.options.getString("sort") || "Alphabetical";
 
@@ -205,7 +210,8 @@ export const bag = buildCommand<SlashCommand>({
                             return displayItem;
                         })
                         .join("\n"),
-                );
+                )
+                .setFooter({ text: `Total Items: ${totalItemCount}/1000` });
             pager.pages.push({ embeds: [embed] });
         }
 

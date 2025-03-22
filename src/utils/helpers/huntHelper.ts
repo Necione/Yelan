@@ -8,7 +8,12 @@ import type { WeaponType } from "../rpgitems/weapons";
 import { getUserSkillLevelData } from "../skillsData";
 import { type MonsterElement, MonsterGroup } from "./monsterHelper";
 
-export type MutationType = "Bloodthirsty" | "Strange" | "Infected" | "Demonic";
+export type MutationType =
+    | "Bloodthirsty"
+    | "Strange"
+    | "Infected"
+    | "Demonic"
+    | "Hard";
 
 export interface Monster {
     startingHp: number;
@@ -248,20 +253,34 @@ export async function getRandomMonster(
     }
 }
 
-export function getEncounterDescription(monsterName: string, location: string) {
-    const encounterDescriptions = [
-        `You were travelling around ${location} when a ${monsterName} attacked you!`,
-        `As you explored the ancient ruins near ${location}, a ${monsterName} suddenly appeared!`,
-        `While gathering herbs in ${location}, a ${monsterName} jumped out from the bushes!`,
-        `You were admiring the scenery at ${location} when a ${monsterName} confronted you!`,
-        `As you crossed the bridges of ${location}, a ${monsterName} blocked your path!`,
-        `Wandering through the mist at ${location}, you were ambushed by a ${monsterName}!`,
-        `In the depths of ${location}, a ${monsterName} loomed in the shadows and charged at you!`,
+export function getEncounterDescription(monster: MonsterInstance) {
+    const lines = [
+        `🎯 Crit Rate: \`${Math.min(
+            100,
+            Math.round(monster.critChance * 100),
+        )}%\``,
+        `💥 Crit Value: \`${Math.min(3.0, monster.critValue).toFixed(2)}x\``,
+        `🛡️ Defense Rate: \`${Math.min(
+            100,
+            Math.round(monster.defChance * 100),
+        )}%\``,
+        `🔰 Defense Value: \`${monster.defValue}\``,
     ];
 
-    return encounterDescriptions[
-        Math.floor(Math.random() * encounterDescriptions.length)
-    ];
+    if (monster.group === "Machine") {
+        lines.push(`⚙️ Ignores player defenses`);
+    }
+    if (monster.group === "Boss") {
+        lines.push(`👑 25% chance to dodge attacks`);
+    }
+    if (monster.group === "Fatui") {
+        lines.push(`〽️ 25% chance to displace player (reduce damage by 80%)`);
+    }
+    if (["Boss", "Beast", "Eremite"].includes(monster.group)) {
+        lines.push(`🧬 Immune to Leech skill`);
+    }
+
+    return lines.join("\n");
 }
 
 export function formatChange(value: number): string {
@@ -553,6 +572,7 @@ export async function generateNextHuntMonsters(
                 "Bloodthirsty",
                 "Strange",
                 "Infected",
+                "Hard",
             ];
             if (stats.rebirths >= 6) {
                 mutationTypes.push("Demonic");
@@ -563,6 +583,9 @@ export async function generateNextHuntMonsters(
             if (chosen === "Demonic" || !preventMutation) {
                 monster.mutationType = chosen;
                 monster.name = `${chosen} ${monster.name}`;
+                if (chosen === "Hard") {
+                    monster.startingHp *= 2;
+                }
             }
         }
 

@@ -37,6 +37,7 @@ export async function handleVictory(
     const finalEmbed = new EmbedBuilder();
     let totalExpGained = 0;
     let dropsCollected = make.array<ItemDrop>();
+    let inventoryFull = false;
 
     let skillsActivated = "";
     let effectsActivated = "";
@@ -75,9 +76,17 @@ export async function handleVictory(
         totalExpGained += expGained;
 
         const drops = calculateDrop(monster.drops);
-        if (Array.isArray(drops)) {
-            dropsCollected = dropsCollected.concat(drops);
-            await addItemToInventory(stats.userId, drops);
+        if (Array.isArray(drops) && !inventoryFull) {
+            try {
+                const success = await addItemToInventory(stats.userId, drops);
+                if (!success) {
+                    inventoryFull = true;
+                } else {
+                    dropsCollected = dropsCollected.concat(drops);
+                }
+            } catch (error) {
+                inventoryFull = true;
+            }
         }
     }
 
@@ -262,7 +271,12 @@ export async function handleVictory(
         });
     }
 
-    if (dropsCollected.length > 0) {
+    if (inventoryFull) {
+        finalEmbed.addFields({
+            name: "Drops",
+            value: "Your inventory is full, please sell some items to make space.",
+        });
+    } else if (dropsCollected.length > 0) {
         const dropsDescription = dropsCollected
             .map((drop) => `\`${drop.amount}x\` ${drop.item}`)
             .join(", ");

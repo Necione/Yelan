@@ -35,6 +35,7 @@ import {
     getMonsterByName,
     getMonstersByName,
     type Monster,
+    type MonsterInstance,
 } from "../../../utils/helpers/huntHelper";
 import { calculateMasteryLevel } from "../../../utils/helpers/masteryHelper";
 import { elementEmojis } from "../../../utils/helpers/monsterHelper";
@@ -173,17 +174,23 @@ export async function handleHunt(
 
     const handleMonsterBattle = async (thread?: PublicThreadChannel<false>) => {
         const monster = monstersEncountered[currentMonsterIndex];
-        const selectedDescription = getEncounterDescription(
-            monster.name,
-            stats.location,
-        );
-
         const monsterStats = monster.getStatsForadventureRank(
             stats.adventureRank,
         );
         if (!monsterStats) {
             throw new Error(`Stats not found for monster: ${monster.name}`);
         }
+
+        const monsterInstance: MonsterInstance = {
+            ...monster,
+            minHp: monsterStats.minHp,
+            maxHp: monsterStats.maxHp,
+            minDamage: monsterStats.minDamage,
+            maxDamage: monsterStats.maxDamage,
+        };
+
+        const selectedDescription = getEncounterDescription(monsterInstance);
+
         let currentMonsterHp = Math.floor(
             getRandomValue(monsterStats.minHp, monsterStats.maxHp),
         );
@@ -229,6 +236,7 @@ export async function handleHunt(
             Strange: 0x658e4d,
             Infected: 0x88349b,
             Demonic: 0x28282b,
+            Hard: 0xff8ad1,
         };
 
         const embedColor: ColorResolvable = monster.mutationType
