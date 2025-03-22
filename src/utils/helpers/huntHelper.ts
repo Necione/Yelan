@@ -254,12 +254,37 @@ export async function getRandomMonster(
 }
 
 export function getEncounterDescription(monster: MonsterInstance) {
-    const lines = [
-        `🎯 Crit Rate: \`${Math.min(100, Math.round(monster.critChance))}%\``,
-        `💥 Crit Value: \`${Math.min(3.0, monster.critValue).toFixed(2)}x\``,
-        `🛡️ Defense Rate: \`${Math.min(100, Math.round(monster.defChance))}%\``,
-        `🔰 Defense Value: \`${monster.defValue}\``,
-    ];
+    const lines = make.array<string>();
+
+    if (typeof monster.critChance === "number" && monster.critChance > 0) {
+        lines.push(
+            `🎯 Crit Rate: \`${Math.min(
+                100,
+                Math.round(monster.critChance),
+            )}%\``,
+        );
+    }
+
+    if (typeof monster.critValue === "number" && monster.critValue > 0) {
+        lines.push(
+            `💥 Crit Value: \`${Math.min(3.0, monster.critValue).toFixed(
+                2,
+            )}x\``,
+        );
+    }
+
+    if (typeof monster.defChance === "number" && monster.defChance > 0) {
+        lines.push(
+            `🛡️ Defense Rate: \`${Math.min(
+                100,
+                Math.round(monster.defChance),
+            )}%\``,
+        );
+    }
+
+    if (typeof monster.defValue === "number" && monster.defValue > 0) {
+        lines.push(`🔰 Defense Value: \`${monster.defValue}\``);
+    }
 
     if (monster.group === "Machine") {
         lines.push(`⚙️ Ignores player defenses`);
