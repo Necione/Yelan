@@ -140,9 +140,11 @@ export const reforge = buildCommand<SlashCommand>({
 
         const baseName = getBaseName(weaponName);
         let newPrefix;
-        const legendaryChance = Math.random() * 100;
-        if (legendaryChance <= 0.5) {
+        const specialChance = Math.random() * 100;
+        if (specialChance <= 1) {
             newPrefix = "Legendary";
+        } else if (specialChance <= 2) {
+            newPrefix = "Sinful";
         } else {
             newPrefix = getRandom(prefixes);
         }
@@ -156,8 +158,50 @@ export const reforge = buildCommand<SlashCommand>({
             );
         }
 
-        // Update inventory for a single item:
-        // If the player has more than one of the original weapon, we only convert one.
+        const breakChance = Math.random() * 100;
+        if (breakChance <= 5) {
+            const updatedInventory = [...stats.inventory];
+            const itemIndex = updatedInventory.findIndex(
+                (item) => item.item === weaponName,
+            );
+            if (itemIndex === -1) {
+                return r.edit(
+                    embedComment(
+                        "Couldn't find the specified weapon in your inventory.",
+                    ),
+                );
+            }
+
+            const originalItem = updatedInventory[itemIndex];
+            if (originalItem.amount > 1) {
+                updatedInventory[itemIndex] = {
+                    ...originalItem,
+                    amount: originalItem.amount - 1,
+                };
+            } else {
+                updatedInventory.splice(itemIndex, 1);
+            }
+
+            await updateUserStats(i.user.id, {
+                inventory: { set: updatedInventory },
+            });
+            await removeBalance(
+                i.user.id,
+                reforgeCost,
+                true,
+                `Failed to reforge ${weaponName} - the weapon broke!`,
+            );
+
+            return r.edit(
+                embedComment(
+                    `❌ The weapon **${weaponName}** broke during reforge! You lost the weapon and ${getAmount(
+                        reforgeCost,
+                    )}.`,
+                    "Red",
+                ),
+            );
+        }
+
         const updatedInventory = [...stats.inventory];
         const itemIndex = updatedInventory.findIndex(
             (item) => item.item === weaponName,
@@ -172,12 +216,11 @@ export const reforge = buildCommand<SlashCommand>({
 
         const originalItem = updatedInventory[itemIndex];
         if (originalItem.amount > 1) {
-            // Reduce the amount by 1 for the old weapon
             updatedInventory[itemIndex] = {
                 ...originalItem,
                 amount: originalItem.amount - 1,
             };
-            // Add a new entry for the reforged weapon
+
             updatedInventory.push({
                 id: snowflakes.generate(),
                 item: newWeaponName,
@@ -185,7 +228,6 @@ export const reforge = buildCommand<SlashCommand>({
                 metadata: null,
             });
         } else {
-            // If there's only one, just rename it
             updatedInventory[itemIndex] = {
                 ...originalItem,
                 item: newWeaponName,

@@ -1136,7 +1136,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         additionalMana: 0,
         minadventurerank: 20,
         chestChance: 0,
-        emoji: "<:Weapon_Amenoma_Kageuchi_2nd:1322104043258253313>",
+        emoji: "<:Weapon_Amenoma_Kageuchi_2nd1:1353334376989196349>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/asc/amenoma_kageuchi.png",
     },
@@ -1219,6 +1219,14 @@ const prefixes: {
         critValue: weaponData.critValue * 2,
         defValue: weaponData.defValue * 2,
         defChance: weaponData.defChance + 50,
+        chestChance: 0,
+    }),
+    Sinful: (weaponData) => ({
+        attackPower: weaponData.attackPower * 10,
+        additionalHP: weaponData.additionalHP * 0,
+        critValue: weaponData.critValue * 0,
+        defValue: weaponData.defValue * 0,
+        defChance: weaponData.defChance + 0,
         chestChance: 0,
     }),
 };
