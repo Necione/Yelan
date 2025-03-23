@@ -715,7 +715,7 @@ export async function startFishingEncounter(
         },
     };
 
-    await handleHunt(message, stats, p, monsters, mergedHandlers);
+    await handleHunt(message, stats, p, monsters, mergedHandlers, true);
 
     return result;
 }

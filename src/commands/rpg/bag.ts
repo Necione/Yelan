@@ -58,6 +58,12 @@ export const bag = buildCommand<SlashCommand>({
                     { name: "Quantity", value: "Quantity" },
                 ),
         )
+        .addStringOption((option) =>
+            option
+                .setName("filter")
+                .setDescription("Filter items by name (case-insensitive)")
+                .setRequired(false),
+        )
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
@@ -96,6 +102,7 @@ export const bag = buildCommand<SlashCommand>({
 
         const category = i.options.getString("category");
         const sortOption = i.options.getString("sort") || "Alphabetical";
+        const filterText = i.options.getString("filter")?.toLowerCase();
 
         let filteredItems = items;
 
@@ -128,6 +135,12 @@ export const bag = buildCommand<SlashCommand>({
             default:
                 filteredItems = items;
                 break;
+        }
+
+        if (filterText) {
+            filteredItems = filteredItems.filter((item) =>
+                item.item.toLowerCase().includes(filterText),
+            );
         }
 
         if (!is.array(filteredItems)) {

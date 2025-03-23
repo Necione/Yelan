@@ -11,7 +11,7 @@ import {
     sleep,
     snowflakes,
 } from "@elara-services/utils";
-import type { Prisma } from "@prisma/client";
+import type { Prisma, UserStats, UserStatsInv } from "@prisma/client";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -19,8 +19,15 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
 } from "discord.js";
-import { getProfileByUserId, syncStats, updateUserStats } from "../../services";
-import { cooldowns, debug, locked } from "../../utils";
+import {
+    addItemToInventory,
+    getProfileByUserId,
+    syncStats,
+    updateUserStats,
+} from "../../services";
+import { cooldowns, locked } from "../../utils";
+import { getRandomFishingMonster } from "../../utils/helpers/fishingHelper";
+import { calculateDrop } from "../../utils/helpers/huntHelper";
 import { type FishData, fishList } from "../../utils/rpgitems/fish";
 import { type WeaponName, weapons } from "../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../utils/skillsData";
@@ -36,6 +43,82 @@ const bait = make.array<string>([
     "Redrot Bait",
     "Sugardew Bait",
 ]);
+
+async function finalizeFishing(
+    userId: string,
+    stats: UserStats,
+    caughtFishDetails: Array<{
+        selectedFish: FishData & { name: string };
+        fishLength: number;
+    }>,
+    cumulativeFishExp: number,
+): Promise<{ embed: EmbedBuilder; updatedStats: UserStats }> {
+    const initialFishingExp = stats.fishingExp;
+    const initialFishingLevel = stats.fishingLevel;
+
+    const newFishingExp = initialFishingExp + cumulativeFishExp;
+    const { correctLevel, requiredExpForNextLevel } =
+        calculateFishingLevel(newFishingExp);
+    const levelsGained = correctLevel - initialFishingLevel;
+
+    stats.fishingExp = newFishingExp;
+    stats.fishingLevel = correctLevel;
+
+    const updateData: Prisma.UserStatsUpdateInput = {
+        fishingExp: { set: stats.fishingExp },
+        fishingLevel: { set: stats.fishingLevel },
+        timesFished: { set: stats.timesFished },
+        longestFish: { set: stats.longestFish },
+        lifetimeFishCaught: { set: stats.lifetimeFishCaught },
+        inventory: { set: stats.inventory },
+    };
+
+    if (
+        caughtFishDetails.some(
+            (f) => f.selectedFish.rarity.toLowerCase() === "legendary",
+        )
+    ) {
+        updateData.legendariesCaught = { set: stats.legendariesCaught };
+    }
+    const updatedStats = await updateUserStats(userId, updateData);
+    if (!updatedStats) {
+        throw new Error("Failed to update user stats.");
+    }
+
+    const caughtEmbed = new EmbedBuilder()
+        .setTitle(`You caught ${caughtFishDetails.length} fish!`)
+        .setColor("Aqua");
+
+    caughtFishDetails.forEach((fish, index) => {
+        const fishExp = Math.floor(
+            Math.random() *
+                (fish.selectedFish.maxExp - fish.selectedFish.minExp + 1) +
+                fish.selectedFish.minExp,
+        );
+        caughtEmbed.addFields({
+            name: `Fish ${index + 1}`,
+            value:
+                `\`${fish.selectedFish.rarity}\` **${fish.selectedFish.name}**\n` +
+                `\`📏\` Length: **${fish.fishLength} cm**\n` +
+                `\`✨\` Exp: **+${fishExp}**`,
+        });
+    });
+
+    if (levelsGained > 0) {
+        caughtEmbed.addFields({
+            name: "Fishing Level Up!",
+            value: `\`🌟\` Congratulations! You reached Fishing Level ${stats.fishingLevel}!`,
+        });
+    }
+    caughtEmbed.addFields({
+        name: "Fishing Progress",
+        value: `\`🎣\` Fishing Level: \`${stats.fishingLevel}\` (\`${
+            stats.fishingExp
+        }/${stats.fishingExp + requiredExpForNextLevel}\` Fishing EXP)`,
+    });
+
+    return { embed: caughtEmbed, updatedStats };
+}
 
 export const fishCommand = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -112,11 +195,9 @@ export const fishCommand = buildCommand<SlashCommand>({
         }
 
         const baitChoice = i.options.getString("bait", true);
-
         const baitItem = stats.inventory.find(
             (item) => item.item === baitChoice,
         );
-
         if (!baitItem || !is.number(baitItem.amount)) {
             locked.del(i.user.id);
             return r.edit(
@@ -142,13 +223,56 @@ export const fishCommand = buildCommand<SlashCommand>({
 
         let fishToCatch = 1;
         let requiresReel = true;
-
         if (baitChoice === "Redrot Bait") {
             fishToCatch = 2;
         } else if (baitChoice === "Sugardew Bait") {
             fishToCatch = 1;
             requiresReel = false;
         }
+
+        const caughtFishDetails: Array<{
+            selectedFish: FishData & { name: string };
+            fishLength: number;
+        }> = [];
+        let cumulativeFishExp = 0;
+
+        const processCatch = (
+            selectedFish: FishData & { name: string },
+            fishLength: number,
+        ) => {
+            stats!.longestFish =
+                fishLength > stats!.longestFish
+                    ? fishLength
+                    : stats!.longestFish;
+            stats!.lifetimeFishCaught = (stats!.lifetimeFishCaught || 0) + 1;
+            if (selectedFish.rarity.toLowerCase() === "legendary") {
+                stats!.legendariesCaught = (stats!.legendariesCaught || 0) + 1;
+            }
+            const invItem = stats!.inventory.find(
+                (c: UserStatsInv) =>
+                    c.item === selectedFish.name &&
+                    c.metadata &&
+                    c.metadata.length === fishLength,
+            );
+            if (invItem) {
+                invItem.amount++;
+            } else {
+                stats!.inventory.push({
+                    id: snowflakes.generate(),
+                    item: selectedFish.name,
+                    amount: 1,
+                    metadata: { length: fishLength, star: null },
+                });
+            }
+            stats!.timesFished = stats!.timesFished + 1;
+            const fishExp = Math.floor(
+                Math.random() *
+                    (selectedFish.maxExp - selectedFish.minExp + 1) +
+                    selectedFish.minExp,
+            );
+            cumulativeFishExp += fishExp;
+            caughtFishDetails.push({ selectedFish, fishLength });
+        };
 
         if (!requiresReel) {
             const availableFish = fishList.filter(
@@ -157,7 +281,6 @@ export const fishCommand = buildCommand<SlashCommand>({
                     fish.fishingLevel <= stats.fishingLevel &&
                     fish.rods.some((rod) => equippedWeapon.name.includes(rod)),
             );
-
             if (!is.array(availableFish)) {
                 locked.del(i.user.id);
                 return r.edit(
@@ -166,141 +289,19 @@ export const fishCommand = buildCommand<SlashCommand>({
                     ),
                 );
             }
-
-            const caughtFish = [];
             for (let j = 0; j < fishToCatch; j++) {
                 const selectedFish = selectFish(availableFish);
                 const fishLength = selectFishLength();
-
-                caughtFish.push({ selectedFish, fishLength });
+                processCatch(selectedFish, fishLength);
             }
 
-            let totalLevelUps = 0;
-            let latestRequiredFishesForNextLevel = 0;
-
-            for (const fish of caughtFish) {
-                const { selectedFish, fishLength } = fish;
-
-                const newLongestFish =
-                    fishLength > stats.longestFish
-                        ? fishLength
-                        : stats.longestFish;
-
-                const isLegendary =
-                    selectedFish.rarity.toLowerCase() === "legendary";
-
-                const newLifetimeFishCaught =
-                    (stats.lifetimeFishCaught || 0) + 1;
-                const newLegendariesCaught = isLegendary
-                    ? (stats.legendariesCaught || 0) + 1
-                    : stats.legendariesCaught || 0;
-                const f = stats.inventory.find(
-                    (c) =>
-                        c.item === selectedFish.name &&
-                        c.metadata &&
-                        c.metadata.length === fishLength,
-                );
-                if (f) {
-                    f.amount++;
-                } else {
-                    stats.inventory.push({
-                        id: snowflakes.generate(),
-                        item: selectedFish.name,
-                        amount: 1,
-                        metadata: {
-                            length: fishLength,
-                            star: null,
-                        },
-                    });
-                }
-
-                const newTimesFished = stats.timesFished + 1;
-                const newTimesFishedForLevel =
-                    (stats.timesFishedForLevel || 0) + 1;
-
-                const { levelUp, requiredFishesForNextLevel, validLevel } =
-                    calculateFishingLevel(
-                        stats.fishingLevel,
-                        newTimesFishedForLevel,
-                    );
-
-                const updateData: Prisma.UserStatsUpdateInput = {
-                    timesFished: { set: newTimesFished },
-                    timesFishedForLevel: { set: newTimesFishedForLevel },
-                    longestFish: { set: newLongestFish },
-                    lifetimeFishCaught: { set: newLifetimeFishCaught },
-                    inventory: { set: stats.inventory },
-                };
-
-                if (!validLevel) {
-                    debug(
-                        `Invalid fishing level detected for user ${i.user.id}: ${stats.fishingLevel}`,
-                    );
-                    stats.fishingLevel = 1;
-                    stats.timesFishedForLevel = 0;
-                }
-
-                latestRequiredFishesForNextLevel = requiredFishesForNextLevel;
-
-                if (levelUp) {
-                    totalLevelUps += 1;
-                    if (stats.fishingLevel + 1 <= 100) {
-                        updateData.fishingLevel = { increment: 1 };
-                    }
-                    updateData.timesFishedForLevel = { set: 0 };
-                }
-                if (levelUp || !validLevel) {
-                    debug(
-                        `Fishing level update for ${i.user.id}: ${
-                            stats.fishingLevel
-                        } -> ${stats.fishingLevel + (levelUp ? 1 : 0)}`,
-                    );
-                }
-
-                if (isLegendary) {
-                    updateData.legendariesCaught = {
-                        set: newLegendariesCaught,
-                    };
-                }
-
-                stats = await updateUserStats(i.user.id, updateData);
-                if (!stats) {
-                    return;
-                }
-            }
-
-            const caughtEmbed = new EmbedBuilder()
-                .setTitle(`You caught ${fishToCatch} fish!`)
-                .setColor("Aqua");
-
-            caughtFish.forEach((fish, index) => {
-                const { selectedFish, fishLength } = fish;
-                caughtEmbed.addFields({
-                    name: `Fish ${index + 1}`,
-                    value:
-                        `\`${selectedFish.rarity}\` **${selectedFish.name}**\n` +
-                        `\`📏\` Length: **${fishLength} cm**`,
-                });
-            });
-
-            if (totalLevelUps > 0) {
-                for (let l = 0; l < totalLevelUps; l++) {
-                    caughtEmbed.addFields({
-                        name: "Fishing Level Up!",
-                        value: `\`🌟\` Congratulations! You reached Fishing Level ${
-                            stats.fishingLevel + 1
-                        }!`,
-                    });
-                }
-            } else {
-                caughtEmbed.addFields({
-                    name: "Fishing Progress",
-                    value: `\`🎣\` Fishing Level: ${stats.fishingLevel} (${stats.timesFishedForLevel}/${latestRequiredFishesForNextLevel} fish caught)`,
-                });
-            }
-
-            await r.edit({ embeds: [caughtEmbed], components: [] }).catch(noop);
-
+            const { embed } = await finalizeFishing(
+                i.user.id,
+                stats!,
+                caughtFishDetails,
+                cumulativeFishExp,
+            );
+            await r.edit({ embeds: [embed], components: [] }).catch(noop);
             await cooldowns.set(user, "fish", get.hrs(1));
             locked.del(i.user.id);
             return;
@@ -334,26 +335,54 @@ export const fishCommand = buildCommand<SlashCommand>({
                 );
             }
 
+            const fishingMonster = await getRandomFishingMonster(
+                stats!.fishingLevel,
+                {
+                    attackPower: stats!.attackPower,
+                    critChance: stats!.critChance,
+                    critValue: stats!.critValue,
+                    defChance: stats!.defChance,
+                    defValue: stats!.defValue,
+                    maxHP: stats!.maxHP,
+                    rebirths: stats!.rebirths,
+                },
+            );
+            if (!fishingMonster) {
+                locked.del(i.user.id);
+                return r.edit(
+                    embedComment("No fishing monster available at your level."),
+                );
+            }
+
             const outcome = await startFishingEncounter(
                 monsterEmbed,
                 i.user,
-                ["Floating Hydro Fungus"],
+                [fishingMonster.name],
                 {
                     win: async () => {
+                        const drops = calculateDrop(fishingMonster.drops);
+                        let dropMessage = "";
+                        if (drops.length > 0) {
+                            dropMessage = drops
+                                .map(
+                                    (drop) =>
+                                        `\`${drop.amount}x\` ${drop.item}`,
+                                )
+                                .join(", ");
+                            await addItemToInventory(i.user.id, drops);
+                        }
+                        const victoryEmbed = new EmbedBuilder()
+                            .setTitle("Another Day Survived...")
+                            .setDescription(
+                                "You defeated the monster!" +
+                                    (dropMessage
+                                        ? `\nDrops: ${dropMessage}`
+                                        : ""),
+                            )
+                            .setColor("Blue");
                         await r
-                            .edit({
-                                embeds: [
-                                    new EmbedBuilder()
-                                        .setTitle("Another Day Survived...")
-                                        .setDescription(
-                                            "You defeated the monster!",
-                                        )
-                                        .setColor("Blue"),
-                                ],
-                                components: [],
-                            })
+                            .edit({ embeds: [victoryEmbed], components: [] })
                             .catch(noop);
-
                         locked.del(i.user.id);
                         return "win";
                     },
@@ -373,13 +402,11 @@ export const fishCommand = buildCommand<SlashCommand>({
                                 components: [],
                             })
                             .catch(noop);
-
                         locked.del(i.user.id);
                         return "lose";
                     },
                 },
             );
-
             if (outcome === "win" || outcome === "lose") {
                 return;
             }
@@ -393,7 +420,6 @@ export const fishCommand = buildCommand<SlashCommand>({
                 fish.fishingLevel <= stats.fishingLevel &&
                 fish.rods.some((rod) => equippedWeapon.name.includes(rod)),
         );
-
         if (!is.array(availableFish)) {
             locked.del(i.user.id);
             return r.edit(
@@ -404,39 +430,25 @@ export const fishCommand = buildCommand<SlashCommand>({
         }
 
         const selectedFish = selectFish(availableFish);
-
         const requiredReels = getRandomValue(
             selectedFish.minReels,
             selectedFish.maxReels,
         );
-
         let reelsCompleted = 0;
         let fishEscaped = false;
-
         const totalFishToCatch = baitChoice === "Redrot Bait" ? 2 : 1;
-
-        const caughtFishDetails = make.array<{
-            selectedFish: FishData & { name: string };
-            fishLength: number;
-            levelUp: boolean;
-        }>();
-
-        let totalLevelUps = 0;
-        let latestRequiredFishesForNextLevel = 0;
 
         while (reelsCompleted < requiredReels && !fishEscaped) {
             const reelInButton = new ButtonBuilder()
                 .setCustomId(`reel_in_${reelsCompleted}`)
                 .setLabel("Reel In")
                 .setStyle(ButtonStyle.Secondary);
-
             const fakeButtonLabels = [
                 "Pull Line",
                 "Cut Line",
                 "Release",
                 "Reel Out",
             ];
-
             const allButtons = [
                 reelInButton,
                 ...fakeButtonLabels.map((label, index) =>
@@ -447,10 +459,8 @@ export const fishCommand = buildCommand<SlashCommand>({
                 ),
             ];
             shuffle(allButtons);
-
             const actionRow =
                 new ActionRowBuilder<ButtonBuilder>().addComponents(allButtons);
-
             const promptEmbed = new EmbedBuilder()
                 .setTitle(
                     reelsCompleted === 0
@@ -463,11 +473,9 @@ export const fishCommand = buildCommand<SlashCommand>({
                         : "This catch is heavy for your rod, keep reeling!",
                 )
                 .setColor("Green");
-
             const message = await r
                 .edit({ embeds: [promptEmbed], components: [actionRow] })
                 .catch(noop);
-
             if (!message) {
                 locked.del(i.user.id);
                 return;
@@ -485,7 +493,6 @@ export const fishCommand = buildCommand<SlashCommand>({
                 break;
             }
             await c.deferUpdate().catch(noop);
-
             reelsCompleted++;
             if (reelsCompleted < requiredReels) {
                 continue;
@@ -501,143 +508,31 @@ export const fishCommand = buildCommand<SlashCommand>({
                     "You didn't reel in the fish in time, and it escaped.",
                 )
                 .setColor("Red");
-
             await r
                 .edit({ embeds: [escapedEmbed], components: [] })
                 .catch(noop);
-
             await cooldowns.set(user, "fish", get.hrs(1));
-
             locked.del(i.user.id);
-
             return;
         } else {
             for (let f = 0; f < totalFishToCatch; f++) {
                 const fishLength = selectFishLength();
-
-                const newLongestFish =
-                    fishLength > stats.longestFish
-                        ? fishLength
-                        : stats.longestFish;
-
-                const isLegendary =
-                    selectedFish.rarity.toLowerCase() === "legendary";
-
-                const newLifetimeFishCaught =
-                    (stats.lifetimeFishCaught || 0) + 1;
-                const newLegendariesCaught = isLegendary
-                    ? (stats.legendariesCaught || 0) + 1
-                    : stats.legendariesCaught || 0;
-                const f = stats.inventory.find(
-                    (c) =>
-                        c.item === selectedFish.name &&
-                        c.metadata &&
-                        c.metadata.length === fishLength,
-                );
-                if (f) {
-                    f.amount++;
-                } else {
-                    stats.inventory.push({
-                        id: snowflakes.generate(),
-                        item: selectedFish.name,
-                        amount: 1,
-                        metadata: {
-                            length: fishLength,
-                            star: null,
-                        },
-                    });
-                }
-
-                const newTimesFished = stats.timesFished + 1;
-                const newTimesFishedForLevel =
-                    (stats.timesFishedForLevel || 0) + 1;
-
-                const { levelUp, requiredFishesForNextLevel, validLevel } =
-                    calculateFishingLevel(
-                        stats.fishingLevel,
-                        newTimesFishedForLevel,
-                    );
-
-                latestRequiredFishesForNextLevel = requiredFishesForNextLevel;
-
-                if (levelUp) {
-                    totalLevelUps += 1;
-                }
-
-                const updateData: Prisma.UserStatsUpdateInput = {
-                    timesFished: { set: newTimesFished },
-                    timesFishedForLevel: { set: newTimesFishedForLevel },
-                    longestFish: { set: newLongestFish },
-                    lifetimeFishCaught: { set: newLifetimeFishCaught },
-                    inventory: { set: stats.inventory },
-                };
-
-                if (isLegendary) {
-                    updateData.legendariesCaught = {
-                        set: newLegendariesCaught,
-                    };
-                }
-
-                if (levelUp || !validLevel) {
-                    debug(
-                        `Fishing level update for ${i.user.id}: ${
-                            stats.fishingLevel
-                        } -> ${stats.fishingLevel + (levelUp ? 1 : 0)}`,
-                    );
-                }
-
-                stats = await updateUserStats(i.user.id, updateData);
-                if (!stats) {
-                    return;
-                }
-                caughtFishDetails.push({
-                    selectedFish,
-                    fishLength,
-                    levelUp,
-                });
+                processCatch(selectedFish, fishLength);
             }
-
-            const caughtEmbed = new EmbedBuilder()
-                .setTitle(`You caught ${totalFishToCatch} fish!`)
-                .setColor("Aqua");
-
-            caughtFishDetails.forEach((fish, index) => {
-                const { selectedFish, fishLength } = fish;
-                caughtEmbed.addFields({
-                    name: `Fish ${index + 1}`,
-                    value:
-                        `\`${selectedFish.rarity}\` **${selectedFish.name}**\n` +
-                        `\`📏\` Length: **${fishLength} cm**`,
-                });
-            });
-
-            if (totalLevelUps > 0) {
-                for (let l = 0; l < totalLevelUps; l++) {
-                    caughtEmbed.addFields({
-                        name: "Fishing Level Up!",
-                        value: `\`🌟\` Congratulations! You reached Fishing Level ${
-                            stats.fishingLevel + 1
-                        }!`,
-                    });
-                }
-            } else {
-                caughtEmbed.addFields({
-                    name: "Fishing Progress",
-                    value: `\`🎣\` Fishing Level: ${stats.fishingLevel} (${stats.timesFishedForLevel}/${latestRequiredFishesForNextLevel} fish caught)`,
-                });
-            }
-
-            await r.edit({ embeds: [caughtEmbed], components: [] }).catch(noop);
+            const { embed } = await finalizeFishing(
+                i.user.id,
+                stats!,
+                caughtFishDetails,
+                cumulativeFishExp,
+            );
+            await r.edit({ embeds: [embed], components: [] }).catch(noop);
 
             const lureSkill = getUserSkillLevelData(stats, "Lure");
-
             const fishingCooldown = lureSkill?.levelData?.cooldown
                 ? get.mins(lureSkill.levelData.cooldown)
                 : get.hrs(1);
             await cooldowns.set(user, "fish", fishingCooldown);
-
             locked.del(i.user.id);
-
             return;
         }
     },

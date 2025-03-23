@@ -12,8 +12,9 @@ import {
 } from "@elara-services/utils";
 import type { Prisma, UserStats } from "@prisma/client";
 import type { Client, TextChannel, User } from "discord.js";
+import { calculateFishingLevel } from "../../commands/rpg/handlers/fishHandler";
 import { prisma } from "../../prisma";
-import { cooldowns } from "../../utils";
+import { cooldowns, debug } from "../../utils";
 import { calculateMasteryLevel } from "../../utils/helpers/masteryHelper";
 import type {
     ArtifactSetName,
@@ -235,6 +236,17 @@ export async function syncStats(userId: string) {
         needsUpdate = true;
     }
 
+    const { correctLevel, validLevel } = calculateFishingLevel(
+        stats.fishingExp || 0,
+    );
+    if (!validLevel || stats.fishingLevel !== correctLevel) {
+        debug(
+            `Fishing level sync for ${userId}: ${stats.fishingLevel} -> ${correctLevel} (exp: ${stats.fishingExp})`,
+        );
+        updateData.fishingLevel = { set: correctLevel };
+        needsUpdate = true;
+    }
+
     if (stats.equippedWeapon) {
         const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
         if (equippedWeapon && equippedWeapon.type !== "Catalyst") {
@@ -312,6 +324,7 @@ export const getUserStats = async (userId: string) => {
                 adventureRank: 1,
                 healEffectiveness: 0,
                 maxMana: 20,
+                fishingExp: 0,
             },
             update: {},
         })

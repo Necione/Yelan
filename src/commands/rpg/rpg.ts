@@ -59,8 +59,8 @@ export const rpg = buildCommand<SlashCommand>({
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
-        const o = i.options.getBoolean("sync_inv", false);
-        if (o === true) {
+        const syncInv = i.options.getBoolean("sync_inv", false);
+        if (syncInv === true) {
             const res = await syncInventoryItemsForUser(
                 i.user.id,
                 undefined,
@@ -114,7 +114,6 @@ export const rpg = buildCommand<SlashCommand>({
             }
 
             let hasCatalyst = false;
-
             if (
                 stats.equippedWeapon &&
                 weapons[stats.equippedWeapon as WeaponName]
@@ -242,9 +241,7 @@ export const rpg = buildCommand<SlashCommand>({
                 });
 
             if (is.number(stats.rebirths)) {
-                embed.setFooter({
-                    text: getRebirthString(stats.rebirths),
-                });
+                embed.setFooter({ text: getRebirthString(stats.rebirths) });
             }
 
             if (is.array(equippedItems)) {
@@ -261,48 +258,41 @@ export const rpg = buildCommand<SlashCommand>({
                             `\`${effect.name}\` (Value=${effect.effectValue}): ${effect.remainingUses} uses left`,
                     )
                     .join("\n");
-
-                embed.addFields({
-                    name: "Active Effects",
-                    value: effectsList,
-                });
+                embed.addFields({ name: "Active Effects", value: effectsList });
             }
 
             pager.pages.push({ embeds: [embed] });
-        }
-
-        if (category === "Fishing") {
+        } else if (category === "Fishing") {
             const fishCooldown = cooldowns.get(p, "fish");
-            const { requiredFishesForNextLevel } = calculateFishingLevel(
-                stats.fishingLevel,
-                stats.timesFishedForLevel || 0,
+            const { requiredExpForNextLevel } = calculateFishingLevel(
+                stats.fishingExp || 0,
             );
-
-            const fishCaughtForLevel = stats.timesFishedForLevel || 0;
-            const fishNeededForNextLevel = requiredFishesForNextLevel;
             const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
-
             const embed = new EmbedBuilder()
                 .setColor(embedColor)
                 .setTitle(`${i.user.username}'s Fishing Stats`)
                 .setThumbnail(i.user.displayAvatarURL())
                 .setDescription(
-                    `🎣 Fishing Level: \`${stats.fishingLevel}\` (\`${fishCaughtForLevel}/${fishNeededForNextLevel}\` fish caught)`,
+                    `🎣 Fishing Level: \`${stats.fishingLevel}\` (\`${
+                        stats.fishingExp
+                    }/${
+                        stats.fishingExp + requiredExpForNextLevel
+                    }\` Fishing EXP)`,
                 )
                 .addFields({
                     name: "Fishing Records",
                     value:
                         `🏆 Longest Fish: ${
                             stats.longestFish
-                                ? `${stats.longestFish} cm`
+                                ? `\`${stats.longestFish} cm\``
                                 : "N/A"
                         }\n` +
-                        `🐡 Total Fish Caught: ${
+                        `🐡 Total Fish Caught: \`${
                             stats.lifetimeFishCaught || 0
-                        }\n` +
-                        `🌟 Legendaries Caught: ${
+                        }\`\n` +
+                        `🌟 Legendaries Caught: \`${
                             stats.legendariesCaught || 0
-                        }`,
+                        }\``,
                 })
                 .addFields({
                     name: "Cooldowns",
@@ -310,130 +300,140 @@ export const rpg = buildCommand<SlashCommand>({
                         fishCooldown.status ? "Ready" : fishCooldown.message
                     }`,
                 });
-
             pager.pages.push({ embeds: [embed] });
         }
 
-        let characters = await getUserCharacters(i.user.id);
-        if (!is.array(characters)) {
-            await createDefaultCharacterForUser(i.user.id, "Amber");
-            characters = await getUserCharacters(i.user.id);
-        }
-
-        const syncedCharacters = [];
-        for await (const character of characters) {
-            const updatedChar = await syncCharacter(character.id);
-            if (updatedChar) {
-                syncedCharacters.push(updatedChar);
-            } else {
-                syncedCharacters.push(character);
+        if (category === "General") {
+            let characters = await getUserCharacters(i.user.id);
+            if (!is.array(characters)) {
+                await createDefaultCharacterForUser(i.user.id, "Amber");
+                characters = await getUserCharacters(i.user.id);
             }
-        }
-
-        if (is.array(characters)) {
-            for (const character of syncedCharacters) {
-                const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
-                const equippedItems = make.array<string>();
-
-                let hpDisplay: string;
-                if (character.hp > character.maxHP) {
-                    hpDisplay = `💜 \`${character.hp}/${character.maxHP}\` **OVERHEALED**`;
-                } else if (character.hp < character.maxHP * 0.3) {
-                    hpDisplay = `🧡 \`${character.hp}/${character.maxHP}\` **LOW HP**`;
+            const syncedCharacters = [];
+            for await (const character of characters) {
+                const updatedChar = await syncCharacter(character.id);
+                if (updatedChar) {
+                    syncedCharacters.push(updatedChar);
                 } else {
-                    hpDisplay = `❤️ \`${character.hp}/${character.maxHP}\``;
+                    syncedCharacters.push(character);
                 }
+            }
 
-                if (character.equippedWeapon) {
-                    const eqWeapon =
-                        weapons[character.equippedWeapon as WeaponName];
-                    if (eqWeapon) {
-                        equippedItems.push(
-                            `${eqWeapon.emoji} ${
-                                character.equippedWeapon
-                            } (${formatChange(eqWeapon.attackPower)} ATK)`,
-                        );
+            if (is.array(characters)) {
+                for (const character of syncedCharacters) {
+                    const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
+                    const equippedItems = make.array<string>();
+
+                    let hpDisplay: string;
+                    if (character.hp > character.maxHP) {
+                        hpDisplay = `💜 \`${character.hp}/${character.maxHP}\` **OVERHEALED**`;
+                    } else if (character.hp < character.maxHP * 0.3) {
+                        hpDisplay = `🧡 \`${character.hp}/${character.maxHP}\` **LOW HP**`;
                     } else {
-                        equippedItems.push(`⚔️ ${character.equippedWeapon}`);
+                        hpDisplay = `❤️ \`${character.hp}/${character.maxHP}\``;
                     }
-                }
 
-                if (character.equippedFlower) {
-                    equippedItems.push(
-                        `🌸 Flower: ${character.equippedFlower}`,
-                    );
-                }
-                if (character.equippedPlume) {
-                    equippedItems.push(`🪶 Plume: ${character.equippedPlume}`);
-                }
-                if (character.equippedSands) {
-                    equippedItems.push(`⏳ Sands: ${character.equippedSands}`);
-                }
-                if (character.equippedGoblet) {
-                    equippedItems.push(
-                        `🍷 Goblet: ${character.equippedGoblet}`,
-                    );
-                }
-                if (character.equippedCirclet) {
-                    equippedItems.push(
-                        `👑 Circlet: ${character.equippedCirclet}`,
-                    );
-                }
+                    if (character.equippedWeapon) {
+                        const eqWeapon =
+                            weapons[character.equippedWeapon as WeaponName];
+                        if (eqWeapon) {
+                            equippedItems.push(
+                                `${eqWeapon.emoji} ${
+                                    character.equippedWeapon
+                                } (${formatChange(eqWeapon.attackPower)} ATK)`,
+                            );
+                        } else {
+                            equippedItems.push(
+                                `⚔️ ${character.equippedWeapon}`,
+                            );
+                        }
+                    }
 
-                const expeditionStatus = character.expedition
-                    ? "Currently on Expedition"
-                    : "Available";
+                    if (character.equippedFlower) {
+                        equippedItems.push(
+                            `🌸 Flower: ${character.equippedFlower}`,
+                        );
+                    }
+                    if (character.equippedPlume) {
+                        equippedItems.push(
+                            `🪶 Plume: ${character.equippedPlume}`,
+                        );
+                    }
+                    if (character.equippedSands) {
+                        equippedItems.push(
+                            `⏳ Sands: ${character.equippedSands}`,
+                        );
+                    }
+                    if (character.equippedGoblet) {
+                        equippedItems.push(
+                            `🍷 Goblet: ${character.equippedGoblet}`,
+                        );
+                    }
+                    if (character.equippedCirclet) {
+                        equippedItems.push(
+                            `👑 Circlet: ${character.equippedCirclet}`,
+                        );
+                    }
 
-                const displayName = character.nickname
-                    ? `${character.nickname} (${character.name})`
-                    : character.name;
+                    const expeditionStatus = character.expedition
+                        ? "Currently on Expedition"
+                        : "Available";
+                    const displayName = character.nickname
+                        ? `${character.nickname} (${character.name})`
+                        : character.name;
+                    const baseName = character.name as CharsName;
+                    let chosenThumbnail = i.user.displayAvatarURL();
+                    if (
+                        chars[baseName]?.thumbnails &&
+                        chars[baseName].thumbnails.length > 0
+                    ) {
+                        const possibleThumbs = chars[baseName].thumbnails;
+                        chosenThumbnail =
+                            possibleThumbs[
+                                Math.floor(
+                                    Math.random() * possibleThumbs.length,
+                                )
+                            ];
+                    }
 
-                const baseName = character.name as CharsName;
-                let chosenThumbnail = i.user.displayAvatarURL();
-                if (
-                    chars[baseName]?.thumbnails &&
-                    chars[baseName].thumbnails.length > 0
-                ) {
-                    const possibleThumbs = chars[baseName].thumbnails;
-                    chosenThumbnail =
-                        possibleThumbs[
-                            Math.floor(Math.random() * possibleThumbs.length)
-                        ];
+                    const charEmbed = new EmbedBuilder()
+                        .setColor(embedColor)
+                        .setTitle(
+                            `${i.user.username}'s Character: ${displayName}`,
+                        )
+                        .setThumbnail(chosenThumbnail)
+                        .setDescription(
+                            `**Expedition Status:** ${expeditionStatus}\n\n${hpDisplay}\n` +
+                                `⚔️ ATK: \`${character.attackPower.toFixed(
+                                    2,
+                                )}\` (Base: ${character.baseAttack})\n` +
+                                (character.critChance > 0 ||
+                                character.critValue > 0
+                                    ? `🎯 Crit Rate: \`${
+                                          character.critChance
+                                      }%\` | 💥 Crit Value: \`${character.critValue.toFixed(
+                                          2,
+                                      )}x\`\n`
+                                    : "") +
+                                (character.defChance > 0 ||
+                                character.defValue > 0
+                                    ? `🛡️ DEF Rate: \`${
+                                          character.defChance
+                                      }%\` | DEF Value: \`${character.defValue.toFixed(
+                                          2,
+                                      )}\`\n`
+                                    : ""),
+                        );
+
+                    if (is.array(equippedItems)) {
+                        charEmbed.addFields({
+                            name: "Equipped Items",
+                            value: equippedItems.join("\n"),
+                        });
+                    }
+
+                    pager.pages.push({ embeds: [charEmbed] });
                 }
-
-                const charEmbed = new EmbedBuilder()
-                    .setColor(embedColor)
-                    .setTitle(`${i.user.username}'s Character: ${displayName}`)
-                    .setThumbnail(chosenThumbnail)
-                    .setDescription(
-                        `**Expedition Status:** ${expeditionStatus}\n\n${hpDisplay}\n` +
-                            `⚔️ ATK: \`${character.attackPower.toFixed(
-                                2,
-                            )}\` (Base: ${character.baseAttack})\n` +
-                            (character.critChance > 0 || character.critValue > 0
-                                ? `🎯 Crit Rate: \`${
-                                      character.critChance
-                                  }%\` | 💥 Crit Value: \`${character.critValue.toFixed(
-                                      2,
-                                  )}x\`\n`
-                                : "") +
-                            (character.defChance > 0 || character.defValue > 0
-                                ? `🛡️ DEF Rate: \`${
-                                      character.defChance
-                                  }%\` | DEF Value: \`${character.defValue.toFixed(
-                                      2,
-                                  )}\`\n`
-                                : ""),
-                    );
-
-                if (is.array(equippedItems)) {
-                    charEmbed.addFields({
-                        name: "Equipped Items",
-                        value: equippedItems.join("\n"),
-                    });
-                }
-
-                pager.pages.push({ embeds: [charEmbed] });
             }
         }
 

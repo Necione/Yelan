@@ -134,7 +134,7 @@ export async function playerAttack(
         messages.push(
             `\`⚔️\` You dealt \`${baseAttack.toFixed(
                 2,
-            )}\` basic damage to the ${monster.name} \`(FISHING)\``,
+            )}\` basic damage to the ${monster.name}`,
         );
         debug(`${username} Fishing attack: Dealt ${baseAttack} damage`);
 
@@ -465,7 +465,7 @@ export async function monsterAttack(
         messages.push(
             `\`⚔️\` The ${monster.name} dealt \`${monsterDamage.toFixed(
                 2,
-            )}\` damage to you \`(FISHING)\``,
+            )}\` damage to you`,
         );
         debug(`${username} Fishing monster => -${monsterDamage} HP to player`);
 

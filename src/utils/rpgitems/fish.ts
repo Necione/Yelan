@@ -8,6 +8,8 @@ export interface FishData {
     rods: string[];
     minReels: number;
     maxReels: number;
+    minExp: number;
+    maxExp: number;
 }
 
 export const fish: { [key: string]: FishData } = {
@@ -27,6 +29,8 @@ export const fish: { [key: string]: FishData } = {
         ],
         minReels: 1,
         maxReels: 2,
+        minExp: 10,
+        maxExp: 20,
     },
     "Lunged Stickleback": {
         rarity: "Common",
@@ -44,6 +48,8 @@ export const fish: { [key: string]: FishData } = {
         ],
         minReels: 1,
         maxReels: 2,
+        minExp: 10,
+        maxExp: 20,
     },
     Medaka: {
         rarity: "Common",
@@ -61,6 +67,8 @@ export const fish: { [key: string]: FishData } = {
         ],
         minReels: 1,
         maxReels: 3,
+        minExp: 15,
+        maxExp: 25,
     },
     "Aizen Medaka": {
         rarity: "Common",
@@ -78,6 +86,8 @@ export const fish: { [key: string]: FishData } = {
         ],
         minReels: 1,
         maxReels: 3,
+        minExp: 15,
+        maxExp: 25,
     },
     "Venomspine Fish": {
         rarity: "Common",
@@ -95,6 +105,8 @@ export const fish: { [key: string]: FishData } = {
         ],
         minReels: 2,
         maxReels: 4,
+        minExp: 20,
+        maxExp: 35,
     },
     "Golden Koi": {
         rarity: "Rare",
@@ -104,6 +116,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Wavepiercer", "Moonstringer", "Windtangler", "Serendipity"],
         minReels: 3,
         maxReels: 5,
+        minExp: 40,
+        maxExp: 60,
     },
     "Purple Shirakodai": {
         rarity: "Common",
@@ -121,6 +135,8 @@ export const fish: { [key: string]: FishData } = {
         ],
         minReels: 2,
         maxReels: 4,
+        minExp: 25,
+        maxExp: 40,
     },
     "Glaze Medaka": {
         rarity: "Common",
@@ -138,6 +154,8 @@ export const fish: { [key: string]: FishData } = {
         ],
         minReels: 1,
         maxReels: 3,
+        minExp: 25,
+        maxExp: 40,
     },
     "Abiding Angelfish": {
         rarity: "Epic",
@@ -155,6 +173,8 @@ export const fish: { [key: string]: FishData } = {
         ],
         minReels: 4,
         maxReels: 6,
+        minExp: 80,
+        maxExp: 120,
     },
     "Rusty Koi": {
         rarity: "Rare",
@@ -164,6 +184,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Moonstringer", "Windtangler", "Serendipity"],
         minReels: 3,
         maxReels: 5,
+        minExp: 50,
+        maxExp: 75,
     },
     Snowstrider: {
         rarity: "Legendary",
@@ -173,6 +195,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Windtangler", "Serendipity"],
         minReels: 5,
         maxReels: 7,
+        minExp: 150,
+        maxExp: 200,
     },
     Crystalfish: {
         rarity: "Legendary",
@@ -182,6 +206,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Serendipity"],
         minReels: 7,
         maxReels: 9,
+        minExp: 200,
+        maxExp: 250,
     },
     "Akai Maou": {
         rarity: "Common",
@@ -199,6 +225,8 @@ export const fish: { [key: string]: FishData } = {
         ],
         minReels: 1,
         maxReels: 3,
+        minExp: 35,
+        maxExp: 50,
     },
     // Non Genshin
     Anchovy: {
@@ -209,6 +237,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Wilderness Rod", "Wishmaker", "Narukawa Ukai", "Wavepiercer"],
         minReels: 1,
         maxReels: 2,
+        minExp: 15,
+        maxExp: 25,
     },
     Sardine: {
         rarity: "Common",
@@ -218,6 +248,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Wilderness Rod", "Wishmaker", "Narukawa Ukai", "Wavepiercer"],
         minReels: 1,
         maxReels: 2,
+        minExp: 15,
+        maxExp: 25,
     },
     Bream: {
         rarity: "Rare",
@@ -227,6 +259,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Wavepiercer", "Moonstringer", "Windtangler"],
         minReels: 3,
         maxReels: 5,
+        minExp: 45,
+        maxExp: 65,
     },
     Perch: {
         rarity: "Rare",
@@ -236,6 +270,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Moonstringer", "Windtangler", "Serendipity"],
         minReels: 3,
         maxReels: 5,
+        minExp: 50,
+        maxExp: 75,
     },
     "Duskhaven Snapper": {
         rarity: "Rare",
@@ -245,6 +281,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Moonstringer", "Windtangler", "Serendipity"],
         minReels: 3,
         maxReels: 5,
+        minExp: 55,
+        maxExp: 80,
     },
     "Marsh Perch": {
         rarity: "Rare",
@@ -254,6 +292,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Moonstringer", "Windtangler"],
         minReels: 3,
         maxReels: 5,
+        minExp: 60,
+        maxExp: 85,
     },
     "Amberfin Catfish": {
         rarity: "Epic",
@@ -263,6 +303,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Windtangler", "Wilderness Rod"],
         minReels: 4,
         maxReels: 6,
+        minExp: 100,
+        maxExp: 140,
     },
     "Silverfin Trout": {
         rarity: "Epic",
@@ -272,6 +314,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Windtangler", "Narukawa Ukai"],
         minReels: 4,
         maxReels: 6,
+        minExp: 110,
+        maxExp: 150,
     },
     Carp: {
         rarity: "Epic",
@@ -281,6 +325,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Windtangler", "Serendipity"],
         minReels: 4,
         maxReels: 6,
+        minExp: 90,
+        maxExp: 130,
     },
     "Twilight Gourami": {
         rarity: "Epic",
@@ -290,6 +336,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Wavepiercer", "Wilderness Rod"],
         minReels: 5,
         maxReels: 7,
+        minExp: 120,
+        maxExp: 160,
     },
     Salmon: {
         rarity: "Epic",
@@ -299,6 +347,8 @@ export const fish: { [key: string]: FishData } = {
         rods: ["Windtangler", "Serendipity"],
         minReels: 5,
         maxReels: 7,
+        minExp: 100,
+        maxExp: 140,
     },
 };
 

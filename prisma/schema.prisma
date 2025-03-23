@@ -295,8 +295,8 @@ model UserStats {
   deity                     String?
   castQueue                 String[]       @default([])
   timesFished               Int            @default(0)
-  timesFishedForLevel       Int            @default(0)
   fishingLevel              Int            @default(1)
+  fishingExp                Int            @default(0)
   longestFish               Float          @default(0)
   lifetimeFishCaught        Int            @default(0)
   legendariesCaught         Int            @default(0)
