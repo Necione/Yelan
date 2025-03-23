@@ -50,6 +50,7 @@ async function finalizeFishing(
     caughtFishDetails: Array<{
         selectedFish: FishData & { name: string };
         fishLength: number;
+        exp: number;
     }>,
     cumulativeFishExp: number,
 ): Promise<{ embed: EmbedBuilder; updatedStats: UserStats }> {
@@ -90,17 +91,12 @@ async function finalizeFishing(
         .setColor("Aqua");
 
     caughtFishDetails.forEach((fish, index) => {
-        const fishExp = Math.floor(
-            Math.random() *
-                (fish.selectedFish.maxExp - fish.selectedFish.minExp + 1) +
-                fish.selectedFish.minExp,
-        );
         caughtEmbed.addFields({
             name: `Fish ${index + 1}`,
             value:
                 `\`${fish.selectedFish.rarity}\` **${fish.selectedFish.name}**\n` +
                 `\`📏\` Length: **${fish.fishLength} cm**\n` +
-                `\`✨\` Exp: **+${fishExp}**`,
+                `\`✨\` Exp: **+${fish.exp}**`,
         });
     });
 
@@ -233,6 +229,7 @@ export const fishCommand = buildCommand<SlashCommand>({
         const caughtFishDetails: Array<{
             selectedFish: FishData & { name: string };
             fishLength: number;
+            exp: number;
         }> = [];
         let cumulativeFishExp = 0;
 
@@ -271,7 +268,7 @@ export const fishCommand = buildCommand<SlashCommand>({
                     selectedFish.minExp,
             );
             cumulativeFishExp += fishExp;
-            caughtFishDetails.push({ selectedFish, fishLength });
+            caughtFishDetails.push({ selectedFish, fishLength, exp: fishExp });
         };
 
         if (!requiresReel) {
