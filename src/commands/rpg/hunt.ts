@@ -1,9 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, is } from "@elara-services/utils";
+import { embedComment, get } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats } from "../../services";
 import { cooldowns, locked } from "../../utils";
-import { startAquaHunt } from "./handlers/aqua/aquaHandler";
 import { startHunt } from "./handlers/huntHandler";
 
 export const hunt = buildCommand<SlashCommand>({
@@ -45,17 +44,7 @@ export const hunt = buildCommand<SlashCommand>({
         }
         await cooldowns.set(userWallet, "stuckHelper", get.mins(5));
 
-        const equippedWeaponName = stats.equippedWeapon ?? "";
-
-        if (
-            is.string(equippedWeaponName) &&
-            equippedWeaponName.includes("Aqua Simulacra")
-        ) {
-            await startAquaHunt(message, i.user);
-            locked.del(i.user.id);
-        } else {
-            await startHunt(message, i.user);
-            locked.del(i.user.id);
-        }
+        await startHunt(message, i.user);
+        locked.del(i.user.id);
     },
 });

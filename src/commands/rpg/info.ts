@@ -51,10 +51,6 @@ const specialEffects: Array<{
         effect: "Disable all Anemo and Electro elemental effects.",
     },
     {
-        substring: "Aqua Simulacra",
-        effect: "Put yourself in the hands of fate.",
-    },
-    {
         substring: "The First Great Magic",
         effect: "Double all skill-related damage (Vigilance, Kindle, Vigor, etc).",
     },

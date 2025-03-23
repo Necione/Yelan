@@ -152,6 +152,20 @@ export async function playerAttack(
     let { paladinSwapped, attackPower } = getEffectiveStats(stats);
     const debugMultipliers: string[] = [];
 
+    if (monster.mutationType === "Poisonous") {
+        const hpLoss = Math.floor(stats.maxHP * 0.1);
+        currentPlayerHp = Math.max(
+            currentPlayerHp - hpLoss,
+            getDeathThreshold(stats),
+        );
+        messages.push(
+            `\`🧬\` The monster is poisonous! You lost ${hpLoss} HP with this attack`,
+        );
+        debug(
+            `${username} Poisonous mutation: Player loses ${hpLoss} HP, new HP: ${currentPlayerHp}`,
+        );
+    }
+
     if (skills.has(stats, "Sting")) {
         const stingChance = 0.15;
         if (Math.random() < stingChance) {
@@ -1046,6 +1060,16 @@ export function applyAttackModifiers(
             messages.push("`💪` Strength effect ended");
             debug(`${username} Strength ended => removed activeEffects`);
         }
+    }
+
+    if (monster.mutationType === "Poisonous") {
+        const bonusDamage = Math.floor(stats.maxHP * 0.1);
+        attackPower += bonusDamage;
+        messages.push(
+            "`☠️` Poisonous mutation: You deal bonus damage equal to 10% of your max HP!",
+        );
+        debugMultipliers.push(`Poisonous bonus (+${bonusDamage})`);
+        debug(`${username} Poisonous bonus added: +${bonusDamage} damage`);
     }
 
     if (monster.mutationType === "Demonic") {

@@ -236,6 +236,7 @@ export async function handleHunt(
             Strange: 0x658e4d,
             Infected: 0x88349b,
             Demonic: 0x28282b,
+            Poisonous: 0x608057,
             Hard: 0xff8ad1,
         };
 

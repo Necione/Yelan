@@ -13,6 +13,7 @@ export type MutationType =
     | "Strange"
     | "Infected"
     | "Demonic"
+    | "Poisonous"
     | "Hard";
 
 export interface Monster {
