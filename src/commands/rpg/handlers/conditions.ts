@@ -260,7 +260,16 @@ export async function handleVictory(
         const style = stats.swordStyle as SwordStyleName;
         const gainConditionMet = checkStyleGainCondition(style, styleCheck);
 
-        if (gainConditionMet) {
+        const rebirthRequirements = [5, 10, 15, 20, 25, 30, 35, 40];
+        const nextRebirthRequirement =
+            rebirthRequirements[stats.rebirths] || 50;
+        const minARForProficiency = nextRebirthRequirement - 10;
+
+        if (
+            gainConditionMet &&
+            stats.adventureRank <= nextRebirthRequirement &&
+            stats.adventureRank >= minARForProficiency
+        ) {
             let newPoints = 0;
             switch (style) {
                 case "Kamisato Art":
@@ -292,11 +301,15 @@ export async function handleVictory(
                 !stats.equippedWeapon ||
                 weapons[stats.equippedWeapon]?.type !== "Sword"
                     ? "No sword equipped"
-                    : style === "Kamisato Art"
-                      ? "Battle took too many turns"
-                      : style === "Guhua Style"
-                        ? "Too many active skills"
-                        : "HP was too low at battle end";
+                    : stats.adventureRank > nextRebirthRequirement
+                      ? `Adventure Rank too high (${stats.adventureRank} > ${nextRebirthRequirement})`
+                      : stats.adventureRank < minARForProficiency
+                        ? `Adventure Rank too low (${stats.adventureRank} < ${minARForProficiency})`
+                        : style === "Kamisato Art"
+                          ? "Battle took too many turns"
+                          : style === "Guhua Style"
+                            ? "Too many active skills"
+                            : "HP was too low at battle end";
             skillsActivated += `\`⚔️\` ${style} proficiency not gained: ${reason}\n`;
         }
     }

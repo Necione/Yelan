@@ -790,7 +790,8 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minadventurerank: 20,
         chestChance: 3,
         emoji: "<:Weapon_Festering_Desire:1353317545452503090>",
-        imageURL: "https://lh.elara.workers.dev/rpg/weapons/festering_desire.png",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/festering_desire.png",
     },
     "Earth Shaker": {
         name: "Earth Shaker",
@@ -1136,7 +1137,8 @@ const baseWeapons: { [key: string]: WeaponData } = {
         minadventurerank: 20,
         chestChance: 0,
         emoji: "<:Weapon_Amenoma_Kageuchi_2nd:1322104043258253313>",
-        imageURL: "https://lh.elara.workers.dev/rpg/weapons/asc/amenoma_kageuchi.png",
+        imageURL:
+            "https://lh.elara.workers.dev/rpg/weapons/asc/amenoma_kageuchi.png",
     },
     "✪ Dull Blade": {
         name: "✪ Dull Blade",
@@ -1209,6 +1211,14 @@ const prefixes: {
     Jaded: (weaponData) => ({
         attackPower: weaponData.attackPower * 1.1,
         critValue: weaponData.critValue * 1.25,
+        chestChance: 0,
+    }),
+    Legendary: (weaponData) => ({
+        attackPower: weaponData.attackPower * 2,
+        additionalHP: weaponData.additionalHP * 2,
+        critValue: weaponData.critValue * 2,
+        defValue: weaponData.defValue * 2,
+        defChance: weaponData.defChance + 50,
         chestChance: 0,
     }),
 };

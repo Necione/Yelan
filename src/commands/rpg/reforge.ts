@@ -139,7 +139,13 @@ export const reforge = buildCommand<SlashCommand>({
         }
 
         const baseName = getBaseName(weaponName);
-        const newPrefix = getRandom(prefixes);
+        let newPrefix;
+        const legendaryChance = Math.random() * 100;
+        if (legendaryChance <= 0.5) {
+            newPrefix = "Legendary";
+        } else {
+            newPrefix = getRandom(prefixes);
+        }
         const newWeaponName = `${newPrefix} ${baseName}`;
 
         if (!weapons[newWeaponName as WeaponName]) {
