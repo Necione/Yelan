@@ -58,7 +58,8 @@ export async function syncStats(userId: string) {
         100 + (stats.adventureRank - 1) * 10 + (stats.rebirths || 0) * 5;
 
     const assignedHpBonus = (stats.assignedHp || 0) * 2;
-    const finalMaxHP = calculatedMaxHP + assignedHpBonus;
+    const bonusHp = stats.bonusHp || 0;
+    const finalMaxHP = calculatedMaxHP + assignedHpBonus + bonusHp;
 
     const assignedCritValueBonus = (stats.assignedCritValue || 0) * 0.01;
     const assignedDefValueBonus = (stats.assignedDefValue || 0) * 1;

@@ -4,6 +4,7 @@ export * from "./healingWellEvent";
 export * from "./injuredManEvent";
 export * from "./merchantEvent";
 export * from "./ninjaChallengeEvent";
+export * from "./oldWizardEvent";
 export * from "./secretCultEvent";
 export * from "./thiefEvent";
 export * from "./traderEvent";

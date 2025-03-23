@@ -246,6 +246,7 @@ model UserStats {
   maxMana                   Int            @default(20)
   hp                        Int            @default(100)
   maxHP                     Int            @default(100)
+  bonusHp                   Int            @default(0)
   shield                    Int            @default(0)
   maxShield                 Int            @default(0)
   baseAttack                Float          @default(5)
@@ -294,6 +295,7 @@ model UserStats {
   hasKey                    Boolean        @default(false)
   deity                     String?
   castQueue                 String[]       @default([])
+  maxCastQueue              Int            @default(10)
   timesFished               Int            @default(0)
   fishingLevel              Int            @default(1)
   fishingExp                Int            @default(0)

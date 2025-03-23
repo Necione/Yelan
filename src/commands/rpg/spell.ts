@@ -213,12 +213,12 @@ export const spell = buildCommand<SlashCommand>({
                     return r.edit({ embeds: [noWeaponEmbed] });
                 }
 
-                if (stats.castQueue.length >= 25) {
+                if (stats.castQueue.length >= stats.maxCastQueue) {
                     const queueFullEmbed = new EmbedBuilder()
                         .setColor(0xecd9fc)
                         .setTitle("Spell Queue Full")
                         .setDescription(
-                            `You cannot add more spells to your cast queue. The maximum limit is **25**.`,
+                            `You cannot add more spells to your cast queue. The maximum limit is **${stats.maxCastQueue}**.`,
                         );
 
                     return r.edit({ embeds: [queueFullEmbed] });
