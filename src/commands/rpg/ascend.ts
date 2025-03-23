@@ -14,6 +14,7 @@ const ascendableBaseWeapons = [
     "Cinnabar Spindle",
     "The Alley Flash",
     "The Widsith",
+    "Amenoma Kageuchi",
 ];
 
 export const ascend = buildCommand<SlashCommand>({
