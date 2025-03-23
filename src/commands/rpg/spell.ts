@@ -218,7 +218,9 @@ export const spell = buildCommand<SlashCommand>({
                         .setColor(0xecd9fc)
                         .setTitle("`⚠️` Spell Queue Full")
                         .setDescription(
-                            `You cannot add more spells to your cast queue. Your maximum limit is **${stats.maxCastQueue ?? 10}**.`,
+                            `You cannot add more spells to your cast queue. Your maximum limit is **${
+                                stats.maxCastQueue ?? 10
+                            }**.`,
                         );
 
                     return r.edit({ embeds: [queueFullEmbed] });

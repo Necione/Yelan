@@ -249,6 +249,10 @@ model UserStats {
   bonusHp                   Int            @default(0)
   shield                    Int            @default(0)
   maxShield                 Int            @default(0)
+  swordStyle                String?
+  styleKamisato             Int            @default(0)
+  styleGuhua                Int            @default(0)
+  styleFavonius             Int            @default(0)
   baseAttack                Float          @default(5)
   attackPower               Float          @default(5)
   critChance                Float          @default(0)

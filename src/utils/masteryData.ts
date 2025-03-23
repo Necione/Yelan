@@ -11,7 +11,7 @@ export const masteryBenefits: Record<
 > = {
     Sword: {
         1: {
-            description: "Deal 110% damage when wielding the Sword.",
+            description: "Unlock sword styles.",
         },
         2: {
             specialSkill: "Parry",

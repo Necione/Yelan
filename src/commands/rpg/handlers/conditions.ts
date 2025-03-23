@@ -8,9 +8,14 @@ import {
     addItemToInventory,
     updateUserStats,
 } from "../../../services";
-import { cooldowns, texts } from "../../../utils";
+import { cooldowns, debug, texts } from "../../../utils";
 import { calculateDrop, type Monster } from "../../../utils/helpers/huntHelper";
 import { calculateMasteryLevel } from "../../../utils/helpers/masteryHelper";
+import {
+    checkStyleGainCondition,
+    type StyleGainCheck,
+    type SwordStyleName,
+} from "../../../utils/helpers/swordStyleHelper";
 import { weapons, type WeaponName } from "../../../utils/rpgitems/weapons";
 import { getUserSkillLevelData } from "../../../utils/skillsData";
 import {
@@ -211,6 +216,24 @@ export async function handleVictory(
         }
     }
 
+    if (stats.swordStyle === "Favonius Bladework" && stats.styleFavonius >= 0) {
+        const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
+        if (equippedWeapon?.type === "Sword") {
+            const shieldAmount = Math.floor(stats.maxHP * 0.25);
+            const newShield = Math.min(
+                (stats.shield || 0) + shieldAmount,
+                stats.maxHP,
+            );
+            await updateUserStats(stats.userId, {
+                shield: { set: newShield },
+            });
+            effectsActivated += `\`🏵️\` Knight's Armor granted you a shield of \`${shieldAmount}\`\n`;
+            debug(
+                `[${stats.userId}] Knight's Armor => shield set to ${newShield}`,
+            );
+        }
+    }
+
     await updateUserStats(stats.userId, {
         hp: { set: currentPlayerHp },
         ...(manaFieldAdded && { mana: { set: stats.mana } }),
@@ -222,6 +245,61 @@ export async function handleVictory(
         masteryCatalyst: { set: stats.masteryCatalyst },
         masteryRod: { set: stats.masteryRod },
     });
+
+    if (stats.swordStyle) {
+        const styleCheck: StyleGainCheck = {
+            hp: currentPlayerHp,
+            maxHp: stats.maxHP,
+            turnCount: monstersEncountered.length,
+            activeSkillCount: stats.activeSkills?.length || 0,
+            equippedWeaponType: stats.equippedWeapon
+                ? weapons[stats.equippedWeapon]?.type
+                : undefined,
+        };
+
+        const style = stats.swordStyle as SwordStyleName;
+        const gainConditionMet = checkStyleGainCondition(style, styleCheck);
+
+        if (gainConditionMet) {
+            let newPoints = 0;
+            switch (style) {
+                case "Kamisato Art":
+                    newPoints = stats.styleKamisato + 1;
+                    break;
+                case "Guhua Style":
+                    newPoints = stats.styleGuhua + 1;
+                    break;
+                case "Favonius Bladework":
+                    newPoints = stats.styleFavonius + 1;
+                    break;
+            }
+
+            await updateUserStats(stats.userId, {
+                ...(style === "Kamisato Art" && {
+                    styleKamisato: { set: newPoints },
+                }),
+                ...(style === "Guhua Style" && {
+                    styleGuhua: { set: newPoints },
+                }),
+                ...(style === "Favonius Bladework" && {
+                    styleFavonius: { set: newPoints },
+                }),
+            });
+
+            skillsActivated += `\`⚔️\` ${style} proficiency increased! (\`${newPoints}\` points)\n`;
+        } else {
+            const reason =
+                !stats.equippedWeapon ||
+                weapons[stats.equippedWeapon]?.type !== "Sword"
+                    ? "No sword equipped"
+                    : style === "Kamisato Art"
+                      ? "Battle took too many turns"
+                      : style === "Guhua Style"
+                        ? "Too many active skills"
+                        : "HP was too low at battle end";
+            skillsActivated += `\`⚔️\` ${style} proficiency not gained: ${reason}\n`;
+        }
+    }
 
     if (effectsActivated) {
         finalEmbed.addFields({

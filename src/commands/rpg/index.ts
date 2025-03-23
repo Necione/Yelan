@@ -33,6 +33,7 @@ export * from "./sell";
 export * from "./skills";
 export * from "./special";
 export * from "./spell";
+export * from "./swordstyle";
 export * from "./trashall";
 export { travel } from "./travel";
 export * from "./unequip";

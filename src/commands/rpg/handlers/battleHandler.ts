@@ -245,15 +245,51 @@ export async function playerAttack(
         }
     }
 
-    const modifiersResult = applyAttackModifiers(
-        attackPower,
-        stats,
-        monster,
-        monsterState,
-        messages,
-    );
-    attackPower = modifiersResult.attackPower;
-    monsterState = modifiersResult.monsterState;
+    const { attackPower: baseAttackPower, monsterState: modifiedMonsterState } =
+        applyAttackModifiers(
+            attackPower,
+            stats,
+            monster,
+            monsterState,
+            messages,
+        );
+    let currentAttackPower = baseAttackPower;
+
+    if (stats.swordStyle === "Guhua Style" && stats.styleGuhua >= 0) {
+        const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
+        if (equippedWeapon?.type === "Sword") {
+            const swordCount = stats.inventory
+                .filter(
+                    (item) =>
+                        weapons[item.item as WeaponName]?.type === "Sword",
+                )
+                .reduce((total, item) => total + item.amount, 0);
+
+            if (swordCount > 0) {
+                currentAttackPower += swordCount;
+                messages.push(
+                    `\`⚔️\` Thousand Swords deals \`${swordCount}\` bonus damage`,
+                );
+                debug(
+                    `${username} Thousand Swords => +${swordCount} damage from ${swordCount} swords`,
+                );
+            }
+        }
+    }
+
+    if (stats.swordStyle === "Kamisato Art" && stats.styleKamisato >= 0) {
+        const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
+        if (equippedWeapon?.type === "Sword") {
+            const baseDamage = equippedWeapon.attackPower || 0;
+            currentAttackPower += baseDamage;
+            messages.push(
+                `\`❄️\` Frozen Domain deals \`${baseDamage}\` bonus damage`,
+            );
+            debug(
+                `${username} Frozen Domain => +${baseDamage} damage from weapon base ATK`,
+            );
+        }
+    }
 
     let critChance = stats.critChance || 0;
     const critValue = stats.critValue || 1;
@@ -270,27 +306,29 @@ export async function playerAttack(
         debugMultipliers.push(`Critical Hit (${multiplier}x)`);
         debug(`${usernameLog} CRIT => x${multiplier}`);
     }
-    attackPower *= multiplier;
+    currentAttackPower *= multiplier;
 
     if (currentPlayerHp > stats.maxHP) {
-        attackPower *= 0.5;
+        currentAttackPower *= 0.5;
         messages.push(`\`💜\` Overhealed! Your damage is halved`);
         debugMultipliers.push("Overheal (0.5x)");
-        debug(`${usernameLog} Overheal => x0.5 => ${attackPower}`);
+        debug(`${usernameLog} Overheal => x0.5 => ${currentAttackPower}`);
     }
 
     const defenseResult = checkMonsterDefenses(
-        attackPower,
+        currentAttackPower,
         stats,
         monster,
-        monsterState,
+        modifiedMonsterState,
         messages,
     );
-    attackPower = defenseResult.attackPower;
-    const attackMissed = defenseResult.attackMissed;
-    const monsterDefended = defenseResult.monsterDefended;
-    const damageReduced = defenseResult.damageReduced;
-    monsterState = defenseResult.monsterState;
+    const {
+        attackPower: finalAttackPower,
+        attackMissed,
+        monsterDefended,
+        damageReduced,
+        monsterState: defenseMonsterState,
+    } = defenseResult;
 
     if (attackMissed) {
         debug(`${usernameLog} Attack missed entirely`);
@@ -298,7 +336,7 @@ export async function playerAttack(
             currentMonsterHp,
             currentPlayerHp,
             vigilanceUsed,
-            monsterState,
+            monsterState: defenseMonsterState,
         };
     }
 
@@ -309,7 +347,8 @@ export async function playerAttack(
             const secondAttackPercentage =
                 levelData.secondAttackPercentage || 0;
 
-            let vigilanceAttackPower = attackPower * secondAttackPercentage;
+            let vigilanceAttackPower =
+                finalAttackPower * secondAttackPercentage;
             if (isFirstGreatMagic) {
                 vigilanceAttackPower *= 2;
                 messages.push(
@@ -333,10 +372,10 @@ export async function playerAttack(
         }
     }
 
-    currentMonsterHp -= attackPower;
-    debugMultipliers.push(`Final Attack Power (${attackPower})`);
+    currentMonsterHp -= finalAttackPower;
+    debugMultipliers.push(`Final Attack Power (${finalAttackPower})`);
     sendDamageMessage(
-        attackPower,
+        finalAttackPower,
         monster.name,
         isCrit,
         monsterDefended,
@@ -344,7 +383,7 @@ export async function playerAttack(
         messages,
     );
     debug(
-        `${usernameLog} Final Attack => ${attackPower}, multipliers= [${debugMultipliers.join(
+        `${usernameLog} Final Attack => ${finalAttackPower}, multipliers= [${debugMultipliers.join(
             ", ",
         )}]`,
     );
@@ -411,10 +450,10 @@ export async function playerAttack(
     if (
         has("Machine", monster, true) &&
         currentMonsterHp <= 0 &&
-        !monsterState.shieldUsed
+        !modifiedMonsterState.shieldUsed
     ) {
         currentMonsterHp = 1;
-        monsterState.shieldUsed = true;
+        modifiedMonsterState.shieldUsed = true;
         messages.push(
             "`⛔` The Machine's Shield prevents it from dying this turn!",
         );
@@ -433,7 +472,7 @@ export async function playerAttack(
         currentMonsterHp,
         currentPlayerHp,
         vigilanceUsed,
-        monsterState,
+        monsterState: defenseMonsterState,
     };
 }
 

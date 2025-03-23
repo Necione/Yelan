@@ -113,7 +113,11 @@ export const rpg = buildCommand<SlashCommand>({
                 hpDisplay = `❤️ \`${stats.hp}/${stats.maxHP}\``;
             }
 
+            let manaDisplay = "";
+            let swordStyleDisplay = "";
+
             let hasCatalyst = false;
+            let hasSword = false;
             if (
                 stats.equippedWeapon &&
                 weapons[stats.equippedWeapon as WeaponName]
@@ -133,6 +137,12 @@ export const rpg = buildCommand<SlashCommand>({
                     equippedWeapon.type.toLowerCase() === "catalyst"
                 ) {
                     hasCatalyst = true;
+                } else if (
+                    equippedWeapon.type &&
+                    equippedWeapon.type.toLowerCase() === "sword" &&
+                    stats.swordStyle
+                ) {
+                    hasSword = true;
                 }
             }
 
@@ -186,9 +196,12 @@ export const rpg = buildCommand<SlashCommand>({
                 }
             }
 
-            let manaDisplay = "";
             if (hasCatalyst) {
                 manaDisplay = ` | ✨ Mana: \`${stats.mana}/${stats.maxMana}\``;
+            }
+
+            if (hasSword) {
+                swordStyleDisplay = ` | 📜 Style: \`${stats.swordStyle}\``;
             }
 
             const embed = new EmbedBuilder()
@@ -207,7 +220,7 @@ export const rpg = buildCommand<SlashCommand>({
                         `🌱 Resonance: \`${stats.resonance}\` | 🎗️ Archon: \`${
                             stats.deity || "None"
                         }\`\n\n` +
-                        `${hpDisplay}${manaDisplay}\n` +
+                        `${hpDisplay}${manaDisplay}${swordStyleDisplay}\n` +
                         `⚔️ ATK: \`${stats.attackPower.toFixed(
                             2,
                         )} (${formatChange(
