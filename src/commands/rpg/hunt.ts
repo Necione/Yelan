@@ -1,8 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get } from "@elara-services/utils";
+import { embedComment } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, syncStats } from "../../services";
-import { cooldowns, locked } from "../../utils";
+import { locked } from "../../utils";
 import { startHunt } from "./handlers/huntHandler";
 
 export const hunt = buildCommand<SlashCommand>({
@@ -42,7 +42,6 @@ export const hunt = buildCommand<SlashCommand>({
                 ),
             );
         }
-        await cooldowns.set(userWallet, "stuckHelper", get.mins(5));
 
         await startHunt(message, i.user);
         locked.del(i.user.id);

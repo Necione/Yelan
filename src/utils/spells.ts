@@ -11,12 +11,12 @@ export const spells: Record<string, Spell> = {
     Heal: {
         spellName: "Heal",
         description: "Restores 15% of your max HP.",
-        cost: 5,
+        cost: 7,
     },
     Fury: {
         spellName: "Fury",
         description: "Makes your attack deal 2x damage.",
-        cost: 13,
+        cost: 20,
     },
     Burn: {
         spellName: "Burn",
@@ -26,7 +26,7 @@ export const spells: Record<string, Spell> = {
     Cripple: {
         spellName: "Cripple",
         description: "Deals 10% of the enemy's max HP as damage.",
-        cost: 5,
+        cost: 7,
     },
     Stun: {
         spellName: "Stun",
@@ -42,7 +42,7 @@ export const spells: Record<string, Spell> = {
     Flare: {
         spellName: "Flare",
         description: "Deal damage equal to half your current HP.",
-        cost: 25,
+        cost: 20,
         requiredMasteryLevel: 2,
     },
     Suffocate: {

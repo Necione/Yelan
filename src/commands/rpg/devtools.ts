@@ -6,7 +6,7 @@ import {
     getUserStats,
     updateUserStats,
 } from "../../services";
-import { cooldowns, locked } from "../../utils";
+import { locked } from "../../utils";
 
 export const devtools = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -57,12 +57,6 @@ export const devtools = buildCommand<SlashCommand>({
                 return r.edit(
                     embedComment("Unable to find/create your user profile."),
                 );
-            }
-
-            const cc = cooldowns.get(userWallet, "stuckHelper");
-            if (!cc.status) {
-                locked.del(i.user.id);
-                return r.edit(embedComment(cc.message));
             }
 
             await updateUserStats(i.user.id, {

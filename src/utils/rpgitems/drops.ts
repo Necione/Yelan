@@ -455,6 +455,22 @@ export const drops = {
         chestChance: 1,
         rarity: 2,
     },
+    "Fungal Spores": {
+        sellPrice: 5,
+        minAmount: 1,
+        maxAmount: 1,
+        minadventurerank: 1,
+        chestChance: 0,
+        rarity: 1,
+    },
+    "Transoceanic Pearl": {
+        sellPrice: 8,
+        minAmount: 1,
+        maxAmount: 1,
+        minadventurerank: 1,
+        chestChance: 0,
+        rarity: 1,
+    },
     "Life Essence": {
         sellPrice: 1,
         minAmount: 0,
