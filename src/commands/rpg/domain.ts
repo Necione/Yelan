@@ -86,7 +86,11 @@ export const domain = buildCommand<SlashCommand>({
                         },
                         {
                             name: "Rewards",
-                            value: `${customEmoji.a.z_coins} \`${domain.reward.coins.toLocaleString()}\` ${texts.c.u}\n${domain.reward.items
+                            value: `${
+                                customEmoji.a.z_coins
+                            } \`${domain.reward.coins.toLocaleString()}\` ${
+                                texts.c.u
+                            }\n${domain.reward.items
                                 .map(
                                     (item) =>
                                         `\`${item.amount}x\` ${item.item} (${item.chance}%)`,
@@ -199,7 +203,9 @@ export const domain = buildCommand<SlashCommand>({
                         )
                         .addFields({
                             name: `${texts.c.u} Earned`,
-                            value: `\`${domain.reward.coins.toLocaleString()}\` ${texts.c.u}`,
+                            value: `\`${domain.reward.coins.toLocaleString()}\` ${
+                                texts.c.u
+                            }`,
                             inline: true,
                         });
 

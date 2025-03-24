@@ -18,6 +18,14 @@ export const spell = buildCommand<SlashCommand>({
                 .setRequired(false)
                 .setAutocomplete(true),
         )
+        .addIntegerOption((option) =>
+            option
+                .setName("times")
+                .setDescription("Number of times to cast the spell")
+                .setRequired(false)
+                .setMinValue(1)
+                .setMaxValue(10),
+        )
         .setDMPermission(false),
     defer: { silent: false },
     async autocomplete(i) {
@@ -81,6 +89,7 @@ export const spell = buildCommand<SlashCommand>({
     async execute(i, r) {
         try {
             const spellName = i.options.getString("cast", false);
+            const times = i.options.getInteger("times", false) ?? 1;
 
             if (spellName) {
                 if (spellName.toLowerCase() === "clear") {
@@ -213,32 +222,36 @@ export const spell = buildCommand<SlashCommand>({
                     return r.edit({ embeds: [noWeaponEmbed] });
                 }
 
-                if (stats.castQueue.length >= (stats.maxCastQueue ?? 10)) {
-                    const queueFullEmbed = new EmbedBuilder()
-                        .setColor(0xecd9fc)
-                        .setTitle("`⚠️` Spell Queue Full")
-                        .setDescription(
-                            `You cannot add more spells to your cast queue. Your maximum limit is **${
-                                stats.maxCastQueue ?? 10
-                            }**.`,
-                        );
-
-                    return r.edit({ embeds: [queueFullEmbed] });
-                }
-
-                if (stats.mana < spell.cost) {
+                const totalManaCost = spell.cost * times;
+                if (stats.mana < totalManaCost) {
                     const insufficientManaEmbed = new EmbedBuilder()
                         .setColor(0xecd9fc)
                         .setTitle("Insufficient Mana")
                         .setDescription(
-                            `You don't have enough mana to cast "${spellName}".\n\n- **Cost**: ${spell.cost} Mana\n- **Your Mana**: ${stats.mana}/${stats.maxMana}`,
+                            `You don't have enough mana to cast "${spellName}" ${times} times.\n\n- **Cost per cast**: ${spell.cost} Mana\n- **Total Cost**: ${totalManaCost} Mana\n- **Your Mana**: ${stats.mana}/${stats.maxMana}`,
                         );
 
                     return r.edit({ embeds: [insufficientManaEmbed] });
                 }
 
-                stats.mana -= spell.cost;
-                stats.castQueue.push(spellName);
+                const maxQueueSize = stats.maxCastQueue ?? 10;
+                const remainingQueueSpace =
+                    maxQueueSize - stats.castQueue.length;
+                if (times > remainingQueueSpace) {
+                    const queueFullEmbed = new EmbedBuilder()
+                        .setColor(0xecd9fc)
+                        .setTitle("`⚠️` Spell Queue Full")
+                        .setDescription(
+                            `You cannot add ${times} spells to your cast queue. You only have ${remainingQueueSpace} slots remaining.\n\n- **Current Queue Size**: ${stats.castQueue.length}/${maxQueueSize}`,
+                        );
+
+                    return r.edit({ embeds: [queueFullEmbed] });
+                }
+
+                stats.mana -= totalManaCost;
+                for (let i = 0; i < times; i++) {
+                    stats.castQueue.push(spellName);
+                }
 
                 await updateUserStats(userId, {
                     mana: { set: stats.mana },
@@ -252,7 +265,7 @@ export const spell = buildCommand<SlashCommand>({
                         `https://lh.elara.workers.dev/rpg/spellicon.png`,
                     )
                     .setDescription(
-                        `You have casted \`${spellName}\`. It has been added to your spell queue.\n- **Remaining Mana**: ${stats.mana}/${stats.maxMana}`,
+                        `You have casted \`${spellName}\` ${times} times. It has been added to your spell queue.\n- **Remaining Mana**: ${stats.mana}/${stats.maxMana}`,
                     )
                     .addFields({
                         name: "Current Cast Queue",
