@@ -121,7 +121,7 @@ export const rpg = buildCommand<SlashCommand>({
             } else if (stats.hp < stats.maxHP * 0.3) {
                 hpDisplay = `🧡 \`${stats.hp}/${stats.maxHP}\` **LOW HP**`;
             } else {
-                hpDisplay = `❤️ \`${stats.hp}/${stats.maxHP}\``;
+                hpDisplay = hasCrimsonMoon ? `🖤 \`${stats.hp}/${stats.maxHP}\`` : `❤️ \`${stats.hp}/${stats.maxHP}\``;
             }
 
             let manaDisplay = "";

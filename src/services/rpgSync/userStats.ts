@@ -59,7 +59,8 @@ export async function syncStats(userId: string) {
 
     const assignedHpBonus = (stats.assignedHp || 0) * 2;
     const bonusHp = stats.bonusHp || 0;
-    const finalMaxHP = calculatedMaxHP + assignedHpBonus + bonusHp;
+    const souls = stats.souls || 0;
+    const finalMaxHP = calculatedMaxHP + assignedHpBonus + bonusHp + souls;
 
     const assignedCritValueBonus = (stats.assignedCritValue || 0) * 0.01;
     const assignedDefValueBonus = (stats.assignedDefValue || 0) * 1;
