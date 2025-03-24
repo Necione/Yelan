@@ -29,7 +29,7 @@ export type ItemDrop = {
     amount: number;
 };
 
-const maxadventureRank = 35;
+const maxadventureRank = 40;
 
 export async function handleVictory(
     message: Message,

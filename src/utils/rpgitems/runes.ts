@@ -9,6 +9,7 @@ export const runes = {
         defValue: { min: 0, max: 10 },
         additionalMana: { min: 0, max: 5 },
         minadventurerank: 5,
+        emoji: "⚡",
     },
     "Snow Rune": {
         sellPrice: 15,
@@ -20,6 +21,7 @@ export const runes = {
         defValue: { min: 10, max: 25 },
         additionalMana: { min: 0, max: 5 },
         minadventurerank: 5,
+        emoji: "❄️",
     },
 };
 

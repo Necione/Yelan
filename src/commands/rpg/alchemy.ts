@@ -74,9 +74,7 @@ const createAlchemyBar = (
 
     const bar = "█".repeat(filledLength) + "░".repeat(emptyLength);
 
-    return `\`${bar}\` ${relativeCurrent.toFixed(2)}/${relativeMax.toFixed(
-        2,
-    )} Alchemy (${rankName})`;
+    return `\`${bar}\` ${relativeCurrent.toFixed(2)}/${relativeMax.toFixed(2)}`;
 };
 
 export const alchemy = buildCommand<SlashCommand>({

@@ -28,6 +28,7 @@ export interface Monster {
     critValue: number;
     defChance: number;
     defValue: number;
+    dodgeChance?: number;
     minadventurerank: number;
     image: string;
     isMutated?: boolean;

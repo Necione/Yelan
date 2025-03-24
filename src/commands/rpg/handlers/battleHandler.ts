@@ -1114,7 +1114,7 @@ export function applyAttackModifiers(
         const bonusDamage = Math.floor(stats.maxHP * 0.1);
         attackPower += bonusDamage;
         messages.push(
-            "`☠️` Poisonous mutation: You deal bonus damage equal to 10% of your max HP!",
+            "`☠️` Poisonous mutation: You deal bonus damage equal to __10%__ of your max HP!",
         );
         debugMultipliers.push(`Poisonous bonus (+${bonusDamage})`);
         debug(`${username} Poisonous bonus added: +${bonusDamage} damage`);
@@ -1122,7 +1122,9 @@ export function applyAttackModifiers(
 
     if (monster.mutationType === "Demonic") {
         attackPower *= 0.6;
-        messages.push("`🎭` A sense of pressure reduces your damage by 40%");
+        messages.push(
+            "`🎭` A sense of pressure reduces your damage by __40%__",
+        );
         debugMultipliers.push("Demonic Pressure (0.6x)");
         debug(`${username} Demonic => Attack Power * 0.6 = ${attackPower}`);
     }
@@ -1155,6 +1157,17 @@ export function checkMonsterDefenses(
     let damageReduced = 0;
 
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
+
+    // Check for dodge chance
+    if (monster.dodgeChance && Math.random() < monster.dodgeChance) {
+        attackMissed = true;
+        messages.push(`\`🔄\` The ${monster.name} dodged your attack!`);
+        debug(
+            `${username} Dodge chance: ${monster.name} dodged the attack with ${
+                monster.dodgeChance * 100
+            }% dodge chance`,
+        );
+    }
 
     if (
         has("Agent", monster) &&
