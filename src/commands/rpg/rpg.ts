@@ -9,7 +9,7 @@ import {
     syncInventoryItemsForUser,
     syncStats,
 } from "../../services";
-import { cooldowns, getPaginatedMessage } from "../../utils";
+import { getPaginatedMessage } from "../../utils";
 import { chars, type CharsName } from "../../utils/helpers/charHelper";
 import { formatChange } from "../../utils/helpers/huntHelper";
 import { artifacts, type ArtifactName } from "../../utils/rpgitems/artifacts";
@@ -95,9 +95,6 @@ export const rpg = buildCommand<SlashCommand>({
         const pager = getPaginatedMessage();
 
         if (category === "General") {
-            const huntCooldown = cooldowns.get(p, "hunt");
-            const exploreCooldown = cooldowns.get(p, "explore");
-
             const expRequired = 20 * Math.pow(1.2, stats.adventureRank - 1);
 
             const equippedWeaponName = stats.equippedWeapon as
@@ -121,7 +118,9 @@ export const rpg = buildCommand<SlashCommand>({
             } else if (stats.hp < stats.maxHP * 0.3) {
                 hpDisplay = `🧡 \`${stats.hp}/${stats.maxHP}\` **LOW HP**`;
             } else {
-                hpDisplay = hasCrimsonMoon ? `🖤 \`${stats.hp}/${stats.maxHP}\`` : `❤️ \`${stats.hp}/${stats.maxHP}\``;
+                hpDisplay = hasCrimsonMoon
+                    ? `🖤 \`${stats.hp}/${stats.maxHP}\``
+                    : `❤️ \`${stats.hp}/${stats.maxHP}\``;
             }
 
             let manaDisplay = "";
@@ -258,16 +257,6 @@ export const rpg = buildCommand<SlashCommand>({
                         (hasCrimsonMoon
                             ? `🌙 **SOULS COLLECTED**: \`${stats.souls || 0}\``
                             : ""),
-                })
-                .addFields({
-                    name: "Cooldowns",
-                    value: `Hunt: ${
-                        huntCooldown.status ? "Ready" : huntCooldown.message
-                    }\nExplore: ${
-                        exploreCooldown.status
-                            ? "Ready"
-                            : exploreCooldown.message
-                    }`,
                 });
 
             if (is.number(stats.rebirths)) {
@@ -293,7 +282,6 @@ export const rpg = buildCommand<SlashCommand>({
 
             pager.pages.push({ embeds: [embed] });
         } else if (category === "Fishing") {
-            const fishCooldown = cooldowns.get(p, "fish");
             const { requiredExpForNextLevel } = calculateFishingLevel(
                 stats.fishingExp || 0,
             );
@@ -323,12 +311,6 @@ export const rpg = buildCommand<SlashCommand>({
                         `🌟 Legendaries Caught: \`${
                             stats.legendariesCaught || 0
                         }\``,
-                })
-                .addFields({
-                    name: "Cooldowns",
-                    value: `Fishing: ${
-                        fishCooldown.status ? "Ready" : fishCooldown.message
-                    }`,
                 });
             pager.pages.push({ embeds: [embed] });
         }

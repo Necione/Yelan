@@ -4,12 +4,12 @@ import { SlashCommandBuilder } from "discord.js";
 import { getProfileByUserId, getUserStats } from "../../services";
 import { cooldowns, debug, locked } from "../../utils";
 import { getUserSkillLevelData } from "../../utils/skillsData";
-import { handleChest } from "./handlers/exploreHandler";
+import { handleMaterials } from "./handlers/exploreHandler";
 
-export const explore = buildCommand<SlashCommand>({
+export const gather = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
-        .setName("explore")
-        .setDescription("[RPG] Go on an exploration to find treasure chests.")
+        .setName("gather")
+        .setDescription("[RPG] Gather raw materials from your surroundings.")
         .setDMPermission(false),
     defer: { silent: false },
     async execute(i, r) {
@@ -31,7 +31,7 @@ export const explore = buildCommand<SlashCommand>({
                 );
             }
 
-            const cc = cooldowns.get(userWallet, "explore");
+            const cc = cooldowns.get(userWallet, "gather");
             if (!cc.status) {
                 locked.del(i.user.id);
                 return r.edit(embedComment(cc.message));
@@ -51,42 +51,48 @@ export const explore = buildCommand<SlashCommand>({
                 locked.del(i.user.id);
                 return r.edit(
                     embedComment(
-                        "You cannot go on an exploration while you are travelling!",
+                        "You cannot gather materials while you are travelling!",
                     ),
                 );
             }
 
             if (stats.isHunting || stats.abyssMode) {
                 locked.del(i.user.id);
-                return r.edit(embedComment("You cannot explore right now!"));
+                return r.edit(
+                    embedComment("You cannot gather materials right now!"),
+                );
             }
 
             if (stats.hp <= 0) {
                 locked.del(i.user.id);
                 return r.edit(
-                    embedComment("You don't have enough HP to explore :("),
+                    embedComment(
+                        "You don't have enough HP to gather materials :(",
+                    ),
                 );
             }
 
             const energizeSkill = getUserSkillLevelData(stats, "Energize");
-            const exploreCooldown = energizeSkill?.levelData?.cooldown
+            const gatherCooldown = energizeSkill?.levelData?.cooldown
                 ? get.mins(energizeSkill.levelData.cooldown)
-                : get.mins(30);
-            await cooldowns.set(userWallet, "explore", exploreCooldown);
+                : get.mins(15);
+            await cooldowns.set(userWallet, "gather", gatherCooldown);
 
-            await r.edit(embedComment(`Exploring around ${stats.location}...`));
+            await r.edit(
+                embedComment(`Gathering materials around ${stats.location}...`),
+            );
             await new Promise((resolve) =>
                 setTimeout(
                     resolve,
                     get.secs(Math.floor(Math.random() * 3) + 3),
                 ),
-            ); // 3-5 seconds delay
+            );
 
-            await handleChest(i, stats);
+            await handleMaterials(i);
 
             locked.del(i.user.id);
         } catch (err) {
-            debug(`[RPG:EXPLORE]: ERROR`, err);
+            debug(`[RPG:GATHER]: ERROR`, err);
             locked.del(i.user.id);
         }
     },

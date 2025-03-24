@@ -1,14 +1,8 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, get, is, noop, sleep } from "@elara-services/utils";
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ComponentType,
-    EmbedBuilder,
-    SlashCommandBuilder,
-} from "discord.js";
+import { embedComment, noop } from "@elara-services/utils";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
+import { locationGroupWeights } from "../../utils/locationGroupWeights";
 
 type RegionName = "Liyue" | "Inazuma";
 
@@ -25,25 +19,23 @@ type LocationName =
     | "Jueyun Karst"
     | "Ritou";
 
-type LocationXY = {
-    x: number;
-    y: number;
-    requiredRebirths?: number;
+type Location = {
     region: RegionName;
+    requiredAR?: number;
 };
 
-export const locations: Record<LocationName, LocationXY> = {
-    "Liyue Harbor": { x: 15, y: 4, region: "Liyue" },
-    "Qingxu Pool": { x: 7, y: 2, region: "Liyue" },
-    "Lingju Pass": { x: 8, y: 4, region: "Liyue" },
-    "Lumberpick Valley": { x: 5, y: 6, region: "Liyue" },
-    "Dunyu Ruins": { x: 10, y: 7, region: "Liyue" },
-    Nantianmen: { x: 3, y: 11, region: "Liyue" },
-    "Tianqiu Valley": { x: 7, y: 9, region: "Liyue" },
-    "Luhua Pool": { x: 13, y: 10, region: "Liyue" },
-    "Guili Plains": { x: 15, y: 12, region: "Liyue" },
-    "Jueyun Karst": { x: 7, y: 13, region: "Liyue" },
-    Ritou: { x: 45, y: -20, region: "Inazuma" },
+export const locations: Record<LocationName, Location> = {
+    "Liyue Harbor": { region: "Liyue" },
+    "Qingxu Pool": { region: "Liyue" },
+    "Lingju Pass": { region: "Liyue" },
+    "Lumberpick Valley": { region: "Liyue" },
+    "Dunyu Ruins": { region: "Liyue" },
+    Nantianmen: { region: "Liyue" },
+    "Tianqiu Valley": { region: "Liyue" },
+    "Luhua Pool": { region: "Liyue" },
+    "Guili Plains": { region: "Liyue" },
+    "Jueyun Karst": { region: "Liyue" },
+    Ritou: { region: "Inazuma", requiredAR: 30 },
 };
 
 export const locationEmojis: Record<LocationName, string> = {
@@ -60,25 +52,59 @@ export const locationEmojis: Record<LocationName, string> = {
     Ritou: "⛩️",
 };
 
-function calculateDistance(start: LocationXY, end: LocationXY) {
-    const dx = end.x - start.x;
-    const dy = end.y - start.y;
-    return Math.sqrt(dx * dx + dy * dy);
-}
-
-interface DirectionalLocations {
-    north?: { location: LocationName; distance: number };
-    south?: { location: LocationName; distance: number };
-    east?: { location: LocationName; distance: number };
-    west?: { location: LocationName; distance: number };
+function getCommonEnemyTypes(location: LocationName): string[] {
+    const locationWeights =
+        locationGroupWeights[location] || locationGroupWeights["Default"];
+    return Object.entries(locationWeights)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 3)
+        .map(([group]) => group);
 }
 
 export const travel = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
         .setName("travel")
         .setDescription("[RPG] Travel to different locations.")
+        .addStringOption((option) =>
+            option
+                .setName("location")
+                .setDescription("The location to travel to")
+                .setRequired(true)
+                .setAutocomplete(true),
+        )
         .setDMPermission(false),
     defer: { silent: false },
+    async autocomplete(i) {
+        const stats = await getUserStats(i.user.id);
+        if (!stats) {
+            return i
+                .respond([{ name: "No stats found.", value: "n/a" }])
+                .catch(noop);
+        }
+
+        const focusedValue = i.options.getFocused()?.toLowerCase() || "";
+
+        const availableLocations = Object.entries(locations)
+            .filter(([, location]) => {
+                if (!location.requiredAR) {
+                    return true;
+                }
+                return stats.adventureRank >= location.requiredAR;
+            })
+            .map(([name]) => ({
+                name,
+                value: name,
+            }))
+            .filter((loc) => loc.name.toLowerCase().includes(focusedValue));
+
+        if (!availableLocations.length) {
+            return i
+                .respond([{ name: "No locations found.", value: "n/a" }])
+                .catch(noop);
+        }
+
+        return i.respond(availableLocations.slice(0, 25)).catch(noop);
+    },
     async execute(i, r) {
         const stats = await getUserStats(i.user.id);
 
@@ -120,184 +146,46 @@ export const travel = buildCommand<SlashCommand>({
             });
         }
 
-        const currentCoords = locations[currentLocation];
+        const selectedLocation = i.options.getString(
+            "location",
+            true,
+        ) as LocationName;
 
-        const isAtPort =
-            currentLocation === "Liyue Harbor" || currentLocation === "Ritou";
-
-        const currentRegion = currentCoords.region;
-
-        const directionalLocations: DirectionalLocations = {};
-
-        for (const [locationName, coords] of Object.entries(locations)) {
-            if (locationName === currentLocation) {
-                continue;
-            }
-            if (coords.region !== currentRegion) {
-                continue;
-            }
-
-            const dx = coords.x - currentCoords.x;
-            const dy = coords.y - currentCoords.y;
-            const distance = calculateDistance(currentCoords, coords);
-
-            let direction: "north" | "south" | "east" | "west" | null = null;
-
-            if (dy > 0 && Math.abs(dy) >= Math.abs(dx)) {
-                direction = "north";
-            } else if (dy < 0 && Math.abs(dy) >= Math.abs(dx)) {
-                direction = "south";
-            } else if (dx > 0 && Math.abs(dx) > Math.abs(dy)) {
-                direction = "east";
-            } else if (dx < 0 && Math.abs(dx) > Math.abs(dy)) {
-                direction = "west";
-            }
-
-            if (direction) {
-                const existing = directionalLocations[direction];
-                if (!existing || distance < existing.distance) {
-                    directionalLocations[direction] = {
-                        location: locationName as LocationName,
-                        distance,
-                    };
-                }
-            }
+        if (!locations[selectedLocation]) {
+            return r.edit(embedComment("Invalid location selected."));
         }
 
-        let travelOptions: LocationName[] = Object.values(
-            directionalLocations,
-        ).map((d) => d.location);
-
-        if (isAtPort) {
-            if (currentLocation === "Liyue Harbor") {
-                if (stats.adventureRank >= 30) {
-                    travelOptions.push("Ritou");
-                }
-            } else if (currentLocation === "Ritou") {
-                travelOptions.push("Liyue Harbor");
-            }
+        if (selectedLocation === currentLocation) {
+            return r.edit(embedComment("You are already at this location!"));
         }
 
-        travelOptions = Array.from(new Set(travelOptions));
-
-        if (!is.array(travelOptions)) {
-            return r.edit({
-                embeds: [
-                    new EmbedBuilder().setDescription(
-                        "There are no available locations to travel to from here.",
-                    ),
-                ],
-            });
-        }
-
-        const embed = new EmbedBuilder()
-            .setTitle("Travel Options")
-            .setDescription(
-                `You are currently at ${locationEmojis[currentLocation]} **${currentLocation}**.\n\nSelect a location to travel to:`,
-            );
-
-        const buttons = travelOptions.map((loc) =>
-            new ButtonBuilder()
-                .setCustomId(`travel_${loc}`)
-                .setLabel(`${locationEmojis[loc]} ${loc}`)
-                .setStyle(ButtonStyle.Primary),
-        );
-
-        const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            ...buttons,
-        );
-
-        const message = await r.edit({
-            embeds: [embed],
-            components: [actionRow],
-        });
-        if (!message) {
+        const targetLocation = locations[selectedLocation];
+        if (
+            targetLocation.requiredAR &&
+            stats.adventureRank < targetLocation.requiredAR
+        ) {
             return r.edit(
-                embedComment(`Unable to fetch the original message.`),
+                embedComment(
+                    `You need to be Adventure Rank ${targetLocation.requiredAR} or higher to travel to ${selectedLocation}.`,
+                ),
             );
         }
 
-        const collector = message.createMessageComponentCollector({
-            filter: (ii) => ii.user.id === i.user.id,
-            componentType: ComponentType.Button,
-            time: get.mins(1),
+        await updateUserStats(i.user.id, {
+            location: { set: selectedLocation },
         });
 
-        collector.on("collect", async (interaction) => {
-            const selectedLocation = interaction.customId.replace(
-                "travel_",
-                "",
-            ) as LocationName;
+        const emoji = locationEmojis[selectedLocation];
+        const commonEnemies = getCommonEnemyTypes(selectedLocation);
+        const enemyList = commonEnemies
+            .map((enemy) => `\`${enemy}\``)
+            .join(", ");
 
-            if (!locations[selectedLocation]) {
-                return interaction
-                    .reply({
-                        content: "Invalid location selected.",
-                        ephemeral: true,
-                    })
-                    .catch(noop);
-            }
-
-            const targetRegion = locations[selectedLocation].region;
-            if (
-                targetRegion === "Inazuma" &&
-                stats.adventureRank < 20 &&
-                currentLocation !== "Ritou"
-            ) {
-                return interaction
-                    .reply({
-                        content:
-                            "You need to be Adventure Rank 20 or higher to travel to Inazuma.",
-                        ephemeral: true,
-                    })
-                    .catch(noop);
-            }
-
-            collector.stop();
-
-            const startCoords = currentCoords;
-            const endCoords = locations[selectedLocation];
-
-            const distance = calculateDistance(startCoords, endCoords);
-            const travelTime = isAtPort ? 30 : distance * 10;
-
-            const arrivalTimestamp =
-                Math.round(Date.now() / 1000) + Math.round(travelTime);
-
-            await updateUserStats(i.user.id, { isTravelling: { set: true } });
-
-            const emoji = locationEmojis[selectedLocation];
-
-            await interaction
-                .update(
-                    embedComment(
-                        `You are travelling to ${emoji} **${selectedLocation}**.\nYou will arrive <t:${arrivalTimestamp}:R>!`,
-                        "Orange",
-                    ),
-                )
-                .catch(noop);
-
-            await sleep(travelTime * 1000);
-
-            await updateUserStats(i.user.id, {
-                location: { set: selectedLocation },
-                isTravelling: { set: false },
-            });
-
-            await i
-                .followUp(
-                    embedComment(
-                        `You have arrived at ${emoji} **${selectedLocation}**!`,
-                        "Green",
-                    ),
-                )
-                .catch(noop);
-        });
-
-        collector.on("end", async (collected) => {
-            if (!collected.size) {
-                await r.edit({ components: [] });
-            }
-        });
+        return r.edit(
+            embedComment(
+                `You have arrived at ${emoji} **${selectedLocation}**!\nCommon enemies in this area: ${enemyList}`,
+                "Green",
+            ),
+        );
     },
 });

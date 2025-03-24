@@ -9,7 +9,7 @@ import {
     noop,
 } from "@elara-services/utils";
 import type { UserStats } from "@prisma/client";
-import type { ChatInputCommandInteraction } from "discord.js";
+import type { ChatInputCommandInteraction, Message } from "discord.js";
 import { ButtonStyle, EmbedBuilder } from "discord.js";
 import { addItemToInventory } from "../../../services";
 import { debug } from "../../../utils";
@@ -21,7 +21,7 @@ import type { WeaponName } from "../../../utils/rpgitems/weapons";
 export async function handleChest(
     i: ChatInputCommandInteraction,
     stats: UserStats,
-) {
+): Promise<Message<boolean> | undefined> {
     try {
         const numberOfChests = getRandomValue(2, 4);
 
@@ -51,14 +51,14 @@ export async function handleChest(
 
         const embed = new EmbedBuilder()
             .setTitle(
-                `<a:z_reward:1091219256395452517> You stumbled upon some chests!`,
+                `<a:z_reward:1091219256395452517> You found some treasure chests!`,
             )
             .setDescription(
                 `Select one of the chests below to claim its contents.\n\n${chestDescriptions.join(
                     "\n\n",
                 )}`,
             )
-            .setColor("Green");
+            .setColor("Gold");
 
         const buttonRow = addButtonRow(
             chestLoots.map((_, idx) => ({
@@ -76,18 +76,20 @@ export async function handleChest(
             .catch(noop);
 
         if (!message) {
-            return i.editReply(
+            await i.editReply(
                 embedComment(`Unable to fetch the original message`),
             );
+            return;
         }
 
         const c = await awaitComponent(message, {
             only: { originalUser: true },
-            time: get.secs(10),
+            time: get.secs(30),
             custom_ids: [{ id: "chest_", includes: true }],
         });
+
         if (!c) {
-            return i
+            const timeoutMessage = await i
                 .editReply({
                     embeds: [
                         embed.setDescription(
@@ -97,6 +99,7 @@ export async function handleChest(
                     components: [],
                 })
                 .catch(noop);
+            return timeoutMessage || undefined;
         }
 
         await c.deferUpdate().catch(noop);
@@ -117,7 +120,7 @@ export async function handleChest(
                           .join(", ")
                     : "No items";
 
-            await i
+            const finalMessage = await i
                 .editReply({
                     embeds: [
                         embed.setDescription(
@@ -133,13 +136,19 @@ export async function handleChest(
                     components: [],
                 })
                 .catch(noop);
+
+            return finalMessage || undefined;
         }
+        return message;
     } catch (err) {
         debug(`[HANDLE:CHEST]: ${i.user.tag} (${i.user.id})`, err);
+        return;
     }
 }
 
-export async function handleMaterials(i: ChatInputCommandInteraction) {
+export async function handleMaterials(
+    i: ChatInputCommandInteraction,
+): Promise<Message<boolean> | undefined> {
     try {
         const { materials } = generateRawMaterials();
 
@@ -156,22 +165,26 @@ export async function handleMaterials(i: ChatInputCommandInteraction) {
                 .map((material) => `\`${material.amount}x\` ${material.item}`)
                 .join(", ");
 
-            await i
+            const message = await i
                 .editReply(
                     embedComment(
                         added
-                            ? `You gathered raw materials while exploring!\nYou found ${materialsList}.`
+                            ? `You found some raw materials while gathering!\nYou found ${materialsList}.`
                             : `Your inventory is full! No materials were added.`,
                         "Green",
                     ),
                 )
                 .catch(noop);
+
+            return message || undefined;
         } else {
-            return i.editReply(
+            const message = await i.editReply(
                 embedComment(`Unable to find any raw materials.`),
             );
+            return message || undefined;
         }
     } catch (err) {
-        debug(`[HANDLE:TRAP]: ${i.user.tag} (${i.user.id})`, err);
+        debug(`[HANDLE:MATERIALS]: ${i.user.tag} (${i.user.id})`, err);
+        return;
     }
 }

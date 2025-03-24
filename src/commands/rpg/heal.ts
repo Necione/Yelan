@@ -51,11 +51,16 @@ export const heal = buildCommand<SlashCommand>({
             );
         }
 
-        const baseHealCost = Math.floor(Math.random() * (50 - 40 + 1)) + 40;
-        const adventureRankCost = stats.adventureRank * 1;
+        const baseHealCost =
+            stats.rebirths <= 1
+                ? Math.floor(Math.random() * (30 - 25 + 1)) + 25
+                : Math.floor(Math.random() * (50 - 40 + 1)) + 40;
+        const adventureRankCost =
+            stats.rebirths <= 1 ? 0 : stats.adventureRank * 1;
         const initialHealCost = baseHealCost + adventureRankCost;
 
-        const rebirthMultiplier = 1 + 0.2 * stats.rebirths;
+        const rebirthMultiplier =
+            stats.rebirths <= 1 ? 1 : 1 + 0.2 * stats.rebirths;
 
         const healCost = Math.round(initialHealCost * rebirthMultiplier);
 

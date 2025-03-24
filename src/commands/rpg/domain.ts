@@ -1,7 +1,13 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { embedComment, noop } from "@elara-services/utils";
+import {
+    addButtonRow,
+    awaitComponent,
+    embedComment,
+    get,
+    noop,
+} from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
     getUserStats,
@@ -155,6 +161,66 @@ export const domain = buildCommand<SlashCommand>({
                 ),
             );
         }
+
+        const warningEmbed = new EmbedBuilder()
+            .setColor(0xff0000)
+            .setTitle("⚠️ Domain Challenge Warning")
+            .setDescription(
+                `**YOU CAN ONLY CHALLENGE THIS DOMAIN ONCE PER DAY**\n\nAre you sure you want to proceed with challenging ${domainName}?`,
+            )
+            .setThumbnail("https://lh.elara.workers.dev/rpg/domain.png");
+
+        const confirmButtons = addButtonRow([
+            {
+                id: "confirm_domain",
+                label: "Yes, I'm Ready",
+                style: ButtonStyle.Success,
+            },
+            {
+                id: "cancel_domain",
+                label: "Cancel",
+                style: ButtonStyle.Danger,
+            },
+        ]);
+
+        await r.edit({
+            embeds: [warningEmbed],
+            components: [confirmButtons],
+        });
+
+        const confirmation = await awaitComponent(
+            await interaction.fetchReply(),
+            {
+                only: { originalUser: true },
+                time: get.secs(30),
+                custom_ids: [{ id: "confirm_domain" }, { id: "cancel_domain" }],
+            },
+        );
+
+        if (!confirmation || confirmation.customId === "cancel_domain") {
+            return r.edit({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("Red")
+                        .setDescription("Domain challenge cancelled."),
+                ],
+                components: [],
+            });
+        }
+
+        await r.edit({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(0xeee1a6)
+                    .setDescription("May the archons be with you...")
+                    .setThumbnail(
+                        "https://lh.elara.workers.dev/rpg/domain.png",
+                    ),
+            ],
+            components: [],
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 5000));
 
         await r.edit({
             embeds: [

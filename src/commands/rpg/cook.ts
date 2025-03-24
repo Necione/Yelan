@@ -1,8 +1,14 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop, snowflakes } from "@elara-services/utils";
-import { SlashCommandBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
+import { getPaginatedMessage } from "../../utils";
 import { recipes } from "../../utils/recipes";
+
+interface CookedItem {
+    name: string;
+    amount: number;
+}
 
 export const cook = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -24,13 +30,34 @@ export const cook = buildCommand<SlashCommand>({
                 .setMinValue(1),
         ),
     async autocomplete(i) {
-        const focusedValue = i.options.getFocused() || "";
-        const choices = recipes
+        const stats = await getUserStats(i.user.id);
+        if (!stats) {
+            return i
+                .respond([{ name: "No stats found", value: "n/a" }])
+                .catch(noop);
+        }
+
+        const focusedValue = i.options.getFocused()?.toLowerCase() || "";
+
+        const availableRecipes = recipes.filter((recipe) => {
+            return recipe.requiredItems.every((required) => {
+                const inventoryItem = stats.inventory.find(
+                    (item) => item.item === required.item,
+                );
+                return inventoryItem && inventoryItem.amount >= required.amount;
+            });
+        });
+
+        const choices = availableRecipes
             .filter((recipe) =>
-                recipe.name.toLowerCase().includes(focusedValue.toLowerCase()),
+                recipe.name.toLowerCase().includes(focusedValue),
             )
-            .map((recipe) => ({ name: recipe.name, value: recipe.name }));
-        return i.respond(choices).catch(noop);
+            .map((recipe) => ({
+                name: recipe.name,
+                value: recipe.name,
+            }));
+
+        return i.respond(choices.slice(0, 25)).catch(noop);
     },
     defer: { silent: false },
     async execute(i, r) {
@@ -52,7 +79,7 @@ export const cook = buildCommand<SlashCommand>({
         }
 
         const currentTime = new Date();
-        const cookedItems = [];
+        const cookedItems: CookedItem[] = [];
         if (stats.cooking && stats.cooking.length > 0) {
             const remainingCooking = [];
             for (const cookingItem of stats.cooking) {
@@ -94,16 +121,24 @@ export const cook = buildCommand<SlashCommand>({
         }
 
         if (!recipeName) {
-            let responseMessage = "";
+            const pager = getPaginatedMessage();
+
+            const currentCookingEmbed = new EmbedBuilder()
+                .setColor("Blue")
+                .setTitle("Current Cooking Status")
+                .setThumbnail("https://lh.elara.workers.dev/rpg/cooking.png");
+
+            let description = "";
             if (cookedItems.length > 0) {
                 const cookedItemsList = cookedItems
                     .map((item) => `\`${item.amount}x\` **${item.name}**`)
                     .join(", ");
-                responseMessage += `Your cooking is done! You received ${cookedItemsList}.\n`;
+                description += `Your cooking is done! You received ${cookedItemsList}.\n\n`;
             }
 
             if (stats.cooking && stats.cooking.length > 0) {
-                const cookingList = stats.cooking
+                description += "**Currently Cooking:**\n";
+                description += stats.cooking
                     .map((cookingItem) => {
                         const finishTimestamp = `<t:${Math.floor(
                             cookingItem.finishTime.getTime() / 1000,
@@ -111,12 +146,45 @@ export const cook = buildCommand<SlashCommand>({
                         return `**${cookingItem.recipeName}** x${cookingItem.amount} - Ready ${finishTimestamp}`;
                     })
                     .join("\n");
-                responseMessage += `You are currently cooking:\n${cookingList}`;
             } else if (cookedItems.length === 0) {
-                responseMessage += "You are not cooking anything currently.";
+                description += "You are not cooking anything currently.";
             }
 
-            return r.edit(embedComment(responseMessage));
+            currentCookingEmbed.setDescription(description);
+
+            const recipesEmbed = new EmbedBuilder()
+                .setColor("Blue")
+                .setTitle("Available Recipes")
+                .setThumbnail("https://lh.elara.workers.dev/rpg/recipes.png");
+
+            const recipeList = recipes
+                .map((recipe) => {
+                    const canCook = recipe.requiredItems.every((required) => {
+                        const inventoryItem = stats.inventory.find(
+                            (item) => item.item === required.item,
+                        );
+                        return (
+                            inventoryItem &&
+                            inventoryItem.amount >= required.amount
+                        );
+                    });
+
+                    const ingredients = recipe.requiredItems
+                        .map((item) => `${item.amount}x ${item.item}`)
+                        .join(", ");
+
+                    return `${canCook ? "✅" : "❌"} **${
+                        recipe.name
+                    }**\n└ Requires: ${ingredients}`;
+                })
+                .join("\n\n");
+
+            recipesEmbed.setDescription(recipeList);
+
+            pager.pages.push({ embeds: [currentCookingEmbed] });
+            pager.pages.push({ embeds: [recipesEmbed] });
+
+            return pager.run(i, i.user).catch(noop);
         }
 
         const recipe = recipes.find(
