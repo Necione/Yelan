@@ -307,28 +307,6 @@ export async function handleHunt(
         const hasDistraction = distractionSkill;
 
         let isMonsterFirst: boolean;
-        if (monster.mutationType) {
-            isMonsterFirst = true;
-        } else {
-            isMonsterFirst = hasDistraction
-                ? Math.random() >= (distractionSkill?.levelData?.priority || 0)
-                : Math.random() < 0.5;
-        }
-
-        let isPlayerTurn = !isMonsterFirst;
-
-        let monsterState = {
-            displaced: false,
-            vanishedUsed: false,
-        };
-
-        let isFirstTurn = true;
-
-        const hasCrystallize = skills.has(stats, "Crystallize");
-        const hasFatigue = skills.has(stats, "Fatigue");
-
-        let turnNumber = 1;
-
         const startingMessages = make.array<string>();
         const tauntSkill = getUserSkillLevelData(stats, "Taunt");
         const pacifistSkill = getUserSkillLevelData(stats, "Pacifist");
@@ -357,6 +335,35 @@ export async function handleHunt(
                 `\`💢\` **SIN OF WRATH** activated. Your starting HP is reduced by __25%__`,
             );
         }
+
+        if (monster.mutationType) {
+            isMonsterFirst = true;
+        } else {
+            isMonsterFirst = hasDistraction
+                ? Math.random() >= (distractionSkill?.levelData?.priority || 0)
+                : Math.random() < 0.5;
+        }
+
+        if (skills.has(stats, "Pride")) {
+            isMonsterFirst = true;
+            startingMessages.push(
+                "`🏅` **SIN OF PRIDE** activated. You will never go first, but deal __250%__ more damage after",
+            );
+        }
+
+        let isPlayerTurn = !isMonsterFirst;
+
+        let monsterState = {
+            displaced: false,
+            vanishedUsed: false,
+        };
+
+        let isFirstTurn = true;
+
+        const hasCrystallize = skills.has(stats, "Crystallize");
+        const hasFatigue = skills.has(stats, "Fatigue");
+
+        let turnNumber = 1;
 
         if (is.array(startingMessages)) {
             if (thread) {

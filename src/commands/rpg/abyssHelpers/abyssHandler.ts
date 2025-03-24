@@ -150,18 +150,6 @@ export async function handleAbyssBattle(
             });
         }
 
-        let vigilanceUsed = false;
-        let isPlayerTurn = false;
-        let isFirstTurn = true;
-        let turnNumber = 1;
-        let monsterState = {
-            displaced: false,
-            vanishedUsed: false,
-        };
-
-        const hasCrystallize = skills.has(stats, "Crystallize");
-        const hasFatigue = skills.has(stats, "Fatigue");
-
         const startingMessages = make.array<string>();
         if (hasSloth) {
             startingMessages.push(
@@ -174,6 +162,19 @@ export async function handleAbyssBattle(
             );
         }
 
+        // Determine turn order
+        let isMonsterFirst = Math.random() < 0.5;
+
+        // If player has Pride skill, monster always goes first
+        if (skills.has(stats, "Pride")) {
+            isMonsterFirst = true;
+            startingMessages.push(
+                "`🏅` **SIN OF PRIDE** activated. You will never go first, but deal 250% more damage after the monster's attack.",
+            );
+        }
+
+        let isPlayerTurn = !isMonsterFirst;
+
         if (is.array(startingMessages)) {
             if (thread) {
                 await sendToChannel(thread.id, {
@@ -181,6 +182,17 @@ export async function handleAbyssBattle(
                 });
             }
         }
+
+        let vigilanceUsed = false;
+        let isFirstTurn = true;
+        let turnNumber = 1;
+        let monsterState = {
+            displaced: false,
+            vanishedUsed: false,
+        };
+
+        const hasCrystallize = skills.has(stats, "Crystallize");
+        const hasFatigue = skills.has(stats, "Fatigue");
 
         while (currentPlayerHp > 0 && currentMonsterHp > 0) {
             if (isPlayerTurn) {

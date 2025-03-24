@@ -204,6 +204,15 @@ export async function playerAttack(
         debug(`${usernameLog} Wrath => attackPower * 1.5 = ${attackPower}`);
     }
 
+    if (skills.has(stats, "Pride")) {
+        attackPower *= 2.5;
+        messages.push(
+            "`🏅` The Pride skill makes you deal __250%__ more damage",
+        );
+        debugMultipliers.push("Pride (3.5x)");
+        debug(`${usernameLog} Pride => attackPower * 2.5 = ${attackPower}`);
+    }
+
     if (monsterState.poisoned) {
         const poisonDamage = Math.floor(0.2 * monster.startingHp);
         currentMonsterHp = Math.max(currentMonsterHp - poisonDamage, 0);

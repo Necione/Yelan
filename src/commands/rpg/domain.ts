@@ -3,7 +3,6 @@ import { embedComment, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
-    getProfileByUserId,
     getUserStats,
     updateUserProfile,
     updateUserStats,
@@ -185,7 +184,9 @@ export const domain = buildCommand<SlashCommand>({
 
         const userWallet = await getProfileByUserId(interaction.user.id);
         if (!userWallet) {
-            return r.edit(embedComment("Unable to find/create your user profile."));
+            return r.edit(
+                embedComment("Unable to find/create your user profile."),
+            );
         }
 
         await handleHunt(
