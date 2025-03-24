@@ -10,6 +10,7 @@ export * from "./craft";
 export * from "./csv";
 export * from "./devtools";
 export * from "./diffuse";
+export * from "./domain";
 export * from "./downgrade";
 export * from "./eat";
 export * from "./equip";

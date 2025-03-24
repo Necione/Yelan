@@ -248,6 +248,33 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
+        if (itemName === "Skill Token") {
+            const updatedInventory = stats.inventory
+                .map((c) => {
+                    if (c.item === itemName) {
+                        c.amount = Math.floor(c.amount - amountToDiffuse);
+                    }
+                    return c;
+                })
+                .filter((c) => c.amount > 0);
+
+            const newBonusTokens = (stats.bonusTokens || 0) + amountToDiffuse;
+
+            await updateUserStats(i.user.id, {
+                inventory: { set: updatedInventory },
+                bonusTokens: { set: newBonusTokens },
+            });
+
+            return r.edit(
+                embedComment(
+                    `You diffused \`${amountToDiffuse}x\` **Skill Token** and gained \`${amountToDiffuse}\` Bonus Token${
+                        amountToDiffuse > 1 ? "s" : ""
+                    }!`,
+                    "Green",
+                ),
+            );
+        }
+
         if (itemName in misc) {
             const baitAmount = amountToDiffuse;
 

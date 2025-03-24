@@ -472,12 +472,20 @@ export async function getMonsterByName(
     }
 }
 
-export async function getMonstersByName(names: string[]) {
+export async function getMonstersByName(
+    names: string[],
+    adventureRank?: number,
+) {
     const mons = make.array<Monster>();
-    for await (const n of names) {
-        const f = await getMonsterByName(n);
-        if (f) {
-            mons.push(f);
+    for await (const rawName of names) {
+        const [baseName, mutation] = rawName.split("|");
+        const monster = await getMonsterByName(baseName.trim(), adventureRank);
+        if (monster) {
+            if (mutation) {
+                monster.mutationType = mutation as MutationType;
+                monster.name = `${mutation} ${monster.name}`;
+            }
+            mons.push(monster);
         }
     }
     return mons;

@@ -119,7 +119,8 @@ export const upgrade = buildCommand<SlashCommand>({
             );
         }
 
-        const tokensAvailable = stats.rebirths - stats.totalTokensUsed;
+        const tokensAvailable =
+            stats.rebirths + stats.bonusTokens - stats.totalTokensUsed;
 
         if (tokensAvailable < 1) {
             return r.edit(
