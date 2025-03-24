@@ -1,5 +1,6 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
+import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     getUserStats,
@@ -85,7 +86,7 @@ export const domain = buildCommand<SlashCommand>({
                         },
                         {
                             name: "Rewards",
-                            value: `<:z_coins:1073332558669262968> \`${domain.reward.coins.toLocaleString()}\` Coins\n${domain.reward.items
+                            value: `${customEmoji.a.z_coins} \`${domain.reward.coins.toLocaleString()}\` ${texts.c.u}\n${domain.reward.items
                                 .map(
                                     (item) =>
                                         `\`${item.amount}x\` ${item.item} (${item.chance}%)`,
@@ -197,8 +198,8 @@ export const domain = buildCommand<SlashCommand>({
                             "https://lh.elara.workers.dev/rpg/domain.png",
                         )
                         .addFields({
-                            name: "Coins Earned",
-                            value: `\`${domain.reward.coins.toLocaleString()}\` Coins`,
+                            name: `${texts.c.u} Earned`,
+                            value: `\`${domain.reward.coins.toLocaleString()}\` ${texts.c.u}`,
                             inline: true,
                         });
 
