@@ -17,10 +17,10 @@ export const domains: Record<string, Domain> = {
     "Cecilia Garden": {
         requiredRebirths: 1,
         monsters: [
-            "Geo Slime",
-            "Large Pyro Slime",
-            "Anemo Hilichurl Rogue",
-            "Ruin Scout",
+            "Dendro Slime",
+            "Hydro Abyss Mage",
+            "Hydro Abyss Mage",
+            "Treasure Hoarder Gravedigger",
         ],
         description:
             "A serene garden filled with Cecilia flowers, now corrupted by monsters.",
@@ -59,9 +59,9 @@ export const domains: Record<string, Domain> = {
     "Valley of Remembrance": {
         requiredRebirths: 2,
         monsters: [
-            "Fatui Vanguard",
-            "Fatui Hydrogunner",
-            "Fatui Pyro Agent|Bloodthirsty",
+            "Large Geo Slime|Hard",
+            "Dendro Samachurl",
+            "Ruin Cruiser|Strange",
         ],
         description:
             "Ancient ruins where memories of the past linger, guarded by mechanical sentinels.",
@@ -105,10 +105,10 @@ export const domains: Record<string, Domain> = {
     "City of Gold": {
         requiredRebirths: 3,
         monsters: [
-            "Ruin Hunter|Strange",
-            "Frost Fall",
-            "Frost Fall",
+            "Fatui Pyro Agent|Infected",
+            "Fathomless Flames",
             "Wicked Torrents",
+            "Electro Cicin|Strange",
         ],
         description:
             "The legendary golden city, now a battleground for treasure seekers.",
@@ -152,9 +152,10 @@ export const domains: Record<string, Domain> = {
     "Ridge Watch": {
         requiredRebirths: 4,
         monsters: [
-            "Frost Operative|Infected",
-            "Wind Operative|Infected",
-            "Eremite: Axe Vanguard|Infected",
+            "Cryo Specter|Bloodthirsty",
+            "Kairagi: Fiery Might|Strange",
+            "Kairagi: Fiery Might|Strange",
+            "Ruin Destroyer|Hard",
         ],
         description: "A treacherous mountain pass where ancient beasts roam.",
         disabledSkills: ["Crystallize", "Vigor", "Sting"],
@@ -202,10 +203,10 @@ export const domains: Record<string, Domain> = {
     "Slumbering Court": {
         requiredRebirths: 5,
         monsters: [
-            "Cryo Specter",
+            "Kairagi: Dancing Thunder|Demonic",
             "Nobushi: Hitsukeban",
-            "Nobushi: Kikouban|Demonic",
-            "Ruin Destoyer|Hard",
+            "Nobushi: Hitsukeban",
+            "Eremite: Galehunter",
         ],
         description:
             "A mysterious court where dark energy seeps from the depths.",
@@ -249,10 +250,9 @@ export const domains: Record<string, Domain> = {
     "The Lost Valley": {
         requiredRebirths: 6,
         monsters: [
-            "Kairagi: Fiery Might|Hard",
-            "Geo Specter",
-            "Geo Specter",
-            "Geo Specter",
+            "Hydro Cicin|Hard",
+            "Dendro Specter|Poisonous",
+            "Red Vulture|Demonic",
         ],
         description:
             "A forgotten valley where ancient machines and dark warriors dwell.",
@@ -276,7 +276,7 @@ export const domains: Record<string, Domain> = {
                     chance: 50,
                 },
                 {
-                    item: "Moment of the Pact",
+                    item: "Thundering Poise",
                     amount: 1,
                     chance: 25,
                 },
@@ -306,10 +306,10 @@ export const domains: Record<string, Domain> = {
     "Violet Court": {
         requiredRebirths: 7,
         monsters: [
-            "Red Vulture|Demonic",
-            "Scorpion|Demonic",
-            "Dendro Specter|Poisonous",
-            "Rockfond Rifthound|Hard",
+            "Fanged Beast|Demonic",
+            "Flying Serpent|Demonic",
+            "Rockfond Rifthound|Poisonous",
+            "Eremite: Clearwater|Strange",
         ],
         description:
             "The most challenging domain, where only the strongest warriors dare to venture.",
@@ -333,7 +333,7 @@ export const domains: Record<string, Domain> = {
                     chance: 50,
                 },
                 {
-                    item: "Feather of Nascent Light",
+                    item: "Flowering Life",
                     amount: 1,
                     chance: 25,
                 },

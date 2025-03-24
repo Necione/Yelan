@@ -3,6 +3,7 @@ import { embedComment, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
+    getProfileByUserId,
     getUserStats,
     updateUserProfile,
     updateUserStats,
@@ -10,7 +11,7 @@ import {
 import { addItemToInventory } from "../../services/rpgSync/userStats";
 import { getPaginatedMessage } from "../../utils";
 import { domains } from "../../utils/domainsHelper";
-import { startHunt } from "./handlers/huntHandler";
+import { handleHunt } from "./handlers/huntHandler";
 
 export const domain = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -182,9 +183,15 @@ export const domain = buildCommand<SlashCommand>({
             activeSkills: { set: activeSkillsForDomain },
         });
 
-        await startHunt(
+        const userWallet = await getProfileByUserId(interaction.user.id);
+        if (!userWallet) {
+            return r.edit(embedComment("Unable to find/create your user profile."));
+        }
+
+        await handleHunt(
             await interaction.fetchReply(),
-            interaction.user,
+            stats,
+            userWallet,
             domain.monsters,
             {
                 win: async () => {
