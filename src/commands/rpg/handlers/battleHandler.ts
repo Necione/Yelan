@@ -83,7 +83,7 @@ export async function playerAttack(
         "The First Great Magic",
     );
 
-    if (equippedWeaponName.includes("jadefall's splendor")) {
+    if (equippedWeaponName.includes("Jadefall's Splendor")) {
         const resonance = stats.resonance || 0;
         const healAmount = resonance;
         if (healAmount > 0) {
