@@ -10,6 +10,7 @@ export default {
     minExp: 5,
     maxExp: 10,
     minadventurerank: 6,
+    souls: 5,
     critChance: 25,
     critValue: 1.5,
     defChance: 20,

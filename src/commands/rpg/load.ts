@@ -1,5 +1,5 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import { discord, embedComment, is, noop } from "@elara-services/utils";
+import { embedComment, is, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import {
     getUserStats,
@@ -11,6 +11,19 @@ import {
     calculateStatChanges,
     getSetBonusMessages,
 } from "../../utils/helpers/artifactHelper";
+import { forbiddenCombinations } from "./activate";
+
+function hasForbiddenCombination(activeSkills: string[]): boolean {
+    for (const combo of forbiddenCombinations) {
+        const activeFromCombo = combo.filter((skill: string) =>
+            activeSkills.includes(skill),
+        );
+        if (activeFromCombo.length > 1) {
+            return true;
+        }
+    }
+    return false;
+}
 
 export const load = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -26,37 +39,16 @@ export const load = buildCommand<SlashCommand>({
         ),
     defer: { silent: false },
     async autocomplete(i) {
-        const focused = i.options.getFocused(true);
-        const input = focused.value.toLowerCase();
-        const lds = await loadouts.list(i.user.id, input);
-
-        const options = await Promise.all(
-            lds.map(async (loadout) => {
-                let userName = "Unknown User";
-
-                if (loadout.userId === i.user.id) {
-                    userName = i.user.username;
-                } else {
-                    const u = await discord.user(i.client, loadout.userId, {
-                        fetch: true,
-                        mock: true,
-                    });
-                    if (u) {
-                        userName = u.username;
-                    }
-                }
-
-                return {
-                    name:
-                        loadout.userId === i.user.id
-                            ? `${loadout.name} - ${
-                                  loadout.isPrivate ? "Private" : "Public"
-                              } Loadout by you.`
-                            : `${loadout.name} - Public Loadout by ${userName}`,
-                    value: loadout.id,
-                };
-            }),
+        const lds = await loadouts.list(
+            i.user.id,
+            i.options.getFocused(true).value.toLowerCase().trim(),
         );
+        const options = lds.map((loadout) => ({
+            name: loadout.isPrivate
+                ? `${i.user.username}'s ${loadout.name} (Private)`
+                : `${i.user.username}'s ${loadout.name}`,
+            value: loadout.name,
+        }));
 
         if (!is.array(options)) {
             return i
@@ -94,6 +86,17 @@ export const load = buildCommand<SlashCommand>({
         if (!stats) {
             return r.edit(
                 embedComment("No stats found. Please set up your profile."),
+            );
+        }
+
+        if (
+            stats.equippedWeapon?.includes("Freedom-Sworn") &&
+            hasForbiddenCombination(stats.activeSkills || [])
+        ) {
+            return r.edit(
+                embedComment(
+                    `You cannot change loadouts while you have forbidden skill combinations active with Freedom-Sworn.`,
+                ),
             );
         }
 

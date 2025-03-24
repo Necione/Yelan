@@ -10,6 +10,7 @@ export default {
     minExp: 7,
     maxExp: 13,
     minadventurerank: 7,
+    souls: 5,
     image: "https://lh.elara.workers.dev/rpg/monsters/treasure_hoarder_gravedigger.png",
     critChance: 10,
     critValue: 1.5,

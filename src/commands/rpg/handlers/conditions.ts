@@ -43,6 +43,10 @@ export async function handleVictory(
     let totalExpGained = 0;
     let dropsCollected = make.array<ItemDrop>();
     let inventoryFull = false;
+    let totalSouls = 0;
+    const hasCrimsonMoon = stats.equippedWeapon?.includes(
+        "Crimson Moon's Semblance",
+    );
 
     let skillsActivated = "";
     let effectsActivated = "";
@@ -92,6 +96,10 @@ export async function handleVictory(
             } catch (error) {
                 inventoryFull = true;
             }
+        }
+
+        if (hasCrimsonMoon && monster.souls) {
+            totalSouls += monster.souls;
         }
     }
 
@@ -384,6 +392,15 @@ export async function handleVictory(
         finalEmbed.addFields({
             name: "Drops",
             value: dropsDescription,
+        });
+    }
+
+    if (hasCrimsonMoon && totalSouls > 0) {
+        stats.souls = (stats.souls || 0) + totalSouls;
+        await updateUserStats(stats.userId, { souls: { set: stats.souls } });
+        finalEmbed.addFields({
+            name: "Souls Collected",
+            value: `\`🌙\` You collected \`${totalSouls}\` **SOULS** from the defeated monsters!`,
         });
     }
 

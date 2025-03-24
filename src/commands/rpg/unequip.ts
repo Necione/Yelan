@@ -21,6 +21,7 @@ import {
     getArtifactType,
     type ArtifactName,
 } from "../../utils/rpgitems/artifacts";
+import { forbiddenCombinations } from "../rpg/activate";
 
 const artifactTypes = make.array<ArtifactType>([
     "Flower",
@@ -29,6 +30,18 @@ const artifactTypes = make.array<ArtifactType>([
     "Goblet",
     "Circlet",
 ]);
+
+function hasForbiddenCombination(activeSkills: string[]): boolean {
+    for (const combo of forbiddenCombinations) {
+        const activeFromCombo = combo.filter((skill: string) =>
+            activeSkills.includes(skill),
+        );
+        if (activeFromCombo.length > 1) {
+            return true;
+        }
+    }
+    return false;
+}
 
 export const unequip = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -211,13 +224,24 @@ export const unequip = buildCommand<SlashCommand>({
                 );
             }
 
+            const beforeStats = { ...stats };
+
+            if (
+                stats.equippedWeapon?.includes("Freedom-Sworn") &&
+                hasForbiddenCombination(stats.activeSkills || [])
+            ) {
+                return r.edit(
+                    embedComment(
+                        `You cannot unequip Freedom-Sworn while you have forbidden skill combinations active.`,
+                    ),
+                );
+            }
+
             if (stats.isHunting) {
                 return r.edit(
                     embedComment("You cannot unequip while hunting!"),
                 );
             }
-
-            const beforeStats = { ...stats };
 
             if (itemName === "All") {
                 if (stats.castQueue.length > 0 && stats.equippedWeapon) {

@@ -10,6 +10,7 @@ export default {
     minExp: 75,
     maxExp: 100,
     minadventurerank: 30,
+    souls: 8,
     image: "https://lh.elara.workers.dev/rpg/monsters/rockfond_rifthound.png",
     drops: [
         { item: "Concealed Claw", minAmount: 1, maxAmount: 1, chance: 50 },

@@ -10,6 +10,7 @@ export default {
     minExp: 80,
     maxExp: 150,
     minadventurerank: 36,
+    souls: 8,
     image: "https://lh.elara.workers.dev/rpg/monsters/electro_abyss_mage.png",
     drops: [
         {

@@ -33,6 +33,7 @@ export interface Monster {
     image: string;
     isMutated?: boolean;
     mutationType?: MutationType;
+    souls?: number;
     drops: {
         item: string;
         minAmount: number;

@@ -10,6 +10,7 @@ export default {
     minExp: 3,
     maxExp: 6,
     minadventurerank: 1,
+    souls: 2,
     image: "https://lh.elara.workers.dev/rpg/monsters/hilichurl.png",
     drops: [
         { item: "Damaged Mask", minAmount: 1, maxAmount: 2, chance: 90 },

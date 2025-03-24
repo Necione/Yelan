@@ -10,6 +10,7 @@ export default {
     minExp: 5,
     maxExp: 10,
     minadventurerank: 8,
+    souls: 5,
     image: "https://lh.elara.workers.dev/rpg/monsters/anemo_hilichurl_rouge.png",
     drops: [
         {

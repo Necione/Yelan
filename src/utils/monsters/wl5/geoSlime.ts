@@ -10,6 +10,7 @@ export default {
     minExp: 5,
     maxExp: 10,
     minadventurerank: 5,
+    souls: 5,
     image: "https://lh.elara.workers.dev/rpg/monsters/geo_slime.png",
     drops: [
         {

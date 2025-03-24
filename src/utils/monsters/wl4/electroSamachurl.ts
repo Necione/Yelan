@@ -10,6 +10,7 @@ export default {
     minExp: 5,
     maxExp: 10,
     minadventurerank: 4,
+    souls: 4,
     image: "https://lh.elara.workers.dev/rpg/monsters/electro_samachurl.png",
     drops: [
         { item: "Divining Scroll", minAmount: 1, maxAmount: 3, chance: 85 },

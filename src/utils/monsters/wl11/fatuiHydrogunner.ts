@@ -10,6 +10,7 @@ export default {
     minExp: 10,
     maxExp: 20,
     minadventurerank: 11,
+    souls: 6,
     image: "https://lh.elara.workers.dev/rpg/monsters/fatui_hydrogunner.png",
     drops: [
         { item: "Recruit's Insignia", minAmount: 1, maxAmount: 2, chance: 75 },

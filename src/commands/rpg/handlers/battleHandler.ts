@@ -83,6 +83,23 @@ export async function playerAttack(
         "The First Great Magic",
     );
 
+    if (equippedWeaponName.includes("jadefall's splendor")) {
+        const resonance = stats.resonance || 0;
+        const healAmount = resonance;
+        if (healAmount > 0) {
+            currentPlayerHp = Math.min(
+                currentPlayerHp + healAmount,
+                effectiveMaxHp,
+            );
+            messages.push(
+                `\`💠\` Jadefall's Splendor heals you for \`${healAmount}\` HP from your resonance`,
+            );
+            debug(
+                `${username} Jadefall's Splendor healed for ${healAmount} HP from resonance`,
+            );
+        }
+    }
+
     if (stats.castQueue.length > 0) {
         const spellName = stats.castQueue[0];
         debug(`${username} Casting spell: ${spellName}`);
@@ -645,6 +662,7 @@ export async function monsterAttack(
             monster,
             username,
             messages,
+            stats,
         );
     }
     if (hasFatigue && !isFishingMonster(monster)) {
@@ -655,6 +673,7 @@ export async function monsterAttack(
             monster,
             username,
             messages,
+            stats,
         );
     }
 
@@ -951,6 +970,21 @@ export function applyAttackModifiers(
     if (equippedWeaponName && weapons[equippedWeaponName]) {
         const equippedWeapon = weapons[equippedWeaponName];
         const weaponType = equippedWeapon.type as WeaponType;
+
+        if (equippedWeaponName.includes("Crimson Moon's Semblance")) {
+            const souls = stats.souls || 0;
+            const soulBonus = souls * 2;
+            attackPower += soulBonus;
+            messages.push(
+                `\`🌙\` Crimson Moon's Semblance adds \`${soulBonus.toFixed(
+                    2,
+                )}\` damage from \`${souls}\` **SOULS**`,
+            );
+            debugMultipliers.push(`Soul Bonus (+${soulBonus})`);
+            debug(
+                `${username} Soul Bonus: +${soulBonus} damage from ${souls} souls`,
+            );
+        }
 
         const effectiveGroups = make.array<MonsterGroup>(
             weaponAdvantages[weaponType] || [],

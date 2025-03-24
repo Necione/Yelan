@@ -10,6 +10,7 @@ export default {
     minExp: 45,
     maxExp: 50,
     minadventurerank: 26,
+    souls: 7,
     image: "https://lh.elara.workers.dev/rpg/monsters/cryo_specter.png",
     drops: [
         {

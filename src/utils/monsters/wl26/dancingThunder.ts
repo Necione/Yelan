@@ -10,6 +10,7 @@ export default {
     minExp: 40,
     maxExp: 60,
     minadventurerank: 26,
+    souls: 7,
     image: "https://lh.elara.workers.dev/rpg/monsters/dancing_thunder.png",
     critChance: 50,
     critValue: 2,

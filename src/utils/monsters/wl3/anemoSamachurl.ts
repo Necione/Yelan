@@ -10,6 +10,7 @@ export default {
     minExp: 5,
     maxExp: 7,
     minadventurerank: 3,
+    souls: 4,
     image: "https://lh.elara.workers.dev/rpg/monsters/anemo_samachurl.png",
     drops: [
         { item: "Divining Scroll", minAmount: 1, maxAmount: 3, chance: 85 },

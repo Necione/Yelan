@@ -2,10 +2,11 @@ import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, noop } from "@elara-services/utils";
 import { SlashCommandBuilder } from "discord.js";
 import { getUserStats, updateUserStats } from "../../services";
+import type { WeaponName } from "../../utils/rpgitems/weapons";
 import { skills } from "../../utils/skillsData";
 import { specialSkills } from "../../utils/specialSkills";
 
-const forbiddenCombinations = [
+export const forbiddenCombinations = [
     ["Drain", "Leech", "Absorption"],
     ["Crystallize", "Fatigue"],
     ["Pacifist", "Taunt"],
@@ -122,20 +123,28 @@ export const activate = buildCommand<SlashCommand>({
                 embedComment(`The skill "${skillName}" has been deactivated.`),
             );
         }
-        for (const combo of forbiddenCombinations) {
-            if (combo.includes(skillName)) {
-                const conflictingSkills = combo.filter(
-                    (skill) =>
-                        skill !== skillName && activeSkills.includes(skill),
-                );
-                if (conflictingSkills.length > 0) {
-                    return r.edit(
-                        embedComment(
-                            `You cannot activate "${skillName}" while the following skill(s) are active: **${conflictingSkills.join(
-                                ", ",
-                            )}**.`,
-                        ),
+
+        const equippedWeaponName = stats.equippedWeapon as
+            | WeaponName
+            | undefined;
+        const hasFreedomSworn = equippedWeaponName?.includes("Freedom-Sworn");
+
+        if (!hasFreedomSworn) {
+            for (const combo of forbiddenCombinations) {
+                if (combo.includes(skillName)) {
+                    const conflictingSkills = combo.filter(
+                        (skill) =>
+                            skill !== skillName && activeSkills.includes(skill),
                     );
+                    if (conflictingSkills.length > 0) {
+                        return r.edit(
+                            embedComment(
+                                `You cannot activate "${skillName}" while the following skill(s) are active: **${conflictingSkills.join(
+                                    ", ",
+                                )}**.`,
+                            ),
+                        );
+                    }
                 }
             }
         }

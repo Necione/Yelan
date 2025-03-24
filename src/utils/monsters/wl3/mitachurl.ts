@@ -10,6 +10,7 @@ export default {
     minExp: 5,
     maxExp: 7,
     minadventurerank: 3,
+    souls: 4,
     image: "https://lh.elara.workers.dev/rpg/monsters/mitachurl.png",
     drops: [
         { item: "Stained Mask", minAmount: 1, maxAmount: 2, chance: 90 },

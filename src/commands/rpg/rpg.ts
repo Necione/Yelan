@@ -100,7 +100,18 @@ export const rpg = buildCommand<SlashCommand>({
 
             const expRequired = 20 * Math.pow(1.2, stats.adventureRank - 1);
 
-            const embedColor = stats.abyssMode ? "#b84df1" : "Aqua";
+            const equippedWeaponName = stats.equippedWeapon as
+                | WeaponName
+                | undefined;
+            const hasCrimsonMoon = equippedWeaponName?.includes(
+                "Crimson Moon's Semblance",
+            );
+
+            const embedColor = stats.abyssMode
+                ? "#b84df1"
+                : hasCrimsonMoon
+                  ? "#ff0000"
+                  : "Aqua";
 
             const equippedItems = make.array<string>();
 
@@ -240,7 +251,13 @@ export const rpg = buildCommand<SlashCommand>({
                                   2,
                               )}\`\n`
                             : "") +
-                        `${generateShieldBar(stats.shield, stats.maxShield)}\n`,
+                        `${generateShieldBar(
+                            stats.shield,
+                            stats.maxShield,
+                        )}\n` +
+                        (hasCrimsonMoon
+                            ? `🌙 **SOULS COLLECTED**: \`${stats.souls || 0}\``
+                            : ""),
                 })
                 .addFields({
                     name: "Cooldowns",

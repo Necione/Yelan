@@ -62,6 +62,18 @@ const specialEffects: Array<{
         substring: "Calamity Queller",
         effect: "Monsters can no longer defend.",
     },
+    {
+        substring: "Jadefall's Splendor",
+        effect: "For every X resonance you have, heal X HP each turn.",
+    },
+    {
+        substring: "Freedom-Sworn",
+        effect: "Skills are effective against all monsters. No restrictions to what skills you cannot activate.",
+    },
+    {
+        substring: "Crim­son Moon's Sem­blance",
+        effect: "Every monster killed with this weapon grants Souls. Deal bonus damage equal to your Souls every turn.",
+    },
 ];
 
 export const info = buildCommand<SlashCommand>({

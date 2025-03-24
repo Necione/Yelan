@@ -10,6 +10,7 @@ export default {
     minExp: 4,
     maxExp: 8,
     minadventurerank: 2,
+    souls: 3,
     image: "https://lh.elara.workers.dev/rpg/monsters/pyro_slime.png",
     drops: [
         {

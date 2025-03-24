@@ -656,7 +656,10 @@ export async function startHunt(
         sinSkills.includes(skill),
     );
 
-    if (activeSinSkills.length > 1) {
+    const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
+    const hasFreedomSworn = equippedWeaponName?.includes("Freedom-Sworn");
+
+    if (activeSinSkills.length > 1 && !hasFreedomSworn) {
         locked.del(user.id);
         return r.edit(
             embedComment(

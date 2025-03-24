@@ -10,6 +10,7 @@ export default {
     minExp: 40,
     maxExp: 60,
     minadventurerank: 20,
+    souls: 7,
     image: "https://lh.elara.workers.dev/rpg/monsters/wind_operative.png",
     drops: [
         {

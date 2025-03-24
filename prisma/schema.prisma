@@ -313,6 +313,7 @@ model UserStats {
   masteryPolearm            Int            @default(0)
   masteryCatalyst           Int            @default(0)
   masteryRod                Int            @default(0)
+  souls                     Int            @default(0)
   unlockedSpecialSkills     String[]       @default([])
   resonance                 Int            @default(0)
   completedDomains          String[]       @default([])

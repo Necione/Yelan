@@ -13,6 +13,7 @@ export default {
     minExp: 7,
     maxExp: 13,
     minadventurerank: 8,
+    souls: 5,
     image: "https://lh.elara.workers.dev/rpg/monsters/treasure_hoarder_potioneer.png",
     critChance: 10,
     critValue: 3,

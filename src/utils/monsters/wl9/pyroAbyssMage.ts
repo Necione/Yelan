@@ -10,6 +10,7 @@ export default {
     minExp: 5,
     maxExp: 10,
     minadventurerank: 9,
+    souls: 6,
     image: "https://lh.elara.workers.dev/rpg/monsters/pyro_abyss_mage.png",
     drops: [
         {

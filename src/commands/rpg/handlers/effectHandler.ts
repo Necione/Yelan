@@ -85,8 +85,12 @@ export function applyCrystallize(
     monster: Monster,
     username: string,
     messages: string[],
+    stats: UserStats,
 ): number {
-    if (has(["Abyss"], monster, true)) {
+    const equippedWeaponName = stats?.equippedWeapon as WeaponName | undefined;
+    const hasFreedomSworn = equippedWeaponName?.includes("Freedom-Sworn");
+
+    if (!hasFreedomSworn && has(["Abyss"], monster, true)) {
         messages.push("`⚠️` Crystallize skill does not work on this monster");
         return monsterDamage;
     }
@@ -122,8 +126,12 @@ export function applyFatigue(
     monster: Monster,
     username: string,
     messages: string[],
+    stats: UserStats,
 ): number {
-    if (has(["Abyss"], monster, true)) {
+    const equippedWeaponName = stats?.equippedWeapon as WeaponName | undefined;
+    const hasFreedomSworn = equippedWeaponName?.includes("Freedom-Sworn");
+
+    if (!hasFreedomSworn && has(["Abyss"], monster, true)) {
         messages.push("`⚠️` Fatigue skill does not work on this monster");
         return monsterDamage;
     }
@@ -162,12 +170,15 @@ export function applyLeechDrain(
     messages: string[],
 ): number {
     const username = `[${stats.userId}]`;
+    const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
+    const hasFreedomSworn = equippedWeaponName?.includes("Freedom-Sworn");
 
     const leechLevelData = getUserSkillLevelData(stats, "Leech");
     if (leechLevelData) {
         if (
-            !isFishingMonster(monster) &&
-            !has(["Boss", "Beast", "Eremite"], monster, true)
+            hasFreedomSworn ||
+            (!isFishingMonster(monster) &&
+                !has(["Boss", "Beast", "Eremite"], monster, true))
         ) {
             const levelData = leechLevelData.levelData || {};
             const lifestealPercentage = levelData.lifestealPercentage || 0;
@@ -195,8 +206,9 @@ export function applyLeechDrain(
     const drainLevelData = getUserSkillLevelData(stats, "Drain");
     if (drainLevelData) {
         if (
-            !isFishingMonster(monster) &&
-            !has(["Boss", "Beast", "Eremite"], monster, true)
+            hasFreedomSworn ||
+            (!isFishingMonster(monster) &&
+                !has(["Boss", "Beast", "Eremite"], monster, true))
         ) {
             const levelData = drainLevelData.levelData || {};
             const lifestealPercentage = levelData.lifestealPercentage || 0;

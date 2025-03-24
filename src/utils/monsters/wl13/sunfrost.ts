@@ -10,6 +10,7 @@ export default {
     minExp: 10,
     maxExp: 25,
     minadventurerank: 13,
+    souls: 6,
     image: "https://lh.elara.workers.dev/rpg/monsters/sunfrost.png",
     drops: [
         {

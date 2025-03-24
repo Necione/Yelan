@@ -10,6 +10,7 @@ export default {
     minExp: 75,
     maxExp: 100,
     minadventurerank: 32,
+    souls: 8,
     image: "https://lh.elara.workers.dev/rpg/monsters/flying_serpent.png",
     drops: [
         {

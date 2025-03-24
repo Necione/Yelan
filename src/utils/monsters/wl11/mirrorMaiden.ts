@@ -10,6 +10,7 @@ export default {
     minExp: 10,
     maxExp: 15,
     minadventurerank: 11,
+    souls: 6,
     image: "https://lh.elara.workers.dev/rpg/monsters/mirror_maiden.png",
     drops: [
         { item: "Dismal Prism", minAmount: 1, maxAmount: 2, chance: 75 },

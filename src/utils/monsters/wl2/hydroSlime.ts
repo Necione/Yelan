@@ -14,6 +14,7 @@ export default {
     critValue: 1.5,
     defChance: 20,
     defValue: 20,
+    souls: 3,
     image: "https://lh.elara.workers.dev/rpg/monsters/hydro_slime.png",
     drops: [
         {

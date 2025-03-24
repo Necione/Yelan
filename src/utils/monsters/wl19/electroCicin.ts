@@ -10,6 +10,7 @@ export default {
     minExp: 20,
     maxExp: 35,
     minadventurerank: 19,
+    souls: 6,
     image: "https://lh.elara.workers.dev/rpg/monsters/electro_cicin.png",
     drops: [
         {

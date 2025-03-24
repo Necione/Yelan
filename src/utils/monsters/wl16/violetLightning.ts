@@ -10,6 +10,7 @@ export default {
     minExp: 20,
     maxExp: 30,
     minadventurerank: 16,
+    souls: 6,
     image: "https://lh.elara.workers.dev/rpg/monsters/violet_lightning.png",
     drops: [
         {
