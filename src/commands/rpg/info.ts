@@ -71,7 +71,7 @@ const specialEffects: Array<{
         effect: "Skills are effective against all monsters. No restrictions to what skills you cannot activate.",
     },
     {
-        substring: "Crim­son Moon's Sem­blance",
+        substring: "Crimson Moon's Semblance",
         effect: "Every monster killed with this weapon grants Souls. Deal bonus damage equal to your Souls every turn.",
     },
 ];
