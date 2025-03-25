@@ -246,7 +246,7 @@ export const rpg = buildCommand<SlashCommand>({
                         (stats.defChance > 0 || stats.defValue > 0
                             ? `🛡️ DEF Rate: \`${
                                   stats.defChance
-                              }%\` | 🛡️ DEF Value: \`${stats.defValue.toFixed(
+                              }%\` | 🔰 DEF Value: \`${stats.defValue.toFixed(
                                   2,
                               )}\`\n`
                             : "") +

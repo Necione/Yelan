@@ -143,7 +143,7 @@ export const masteryBenefits: Record<
             description: "Restore 50 - 75% of your max mana after hunts.",
         },
         6: {
-            description: "Unlock the spell `Distract`",
+            description: "Unlock the spell `Immunity`",
         },
         7: {
             description: "Unlock the spell `Meteor`",

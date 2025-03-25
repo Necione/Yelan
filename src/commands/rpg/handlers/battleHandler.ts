@@ -38,9 +38,6 @@ export type MonsterState = {
 
 export function getDeathThreshold(stats: UserStats): number {
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
-    if (equippedWeaponName && equippedWeaponName.includes("Memory of Dust")) {
-        return -500;
-    }
 
     if (
         stats.swordStyle === "Favonius Bladework" &&
@@ -89,14 +86,25 @@ export async function playerAttack(
 }> {
     const username = `[${stats.userId}]`;
 
-    const equippedWeaponName = (stats.equippedWeapon ?? "").toLowerCase();
-    const isFirstGreatMagic = equippedWeaponName.includes(
-        "The First Great Magic",
-    );
+    const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
+    const isFirstGreatMagic =
+        equippedWeaponName &&
+        equippedWeaponName.includes("The First Great Magic");
 
-    if (equippedWeaponName.includes("Jadefall's Splendor")) {
-        const resonance = stats.resonance || 0;
-        const healAmount = resonance;
+    if (equippedWeaponName && equippedWeaponName.includes("Memory of Dust")) {
+        const memoryDamage = Math.floor(currentMonsterHp * 0.2);
+        currentMonsterHp = Math.max(currentMonsterHp - memoryDamage, 0);
+        messages.push(
+            `\`🌾\` Memory of Dust deals \`${memoryDamage}\` bonus damage`,
+        );
+        debug(`${username} Memory of Dust => -${memoryDamage} HP to monster`);
+    }
+
+    if (
+        equippedWeaponName &&
+        equippedWeaponName.includes("Jadefall's Splendor")
+    ) {
+        const healAmount = stats.resonance || 0;
         if (healAmount > 0) {
             currentPlayerHp = Math.min(
                 currentPlayerHp + healAmount,
@@ -233,12 +241,12 @@ export async function playerAttack(
     }
 
     if (skills.has(stats, "Pride")) {
-        attackPower *= 2.5;
+        attackPower *= 2;
         messages.push(
-            "`🏅` The Pride skill makes you deal __250%__ more damage",
+            "`🏅` The Pride skill makes you deal __200%__ more damage",
         );
-        debugMultipliers.push("Pride (3.5x)");
-        debug(`${usernameLog} Pride => attackPower * 2.5 = ${attackPower}`);
+        debugMultipliers.push("Pride (2.0x)");
+        debug(`${usernameLog} Pride => attackPower * 2.0 = ${attackPower}`);
     }
 
     if (monsterState.poisoned) {
@@ -940,6 +948,10 @@ export function applyAttackModifiers(
     const username = `[${stats.userId}]`;
     const debugMultipliers: string[] = [];
 
+    const hasImmunity = stats.activeEffects.some(
+        (effect) => effect.name === "Immunity" && effect.remainingUses > 0,
+    );
+
     const hasBackstab = skills.has(stats, "Backstab");
 
     const isHumanOrFatui = has(
@@ -1185,13 +1197,18 @@ export function applyAttackModifiers(
         debug(`${username} Poisonous bonus added: +${bonusDamage} damage`);
     }
 
-    if (monster.mutationType === "Demonic") {
+    if (monster.mutationType === "Demonic" && !hasImmunity) {
         attackPower *= 0.6;
         messages.push(
             "`🎭` A sense of pressure reduces your damage by __40%__",
         );
         debugMultipliers.push("Demonic Pressure (0.6x)");
         debug(`${username} Demonic => Attack Power * 0.6 = ${attackPower}`);
+    } else if (monster.mutationType === "Demonic" && hasImmunity) {
+        messages.push(
+            "`✨` Your Immunity spell protects you from the demonic pressure",
+        );
+        debug(`${username} Immunity active => Demonic pressure negated`);
     }
 
     debug(

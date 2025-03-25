@@ -35,7 +35,7 @@ export function calculateStatChanges(
         },
         { key: "maxHP" as const, label: "❤️ Max HP" },
         { key: "defChance" as const, label: "🛡️ DEF Rate", isPercentage: true },
-        { key: "defValue" as const, label: "🛡️ DEF Value" },
+        { key: "defValue" as const, label: "🔰 DEF Value" },
         { key: "maxMana" as const, label: "✨ Max Mana" },
     ];
 
@@ -225,7 +225,7 @@ function describeSetBonus(setName: string, bonusType: "2pc" | "4pc"): string {
                 break;
             case "defValuePercentage":
                 descriptions.push(
-                    `🛡️ DEF Value increased by ${(value * 100).toFixed(2)}%`,
+                    `🔰 DEF Value increased by ${(value * 100).toFixed(2)}%`,
                 );
                 break;
             case "healEffectiveness":
@@ -266,7 +266,7 @@ export function calculateCharacterStatChanges(
         { key: "maxMana" as const, label: "✨ Max Mana" },
         { key: "maxHP" as const, label: "❤️ Max HP" },
         { key: "defChance" as const, label: "🛡️ DEF Rate", isPercentage: true },
-        { key: "defValue" as const, label: "🛡️ DEF Value" },
+        { key: "defValue" as const, label: "🔰 DEF Value" },
     ];
 
     for (const stat of statsToCheck) {

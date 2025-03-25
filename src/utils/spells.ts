@@ -51,6 +51,12 @@ export const spells: Record<string, Spell> = {
         cost: 25,
         requiredMasteryLevel: 3,
     },
+    Immunity: {
+        spellName: "Immunity",
+        description: "Disable pressure from Demonic enemies for 3 turns.",
+        cost: 35,
+        requiredMasteryLevel: 6,
+    },
 };
 
 export function getAvailableSpells(points: number): Spell[] {

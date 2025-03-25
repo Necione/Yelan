@@ -347,7 +347,7 @@ export async function handleHunt(
         if (skills.has(stats, "Pride")) {
             isMonsterFirst = true;
             startingMessages.push(
-                "`🏅` **SIN OF PRIDE** activated. You will never go first, but deal __250%__ more damage after",
+                "`🏅` **SIN OF PRIDE** activated. You will never go first, but deal __200%__ more damage after",
             );
         }
 

@@ -169,7 +169,7 @@ export async function handleAbyssBattle(
         if (skills.has(stats, "Pride")) {
             isMonsterFirst = true;
             startingMessages.push(
-                "`🏅` **SIN OF PRIDE** activated. You will never go first, but deal 250% more damage after the monster's attack.",
+                "`🏅` **SIN OF PRIDE** activated. You will never go first, but deal 200% more damage after the monster's attack.",
             );
         }
 

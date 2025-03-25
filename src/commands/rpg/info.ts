@@ -32,7 +32,7 @@ const specialEffects: Array<{
     },
     {
         substring: "Memory of Dust",
-        effect: "Keep hunting for another 500 HP after death.",
+        effect: "Deal 20% of the monster's HP as bonus damage each turn.",
     },
     {
         substring: "Wolf's Gravestone",
@@ -69,6 +69,10 @@ const specialEffects: Array<{
     {
         substring: "Freedom-Sworn",
         effect: "Skills are effective against all monsters. No restrictions to what skills you cannot activate.",
+    },
+    {
+        substring: "Crimson Moon's Semblance",
+        effect: "Gain the ability to harvest and use Souls.",
     },
 ];
 
@@ -423,7 +427,41 @@ export const info = buildCommand<SlashCommand>({
                     continue;
                 }
 
-                const statName = capitalizeFirstLetter(key);
+                let statName = "";
+                let statEmoji = "";
+                switch (key) {
+                    case "attackPower":
+                        statName = "ATK";
+                        statEmoji = "⚔️";
+                        break;
+                    case "critChance":
+                        statName = "Crit Rate";
+                        statEmoji = "🎯";
+                        break;
+                    case "critValue":
+                        statName = "Crit Value";
+                        statEmoji = "💥";
+                        break;
+                    case "defValue":
+                        statName = "DEF Value";
+                        statEmoji = "🔰";
+                        break;
+                    case "defChance":
+                        statName = "DEF Rate";
+                        statEmoji = "🛡️";
+                        break;
+                    case "additionalHP":
+                        statName = "HP";
+                        statEmoji = "❤️";
+                        break;
+                    case "additionalMana":
+                        statName = "Mana";
+                        statEmoji = "🔮";
+                        break;
+                    default:
+                        statName = capitalizeFirstLetter(key);
+                        statEmoji = "📊";
+                }
 
                 let statValue = "";
                 if (typeof value === "number") {
@@ -434,7 +472,7 @@ export const info = buildCommand<SlashCommand>({
                     statValue = `\`${value}\``;
                 }
 
-                weaponStats.push(`${statName}: ${statValue}`);
+                weaponStats.push(`${statEmoji} ${statName}: ${statValue}`);
             }
 
             const statsDisplay =

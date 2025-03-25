@@ -703,7 +703,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Never go first, deal 250% more damage afterwards.",
+                    "Never go first, deal 200% more damage afterwards.",
             },
         ],
         emoji: "🏅",

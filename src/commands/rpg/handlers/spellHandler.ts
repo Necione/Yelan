@@ -29,6 +29,28 @@ export const spellHandlers: Record<string, SpellHandler> = {
         return { currentPlayerHp, currentMonsterHp };
     },
 
+    Immunity: async ({
+        stats,
+        currentPlayerHp,
+        currentMonsterHp,
+        messages,
+    }) => {
+        stats.activeEffects.push({
+            name: "Immunity",
+            remainingUses: 3,
+            effectValue: 1,
+        });
+
+        messages.push(
+            "`✨` Immunity spell casted! You are protected from demonic pressure for 3 turns",
+        );
+        debug(
+            `[${stats.userId}] Immunity spell: Added immunity effect for 3 turns`,
+        );
+
+        return { currentPlayerHp, currentMonsterHp };
+    },
+
     Fury: async ({ stats, currentPlayerHp, currentMonsterHp, messages }) => {
         stats.attackPower *= 2;
         messages.push(

@@ -285,7 +285,7 @@ export const alchemy = buildCommand<SlashCommand>({
                                     `⚔️ ATK: \`+${assignedAtkBonus}\` (${stats.assignedAtk} Points)\n` +
                                     `❤️ HP: \`+${assignedHpBonus}\` (${stats.assignedHp} Points)\n` +
                                     `💥 Crit Value: \`+${assignedCritValueBonus}\` (${stats.assignedCritValue} Points)\n` +
-                                    `🛡️ DEF Value: \`+${assignedDefValueBonus}\` (${stats.assignedDefValue} Points)`,
+                                    `🔰 DEF Value: \`+${assignedDefValueBonus}\` (${stats.assignedDefValue} Points)`,
                             },
                             {
                                 name: "Total Assigned Points",
