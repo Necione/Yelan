@@ -7,8 +7,8 @@ export default {
     name: "Ruin Drake: Skywatch",
     group: MonsterGroup.Machine,
     element: MonsterElement.Physical,
-    minExp: 80,
-    maxExp: 150,
+    minExp: 120,
+    maxExp: 200,
     minadventurerank: 36,
     image: "https://lh.elara.workers.dev/rpg/monsters/ruin_skywatch.png",
     drops: [
