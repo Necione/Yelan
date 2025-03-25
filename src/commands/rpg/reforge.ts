@@ -145,6 +145,8 @@ export const reforge = buildCommand<SlashCommand>({
             newPrefix = "Legendary";
         } else if (specialChance <= 2) {
             newPrefix = "Sinful";
+        } else if (specialChance <= 3) {
+            newPrefix = "Harmonic";
         } else {
             newPrefix = getRandom(prefixes);
         }

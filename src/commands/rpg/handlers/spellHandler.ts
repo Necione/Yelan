@@ -29,6 +29,26 @@ export const spellHandlers: Record<string, SpellHandler> = {
         return { currentPlayerHp, currentMonsterHp };
     },
 
+    Meteor: async ({
+        stats,
+        monster,
+        currentPlayerHp,
+        currentMonsterHp,
+        messages,
+    }) => {
+        const meteorDamage = 10000;
+        currentMonsterHp = Math.max(currentMonsterHp - meteorDamage, 0);
+
+        messages.push(
+            `\`🌠\` Meteor spell casted! Dealt \`${meteorDamage}\` damage to the ${monster.name}`,
+        );
+        debug(
+            `[${stats.userId}] Meteor spell: Dealt ${meteorDamage} damage to ${monster.name}`,
+        );
+
+        return { currentPlayerHp, currentMonsterHp };
+    },
+
     Immunity: async ({
         stats,
         currentPlayerHp,

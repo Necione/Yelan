@@ -1277,6 +1277,15 @@ const prefixes: {
         defChance: weaponData.defChance + 0,
         chestChance: 0,
     }),
+    Harmonic: (weaponData) => ({
+        attackPower: weaponData.attackPower,
+        additionalHP: weaponData.additionalHP * -2,
+        critValue: weaponData.critValue * 6,
+        critChance: weaponData.critChance * 0,
+        defValue: weaponData.defValue * -1,
+        defChance: weaponData.defChance - 50,
+        chestChance: 0,
+    }),
 };
 
 export const weapons = make.object<{ [key: string]: WeaponData }>();

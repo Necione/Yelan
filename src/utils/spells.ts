@@ -57,6 +57,12 @@ export const spells: Record<string, Spell> = {
         cost: 35,
         requiredMasteryLevel: 6,
     },
+    Meteor: {
+        spellName: "Meteor",
+        description: "Deal 10,000 flat damage.",
+        cost: 70,
+        requiredMasteryLevel: 7,
+    },
 };
 
 export function getAvailableSpells(points: number): Spell[] {

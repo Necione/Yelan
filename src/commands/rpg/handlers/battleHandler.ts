@@ -87,11 +87,11 @@ export async function playerAttack(
     const username = `[${stats.userId}]`;
 
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
-    const isFirstGreatMagic =
-        equippedWeaponName &&
-        equippedWeaponName.includes("The First Great Magic");
+    const isFirstGreatMagic = equippedWeaponName?.includes(
+        "The First Great Magic",
+    );
 
-    if (equippedWeaponName && equippedWeaponName.includes("Memory of Dust")) {
+    if (equippedWeaponName?.includes("Memory of Dust")) {
         const memoryDamage = Math.floor(currentMonsterHp * 0.2);
         currentMonsterHp = Math.max(currentMonsterHp - memoryDamage, 0);
         messages.push(
@@ -100,10 +100,7 @@ export async function playerAttack(
         debug(`${username} Memory of Dust => -${memoryDamage} HP to monster`);
     }
 
-    if (
-        equippedWeaponName &&
-        equippedWeaponName.includes("Jadefall's Splendor")
-    ) {
+    if (equippedWeaponName?.includes("Jadefall's Splendor")) {
         const healAmount = stats.resonance || 0;
         if (healAmount > 0) {
             currentPlayerHp = Math.min(
@@ -672,7 +669,7 @@ export async function monsterAttack(
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
     let monsterCritChance = monster.critChance || 0;
     let monsterCritValue = monster.critValue || 1;
-    if (equippedWeaponName && equippedWeaponName.includes("Absolution")) {
+    if (equippedWeaponName?.includes("Absolution")) {
         monsterCritChance = 0;
         monsterCritValue = 1;
         messages.push(
@@ -736,7 +733,7 @@ export async function monsterAttack(
     }
 
     const hasVortexVanquisher =
-        equippedWeaponName && equippedWeaponName.includes("Vortex Vanquisher");
+        equippedWeaponName?.includes("Vortex Vanquisher");
     const damageReductionFactor = hasVortexVanquisher ? 0.5 : 1;
     if (hasVortexVanquisher) {
         messages.push(
@@ -1014,7 +1011,7 @@ export function applyAttackModifiers(
         const equippedWeapon = weapons[equippedWeaponName];
         const weaponType = equippedWeapon.type as WeaponType;
 
-        if (equippedWeaponName.includes("Crimson Moon's Semblance")) {
+        if (equippedWeaponName?.includes("Crimson Moon's Semblance")) {
             const souls = stats.souls || 0;
             const soulBonus = souls * 2;
             attackPower += soulBonus;
@@ -1092,7 +1089,7 @@ export function applyAttackModifiers(
             );
         }
 
-        if (equippedWeaponName.includes("Wolf's Gravestone")) {
+        if (equippedWeaponName?.includes("Wolf's Gravestone")) {
             const hpThreshold = Math.floor(monster.startingHp / 1000);
             if (hpThreshold > 0) {
                 const damageMultiplier = 1 + 0.2 * hpThreshold;
@@ -1269,8 +1266,7 @@ export function checkMonsterDefenses(
     if (
         monster.element === MonsterElement.Electro &&
         Math.random() < 0.25 &&
-        equippedWeaponName &&
-        !equippedWeaponName.includes("Everlasting Moonglow")
+        equippedWeaponName?.includes("Everlasting Moonglow")
     ) {
         messages.push(
             `\`💫\` The ${monster.name} stunned you! You missed your attack`,
@@ -1284,8 +1280,7 @@ export function checkMonsterDefenses(
     if (
         monster.element === MonsterElement.Anemo &&
         Math.random() < 0.25 &&
-        equippedWeaponName &&
-        !equippedWeaponName.includes("Everlasting Moonglow")
+        !equippedWeaponName?.includes("Everlasting Moonglow")
     ) {
         messages.push(
             `\`💨\` The ${monster.name} dodged your attack with its Anemo agility`,
@@ -1319,7 +1314,7 @@ export function checkMonsterDefenses(
     let monsterDefChance = monster.defChance || 0;
     const monsterDefValue = monster.defValue || 0;
 
-    if (equippedWeaponName && equippedWeaponName.includes("Calamity Queller")) {
+    if (equippedWeaponName?.includes("Calamity Queller")) {
         monsterDefChance = 0;
         messages.push(
             `\`🌊\` **Calamity Queller** prevents the ${monster.name} from defending`,
