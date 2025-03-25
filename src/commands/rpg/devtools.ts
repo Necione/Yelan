@@ -24,6 +24,7 @@ export const devtools = buildCommand<SlashCommand>({
                     { name: "export_data", value: "export_data" },
                     { name: "exp_calc", value: "exp_calc" },
                     { name: "explode", value: "explode" },
+                    { name: "expert_mode", value: "expert_mode" },
                 ),
         )
         .setDMPermission(false),
@@ -139,6 +140,34 @@ export const devtools = buildCommand<SlashCommand>({
                 .edit({
                     embeds: [expEmbed],
                 })
+                .catch(noop);
+        } else if (selectedOption === "expert_mode") {
+            const userStats = await getUserStats(i.user.id);
+
+            if (!userStats) {
+                return r
+                    .edit(
+                        embedComment(
+                            "No stats found for you. Please set up your profile.",
+                        ),
+                    )
+                    .catch(noop);
+            }
+
+            const newExpertMode = !userStats.expertMode;
+            await updateUserStats(i.user.id, {
+                expertMode: { set: newExpertMode },
+            });
+
+            return r
+                .edit(
+                    embedComment(
+                        `Expert Mode has been ${
+                            newExpertMode ? "enabled" : "disabled"
+                        }.`,
+                        newExpertMode ? "Green" : "Red",
+                    ),
+                )
                 .catch(noop);
         } else {
             return r

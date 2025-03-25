@@ -27,7 +27,12 @@ import {
     syncStats,
     updateUserStats,
 } from "../../../services";
-import { cooldowns, locked } from "../../../utils";
+import {
+    clearDebugMessages,
+    cooldowns,
+    getDebugMessages,
+    locked,
+} from "../../../utils";
 import type { MutationType } from "../../../utils/helpers/huntHelper";
 import {
     generateNextHuntMonsters,
@@ -71,6 +76,19 @@ export type HuntHandlers = {
         userWallet: UserWallet,
     ) => Promise<unknown> | unknown;
 };
+
+async function sendDebugLogsAsCodeblock(threadId: string): Promise<void> {
+    const battleLogs = getDebugMessages();
+    if (battleLogs.length > 0) {
+        const debugLogContent = battleLogs.join("\n");
+        const maxChunkLength = 1900;
+        for (let i = 0; i < debugLogContent.length; i += maxChunkLength) {
+            const chunk = debugLogContent.substring(i, i + maxChunkLength);
+            const content = "```ts\n" + chunk + "\n```";
+            await sendToChannel(threadId, { content });
+        }
+    }
+}
 
 export async function handleHunt(
     message: Message,
@@ -212,6 +230,7 @@ export async function handleHunt(
 
         const initialPlayerHp = currentPlayerHp;
         const effectiveMaxHp = currentPlayerHp;
+        const deathThreshold = getDeathThreshold(stats);
 
         const createHealthBar = (
             current: number,
@@ -231,8 +250,6 @@ export async function handleHunt(
             }
             return `\`${bar}\` ${current.toFixed(2)}/${max.toFixed(2)} HP`;
         };
-
-        const deathThreshold = getDeathThreshold(stats);
 
         const mutationColors: Record<MutationType, ColorResolvable> = {
             Bloodthirsty: 0xb40000,
@@ -258,7 +275,7 @@ export async function handleHunt(
             .setTitle(`You encountered a ${displayedMonsterName}!`)
             .setDescription(selectedDescription)
             .setThumbnail(monster.image)
-            .addFields(
+            .addFields([
                 {
                     name: "Your HP",
                     value: createHealthBar(
@@ -277,7 +294,147 @@ export async function handleHunt(
                     ),
                     inline: true,
                 },
-            );
+            ]);
+
+        if (stats.expertMode) {
+            let vigilanceUsed = false;
+            let monsterState = {
+                displaced: false,
+                vanishedUsed: false,
+            };
+            let turnNumber = 1;
+            const hasCrystallize = skills.has(stats, "Crystallize");
+            const hasFatigue = skills.has(stats, "Fatigue");
+            let isPlayerTurn = !skills.has(stats, "Pride");
+
+            if (!thread) {
+                thread =
+                    (await message
+                        .startThread({
+                            name: `Battle with ${monster.name}`,
+                            autoArchiveDuration: 60,
+                        })
+                        .catch(noop)) ?? undefined;
+
+                if (!thread) {
+                    return message
+                        .edit(embedComment(`Unable to create the thread.`))
+                        .catch(noop);
+                }
+            } else {
+                await sendToChannel(thread.id, {
+                    content: `Another monster has appeared! You are now facing ${monster.name}.`,
+                });
+            }
+
+            clearDebugMessages();
+
+            await sendToChannel(thread.id, {
+                content: `>>> Battle started with ${monster.name}!\nInitial HP:\nPlayer: ${currentPlayerHp}/${effectiveMaxHp}\nMonster: ${currentMonsterHp}/${initialMonsterHp}`,
+            });
+
+            while (currentPlayerHp > deathThreshold && currentMonsterHp > 0) {
+                if (isPlayerTurn) {
+                    const result = await playerAttack(
+                        stats,
+                        monster,
+                        currentPlayerHp,
+                        currentMonsterHp,
+                        effectiveMaxHp,
+                        vigilanceUsed,
+                        monsterState,
+                        [],
+                        hasWrath,
+                    );
+
+                    currentMonsterHp = result.currentMonsterHp;
+                    currentPlayerHp = result.currentPlayerHp;
+                    vigilanceUsed = result.vigilanceUsed;
+                    monsterState = result.monsterState;
+                    isPlayerTurn = false;
+                } else {
+                    const result = await monsterAttack(
+                        stats,
+                        monster,
+                        currentPlayerHp,
+                        currentMonsterHp,
+                        [],
+                        turnNumber,
+                        hasCrystallize,
+                        hasFatigue,
+                        monsterState,
+                        effectiveMaxHp,
+                    );
+
+                    currentPlayerHp = result.currentPlayerHp;
+                    currentMonsterHp = result.currentMonsterHp;
+                    isPlayerTurn = true;
+                    turnNumber++;
+                }
+            }
+
+            await sendToChannel(thread.id, {
+                content: `>>> Battle ended!\nFinal HP:\nPlayer: ${currentPlayerHp}/${effectiveMaxHp}\nMonster: ${currentMonsterHp}/${initialMonsterHp}`,
+            });
+
+            await sendDebugLogsAsCodeblock(thread.id);
+
+            if (currentPlayerHp > deathThreshold) {
+                if (currentMonsterIndex < monstersEncountered.length - 1) {
+                    clearDebugMessages();
+                    currentMonsterIndex++;
+                    await handleMonsterBattle(thread);
+                } else {
+                    if (handlers?.win && typeof handlers?.win === "function") {
+                        await handlers.win(
+                            message,
+                            thread!,
+                            stats,
+                            monstersEncountered,
+                            currentPlayerHp,
+                            userWallet,
+                        );
+                    } else {
+                        await handleVictory(
+                            message,
+                            thread!,
+                            stats,
+                            monstersEncountered,
+                            currentPlayerHp,
+                            userWallet,
+                        );
+                    }
+
+                    if (isBossEncounter) {
+                        stats.beatenBosses.push(bossName);
+                        await updateUserStats(stats.userId, {
+                            beatenBosses: stats.beatenBosses,
+                        });
+                    }
+                }
+            } else {
+                if (handlers?.lose && typeof handlers?.lose === "function") {
+                    await handlers.lose(
+                        message,
+                        thread!,
+                        stats,
+                        monstersEncountered[currentMonsterIndex],
+                        currentPlayerHp,
+                        userWallet,
+                    );
+                } else {
+                    await handleDefeat(
+                        message,
+                        thread!,
+                        stats,
+                        monstersEncountered[currentMonsterIndex],
+                        currentPlayerHp,
+                        userWallet,
+                    );
+                }
+            }
+            return;
+        }
 
         await message.edit({ embeds: [battleEmbed] }).catch(noop);
 

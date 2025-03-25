@@ -317,6 +317,7 @@ model UserStats {
   unlockedSpecialSkills     String[]       @default([])
   resonance                 Int            @default(0)
   completedDomains          String[]       @default([])
+  expertMode                Boolean        @default(false)
 }
 
 type Strikes {
