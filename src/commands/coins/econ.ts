@@ -1,8 +1,8 @@
 import type { SlashCommand } from "@elara-services/botbuilder";
-import { formatNumber } from "@elara-services/utils";
+import { formatNumber, make, noop } from "@elara-services/utils";
 import { customEmoji, texts } from "@liyueharbor/econ";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { channels, economy } from "../../config";
+import { channels, economy, mainServerId, roles } from "../../config";
 import { prisma } from "../../prisma";
 
 export const econ: SlashCommand = {
@@ -22,8 +22,31 @@ export const econ: SlashCommand = {
         silent: false,
     },
     execute: async (interaction, responder) => {
+        if (!interaction.guild) {
+            return;
+        }
+        const guild =
+            interaction.client.guilds.resolve(mainServerId) ||
+            (await interaction.client.guilds.fetch(mainServerId).catch(noop));
+        let hasRole = make.array<string>();
+        if (guild) {
+            const members = await guild.members.fetch().catch(noop);
+            hasRole =
+                members
+                    ?.filter((c) => c.roles.cache.hasAll(...roles.main))
+                    .map((c) => c.id) ?? [];
+        }
+
         const files = (
-            await prisma.userWallet.findMany().catch(() => [])
+            await prisma.userWallet
+                .findMany({
+                    where: {
+                        userId: {
+                            notIn: hasRole,
+                        },
+                    },
+                })
+                .catch(() => [])
         ).filter((c) => c.balance + c.vault >= 1);
 
         const TC = files.reduce(
