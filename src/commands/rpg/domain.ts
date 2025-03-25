@@ -4,9 +4,13 @@ import {
     awaitComponent,
     embedComment,
     get,
+    getKeys,
+    is,
     noop,
+    sleep,
+    time,
 } from "@elara-services/utils";
-import { customEmoji, texts } from "@liyueharbor/econ";
+import { cdn, texts } from "@liyueharbor/econ";
 import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
@@ -15,7 +19,7 @@ import {
     updateUserStats,
 } from "../../services";
 import { addItemToInventory } from "../../services/rpgSync/userStats";
-import { getPaginatedMessage } from "../../utils";
+import { getAmount, getPaginatedMessage } from "../../utils";
 import { domains } from "../../utils/domainsHelper";
 import { handleHunt } from "./handlers/huntHandler";
 
@@ -29,15 +33,27 @@ export const domain = buildCommand<SlashCommand>({
                 .setDescription("The name of the domain to challenge")
                 .setRequired(false)
                 .addChoices(
-                    ...Object.keys(domains).map((name) => ({
+                    ...getKeys(domains).map((name) => ({
                         name,
                         value: name,
                     })),
                 ),
         ),
+    defer: { silent: false },
+    only: { text: true, threads: false, voice: false, dms: false },
 
     async execute(interaction, r) {
-        await interaction.deferReply();
+        if (!interaction.channel || !("send" in interaction.channel)) {
+            return r.edit(
+                embedComment(
+                    "Failed to start domain challenge - invalid channel.",
+                ),
+            );
+        }
+        const message = await interaction.fetchReply().catch(noop);
+        if (!message) {
+            return;
+        }
 
         const now = new Date();
         const pst = new Date(
@@ -64,7 +80,7 @@ export const domain = buildCommand<SlashCommand>({
 
                 const embed = new EmbedBuilder()
                     .setColor(0xeee1a6)
-                    .setThumbnail("https://lh.elara.workers.dev/rpg/domain.png")
+                    .setThumbnail(cdn("/rpg/domain.png"))
                     .setTitle(`${name} ${statusEmoji}`)
                     .setDescription(domain.description)
                     .addFields(
@@ -75,7 +91,6 @@ export const domain = buildCommand<SlashCommand>({
                             }\`\n❌ Disabled Skills: \`${domain.disabledSkills.join(
                                 ", ",
                             )}\``,
-                            inline: false,
                         },
                         {
                             name: "Daily Monsters",
@@ -89,21 +104,17 @@ export const domain = buildCommand<SlashCommand>({
                                     return `- ${monster}`;
                                 })
                                 .join("\n"),
-                            inline: false,
                         },
                         {
                             name: "Rewards",
-                            value: `${
-                                customEmoji.a.z_coins
-                            } \`${domain.reward.coins.toLocaleString()}\` ${
-                                texts.c.u
-                            }\n${domain.reward.items
+                            value: `${getAmount(
+                                domain.reward.coins,
+                            )}\n${domain.reward.items
                                 .map(
                                     (item) =>
                                         `\`${item.amount}x\` ${item.item} (${item.chance}%)`,
                                 )
                                 .join("\n")}`,
-                            inline: false,
                         },
                     );
 
@@ -135,14 +146,6 @@ export const domain = buildCommand<SlashCommand>({
             );
         }
 
-        if (!interaction.channel || !("send" in interaction.channel)) {
-            return r.edit(
-                embedComment(
-                    "Failed to start domain challenge - invalid channel.",
-                ),
-            );
-        }
-
         const completedDomains = stats.completedDomains || [];
         if (
             completedDomains.some((entry: string) =>
@@ -155,9 +158,9 @@ export const domain = buildCommand<SlashCommand>({
 
             return r.edit(
                 embedComment(
-                    `You have already challenged ${domainName} today. Domain resets <t:${Math.floor(
-                        nextReset.getTime() / 1000,
-                    )}:R>`,
+                    `You have already challenged ${domainName} today. Domain resets ${time.relative(
+                        nextReset,
+                    )}`,
                 ),
             );
         }
@@ -168,7 +171,7 @@ export const domain = buildCommand<SlashCommand>({
             .setDescription(
                 `**YOU CAN ONLY CHALLENGE THIS DOMAIN ONCE PER DAY**\n\nAre you sure you want to proceed with challenging ${domainName}?`,
             )
-            .setThumbnail("https://lh.elara.workers.dev/rpg/domain.png");
+            .setThumbnail(cdn("/rpg/domain.png"));
 
         const confirmButtons = addButtonRow([
             {
@@ -188,14 +191,11 @@ export const domain = buildCommand<SlashCommand>({
             components: [confirmButtons],
         });
 
-        const confirmation = await awaitComponent(
-            await interaction.fetchReply(),
-            {
-                only: { originalUser: true },
-                time: get.secs(30),
-                custom_ids: [{ id: "confirm_domain" }, { id: "cancel_domain" }],
-            },
-        );
+        const confirmation = await awaitComponent(message, {
+            only: { originalUser: true },
+            time: get.secs(30),
+            custom_ids: [{ id: "confirm_domain" }, { id: "cancel_domain" }],
+        });
 
         if (!confirmation || confirmation.customId === "cancel_domain") {
             return r.edit({
@@ -213,14 +213,11 @@ export const domain = buildCommand<SlashCommand>({
                 new EmbedBuilder()
                     .setColor(0xeee1a6)
                     .setDescription("May the archons be with you...")
-                    .setThumbnail(
-                        "https://lh.elara.workers.dev/rpg/domain.png",
-                    ),
+                    .setThumbnail(cdn("/rpg/domain.png")),
             ],
             components: [],
         });
-
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+        await sleep(get.secs(5));
 
         await r.edit({
             embeds: [
@@ -229,15 +226,9 @@ export const domain = buildCommand<SlashCommand>({
                     .setDescription(
                         `Challenging ${domainName}...\n\n${domain.description}`,
                     )
-                    .setThumbnail(
-                        "https://lh.elara.workers.dev/rpg/domain.png",
-                    ),
+                    .setThumbnail(cdn("/rpg/domain.png")),
             ],
         });
-
-        if (!interaction.replied) {
-            return r.edit(embedComment("Failed to start domain challenge."));
-        }
 
         const originalActiveSkills = [...stats.activeSkills];
 
@@ -257,7 +248,7 @@ export const domain = buildCommand<SlashCommand>({
         }
 
         await handleHunt(
-            await interaction.fetchReply(),
+            message,
             stats,
             userWallet,
             domain.monsters,
@@ -273,14 +264,10 @@ export const domain = buildCommand<SlashCommand>({
                         .setDescription(
                             `You have proven worthy of the ${domainName} domain!`,
                         )
-                        .setThumbnail(
-                            "https://lh.elara.workers.dev/rpg/domain.png",
-                        )
+                        .setThumbnail(cdn("/rpg/domain.png"))
                         .addFields({
                             name: `${texts.c.u} Earned`,
-                            value: `\`${domain.reward.coins.toLocaleString()}\` ${
-                                texts.c.u
-                            }`,
+                            value: `${getAmount(domain.reward.coins)}`,
                             inline: true,
                         });
 
@@ -299,7 +286,7 @@ export const domain = buildCommand<SlashCommand>({
 
                     await r.edit({ embeds: [embed], components: [] });
 
-                    if (obtainedItems.length > 0) {
+                    if (is.array(obtainedItems)) {
                         await addItemToInventory(
                             interaction.user.id,
                             obtainedItems.map((item) => ({
@@ -331,9 +318,7 @@ export const domain = buildCommand<SlashCommand>({
                         .setDescription(
                             `The ${domainName} domain has found you unworthy. The domain's power overwhelms you, and you are forced to retreat.`,
                         )
-                        .setThumbnail(
-                            "https://lh.elara.workers.dev/rpg/domain.png",
-                        );
+                        .setThumbnail(cdn(`/rpg/domain.png`));
 
                     await r.edit({ embeds: [embed], components: [] });
                     await updateUserStats(stats.userId, {
