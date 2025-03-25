@@ -9,7 +9,6 @@ import {
     get,
     getInteractionResponder,
     is,
-    log,
     make,
     noop,
     proper,
@@ -448,13 +447,9 @@ export { texts };
 let debugMessages: string[] = [];
 
 export function debug(...args: unknown[]): void {
-    if (isMainBot) {
-        return;
-    }
     const message = args.join(" ");
     debugMessages.push(message);
-    log(`[DEBUGGER]: `, ...args);
-}
+} // Now theres no console log :wiow: I'll probably just make a separate copy of this for the future so I can use it in RPG but I'm stealing this for now.
 
 export function clearDebugMessages(): void {
     debugMessages = [];
