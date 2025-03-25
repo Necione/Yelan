@@ -26,7 +26,7 @@ export const swordStyles: Record<SwordStyleName, SwordStyleInfo> = {
             {
                 name: "Thousand Swords",
                 description:
-                    "For every X swords in your inventory, deal X bonus damage per turn.",
+                    "For every X swords in your inventory, deal 2X bonus damage per turn.",
                 rank: "Novice",
             },
             {

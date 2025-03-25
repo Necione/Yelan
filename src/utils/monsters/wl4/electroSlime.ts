@@ -33,7 +33,7 @@ export default {
         },
     ],
     baseHp: 14,
-    baseAtk: 7,
+    baseAtk: 4,
     getStatsForadventureRank(adventureRank: number) {
         if (!limits.check(adventureRank)) {
             return null;

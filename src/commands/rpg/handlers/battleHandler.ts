@@ -41,6 +41,17 @@ export function getDeathThreshold(stats: UserStats): number {
     if (equippedWeaponName && equippedWeaponName.includes("Memory of Dust")) {
         return -500;
     }
+
+    if (
+        stats.swordStyle === "Favonius Bladework" &&
+        stats.styleFavonius >= 50
+    ) {
+        const equippedWeapon = weapons[equippedWeaponName as WeaponName];
+        if (equippedWeapon?.type === "Sword") {
+            return -Math.floor(stats.maxHP * 0.5);
+        }
+    }
+
     return 0;
 }
 
@@ -292,7 +303,7 @@ export async function playerAttack(
                 .reduce((total, item) => total + item.amount, 0);
 
             if (swordCount > 0) {
-                currentAttackPower += swordCount;
+                currentAttackPower += swordCount * 2;
                 messages.push(
                     `\`⚔️\` Thousand Swords deals \`${swordCount}\` bonus damage`,
                 );
@@ -413,6 +424,23 @@ export async function playerAttack(
             ", ",
         )}]`,
     );
+
+    if (stats.swordStyle === "Guhua Style" && stats.styleGuhua >= 50) {
+        const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
+        if (equippedWeapon?.type === "Sword") {
+            const healAmount = Math.floor(finalAttackPower / 10);
+            if (healAmount > 0) {
+                currentPlayerHp = Math.min(
+                    currentPlayerHp + healAmount,
+                    effectiveMaxHp,
+                );
+                messages.push(
+                    `\`💚\` Ambient Healing activated! You healed \`${healAmount}\` HP`,
+                );
+                debug(`${usernameLog} Ambient Healing => +${healAmount} HP`);
+            }
+        }
+    }
 
     const kindleLevelData = getUserSkillLevelData(stats, "Kindle");
     if (kindleLevelData) {
@@ -648,6 +676,9 @@ export async function monsterAttack(
     const { isCrit, multiplier } = calculateCriticalHit(
         monsterCritChance,
         monsterCritValue,
+        stats,
+        currentPlayerHp,
+        effectiveMaxHp,
     );
     if (isCrit) {
         debug(`${username} ${monster.name} crit => x${multiplier}`);
@@ -1304,7 +1335,25 @@ export function checkMonsterDefenses(
 function calculateCriticalHit(
     critChance: number,
     critValue: number,
+    stats?: UserStats,
+    currentHp?: number,
+    maxHp?: number,
 ): { isCrit: boolean; multiplier: number } {
+    if (
+        stats &&
+        currentHp &&
+        maxHp &&
+        stats.swordStyle === "Kamisato Art" &&
+        stats.styleKamisato >= 50
+    ) {
+        const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
+        if (equippedWeapon?.type === "Sword") {
+            if (currentHp / maxHp > 0.8) {
+                return { isCrit: true, multiplier: critValue };
+            }
+        }
+    }
+
     const isCrit = Math.random() * 100 < critChance;
     return { isCrit, multiplier: isCrit ? critValue : 1 };
 }
