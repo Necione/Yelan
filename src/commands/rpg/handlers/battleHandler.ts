@@ -229,21 +229,43 @@ export async function playerAttack(
     }
 
     if (hasWrath) {
-        attackPower *= 1.5;
+        let wrathMultiplier = 1.5;
+        if (isFirstGreatMagic) {
+            wrathMultiplier *= 2;
+            messages.push(
+                "`🎩` The First Great Magic doubles your Wrath effect!",
+            );
+        }
+        attackPower *= wrathMultiplier;
         messages.push(
-            "`💢` The Wrath skill makes you deal __150%__ more damage",
+            `\`💢\` The Wrath skill makes you deal __${(
+                wrathMultiplier * 100
+            ).toFixed(0)}%__ more damage`,
         );
-        debugMultipliers.push("Wrath (1.5x)");
-        debug(`${usernameLog} Wrath => attackPower * 1.5 = ${attackPower}`);
+        debugMultipliers.push(`Wrath (${wrathMultiplier}x)`);
+        debug(
+            `${usernameLog} Wrath => attackPower * ${wrathMultiplier} = ${attackPower}`,
+        );
     }
 
     if (skills.has(stats, "Pride")) {
-        attackPower *= 2;
+        let prideMultiplier = 2;
+        if (isFirstGreatMagic) {
+            prideMultiplier *= 2;
+            messages.push(
+                "`🎩` The First Great Magic doubles your Pride effect!",
+            );
+        }
+        attackPower *= prideMultiplier;
         messages.push(
-            "`🏅` The Pride skill makes you deal __200%__ more damage",
+            `\`🏅\` The Pride skill makes you deal __${(
+                prideMultiplier * 100
+            ).toFixed(0)}%__ more damage`,
         );
-        debugMultipliers.push("Pride (2.0x)");
-        debug(`${usernameLog} Pride => attackPower * 2.0 = ${attackPower}`);
+        debugMultipliers.push(`Pride (${prideMultiplier}x)`);
+        debug(
+            `${usernameLog} Pride => attackPower * ${prideMultiplier} = ${attackPower}`,
+        );
     }
 
     if (monsterState.poisoned) {
