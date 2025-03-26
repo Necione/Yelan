@@ -14,11 +14,18 @@ const adviceArray = [
     "Jade Parcels will heal 100% of your HP, you should make some, they're delicious!",
     "You can brew all sorts of potions with Chaos Devices and Chaos Cores.",
     "Casting the Poison spell with a Catalyst stops special effects like a Nobushi's discipline or a Fatui Agent's Vanish.",
+    "You can use the `/diffuse` command to do a lot of things, such as diffusing **Life Essence** to increase your alchemy.",
+    "Different monsters will appear more commonly in different locations, use the `/info` command to check those!",
+    "The more you use a weapon, the better you will be with it! Check your weapon masteries with `/masteries`",
 ];
 
 const rumorArray = [
     "They say the Serendipity can catch all sorts of Legendary fish, I wonder how much they sell for!",
     "Rumor has it there's a legendary sword that never dulls if you find all its pieces.",
+    "They say kindness is always paid back twofold.",
+    "I heard that in Nantianmen there is an old scroll somewhere that makes you feel healthier.",
+    "There's an old wizard that has been wandering around lately... maybe you should try talking to them.",
+    "You can never really tell know if a secret cult is dangerous or benevolent, they believe in the weirdest things!",
 ];
 
 export const travellerEvent = createEvent({
