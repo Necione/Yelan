@@ -1298,14 +1298,11 @@ export function checkMonsterDefenses(
 
     const equippedWeaponName = stats.equippedWeapon as WeaponName | undefined;
 
-    // Check for dodge chance
-    if (monster.dodgeChance && Math.random() < monster.dodgeChance) {
+    if (monster.dodgeChance && Math.random() < monster.dodgeChance / 100) {
         attackMissed = true;
         messages.push(`\`🔄\` The ${monster.name} dodged your attack!`);
         debug(
-            `${username} Dodge chance: ${monster.name} dodged the attack with ${
-                monster.dodgeChance * 100
-            }% dodge chance`,
+            `${username} Dodge chance: ${monster.name} dodged the attack with ${monster.dodgeChance}% dodge chance`,
         );
     }
 
