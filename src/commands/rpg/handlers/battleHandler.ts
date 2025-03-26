@@ -849,7 +849,9 @@ export async function monsterAttack(
         debug(
             `${username} Parry => monster HP -${parried}, finalMonsterDamage => ${finalMonsterDamage}`,
         );
-    } else if (skills.has(stats, "Iron Skin")) {
+    }
+
+    if (skills.has(stats, "Iron Skin")) {
         const resisted = finalMonsterDamage * 0.25;
         finalMonsterDamage *= 0.75;
         messages.push(
@@ -860,13 +862,30 @@ export async function monsterAttack(
         debug(
             `${username} Iron Skin => resisted ${resisted} damage, finalMonsterDamage => ${finalMonsterDamage}`,
         );
-    } else if (skills.has(stats, "Fear")) {
-        if (Math.random() < 0.5) {
+    }
+
+    if (skills.has(stats, "Fear")) {
+        const monsterStats = monster.getStatsForadventureRank(
+            stats.adventureRank,
+        );
+        if (!monsterStats) {
+            throw new Error(`Stats not found for monster: ${monster.name}`);
+        }
+        const minWorldLevel = monster.minadventurerank || 0;
+
+        if (stats.adventureRank >= minWorldLevel + 5) {
+            if (Math.random() < 0.5) {
+                messages.push(
+                    "`👁️` Fear skill activated! The monster missed their attack",
+                );
+                debug(`${username} Fear => monster attack missed`);
+                finalMonsterDamage = 0;
+            }
+        } else {
             messages.push(
-                "`👁️` Fear skill activated! The monster missed their attack",
+                "`⚠️` The monster is not afraid of you! Your AR is too low for this monster to be afraid.",
             );
-            debug(`${username} Fear => monster attack missed`);
-            finalMonsterDamage = 0;
+            debug(`${username} Fear => monster not afraid (AR too low)`);
         }
     }
 
@@ -874,6 +893,7 @@ export async function monsterAttack(
     const resistanceEffect = stats.activeEffects.find(
         (eff) => eff.name === "Resistance" && eff.remainingUses > 0,
     );
+
     if (resistanceEffect) {
         const before = finalMonsterDamage;
         finalMonsterDamage *= resistanceEffect.effectValue;
