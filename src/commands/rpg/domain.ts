@@ -289,7 +289,7 @@ export const domain = buildCommand<SlashCommand>({
 
         await handleHunt(
             message,
-            stats,
+            { ...stats, activeSkills: activeSkillsForDomain },
             userWallet,
             domainMonsters.monsters,
             {
