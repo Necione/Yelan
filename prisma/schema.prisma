@@ -417,3 +417,13 @@ type ColorRole {
   level     Int      @default(0)
   exclusive String   @default("")
 }
+
+model DailyDomainMonsters {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  date      String
+  domain    String
+  monsters  String[]
+  rewards   Json
+
+  @@unique([date, domain])
+}

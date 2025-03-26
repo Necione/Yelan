@@ -11,6 +11,7 @@ import {
     time,
 } from "@elara-services/utils";
 import { cdn, texts } from "@liyueharbor/econ";
+import type { Prisma } from "@prisma/client";
 import { ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
     getProfileByUserId,
@@ -18,10 +19,37 @@ import {
     updateUserProfile,
     updateUserStats,
 } from "../../services";
+import { getDomainMonstersForDomain } from "../../services/domainService";
 import { addItemToInventory } from "../../services/rpgSync/userStats";
 import { getAmount, getPaginatedMessage } from "../../utils";
 import { domains } from "../../utils/domainsHelper";
 import { handleHunt } from "./handlers/huntHandler";
+
+interface DomainReward {
+    item: string;
+    amount: number;
+    chance: number;
+}
+
+interface DomainMonsters {
+    monsters: string[];
+    rewards: DomainReward[];
+}
+
+function parseDomainMonsters(data: {
+    monsters: string[];
+    rewards: Prisma.JsonValue;
+}): DomainMonsters {
+    const rewards = data.rewards as unknown as DomainReward[];
+    return {
+        monsters: data.monsters,
+        rewards: rewards.map((reward) => ({
+            item: reward.item,
+            amount: reward.amount,
+            chance: reward.chance,
+        })),
+    };
+}
 
 export const domain = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -68,6 +96,13 @@ export const domain = buildCommand<SlashCommand>({
             const stats = await getUserStats(interaction.user.id);
             const completedDomains = stats?.completedDomains || [];
 
+            // Get today's monsters for all domains
+            const domainMonstersMap = new Map<string, DomainMonsters>();
+            for (const [name] of Object.entries(domains)) {
+                const monsters = await getDomainMonstersForDomain(name, today);
+                domainMonstersMap.set(name, parseDomainMonsters(monsters));
+            }
+
             for (const [name, domain] of Object.entries(domains)) {
                 const domainStatus = completedDomains.find((entry: string) =>
                     entry.startsWith(`${name}:${today}`),
@@ -94,7 +129,7 @@ export const domain = buildCommand<SlashCommand>({
                         },
                         {
                             name: "Daily Monsters",
-                            value: domain.monsters
+                            value: (domainMonstersMap.get(name)?.monsters || [])
                                 .map((monster) => {
                                     if (monster.includes("|")) {
                                         const [base, mutation] =
@@ -107,9 +142,10 @@ export const domain = buildCommand<SlashCommand>({
                         },
                         {
                             name: "Rewards",
-                            value: `${getAmount(
-                                domain.reward.coins,
-                            )}\n${domain.reward.items
+                            value: `${getAmount(domain.reward.coins)}\n${(
+                                domainMonstersMap.get(name)?.rewards || []
+                            )
+                                .sort((a, b) => b.chance - a.chance)
                                 .map(
                                     (item) =>
                                         `\`${item.amount}x\` ${item.item} (${item.chance}%)`,
@@ -158,7 +194,7 @@ export const domain = buildCommand<SlashCommand>({
 
             return r.edit(
                 embedComment(
-                    `You have already challenged ${domainName} today. Domain resets ${time.relative(
+                    `You have already challenged ${domainName} today.\nDomains reset ${time.relative(
                         nextReset,
                     )}`,
                 ),
@@ -212,8 +248,7 @@ export const domain = buildCommand<SlashCommand>({
             embeds: [
                 new EmbedBuilder()
                     .setColor(0xeee1a6)
-                    .setDescription("May the archons be with you...")
-                    .setThumbnail(cdn("/rpg/domain.png")),
+                    .setDescription("May the archons be with you..."),
             ],
             components: [],
         });
@@ -247,15 +282,21 @@ export const domain = buildCommand<SlashCommand>({
             );
         }
 
+        // Get today's monsters for this domain
+        const domainMonsters = parseDomainMonsters(
+            await getDomainMonstersForDomain(domainName, today),
+        );
+
         await handleHunt(
             message,
             stats,
             userWallet,
-            domain.monsters,
+            domainMonsters.monsters,
             {
                 win: async () => {
-                    const obtainedItems = domain.reward.items.filter(
-                        (item) => Math.random() * 100 <= item.chance,
+                    const obtainedItems = domainMonsters.rewards.filter(
+                        (item: DomainReward) =>
+                            Math.random() * 100 <= item.chance,
                     );
 
                     const embed = new EmbedBuilder()
@@ -276,7 +317,7 @@ export const domain = buildCommand<SlashCommand>({
                             name: "Domain Rewards",
                             value: obtainedItems
                                 .map(
-                                    (item) =>
+                                    (item: DomainReward) =>
                                         `\`${item.amount}x\` ${item.item}`,
                                 )
                                 .join("\n"),
@@ -289,7 +330,7 @@ export const domain = buildCommand<SlashCommand>({
                     if (is.array(obtainedItems)) {
                         await addItemToInventory(
                             interaction.user.id,
-                            obtainedItems.map((item) => ({
+                            obtainedItems.map((item: DomainReward) => ({
                                 item: item.item,
                                 amount: item.amount,
                             })),

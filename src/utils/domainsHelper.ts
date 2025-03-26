@@ -1,11 +1,12 @@
 interface Domain {
     requiredRebirths: number;
-    monsters: string[];
+    monsterPool: string[];
+    monsterCount: number;
     description: string;
     disabledSkills: string[];
     reward: {
         coins: number;
-        items: {
+        extraItems?: {
             item: string;
             amount: number;
             chance: number;
@@ -16,267 +17,153 @@ interface Domain {
 export const domains: Record<string, Domain> = {
     "Cecilia Garden": {
         requiredRebirths: 1,
-        monsters: [
+        monsterPool: [
             "Dendro Slime",
             "Hydro Abyss Mage",
-            "Hydro Abyss Mage",
             "Treasure Hoarder Gravedigger",
+            "Treasure Hoarder Marksman",
+            "Treasure Hoarder Crusher",
+            "Hydro Slime",
+            "Dendro Samachurl",
+            "Stonehide Lawachurl",
         ],
+        monsterCount: 3,
         description:
             "A serene garden filled with Cecilia flowers, now corrupted by monsters.",
         disabledSkills: ["Leech", "Backstep", "Kindle"],
         reward: {
             coins: 100,
-            items: [
-                {
-                    item: "Violetgrass",
-                    amount: 3,
-                    chance: 100,
-                },
-                {
-                    item: "Life Essence",
-                    amount: 1,
-                    chance: 50,
-                },
-                {
-                    item: "Slime Condensate",
-                    amount: 2,
-                    chance: 80,
-                },
-                {
-                    item: "Damaged Mask",
-                    amount: 2,
-                    chance: 70,
-                },
-                {
-                    item: "Firm Arrowhead",
-                    amount: 2,
-                    chance: 60,
-                },
-            ],
+            extraItems: [],
         },
     },
     "Valley of Remembrance": {
         requiredRebirths: 2,
-        monsters: [
-            "Large Geo Slime|Hard",
+        monsterPool: [
+            "Large Geo Slime",
             "Dendro Samachurl",
-            "Ruin Cruiser|Strange",
+            "Ruin Cruiser",
+            "Ruin Scout",
+            "Fatui Hydrogunner",
+            "Fatui Pyro Agent",
+            "Fatui Vanguard",
+            "Eremite: Clearwater",
+            "Eremite: Sunfrost",
         ],
+        monsterCount: 3,
         description:
             "Ancient ruins where memories of the past linger, guarded by mechanical sentinels.",
         disabledSkills: ["Vigilance", "Distraction", "Paladin"],
         reward: {
             coins: 150,
-            items: [
-                {
-                    item: "Dismal Prism",
-                    amount: 5,
-                    chance: 90,
-                },
-                {
-                    item: "A Flower Yet to Bloom",
-                    amount: 1,
-                    chance: 70,
-                },
-                {
-                    item: "Life Essence",
-                    amount: 1,
-                    chance: 50,
-                },
-                {
-                    item: "Slime Secretions",
-                    amount: 2,
-                    chance: 75,
-                },
-                {
-                    item: "Stained Mask",
-                    amount: 2,
-                    chance: 65,
-                },
-                {
-                    item: "Sharp Arrowhead",
-                    amount: 2,
-                    chance: 55,
-                },
-            ],
+            extraItems: [],
         },
     },
     "City of Gold": {
         requiredRebirths: 3,
-        monsters: [
+        monsterPool: [
             "Fatui Pyro Agent|Infected",
             "Fathomless Flames",
             "Wicked Torrents",
+            "Violet Lightning",
+            "Frost Fall",
             "Electro Cicin|Strange",
+            "Ruin Guard|Strange",
+            "Nobushi: Jintouban",
+            "Nobushi: Kikouban",
         ],
+        monsterCount: 4,
         description:
             "The legendary golden city, now a battleground for treasure seekers.",
         disabledSkills: ["Wrath", "Spice", "Drain"],
         reward: {
             coins: 200,
-            items: [
+            extraItems: [
                 {
                     item: "Gold Seal",
                     amount: 1,
                     chance: 100,
-                },
-                {
-                    item: "Geode",
-                    amount: 1,
-                    chance: 20,
-                },
-                {
-                    item: "Life Essence",
-                    amount: 1,
-                    chance: 50,
-                },
-                {
-                    item: "Slime Concentrate",
-                    amount: 2,
-                    chance: 70,
-                },
-                {
-                    item: "Ominous Mask",
-                    amount: 2,
-                    chance: 60,
-                },
-                {
-                    item: "Weathered Arrowhead",
-                    amount: 2,
-                    chance: 50,
                 },
             ],
         },
     },
     "Ridge Watch": {
         requiredRebirths: 4,
-        monsters: [
+        monsterPool: [
             "Cryo Specter|Bloodthirsty",
             "Kairagi: Fiery Might|Strange",
-            "Kairagi: Fiery Might|Strange",
+            "Eremite: Galehunter|Strange",
+            "Eremite: Dayhunter|Bloodthirsty",
+            "Eremite: Axe Vanguard|Poisonous",
             "Ruin Destroyer|Hard",
         ],
+        monsterCount: 4,
         description: "A treacherous mountain pass where ancient beasts roam.",
         disabledSkills: ["Crystallize", "Vigor", "Sting"],
         reward: {
             coins: 250,
-            items: [
+            extraItems: [
                 {
                     item: "Ridge Seal",
                     amount: 1,
                     chance: 100,
-                },
-                {
-                    item: "Vishap Scale",
-                    amount: 1,
-                    chance: 40,
-                },
-                {
-                    item: "Life Essence",
-                    amount: 1,
-                    chance: 50,
-                },
-                {
-                    item: "Skill Token",
-                    amount: 1,
-                    chance: 10,
-                },
-                {
-                    item: "Heavy Horn",
-                    amount: 2,
-                    chance: 65,
-                },
-                {
-                    item: "Black Bronze Horn",
-                    amount: 2,
-                    chance: 55,
-                },
-                {
-                    item: "Treasure Hoarder Insignia",
-                    amount: 2,
-                    chance: 45,
                 },
             ],
         },
     },
     "Slumbering Court": {
         requiredRebirths: 5,
-        monsters: [
-            "Kairagi: Dancing Thunder|Demonic",
-            "Nobushi: Hitsukeban",
-            "Nobushi: Hitsukeban",
-            "Eremite: Galehunter",
+        monsterPool: [
+            "Kairagi: Dancing Thunder|Infected",
+            "Kairagi: Fiery Might|Hard",
+            "Electro Specter|Strange",
+            "Pyro Specter|Strange",
+            "Ruin Hunter|Bloodthirsty",
+            "Cryo Cicin|Infected",
+            "Ruin Hunter|Strange",
         ],
+        monsterCount: 4,
         description:
             "A mysterious court where dark energy seeps from the depths.",
         disabledSkills: ["Vigilance", "Wrath", "Paladin"],
         reward: {
             coins: 300,
-            items: [
+            extraItems: [
                 {
                     item: "Court Seal",
                     amount: 1,
                     chance: 100,
-                },
-                {
-                    item: "Life Essence",
-                    amount: 1,
-                    chance: 50,
-                },
-                {
-                    item: "Skill Token",
-                    amount: 1,
-                    chance: 10,
-                },
-                {
-                    item: "Black Crystal Horn",
-                    amount: 2,
-                    chance: 60,
-                },
-                {
-                    item: "Silver Raven Insignia",
-                    amount: 2,
-                    chance: 50,
-                },
-                {
-                    item: "Dead Ley Line Branch",
-                    amount: 2,
-                    chance: 40,
                 },
             ],
         },
     },
     "The Lost Valley": {
         requiredRebirths: 6,
-        monsters: [
+        monsterPool: [
             "Hydro Cicin|Hard",
             "Dendro Specter|Poisonous",
             "Red Vulture|Demonic",
+            "Red Vulture|Strange",
+            "Geo Specter|Demonic",
+            "Scorpion|Strange",
+            "Hydro Samachurl|Strange",
+            "Rockfond Rifthound|Demonic",
+            "Eremite: Loremaster|Poisonous",
+            "Eremite: Loremaster|Demonic",
         ],
+        monsterCount: 4,
         description:
             "A forgotten valley where ancient machines and dark warriors dwell.",
         disabledSkills: ["Fatigue", "Sloth", "Fortress"],
         reward: {
             coins: 350,
-            items: [
+            extraItems: [
                 {
                     item: "Valley Relic",
                     amount: 1,
                     chance: 100,
                 },
                 {
-                    item: "Scattered Star",
-                    amount: 1,
-                    chance: 50,
-                },
-                {
-                    item: "Life Essence",
-                    amount: 1,
-                    chance: 50,
-                },
-                {
-                    item: "Thundering Poise",
+                    item: "Feather of Nascent Light",
                     amount: 1,
                     chance: 25,
                 },
@@ -284,56 +171,36 @@ export const domains: Record<string, Domain> = {
                     item: "Skill Token",
                     amount: 1,
                     chance: 10,
-                },
-                {
-                    item: "Golden Raven Insignia",
-                    amount: 2,
-                    chance: 55,
-                },
-                {
-                    item: "Dead Ley Line Leaves",
-                    amount: 2,
-                    chance: 45,
-                },
-                {
-                    item: "Recruit's Insignia",
-                    amount: 2,
-                    chance: 35,
                 },
             ],
         },
     },
     "Violet Court": {
         requiredRebirths: 7,
-        monsters: [
+        monsterPool: [
             "Fanged Beast|Demonic",
             "Flying Serpent|Demonic",
+            "Fanged Beast|Strange",
+            "Flying Serpent|Infected",
             "Rockfond Rifthound|Poisonous",
-            "Eremite: Clearwater|Strange",
+            "Dendro Specter|Hard",
+            "Scorpion|Strange",
+            "Red Vulture|Demonic",
         ],
+        monsterCount: 4,
         description:
             "The most challenging domain, where only the strongest warriors dare to venture.",
         disabledSkills: ["Sting", "Drain", "Fortress"],
         reward: {
             coins: 400,
-            items: [
+            extraItems: [
                 {
                     item: "Violet Seal",
                     amount: 1,
                     chance: 100,
                 },
                 {
-                    item: "Scattered Star",
-                    amount: 1,
-                    chance: 70,
-                },
-                {
-                    item: "Life Essence",
-                    amount: 1,
-                    chance: 50,
-                },
-                {
-                    item: "Flowering Life",
+                    item: "Moment of the Pact",
                     amount: 1,
                     chance: 25,
                 },
@@ -341,16 +208,6 @@ export const domains: Record<string, Domain> = {
                     item: "Skill Token",
                     amount: 1,
                     chance: 10,
-                },
-                {
-                    item: "Crystal Prism",
-                    amount: 2,
-                    chance: 40,
-                },
-                {
-                    item: "Mist Grass",
-                    amount: 2,
-                    chance: 35,
                 },
             ],
         },
