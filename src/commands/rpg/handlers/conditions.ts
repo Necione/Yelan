@@ -333,7 +333,7 @@ export async function handleVictory(
         finalEmbed.setColor("Red");
         finalEmbed.setTitle("Defeat after Victory...");
         finalEmbed.setDescription(
-            `You defeated the monsters but succumbed to poisoning afterwards...`,
+            `You defeated the monsters but succumbed afterwards...`,
         );
 
         await message.edit({ embeds: [finalEmbed] }).catch(noop);
@@ -344,6 +344,14 @@ export async function handleVictory(
             hp: { set: 0 },
             isHunting: { set: false },
         });
+
+        const insomniaSkill = getUserSkillLevelData(stats, "Insomnia");
+
+        const huntCooldown = insomniaSkill?.levelData?.cooldown
+            ? get.mins(insomniaSkill.levelData.cooldown)
+            : get.mins(30);
+
+        await cooldowns.set(userWallet, "hunt", huntCooldown);
 
         return;
     }

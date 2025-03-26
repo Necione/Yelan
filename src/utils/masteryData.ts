@@ -49,13 +49,13 @@ export const masteryBenefits: Record<
             specialSkill: "Fortress",
         },
         3: {
-            description: "Deal 125% damage when wielding the Claymore.",
+            specialSkill: "Iron Skin",
         },
         4: {
             description: "Increase DEF Value by 25%.",
         },
         5: {
-            description: "Increase DEF Value by 50%.",
+            specialSkill: "Fear",
         },
         6: {
             description: "Deal 200% damage when wielding the Claymore.",
@@ -64,7 +64,7 @@ export const masteryBenefits: Record<
             description: "Double your Max HP when wielding the Claymore.",
         },
         8: {
-            specialSkill: "Fear",
+            description: "Increase DEF Value by 50%.",
         },
         9: {
             description: "Unlock the Shield stat.",

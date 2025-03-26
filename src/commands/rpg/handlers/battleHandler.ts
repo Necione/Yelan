@@ -849,6 +849,25 @@ export async function monsterAttack(
         debug(
             `${username} Parry => monster HP -${parried}, finalMonsterDamage => ${finalMonsterDamage}`,
         );
+    } else if (skills.has(stats, "Iron Skin")) {
+        const resisted = finalMonsterDamage * 0.25;
+        finalMonsterDamage *= 0.75;
+        messages.push(
+            `\`💮\` Iron Skin activated! You resisted \`${resisted.toFixed(
+                2,
+            )}\` damage`,
+        );
+        debug(
+            `${username} Iron Skin => resisted ${resisted} damage, finalMonsterDamage => ${finalMonsterDamage}`,
+        );
+    } else if (skills.has(stats, "Fear")) {
+        if (Math.random() < 0.5) {
+            messages.push(
+                "`👁️` Fear skill activated! The monster missed their attack",
+            );
+            debug(`${username} Fear => monster attack missed`);
+            finalMonsterDamage = 0;
+        }
     }
 
     let resistanceReduced = 0;
