@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../prisma"; // To be fair this code isn't being used anyway since cron is not here
 import { domains } from "../utils/domainsHelper";
 import { artifacts } from "../utils/rpgitems/artifacts";
 import { drops } from "../utils/rpgitems/drops";
 import { misc } from "../utils/rpgitems/misc";
-
-const prisma = new PrismaClient();
 
 function getRandomItems<
     T extends { chestChance?: number; dropChance?: number },
@@ -85,7 +83,6 @@ export async function getDailyDomainMonsters(date: string) {
     }
 }
 
-//Yeah I have no idea how this shit works I'm just going to drop the database daily LMAO
 export const domainMonstersCron = {
     name: "domain-monsters",
     cron: "0 0 * * *",

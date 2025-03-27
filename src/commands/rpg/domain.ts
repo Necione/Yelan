@@ -89,6 +89,10 @@ export const domain = buildCommand<SlashCommand>({
         );
         const today = pst.toISOString().split("T")[0];
 
+        const yesterday = new Date(pst);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split("T")[0];
+
         const domainName = interaction.options.getString("name", false);
 
         if (!domainName) {
@@ -96,7 +100,22 @@ export const domain = buildCommand<SlashCommand>({
             const stats = await getUserStats(interaction.user.id);
             const completedDomains = stats?.completedDomains || [];
 
-            // Get today's monsters for all domains
+            const currentCompletedDomains = completedDomains.filter(
+                (entry: string) => {
+                    const [, date] = entry.split(":");
+                    return date === today || date === yesterdayStr;
+                },
+            );
+
+            if (
+                currentCompletedDomains.length !== completedDomains.length &&
+                stats
+            ) {
+                await updateUserStats(stats.userId, {
+                    completedDomains: { set: currentCompletedDomains },
+                });
+            }
+
             const domainMonstersMap = new Map<string, DomainMonsters>();
             for (const [name] of Object.entries(domains)) {
                 const monsters = await getDomainMonstersForDomain(name, today);
@@ -104,8 +123,8 @@ export const domain = buildCommand<SlashCommand>({
             }
 
             for (const [name, domain] of Object.entries(domains)) {
-                const domainStatus = completedDomains.find((entry: string) =>
-                    entry.startsWith(`${name}:${today}`),
+                const domainStatus = currentCompletedDomains.find(
+                    (entry: string) => entry.startsWith(`${name}:${today}`),
                 );
                 const statusEmoji = domainStatus
                     ? domainStatus.endsWith(":win")
@@ -191,8 +210,25 @@ export const domain = buildCommand<SlashCommand>({
         }
 
         const completedDomains = stats.completedDomains || [];
+
+        const currentCompletedDomains = completedDomains.filter(
+            (entry: string) => {
+                const [, date] = entry.split(":");
+                return date === today || date === yesterdayStr;
+            },
+        );
+
         if (
-            completedDomains.some((entry: string) =>
+            currentCompletedDomains.length !== completedDomains.length &&
+            stats
+        ) {
+            await updateUserStats(stats.userId, {
+                completedDomains: { set: currentCompletedDomains },
+            });
+        }
+
+        if (
+            currentCompletedDomains.some((entry: string) =>
                 entry.startsWith(`${domainName}:${today}`),
             )
         ) {
@@ -209,7 +245,6 @@ export const domain = buildCommand<SlashCommand>({
             );
         }
 
-        // Set isHunting to true before starting the domain challenge
         await updateUserStats(stats.userId, { isHunting: { set: true } });
 
         const warningEmbed = new EmbedBuilder()
@@ -245,6 +280,7 @@ export const domain = buildCommand<SlashCommand>({
         });
 
         if (!confirmation || confirmation.customId === "cancel_domain") {
+            await updateUserStats(stats.userId, { isHunting: { set: false } });
             return r.edit({
                 embeds: [
                     new EmbedBuilder()
@@ -293,7 +329,6 @@ export const domain = buildCommand<SlashCommand>({
             );
         }
 
-        // Get today's monsters for this domain
         const domainMonsters = parseDomainMonsters(
             await getDomainMonstersForDomain(domainName, today),
         );
@@ -348,9 +383,9 @@ export const domain = buildCommand<SlashCommand>({
                         );
                     }
 
-                    completedDomains.push(`${domainName}:${today}:win`);
+                    currentCompletedDomains.push(`${domainName}:${today}:win`);
                     await updateUserStats(stats.userId, {
-                        completedDomains: { set: completedDomains },
+                        completedDomains: { set: currentCompletedDomains },
                         isHunting: { set: false },
                         activeSkills: { set: originalActiveSkills },
                     });
@@ -376,7 +411,7 @@ export const domain = buildCommand<SlashCommand>({
                     await updateUserStats(stats.userId, {
                         completedDomains: {
                             set: [
-                                ...completedDomains,
+                                ...currentCompletedDomains,
                                 `${domainName}:${today}:lose`,
                             ],
                         },
