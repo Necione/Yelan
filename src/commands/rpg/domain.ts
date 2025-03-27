@@ -174,6 +174,14 @@ export const domain = buildCommand<SlashCommand>({
             );
         }
 
+        if (stats.isHunting) {
+            return r.edit(
+                embedComment(
+                    "You cannot challenge a domain while you are already in a hunt or domain challenge!",
+                ),
+            );
+        }
+
         if (stats.rebirths < domain.requiredRebirths) {
             return r.edit(
                 embedComment(
@@ -200,6 +208,9 @@ export const domain = buildCommand<SlashCommand>({
                 ),
             );
         }
+
+        // Set isHunting to true before starting the domain challenge
+        await updateUserStats(stats.userId, { isHunting: { set: true } });
 
         const warningEmbed = new EmbedBuilder()
             .setColor(0xff0000)
