@@ -4,26 +4,20 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 
 export default {
     startingHp: 0,
-    name: "Dendro Specter",
-    group: MonsterGroup.Specter,
-    element: MonsterElement.Dendro,
-    minExp: 75,
-    maxExp: 100,
-    minadventurerank: 32,
+    name: "Rock-Cavernous Manifestation",
+    group: MonsterGroup.Wayob,
+    element: MonsterElement.Geo,
+    minExp: 120,
+    maxExp: 200,
+    minadventurerank: 36,
     souls: 5,
-    image: "https://lh.elara.workers.dev/rpg/monsters/dendro_specter.png",
+    image: "https://lh.elara.workers.dev/rpg/monsters/geo_wayob.png",
     drops: [
         {
-            item: "Spectral Husk",
+            item: "Shard of a Shattered Will",
             minAmount: 1,
             maxAmount: 1,
             chance: 75,
-        },
-        {
-            item: "Spectral Heart",
-            minAmount: 1,
-            maxAmount: 1,
-            chance: 10,
         },
         {
             item: "Life Essence",
@@ -32,13 +26,13 @@ export default {
             chance: 10,
         },
     ],
-
-    critChance: 25,
-    critValue: 1.5,
+    critChance: 30,
+    critValue: 2.75,
     defChance: 75,
-    defValue: 500,
-    baseHp: 22,
-    baseAtk: 12,
+    defValue: 750,
+    dodgeChance: 20,
+    baseHp: 40,
+    baseAtk: 30,
     getStatsForadventureRank(adventureRank: number) {
         if (!limits.check(adventureRank)) {
             return null;

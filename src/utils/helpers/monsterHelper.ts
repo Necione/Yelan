@@ -9,6 +9,7 @@ export enum MonsterGroup {
     Eremite = "Eremite",
     Specter = "Specter",
     Beast = "Beast",
+    Wayob = "Wayob",
     Fishing = "Fishing",
     Boss = "Boss",
 }

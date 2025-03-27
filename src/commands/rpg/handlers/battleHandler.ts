@@ -406,7 +406,7 @@ export async function playerAttack(
 
     const vigilanceLevelData = getUserSkillLevelData(stats, "Vigilance");
     if (vigilanceLevelData && !vigilanceUsed) {
-        if (!has("Fatui", monster, true)) {
+        if (!has(["Fatui", "Wayob"], monster, true)) {
             const levelData = vigilanceLevelData.levelData || {};
             const secondAttackPercentage =
                 levelData.secondAttackPercentage || 0;
@@ -471,7 +471,10 @@ export async function playerAttack(
 
     const kindleLevelData = getUserSkillLevelData(stats, "Kindle");
     if (kindleLevelData) {
-        if (!isFishingMonster(monster) && !has("Human", monster, true)) {
+        if (
+            !isFishingMonster(monster) &&
+            !has(["Human", "Wayob"], monster, true)
+        ) {
             const levelData = kindleLevelData.levelData || {};
             const damageBonus = levelData.damageBonus || 0;
 

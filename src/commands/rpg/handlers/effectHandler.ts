@@ -178,7 +178,7 @@ export function applyLeechDrain(
         if (
             hasFreedomSworn ||
             (!isFishingMonster(monster) &&
-                !has(["Boss", "Beast", "Eremite"], monster, true))
+                !has(["Boss", "Beast", "Eremite", "Wayob"], monster, true))
         ) {
             const levelData = leechLevelData.levelData || {};
             const lifestealPercentage = levelData.lifestealPercentage || 0;
@@ -208,7 +208,7 @@ export function applyLeechDrain(
         if (
             hasFreedomSworn ||
             (!isFishingMonster(monster) &&
-                !has(["Boss", "Beast", "Eremite"], monster, true))
+                !has(["Boss", "Beast", "Eremite", "Wayob"], monster, true))
         ) {
             const levelData = drainLevelData.levelData || {};
             const lifestealPercentage = levelData.lifestealPercentage || 0;

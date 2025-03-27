@@ -5,12 +5,12 @@ import { getAtkScaleMultiplier, getHpScaleMultiplier } from "../../statHelper";
 export default {
     startingHp: 0,
     name: "Flow-Inverted Manifestation",
-    group: MonsterGroup.Beast,
+    group: MonsterGroup.Wayob,
     element: MonsterElement.Hydro,
     minExp: 120,
     maxExp: 200,
     minadventurerank: 36,
-    souls: 8,
+    souls: 5,
     image: "https://lh.elara.workers.dev/rpg/monsters/flow_inverted_manifestation.png",
     drops: [
         {
@@ -28,12 +28,12 @@ export default {
     ],
 
     critChance: 25,
-    critValue: 2.25,
+    critValue: 3,
     defChance: 75,
     defValue: 750,
     dodgeChance: 10,
-    baseHp: 35,
-    baseAtk: 30,
+    baseHp: 38,
+    baseAtk: 35,
     getStatsForadventureRank(adventureRank: number) {
         if (!limits.check(adventureRank)) {
             return null;

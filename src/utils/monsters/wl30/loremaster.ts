@@ -10,7 +10,7 @@ export default {
     minExp: 75,
     maxExp: 100,
     minadventurerank: 30,
-    souls: 8,
+    souls: 5,
     image: "https://lh.elara.workers.dev/rpg/monsters/loremaster.png",
     drops: [
         {
