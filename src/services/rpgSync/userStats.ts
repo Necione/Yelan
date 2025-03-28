@@ -80,6 +80,11 @@ export async function syncStats(userId: string) {
     let needsUpdate = false;
     const updateData: Prisma.UserStatsUpdateInput = {};
 
+    if (!stats.maxShield) {
+        updateData.maxShield = { set: 1000 };
+        needsUpdate = true;
+    }
+
     const baseInventoryCap = 1000 + stats.rebirths * 500;
     const totalInventoryCap =
         baseInventoryCap + (stats.scatteredStarsUsed || 0) * 200;
