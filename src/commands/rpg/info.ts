@@ -204,7 +204,9 @@ export const info = buildCommand<SlashCommand>({
 
             if (!skill) {
                 return r.edit(
-                    embedComment(`The skill "${name}" does not exist.`),
+                    embedComment(
+                        `The skill "${name}" does not exist or is a hidden skill.`,
+                    ),
                 );
             }
 
@@ -406,7 +408,9 @@ export const info = buildCommand<SlashCommand>({
                 const weaponNotFoundEmbed = new EmbedBuilder()
                     .setColor("Red")
                     .setTitle("Weapon Not Found")
-                    .setDescription(`The weapon "${name}" could not be found.`)
+                    .setDescription(
+                        `The weapon "${name}" could not be found or is a hidden weapon.`,
+                    )
                     .setTimestamp();
 
                 return r.edit({ embeds: [weaponNotFoundEmbed] });

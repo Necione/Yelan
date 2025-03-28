@@ -207,7 +207,7 @@ export async function playerAttack(
             getDeathThreshold(stats),
         );
         messages.push(
-            `\`🧬\` The monster is poisonous! You lost ${hpLoss} HP with this attack`,
+            `\`🧬\` The monster is poisonous! You lost \`${hpLoss}\` HP with this attack`,
         );
         debug(
             `${username} Poisonous mutation: Player loses ${hpLoss} HP, new HP: ${currentPlayerHp}`,
