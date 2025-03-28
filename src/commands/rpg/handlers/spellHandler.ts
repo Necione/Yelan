@@ -1,3 +1,4 @@
+import { noop } from "@elara-services/utils";
 import { type UserStats } from "@prisma/client";
 import { debug } from "../../../utils";
 import { type Monster } from "../../../utils/helpers/huntHelper";
@@ -71,14 +72,21 @@ export const spellHandlers: Record<string, SpellHandler> = {
         return { currentPlayerHp, currentMonsterHp };
     },
 
-    Fury: async ({ stats, currentPlayerHp, currentMonsterHp, messages }) => {
-        stats.attackPower *= 2;
-        messages.push(
-            "`⚡` Fury spell casted! Your next attack will deal double damage",
+    Fury: async ({ stats, currentPlayerHp, currentMonsterHp }) => {
+        const furyActive = stats.activeEffects.some(
+            (effect) => effect.name === "Fury",
         );
-        debug(
-            `[${stats.userId}] Fury spell: Attack power doubled to ${stats.attackPower}`,
-        );
+
+        if (!furyActive) {
+            stats.activeEffects.push({
+                name: "Fury",
+                remainingUses: 1,
+                effectValue: 2,
+            });
+            debug(`[${stats.userId}] Fury spell: Fury effect applied.`);
+        } else {
+            noop();
+        }
 
         return { currentPlayerHp, currentMonsterHp };
     },

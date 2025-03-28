@@ -1225,11 +1225,6 @@ export function applyAttackModifiers(
         messages.push(
             `\`⚡\` Fury effect activated! Your attack deals double damage this turn`,
         );
-        debugMultipliers.push("Fury Effect (2x)");
-        debug(
-            `${username} Fury effect: Attack power doubled to ${attackPower}`,
-        );
-
         furyEffect.remainingUses -= 1;
         if (furyEffect.remainingUses <= 0) {
             stats.activeEffects = stats.activeEffects.filter(
