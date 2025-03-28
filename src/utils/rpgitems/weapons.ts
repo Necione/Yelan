@@ -23,6 +23,7 @@ interface WeaponData {
     emoji: string;
     imageURL: string;
     additionalMana: number;
+    hidden: boolean;
 }
 
 const baseWeapons: { [key: string]: WeaponData } = {
@@ -41,6 +42,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 30,
         emoji: "<:Weapon_Dull_Blade:1282455010222800968>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/dull_blade.png",
+        hidden: false,
     },
     "Waster Greatsword": {
         name: "Waster Greatsword",
@@ -58,6 +60,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Waster_Greatsword:1282455085741510857>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/waster_greatsword.png",
+        hidden: false,
     },
     "Iron Point": {
         name: "Iron Point",
@@ -74,6 +77,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 10,
         emoji: "<:Weapon_Iron_Point:1282455154427170987>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/iron_point.png",
+        hidden: false,
     },
     "Silver Sword": {
         name: "Silver Sword",
@@ -90,6 +94,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Silver_Sword:1282455291153223774>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/silver_sword.png",
+        hidden: false,
     },
     "Cool Steel": {
         name: "Cool Steel",
@@ -106,6 +111,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Cool_Steel:1282455365161582643>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/cool_steel.png",
+        hidden: false,
     },
     "White Tassel": {
         name: "White Tassel",
@@ -122,6 +128,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_White_Tassel:1282455432715047003>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/white_tassel.png",
+        hidden: false,
     },
     "Wilderness Rod": {
         name: "Wilderness Rod",
@@ -138,6 +145,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 10,
         emoji: "<:Item_Wilderness_Rod1:1309627118803750932>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/wilderness_rod.png",
+        hidden: false,
     },
     "Skyrider Sword": {
         name: "Skyrider Sword",
@@ -154,6 +162,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Skyrider_Sword:1282455504269869109>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/skyrider_sword.png",
+        hidden: false,
     },
     "Twin Nephrite": {
         name: "Twin Nephrite",
@@ -170,6 +179,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Twin_Nephrite:1282455571370606653>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/twin_nephrite.png",
+        hidden: false,
     },
     "Harbinger of Dawn": {
         name: "Harbinger of Dawn",
@@ -187,6 +197,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Harbinger_of_Dawn:1282455645273981039>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/harbinger_of_dawn.png",
+        hidden: false,
     },
     "Magic Guide": {
         name: "Magic Guide",
@@ -203,6 +214,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 10,
         emoji: "<:Weapon_Magic_Guide:1282455719580270624>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/magic_guide.png",
+        hidden: false,
     },
     Messenger: {
         name: "Messenger",
@@ -219,6 +231,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Messenger:1282455784940245032>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/messenger.png",
+        hidden: false,
     },
     Wishmaker: {
         name: "Wishmaker",
@@ -235,6 +248,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 10,
         emoji: "<:Item_Wishmaker:1309629861081387080>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/wishmaker.png",
+        hidden: false,
     },
     "Raven Bow": {
         name: "Raven Bow",
@@ -251,6 +265,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Raven_Bow:1282455848810971136>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/raven_bow.png",
+        hidden: false,
     },
     "Recurve Bow": {
         name: "Recurve Bow",
@@ -267,6 +282,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Recurve_Bow:1282455914556952576>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/recurve_bow.png",
+        hidden: false,
     },
     "Otherworldly Story": {
         name: "Otherworldly Story",
@@ -284,6 +300,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Otherworldly_Story:1282455997994238033>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/otherworldly_story.png",
+        hidden: false,
     },
     "The Black Sword": {
         name: "The Black Sword",
@@ -301,6 +318,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Black_Sword:1282998131432230933>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/the_black-sword.png",
+        hidden: false,
     },
     "The Bell": {
         name: "The Bell",
@@ -317,6 +335,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_The_Bell:1282998169830952960>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_bell.png",
+        hidden: false,
     },
     "Emerald Orb": {
         name: "Emerald orb",
@@ -333,6 +352,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Emerald_Orb:1282456084505952286>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/emerald_orb.png",
+        hidden: false,
     },
     "The Halberd": {
         name: "The Halberd",
@@ -349,6 +369,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Halberd:1291432656986312766>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_halberd.png",
+        hidden: false,
     },
     "Ferrous Shadow": {
         name: "Ferrous Shadow",
@@ -365,6 +386,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Ferrous_Shadow:1282456147210535013>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/ferrous_shadow.png",
+        hidden: false,
     },
     "Fillet Blade": {
         name: "Fillet Blade",
@@ -381,6 +403,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Fillet_Blade:1282456217150558258>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/fillet_blade.png",
+        hidden: false,
     },
     "Sacrificial Sword": {
         name: "Sacrificial Sword",
@@ -398,6 +421,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Sacrificial_Sword:1282504118518284338>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/sacrificial_sword.png",
+        hidden: false,
     },
     "The Widsith": {
         name: "The Widsith",
@@ -414,6 +438,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_The_Widsith:1291432715622547478>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_widsith.png",
+        hidden: false,
     },
     "The Flute": {
         name: "The Flute",
@@ -430,6 +455,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_The_Flute:1282504448538837013>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_flute.png",
+        hidden: false,
     },
     "Narukawa Ukai": {
         name: "Narukawa Ukai",
@@ -446,6 +472,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 10,
         emoji: "<:Item_Narukawa_Ukai:1309632037803528242>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/narukawa_ukai.png",
+        hidden: false,
     },
     "Blackcliff Agate": {
         name: "Blackcliff Agate",
@@ -463,6 +490,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Blackcliff_Agate:1284390885836066847>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/blackcliff_agate.png",
+        hidden: false,
     },
     "Chain Breaker": {
         name: "Chain Breaker",
@@ -479,6 +507,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Chain_Breaker:1284617740899844176>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/chain_breaker.png",
+        hidden: false,
     },
     "Cinnabar Spindle": {
         name: "Cinnabar Spindle",
@@ -496,6 +525,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Cinnabar_Spindle:1292283663329005621>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/cinnabar_spindle.png",
+        hidden: false,
     },
     Deathmatch: {
         name: "Deathmatch",
@@ -512,6 +542,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Deathmatch:1284617953509245082>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/deathmatch.png",
+        hidden: false,
     },
     "The Stringless": {
         name: "The Stringless",
@@ -528,6 +559,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_The_Stringless:1291432822808117338>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/the_stringless.png",
+        hidden: false,
     },
     Wavepiercer: {
         name: "Wavepiercer",
@@ -544,6 +576,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 10,
         emoji: "<:Item_Wavepiercer:1309632428935090176>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/wavepiercer.png",
+        hidden: false,
     },
     "Vortex Vanquisher": {
         name: "Vortex Vanquisher",
@@ -561,6 +594,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Vortex_Vanquisher:1304700656400994376>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/vortex_vanquisher.png",
+        hidden: false,
     },
     "The Alley Flash": {
         name: "The Alley Flash",
@@ -578,6 +612,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Alley_Flash:1289482689778548736>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/the_alley_flash.png",
+        hidden: false,
     },
     "Lithic Blade": {
         name: "Lithic Blade",
@@ -594,6 +629,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Lithic_Blade:1294565079554981898>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/lithic_blade.png",
+        hidden: false,
     },
     "Pro­to­type Ar­cha­ic": {
         name: "Prototype Archaic",
@@ -611,6 +647,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Prototype_Archaic:1289482979793698896>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/prototype_archaic.png",
+        hidden: false,
     },
     "Black­cliff War­bow": {
         name: "Blackcliff Warbow",
@@ -628,6 +665,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Blackcliff_Warbow:1289483143304314940>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/blackcliff_warbow.png",
+        hidden: false,
     },
     Rainslasher: {
         name: "Rainslasher",
@@ -644,6 +682,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Rainslasher:1292670965121159250>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/rainslasher.png",
+        hidden: false,
     },
     "Roy­al Gri­moire": {
         name: "Royal Grimoire",
@@ -660,6 +699,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 5,
         emoji: "<:Weapon_Royal_Grimoire:1289486411061395517>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/royal_grimoire.png",
+        hidden: false,
     },
     "Eye of Perception": {
         name: "Eye of Perception",
@@ -677,6 +717,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Eye_of_Perception:1291133932711972955>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/eye_of_perception.png",
+        hidden: false,
     },
     "Kagotsurube Isshin": {
         name: "Kagotsurube Isshin",
@@ -694,6 +735,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Kagotsurube_Isshin:1291134317984092262>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/kagotsurube_isshin.png",
+        hidden: false,
     },
     Moonstringer: {
         name: "Moonstringer",
@@ -710,6 +752,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 10,
         emoji: "<:Item_Moonstringer:1309632789057896448>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/moonstringer.png",
+        hidden: false,
     },
     "Amenoma Kageuchi": {
         name: "Amenoma Kageuchi",
@@ -727,6 +770,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Amenoma_Kageuchi:1296678201065603112>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/amenoma_kageuchi.png",
+        hidden: false,
     },
     Akuoumaru: {
         name: "Akuoumaru",
@@ -743,6 +787,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Akuoumaru:1303587310788411392>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/akuoumaru.png",
+        hidden: false,
     },
     "Compound Bow": {
         name: "Compound Bow",
@@ -759,6 +804,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Compound_Bow:1303587466300751912>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/compound_bow.png",
+        hidden: false,
     },
     "Favonius Sword": {
         name: "Favonius Sword",
@@ -775,6 +821,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Favonius_Sword:1304141989092130937>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/favonius_sword.png",
+        hidden: false,
     },
     "Mailed Flower": {
         name: "Mailed Flower",
@@ -791,6 +838,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Mailed_Flower:1354328247097364500>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/mailed_flower.png",
+        hidden: false,
     },
     "Festering Desire": {
         name: "Festering Desire",
@@ -808,6 +856,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Festering_Desire:1353317545452503090>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/festering_desire.png",
+        hidden: false,
     },
     "Amos' Bow": {
         name: "Amos' Bow",
@@ -824,6 +873,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0.5,
         emoji: "<:Weapon_Amos27_Bow:1321725213377040384>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/amos.png",
+        hidden: false,
     },
     "Earth Shaker": {
         name: "Earth Shaker",
@@ -840,6 +890,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 2,
         emoji: "<:Weapon_Earth_Shaker:1316559802046087178>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/earth_shaker.png",
+        hidden: false,
     },
     "Kitain Cross Spear": {
         name: "Kitain Cross Spear",
@@ -857,6 +908,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Kitain_Cross_Spear:1319514955829088256>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/kitan_cross_spear.png",
+        hidden: false,
     },
     Serendipity: {
         name: "Serendipity",
@@ -873,6 +925,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 10,
         emoji: "<:Item_Serendipity:1310102946142228573>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/serendipity.png",
+        hidden: false,
     },
     "Serpent Spine": {
         name: "Serpent Spine",
@@ -889,6 +942,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Serpent_Spine:1310715179876483213>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/serpent_spine.png",
+        hidden: false,
     },
     Absolution: {
         name: "Absolution",
@@ -905,6 +959,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0.5,
         emoji: "<:Weapon_Absolution1:1303960695653535776>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/absolution.png",
+        hidden: false,
     },
     "Wolf's Gravestone": {
         name: "Wolf's Gravestone",
@@ -922,6 +977,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Wolfs_Gravestone:1310711268851716247>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/wolfs_gravestone.png",
+        hidden: false,
     },
     "Song of Broken Pines": {
         name: "Song of Broken Pines",
@@ -939,6 +995,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Song_of_Broken_Pines:1355015692256153740>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/song_of_broken_pines.png",
+        hidden: false,
     },
     "Memory of Dust": {
         name: "Memory of Dust",
@@ -955,6 +1012,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0.5,
         emoji: "<:Weapon_Memory_of_Dust:1303985604060643359>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/memory_of_dust.png",
+        hidden: false,
     },
     "Fading Twilight": {
         name: "Fading Twilight",
@@ -972,6 +1030,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Fading_Twilight:1354326169159340092>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/fading_twilight.png",
+        hidden: false,
     },
     "Lion's Roar": {
         name: "Lion's Roar",
@@ -988,6 +1047,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Lion27s_Roar:1354326316349915137>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/lions_roar.png",
+        hidden: false,
     },
     "Everlasting Moonglow": {
         name: "Everlasting Moonglow",
@@ -1005,6 +1065,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Everlasting_Moonglow1:1317048177895014410>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/everlasting_moonglow.png",
+        hidden: false,
     },
     "Finale of the Deep": {
         name: "Finale of the Deep",
@@ -1022,6 +1083,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Finale_of_the_Deep:1354326844341489827>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/finale_of_the_deep.png",
+        hidden: false,
     },
     Frostbearer: {
         name: "Frostbearer",
@@ -1038,6 +1100,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Frostbearer:1354327477379665930>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/frostbearer.png",
+        hidden: false,
     },
     Hamayumi: {
         name: "Hamayumi",
@@ -1054,6 +1117,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 3,
         emoji: "<:Weapon_Hamayumi:1354327903243862036>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/hamayumi.png",
+        hidden: false,
     },
     "The First Great Magic": {
         name: "The First Great Magic",
@@ -1070,6 +1134,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0.5,
         emoji: "<:Weapon_The_First_Great_Magic:1321734222255493203>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/magic.png",
+        hidden: false,
     },
     "Haran Geppaku Futsu": {
         name: "Haran Geppaku Futsu",
@@ -1086,6 +1151,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0.5,
         emoji: "<:Weapon_Haran_Geppaku_Futsu:1323447532654690364>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/haran.png",
+        hidden: false,
     },
     "Calamity Queller": {
         name: "Calamity Queller",
@@ -1103,6 +1169,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Calamity_Queller:1314132564427935764>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/calamity_queller.png",
+        hidden: false,
     },
     "Jadefall's Splendor": {
         name: "Jadefall's Splendor",
@@ -1119,6 +1186,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0.5,
         emoji: "<:Weapon_Jadefall27s_Splendor:1353616868698620006>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/jadefall.png",
+        hidden: false,
     },
     "Freedom-Sworn": {
         name: "Freedom-Sworn",
@@ -1135,6 +1203,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0.5,
         emoji: "<:Weapon_FreedomSworn:1353622321780363287>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/freedom_sworn.png",
+        hidden: false,
     },
     "Crimson Moon's Semblance": {
         name: "Crimson Moon's Semblance",
@@ -1151,6 +1220,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0.5,
         emoji: "<:Weapon_Crimson_Moon27s_Semblance:1353622274875592714>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/crimson.png",
+        hidden: false,
     },
     "✪ Harbinger of Dawn": {
         name: "✪ Harbinger of Dawn",
@@ -1168,6 +1238,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Harbinger_of_Dawn_2nd:1317755526980964423>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/asc/harbinger_of_dawn.png",
+        hidden: false,
     },
     "✪ Messenger": {
         name: "✪ Messenger",
@@ -1184,6 +1255,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0,
         emoji: "<:Weapon_Messenger_2nd:1317756274548408380>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/asc/messenger.png",
+        hidden: false,
     },
     "✪ Lithic Blade": {
         name: "✪ Lithic Blade",
@@ -1201,6 +1273,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Lithic_Blade_2nd:1320599046511136788>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/asc/lithic_blade.png",
+        hidden: false,
     },
     "✪ Deathmatch": {
         name: "✪ Deathmatch",
@@ -1217,6 +1290,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0,
         emoji: "<:Weapon_Deathmatch_2nd:1320599544211308684>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/asc/deathmatch.png",
+        hidden: false,
     },
     "✪ The Halberd": {
         name: "✪ The Halberd",
@@ -1234,6 +1308,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Halberd_2nd:1322102922439561277>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/asc/the_halberd.png",
+        hidden: false,
     },
     "✪ Cinnabar Spindle": {
         name: "✪ Cinnabar Spindle",
@@ -1251,6 +1326,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Cinnabar_Spindle_2nd:1322103228145602563>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/asc/cinnabar_spindle.png",
+        hidden: false,
     },
     "✪ The Alley Flash": {
         name: "✪ The Alley Flash",
@@ -1268,6 +1344,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Alley_Flash_2nd:1322103720242184225>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/asc/the_alley_flash.png",
+        hidden: false,
     },
     "✪ The Widsith": {
         name: "✪ The Widsith",
@@ -1285,6 +1362,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_The_Widsith_2nd:1322104043258253312>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/asc/the_widsith.png",
+        hidden: false,
     },
     "✪ Amenoma Kageuchi": {
         name: "✪ Amenoma Kageuchi",
@@ -1302,6 +1380,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         emoji: "<:Weapon_Amenoma_Kageuchi_2nd1:1353334376989196349>",
         imageURL:
             "https://lh.elara.workers.dev/rpg/weapons/asc/amenoma_kageuchi.png",
+        hidden: false,
     },
     "✪ Dull Blade": {
         name: "✪ Dull Blade",
@@ -1318,6 +1397,25 @@ const baseWeapons: { [key: string]: WeaponData } = {
         chestChance: 0,
         emoji: "<:Weapon_Dull_Blade_2nd:1322473719083438121>",
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/asc/dull_blade.png",
+        hidden: false,
+    },
+    // Hidden
+    "Wine and Song": {
+        name: "Wine and Song",
+        type: "Catalyst",
+        sellPrice: 5,
+        attackPower: 125,
+        critChance: 50,
+        critValue: 1.5,
+        defValue: 150,
+        defChance: 10,
+        additionalHP: 150,
+        additionalMana: 80,
+        minadventurerank: 4,
+        chestChance: 0,
+        emoji: "<:Weapon_Wine_and_Song:1355065295290634433>",
+        imageURL: "https://lh.elara.workers.dev/rpg/weapons/wine_and_song.png",
+        hidden: true,
     },
 };
 

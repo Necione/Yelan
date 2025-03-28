@@ -37,8 +37,8 @@ export const csv = buildCommand<SlashCommand>({
         let totalSellPrice = 0;
         const rebirthMultiplier =
             1 +
-            Math.min(stats.rebirths, 3) * 0.2 +
-            Math.max(0, stats.rebirths - 3) * 0.1;
+            Math.min(stats.rebirths, 4) * 0.1 +
+            Math.max(0, stats.rebirths - 4) * 0.05;
 
         for (const item of stats.inventory) {
             const itemData =

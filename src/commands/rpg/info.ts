@@ -155,7 +155,9 @@ export const info = buildCommand<SlashCommand>({
                 )
                 .catch(noop);
         } else if (type === "weapon") {
-            const weaponNames = Object.keys(weapons);
+            const weaponNames = Object.keys(weapons).filter(
+                (wn) => !weapons[wn].hidden,
+            );
             const filteredNames = weaponNames.filter((wn) =>
                 wn.toLowerCase().includes(searchTerm),
             );
@@ -400,7 +402,7 @@ export const info = buildCommand<SlashCommand>({
 
             const weaponName = name as WeaponName;
             const selectedWeapon = weapons[weaponName];
-            if (!selectedWeapon) {
+            if (!selectedWeapon || selectedWeapon.hidden) {
                 const weaponNotFoundEmbed = new EmbedBuilder()
                     .setColor("Red")
                     .setTitle("Weapon Not Found")
