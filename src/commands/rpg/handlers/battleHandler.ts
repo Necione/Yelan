@@ -1092,7 +1092,7 @@ export function applyAttackModifiers(
 
         if (equippedWeaponName?.includes("Crimson Moon's Semblance")) {
             const souls = stats.souls || 0;
-            const soulBonus = souls * 2;
+            const soulBonus = souls;
             attackPower += soulBonus;
             messages.push(
                 `\`🌙\` Crimson Moon's Semblance adds \`${soulBonus.toFixed(
