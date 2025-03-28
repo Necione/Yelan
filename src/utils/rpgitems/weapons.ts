@@ -1499,6 +1499,30 @@ const prefixes: {
         defChance: weaponData.defChance - 50,
         chestChance: 0,
     }),
+    Demonic: (weaponData) => ({
+        attackPower: Math.abs(weaponData.attackPower * 3),
+        additionalHP: Math.abs(weaponData.additionalHP * 3),
+        critValue: Math.abs(weaponData.critValue * 3),
+        defValue: Math.abs(weaponData.defValue * 3),
+        defChance: 100,
+        chestChance: 0,
+    }),
+    Corrupted: (weaponData) => ({
+        attackPower: Math.abs(weaponData.attackPower * 5),
+        additionalHP: Math.abs(weaponData.additionalHP * 2),
+        critValue: Math.abs(weaponData.critValue * 2),
+        defValue: Math.abs(weaponData.defValue * 4),
+        defChance: 100,
+        chestChance: 0,
+    }),
+    Revered: (weaponData) => ({
+        attackPower: Math.abs(weaponData.attackPower * 3),
+        additionalHP: Math.abs(weaponData.additionalHP * 10),
+        critValue: Math.abs(weaponData.critValue * 2),
+        defValue: Math.abs(weaponData.defValue * 5),
+        defChance: 100,
+        chestChance: 0,
+    }),
 };
 
 export const weapons = make.object<{ [key: string]: WeaponData }>();

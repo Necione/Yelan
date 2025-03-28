@@ -318,6 +318,7 @@ model UserStats {
   resonance                 Int            @default(0)
   completedDomains          String[]       @default([])
   expertMode                Boolean        @default(false)
+  blacksmith                String[]       @default([])
 }
 
 type Strikes {

@@ -12,6 +12,12 @@ export const prefixes = [
     "Clean",
     "Wise",
     "Jaded",
+    "Legendary",
+    "Harmonic",
+    "Sinful",
+    "Demonic",
+    "Corrupted",
+    "Revered",
 ];
 
 export function getPrefix(weaponName: string, list?: string[]): string {

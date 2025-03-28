@@ -156,7 +156,11 @@ export const info = buildCommand<SlashCommand>({
                 .catch(noop);
         } else if (type === "weapon") {
             const weaponNames = Object.keys(weapons).filter(
-                (wn) => !weapons[wn].hidden,
+                (wn) =>
+                    !weapons[wn].hidden &&
+                    !["Demonic", "Corrupted", "Revered"].some((prefix) =>
+                        wn.startsWith(prefix + " "),
+                    ),
             );
             const filteredNames = weaponNames.filter((wn) =>
                 wn.toLowerCase().includes(searchTerm),

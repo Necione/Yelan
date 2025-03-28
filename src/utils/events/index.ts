@@ -1,3 +1,4 @@
+export * from "./blacksmithEvent";
 export * from "./cliffFallEvent";
 export * from "./cursedWitchEvent";
 export * from "./healingWellEvent";

@@ -141,15 +141,28 @@ export const reforge = buildCommand<SlashCommand>({
         const baseName = getBaseName(weaponName);
         let newPrefix;
         const specialChance = Math.random() * 100;
-        if (specialChance <= 1) {
+
+        if (specialChance <= 0.5) {
             newPrefix = "Legendary";
-        } else if (specialChance <= 2) {
-            newPrefix = "Sinful";
-        } else if (specialChance <= 3) {
+        } else if (specialChance <= 1) {
             newPrefix = "Harmonic";
+        } else if (specialChance <= 1.5) {
+            newPrefix = "Sinful";
         } else {
-            newPrefix = getRandom(prefixes);
+            const regularPrefixes = prefixes.filter(
+                (prefix) =>
+                    ![
+                        "Legendary",
+                        "Harmonic",
+                        "Sinful",
+                        "Demonic",
+                        "Corrupted",
+                        "Revered",
+                    ].includes(prefix),
+            );
+            newPrefix = getRandom(regularPrefixes);
         }
+
         const newWeaponName = `${newPrefix} ${baseName}`;
 
         if (!weapons[newWeaponName as WeaponName]) {
