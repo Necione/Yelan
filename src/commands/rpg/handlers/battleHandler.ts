@@ -78,6 +78,7 @@ export async function playerAttack(
     monsterState: MonsterState,
     messages: string[],
     hasWrath: boolean,
+    turnNumber: number,
 ): Promise<{
     currentMonsterHp: number;
     currentPlayerHp: number;
@@ -114,6 +115,20 @@ export async function playerAttack(
                 `${username} Jadefall's Splendor healed for ${healAmount} HP from resonance`,
             );
         }
+    }
+
+    if (
+        equippedWeaponName?.includes("Song of Broken Pines") &&
+        typeof turnNumber === "number"
+    ) {
+        const exponentialDamage = Math.floor(Math.exp(turnNumber));
+        currentMonsterHp = Math.max(currentMonsterHp - exponentialDamage, 0);
+        messages.push(
+            `\`🎼\` Song of Broken Pines deals \`${exponentialDamage}\` bonus damage`,
+        );
+        debug(
+            `${username} Song of Broken Pines => -${exponentialDamage} HP (e^${turnNumber})`,
+        );
     }
 
     if (stats.castQueue.length > 0) {

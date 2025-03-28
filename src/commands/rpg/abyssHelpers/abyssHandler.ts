@@ -208,6 +208,7 @@ export async function handleAbyssBattle(
                     monsterState,
                     playerMessages,
                     hasWrath,
+                    turnNumber,
                 );
 
                 currentMonsterHp = result.currentMonsterHp;

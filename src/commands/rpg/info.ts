@@ -39,6 +39,10 @@ const specialEffects: Array<{
         effect: "Deal 20% more damage per 1000 HP the monster has.",
     },
     {
+        substring: "Song of Broken Pines",
+        effect: "Deal e^X bonus damage per turn, where X is the turn number.",
+    },
+    {
         substring: "Vortex Vanquisher",
         effect: "Reduce all damage taken by 50%.",
     },

@@ -345,6 +345,7 @@ export async function handleHunt(
                         monsterState,
                         [],
                         hasWrath,
+                        turnNumber,
                     );
 
                     currentMonsterHp = result.currentMonsterHp;
@@ -549,6 +550,7 @@ export async function handleHunt(
                     monsterState,
                     playerMessages,
                     hasWrath,
+                    turnNumber,
                 );
 
                 currentMonsterHp = result.currentMonsterHp;
