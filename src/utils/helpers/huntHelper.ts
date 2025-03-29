@@ -200,23 +200,6 @@ export async function getRandomMonster(
         return null;
     }
 
-    if (selectedMonster.name === "Mirror Maiden") {
-        const monsterInstance: MonsterInstance = {
-            ...selectedMonster,
-            startingHp: playerStats.maxHp,
-            minDamage: playerStats.attackPower,
-            maxDamage: playerStats.attackPower,
-            critChance: playerStats.critChance,
-            critValue: playerStats.critValue,
-            defChance: playerStats.defChance,
-            defValue: playerStats.defValue,
-            minHp: playerStats.maxHp,
-            maxHp: playerStats.maxHp,
-        };
-
-        return monsterInstance;
-    }
-
     if (typeof selectedMonster.getStatsForadventureRank !== "function") {
         debug(
             `getStatsForadventureRank is not a function for monster: ${selectedMonster.name}`,
@@ -238,22 +221,22 @@ export async function getRandomMonster(
         stats.minDamage = Math.floor(stats.minDamage * damageMultiplier);
         stats.maxDamage = Math.floor(stats.maxDamage * damageMultiplier);
 
+        const startingHp = selectedMonster.name.includes("Mirror Maiden")
+            ? playerStats.maxHp
+            : stats.minHp;
+
         const monsterInstance: MonsterInstance = {
             ...selectedMonster,
             minHp: stats.minHp,
             maxHp: stats.maxHp,
             minDamage: stats.minDamage,
             maxDamage: stats.maxDamage,
-            startingHp: stats.minHp,
+            startingHp,
         };
 
         return monsterInstance;
-    } else {
-        debug(
-            `Stats for Adventure Rank ${adventureRank} not found for monster: ${selectedMonster.name}`,
-        );
-        return null;
     }
+    return null;
 }
 
 export function getEncounterDescription(monster: MonsterInstance) {

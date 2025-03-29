@@ -33,7 +33,7 @@ export default {
     defValue: 750,
     dodgeChance: 10,
     baseHp: 38,
-    baseAtk: 35,
+    baseAtk: 40,
     getStatsForadventureRank(adventureRank: number) {
         if (!limits.check(adventureRank)) {
             return null;

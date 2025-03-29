@@ -467,6 +467,21 @@ export async function playerAttack(
         )}]`,
     );
 
+    if (has("Mirror Maiden", monster)) {
+        currentPlayerHp = Math.max(
+            currentPlayerHp - finalAttackPower,
+            getDeathThreshold(stats),
+        );
+        messages.push(
+            `\`📩\` Mirror Maiden reflects \`${finalAttackPower.toFixed(
+                2,
+            )}\` damage back to you`,
+        );
+        debug(
+            `${usernameLog} Mirror Maiden reflection: -${finalAttackPower} HP to player`,
+        );
+    }
+
     if (stats.swordStyle === "Guhua Style" && stats.styleGuhua >= 50) {
         const equippedWeapon = weapons[stats.equippedWeapon as WeaponName];
         if (equippedWeapon?.type === "Sword") {
@@ -1156,7 +1171,6 @@ export function applyAttackModifiers(
                       applicableMultiplier * 100
                   ).toFixed(0)}%__ damage`
                 : `\`➰\` Mastery Level ${appliedMasteryLevel} activated`;
-
             messages.push(masteryMessage);
             debugMultipliers.push(
                 `Mastery Level ${appliedMasteryLevel} (${(
@@ -1217,57 +1231,6 @@ export function applyAttackModifiers(
         }
     }
 
-    const furyEffect = stats.activeEffects.find(
-        (effect) => effect.name === "Fury" && effect.remainingUses > 0,
-    );
-    if (furyEffect) {
-        attackPower *= 2;
-        messages.push(
-            `\`⚡\` Fury effect activated! Your attack deals double damage this turn`,
-        );
-        furyEffect.remainingUses -= 1;
-        if (furyEffect.remainingUses <= 0) {
-            stats.activeEffects = stats.activeEffects.filter(
-                (effect) => effect !== furyEffect,
-            );
-            debug(`${username} Fury effect expired`);
-        }
-    }
-
-    const strengthEffect = stats.activeEffects.find(
-        (eff) => eff.name === "Strength" && eff.remainingUses > 0,
-    );
-    if (strengthEffect) {
-        const multiplier = strengthEffect.effectValue;
-        attackPower *= multiplier;
-        messages.push(
-            `\`💪\` Strength effect activated! Your attack is __x${multiplier.toFixed(
-                2,
-            )}__ this turn`,
-        );
-        debugMultipliers.push(`Strength (${multiplier}x)`);
-        debug(`${username} Strength => x${multiplier} => ${attackPower}`);
-
-        strengthEffect.remainingUses -= 1;
-        if (strengthEffect.remainingUses <= 0) {
-            stats.activeEffects = stats.activeEffects.filter(
-                (e) => e !== strengthEffect,
-            );
-            messages.push("`💪` Strength effect ended");
-            debug(`${username} Strength ended => removed activeEffects`);
-        }
-    }
-
-    if (monster.mutationType === "Poisonous") {
-        const bonusDamage = Math.floor(stats.maxHP * 0.1);
-        attackPower += bonusDamage;
-        messages.push(
-            "`☠️` Poisonous mutation: You deal bonus damage equal to __10%__ of your max HP!",
-        );
-        debugMultipliers.push(`Poisonous bonus (+${bonusDamage})`);
-        debug(`${username} Poisonous bonus added: +${bonusDamage} damage`);
-    }
-
     if (monster.mutationType === "Demonic" && !hasImmunity) {
         attackPower *= 0.6;
         messages.push(
@@ -1280,6 +1243,17 @@ export function applyAttackModifiers(
             "`✨` Your Immunity spell protects you from the demonic pressure",
         );
         debug(`${username} Immunity active => Demonic pressure negated`);
+    }
+
+    if (monster.defValue && monster.defValue > 1000) {
+        attackPower *= 0.8;
+        messages.push(
+            "`🌻` The monster's high defense reduces your damage by __20%__",
+        );
+        debugMultipliers.push("High Defense (0.8x)");
+        debug(
+            `${username} High Defense => Attack Power * 0.8 = ${attackPower}`,
+        );
     }
 
     debug(

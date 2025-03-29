@@ -22,7 +22,6 @@ export default {
             chance: 10,
         },
     ],
-
     critChance: 30,
     critValue: 1.2,
     defChance: 25,
