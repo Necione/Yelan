@@ -1,17 +1,14 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
-import {
-    embedComment,
-    getKeys,
-    is,
-    noop,
-    snowflakes,
-} from "@elara-services/utils";
-import { type UserCharacter } from "@prisma/client";
+import { embedComment, getKeys, is, noop } from "@elara-services/utils";
+import { type UserCharacter, type UserStats } from "@prisma/client";
 import { SlashCommandBuilder } from "discord.js";
 import {
+    addItemToInventory,
+    checkEquipped,
     getProfileByUserId,
     getUserCharacters,
     getUserStats,
+    removeItemFromInventory,
     updateUserStats,
 } from "../../services";
 import { locked } from "../../utils";
@@ -37,6 +34,50 @@ function getRandomBait(options: { name: string; weight: number }[]) {
     }
     return options[options.length - 1].name;
 }
+
+const diffusionHandlers: {
+    [itemName: string]: (
+        userId: string,
+        amount: number,
+        stats: UserStats,
+    ) => Promise<{ reply: string; color?: string }>;
+} = {
+    "Life Essence": async (userId, amount, stats) => {
+        const alchemyIncrease = amount;
+        const newAlchemyProgress = stats.alchemyProgress + alchemyIncrease;
+        await removeItemFromInventory(userId, "Life Essence", amount);
+        await updateUserStats(userId, {
+            alchemyProgress: { set: newAlchemyProgress },
+        });
+        return {
+            reply: `You diffused \`${amount}x\` **Life Essence** and gained \`${alchemyIncrease}\` Alchemy Point!`,
+            color: "Green",
+        };
+    },
+    "Scattered Star": async (userId, amount, stats) => {
+        const newScatteredStarsUsed = (stats.scatteredStarsUsed || 0) + amount;
+        const inventoryIncrease = amount * 200;
+        await removeItemFromInventory(userId, "Scattered Star", amount);
+        await updateUserStats(userId, {
+            scatteredStarsUsed: { set: newScatteredStarsUsed },
+        });
+        return {
+            reply: `You diffused \`${amount}x\` **Scattered Star** and increased your inventory capacity by \`${inventoryIncrease}\` slots!`,
+            color: "Green",
+        };
+    },
+    "Skill Token": async (userId, amount, stats) => {
+        const newBonusTokens = (stats.bonusTokens || 0) + amount;
+        await removeItemFromInventory(userId, "Skill Token", amount);
+        await updateUserStats(userId, { bonusTokens: { set: newBonusTokens } });
+        return {
+            reply: `You diffused \`${amount}x\` **Skill Token** and gained \`${amount}\` Bonus Token${
+                amount > 1 ? "s" : ""
+            }!`,
+            color: "Green",
+        };
+    },
+};
 
 export const diffuse = buildCommand<SlashCommand>({
     command: new SlashCommandBuilder()
@@ -80,6 +121,7 @@ export const diffuse = buildCommand<SlashCommand>({
         return i.respond(items.slice(0, 25)).catch(noop);
     },
     async execute(i, r) {
+        const userId = i.user.id;
         const itemName = i.options.getString("item", true);
         const amountToDiffuse = i.options.getInteger("amount", true);
 
@@ -87,15 +129,15 @@ export const diffuse = buildCommand<SlashCommand>({
             return r.edit(embedComment(`You didn't select a valid item.`));
         }
 
-        const userWallet = await getProfileByUserId(i.user.id);
+        const userWallet = await getProfileByUserId(userId);
         if (!userWallet) {
-            locked.del(i.user.id);
+            locked.del(userId);
             return r.edit(
                 embedComment("Unable to find/create your user profile."),
             );
         }
 
-        const stats = await getUserStats(i.user.id);
+        const stats = await getUserStats(userId);
         if (!stats) {
             return r.edit(
                 embedComment(
@@ -103,7 +145,6 @@ export const diffuse = buildCommand<SlashCommand>({
                 ),
             );
         }
-
         if (stats.isHunting) {
             return r.edit(embedComment("You cannot diffuse while hunting!"));
         }
@@ -122,57 +163,19 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
-        const item = stats.inventory.find((c) => c.item === itemName);
-        if (!item) {
+        const item = stats.inventory.find((entry) => entry.item === itemName);
+        if (!item || item.amount < amountToDiffuse) {
             return r.edit(
                 embedComment(
-                    `You don't have "${itemName}" to diffuse.\n-# Check your inventory with </bag:1282456807100387411>`,
-                ),
-            );
-        }
-        if (item.amount < amountToDiffuse) {
-            return r.edit(
-                embedComment(
-                    `You don't have enough of "${itemName}" to diffuse.\n-# Check your inventory with </bag:1282456807100387411>`,
+                    `You don't have enough "${itemName}" to diffuse (You have \`${
+                        item?.amount || 0
+                    }x\`).`,
                 ),
             );
         }
 
-        const characters = (await getUserCharacters(
-            i.user.id,
-        )) as UserCharacter[];
-
-        const isEquippedOnCharacter = characters.some((character) => {
-            if (
-                weapons[itemName as WeaponName] &&
-                character.equippedWeapon === itemName
-            ) {
-                return true;
-            }
-            if (artifacts[itemName as ArtifactName]) {
-                return (
-                    character.equippedFlower === itemName ||
-                    character.equippedPlume === itemName ||
-                    character.equippedSands === itemName ||
-                    character.equippedGoblet === itemName ||
-                    character.equippedCirclet === itemName
-                );
-            }
-            return false;
-        });
-
-        if (isEquippedOnCharacter) {
-            return r.edit(
-                embedComment(
-                    `You cannot diffuse "${itemName}" because it is currently equipped on one of your characters.`,
-                ),
-            );
-        }
-
-        if (
-            weapons[itemName as WeaponName] &&
-            stats.equippedWeapon === itemName
-        ) {
+        const characters = (await getUserCharacters(userId)) as UserCharacter[];
+        if (checkEquipped(itemName, stats, characters)) {
             return r.edit(
                 embedComment(
                     `You cannot diffuse "${itemName}" because it is currently equipped!`,
@@ -180,134 +183,22 @@ export const diffuse = buildCommand<SlashCommand>({
             );
         }
 
-        if (
-            artifacts[itemName as ArtifactName] &&
-            (stats.equippedFlower === itemName ||
-                stats.equippedPlume === itemName ||
-                stats.equippedSands === itemName ||
-                stats.equippedGoblet === itemName ||
-                stats.equippedCirclet === itemName)
-        ) {
-            return r.edit(
-                embedComment(
-                    `You cannot diffuse "${itemName}" because it is currently equipped!`,
-                ),
+        if (diffusionHandlers[itemName]) {
+            const { reply } = await diffusionHandlers[itemName](
+                userId,
+                amountToDiffuse,
+                stats,
             );
-        }
-
-        if (itemName === "Life Essence") {
-            const alchemyIncrease = amountToDiffuse;
-            const newAlchemyProgress = stats.alchemyProgress + alchemyIncrease;
-
-            const updatedInventory = stats.inventory
-                .map((c) => {
-                    if (c.item === itemName) {
-                        c.amount = Math.floor(c.amount - amountToDiffuse);
-                    }
-                    return c;
-                })
-                .filter((c) => c.amount > 0);
-
-            await updateUserStats(i.user.id, {
-                inventory: { set: updatedInventory },
-                alchemyProgress: { set: newAlchemyProgress },
-            });
-
-            return r.edit(
-                embedComment(
-                    `You diffused \`${amountToDiffuse}x\` **Life Essence** and gained \`${alchemyIncrease}\` Alchemy Point!`,
-                    "Green",
-                ),
-            );
-        }
-
-        if (itemName === "Scattered Star") {
-            const updatedInventory = stats.inventory
-                .map((c) => {
-                    if (c.item === itemName) {
-                        c.amount = Math.floor(c.amount - amountToDiffuse);
-                    }
-                    return c;
-                })
-                .filter((c) => c.amount > 0);
-
-            const newScatteredStarsUsed =
-                (stats.scatteredStarsUsed || 0) + amountToDiffuse;
-            const inventoryIncrease = amountToDiffuse * 200;
-
-            await updateUserStats(i.user.id, {
-                inventory: { set: updatedInventory },
-                scatteredStarsUsed: { set: newScatteredStarsUsed },
-            });
-
-            return r.edit(
-                embedComment(
-                    `You diffused \`${amountToDiffuse}x\` **Scattered Star** and increased your inventory capacity by \`${inventoryIncrease}\` slots!`,
-                    "Green",
-                ),
-            );
-        }
-
-        if (itemName === "Skill Token") {
-            const updatedInventory = stats.inventory
-                .map((c) => {
-                    if (c.item === itemName) {
-                        c.amount = Math.floor(c.amount - amountToDiffuse);
-                    }
-                    return c;
-                })
-                .filter((c) => c.amount > 0);
-
-            const newBonusTokens = (stats.bonusTokens || 0) + amountToDiffuse;
-
-            await updateUserStats(i.user.id, {
-                inventory: { set: updatedInventory },
-                bonusTokens: { set: newBonusTokens },
-            });
-
-            return r.edit(
-                embedComment(
-                    `You diffused \`${amountToDiffuse}x\` **Skill Token** and gained \`${amountToDiffuse}\` Bonus Token${
-                        amountToDiffuse > 1 ? "s" : ""
-                    }!`,
-                    "Green",
-                ),
-            );
+            return r.edit(embedComment(reply));
         }
 
         if (itemName in misc) {
             const baitAmount = amountToDiffuse;
-
             const selectedBait = getRandomBait(baitOptions);
-
-            const existingBait = stats.inventory.find(
-                (c) => c.item === selectedBait,
-            );
-
-            if (existingBait) {
-                existingBait.amount += baitAmount;
-            } else {
-                stats.inventory.push({
-                    id: snowflakes.generate(),
-                    item: selectedBait,
-                    amount: baitAmount,
-                    metadata: null,
-                });
-            }
-
-            const updatedInventory = stats.inventory
-                .map((c) => {
-                    if (c.item === itemName) {
-                        c.amount = Math.floor(c.amount - amountToDiffuse);
-                    }
-                    return c;
-                })
-                .filter((c) => c.amount > 0);
-
-            await updateUserStats(i.user.id, {
-                inventory: { set: updatedInventory },
-            });
-
+            await removeItemFromInventory(userId, itemName, amountToDiffuse);
+            await addItemToInventory(userId, [
+                { item: selectedBait, amount: baitAmount },
+            ]);
             return r.edit(
                 embedComment(
                     `You diffused \`${amountToDiffuse}x\` **${itemName}** and received \`${baitAmount}x\` **${selectedBait}**!`,
@@ -318,25 +209,9 @@ export const diffuse = buildCommand<SlashCommand>({
 
         const totalDiffusePrice = itemData.sellPrice * amountToDiffuse;
         const totalHeal = Math.round(totalDiffusePrice * 1.5);
-        const maxHP = stats.maxHP;
-        const newHp = Math.min(stats.hp + totalHeal, maxHP);
-
-        const updatedInventory = stats.inventory
-            .map((c) => {
-                if (c.item === itemName) {
-                    c.amount = Math.floor(c.amount - amountToDiffuse);
-                }
-                return c;
-            })
-            .filter((c) => c.amount > 0);
-
-        await updateUserStats(i.user.id, {
-            inventory: {
-                set: updatedInventory,
-            },
-            hp: { set: newHp },
-        });
-
+        const newHp = Math.min(stats.hp + totalHeal, stats.maxHP);
+        await removeItemFromInventory(userId, itemName, amountToDiffuse);
+        await updateUserStats(userId, { hp: { set: newHp } });
         return r.edit(
             embedComment(
                 `You diffused \`${amountToDiffuse}x\` **${itemName}${

@@ -10,7 +10,7 @@ import {
     snowflakes,
     status,
 } from "@elara-services/utils";
-import type { Prisma, UserStats } from "@prisma/client";
+import type { Prisma, UserCharacter, UserStats } from "@prisma/client";
 import type { Client, TextChannel, User } from "discord.js";
 import { calculateFishingLevel } from "../../commands/rpg/handlers/fishHandler";
 import { prisma } from "../../prisma";
@@ -416,6 +416,58 @@ export const addItemToInventory = async (
         },
     });
 };
+
+interface EquippedStats {
+    equippedWeapon: string | null;
+    equippedFlower: string | null;
+    equippedPlume: string | null;
+    equippedSands: string | null;
+    equippedGoblet: string | null;
+    equippedCirclet: string | null;
+}
+
+export function checkEquipped(
+    itemName: string,
+    stats: EquippedStats,
+    characters: UserCharacter[],
+): boolean {
+    if (weapons[itemName as WeaponName] && stats.equippedWeapon === itemName) {
+        return true;
+    }
+    if (artifacts[itemName as ArtifactName]) {
+        const equippedArtifacts = [
+            stats.equippedFlower,
+            stats.equippedPlume,
+            stats.equippedSands,
+            stats.equippedGoblet,
+            stats.equippedCirclet,
+        ];
+        if (equippedArtifacts.includes(itemName)) {
+            return true;
+        }
+    }
+    for (const character of characters) {
+        if (
+            weapons[itemName as WeaponName] &&
+            character.equippedWeapon === itemName
+        ) {
+            return true;
+        }
+        if (artifacts[itemName as ArtifactName]) {
+            const equippedArtifacts = [
+                character.equippedFlower,
+                character.equippedPlume,
+                character.equippedSands,
+                character.equippedGoblet,
+                character.equippedCirclet,
+            ];
+            if (equippedArtifacts.includes(itemName)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 export const removeItemFromInventory = async (
     userId: string,
