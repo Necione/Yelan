@@ -91,6 +91,7 @@ export async function playerAttack(
     const isFirstGreatMagic = equippedWeaponName?.includes(
         "The First Great Magic",
     );
+    const hasFreedomSworn = equippedWeaponName?.includes("Freedom-Sworn");
 
     if (equippedWeaponName?.includes("Memory of Dust")) {
         const memoryDamage = Math.floor(currentMonsterHp * 0.2);
@@ -420,7 +421,7 @@ export async function playerAttack(
     }
 
     const vigilanceLevelData = getUserSkillLevelData(stats, "Vigilance");
-    if (vigilanceLevelData && !vigilanceUsed) {
+    if (vigilanceLevelData && !hasFreedomSworn && !vigilanceUsed) {
         if (!has(["Fatui", "Wayob"], monster, true)) {
             const levelData = vigilanceLevelData.levelData || {};
             const secondAttackPercentage =
@@ -503,6 +504,7 @@ export async function playerAttack(
     if (kindleLevelData) {
         if (
             !isFishingMonster(monster) &&
+            !hasFreedomSworn &&
             !has(["Human", "Wayob"], monster, true)
         ) {
             const levelData = kindleLevelData.levelData || {};
@@ -536,7 +538,11 @@ export async function playerAttack(
 
     const spiceLevelData = getUserSkillLevelData(stats, "Spice");
     if (spiceLevelData && currentMonsterHp > 0) {
-        if (!isFishingMonster(monster) && !has("Human", monster, true)) {
+        if (
+            !isFishingMonster(monster) &&
+            !hasFreedomSworn &&
+            !has("Human", monster, true)
+        ) {
             const levelData = spiceLevelData.levelData || {};
             const damageBonus = levelData.damageBonus || 0;
 
