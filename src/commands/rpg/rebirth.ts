@@ -126,7 +126,7 @@ export const rebirth = buildCommand<SlashCommand>({
                         `All items have been sold for ${getAmount(
                             totalSellPrice,
                         )}.\n` +
-                        `You now have **${tokensAfterRebirth}** token(s) available to spend.`,
+                        `You now have **${tokensAfterRebirth}** skill token(s) available to spend. Use </upgrade:1310180403385991250> to upgrade your skills.`,
                     "Green",
                 ),
             );

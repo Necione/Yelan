@@ -432,6 +432,7 @@ export const info = buildCommand<SlashCommand>({
                         "chestChance",
                         "minadventurerank",
                         "name",
+                        "hidden",
                     ].includes(key)
                 ) {
                     continue;

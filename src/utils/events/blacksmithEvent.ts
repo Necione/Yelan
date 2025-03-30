@@ -2,14 +2,16 @@ import { addButtonRow, awaitComponent, get, noop } from "@elara-services/utils";
 import { customEmoji } from "@liyueharbor/econ";
 import { ButtonStyle, EmbedBuilder } from "discord.js";
 import { getAmount } from "..";
+import { getBaseName } from "../../commands/rpg/handlers/utils";
 import {
+    addItemToInventory,
     removeBalance,
     removeItemFromInventory,
     updateUserStats,
 } from "../../services";
 import { createEvent } from "./utils";
 
-const prefixes = ["Demonic", "Corrupted", "Revered"];
+const forgingPrefixes = ["Demonic", "Corrupted", "Revered"];
 
 export const blacksmith = createEvent({
     name: "blacksmith",
@@ -28,10 +30,11 @@ export const blacksmith = createEvent({
 
         if (stats.blacksmith && stats.blacksmith.length > 0) {
             const forgedWeapon = stats.blacksmith[0];
-            await updateUserStats(stats.userId, {
-                equippedWeapon: { set: forgedWeapon },
-                blacksmith: { set: [] },
-            });
+            const added = await addItemToInventory(stats.userId, [
+                { item: forgedWeapon, amount: 1 },
+            ]);
+
+            await updateUserStats(stats.userId, { blacksmith: { set: [] } });
 
             return message
                 .edit({
@@ -39,7 +42,9 @@ export const blacksmith = createEvent({
                         new EmbedBuilder()
                             .setTitle("The Blacksmith Returns!")
                             .setDescription(
-                                `The blacksmith has finished forging your weapon! You receive your **${forgedWeapon}** back.`,
+                                added
+                                    ? `The blacksmith has finished forging your weapon! **${forgedWeapon}** has been added to your inventory.`
+                                    : `The blacksmith has finished forging your weapon! However, your inventory is full, so **${forgedWeapon}** could not be added.`,
                             )
                             .setColor("Gold"),
                     ],
@@ -144,22 +149,24 @@ export const blacksmith = createEvent({
             equippedWeapon: { set: null },
         });
 
-        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-        const weaponName = stats.equippedWeapon.replace(
-            /^(Demonic|Corrupted|Revered)\s+/,
-            "",
-        );
-        const newWeaponName = `${prefix} ${weaponName}`;
+        const baseWeaponName = getBaseName(stats.equippedWeapon);
+        const newPrefix =
+            forgingPrefixes[Math.floor(Math.random() * forgingPrefixes.length)];
+        const newWeaponName = `${newPrefix} ${baseWeaponName}`;
 
-        await updateUserStats(stats.userId, {
-            blacksmith: { set: [newWeaponName] },
-        });
+        const added = await addItemToInventory(stats.userId, [
+            { item: newWeaponName, amount: 1 },
+        ]);
 
         return message
             .edit({
                 embeds: [
                     embed.setDescription(
-                        `The blacksmith takes your weapon and coins. "I'll have your **${newWeaponName}** ready next time we meet!"`,
+                        `The blacksmith takes your weapon and coins. "I'll have your **${newWeaponName}** ready next time we meet!" ${
+                            added
+                                ? "It has been added to your inventory."
+                                : "However, your inventory is full and the item could not be added."
+                        }`,
                     ),
                 ],
                 components: [],
