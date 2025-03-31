@@ -508,7 +508,12 @@ export const fishCommand = buildCommand<SlashCommand>({
             await r
                 .edit({ embeds: [escapedEmbed], components: [] })
                 .catch(noop);
-            await cooldowns.set(user, "fish", get.hrs(1));
+
+            const lureSkill = getUserSkillLevelData(stats, "Lure");
+            const fishingCooldown = lureSkill?.levelData?.cooldown
+                ? get.mins(lureSkill.levelData.cooldown)
+                : get.hrs(1);
+            await cooldowns.set(user, "fish", fishingCooldown);
             locked.del(i.user.id);
             return;
         } else {

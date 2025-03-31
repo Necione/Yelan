@@ -851,6 +851,7 @@ export async function monsterAttack(
 
     const hasBackstep = skills.has(stats, "Backstep");
     const hasParry = skills.has(stats, "Parry");
+    const hasPerfectParry = skills.has(stats, "Perfect Parry");
 
     const evasionEffect = stats.activeEffects.find(
         (eff) => eff.name === "Evasion" && eff.remainingUses > 0,
@@ -876,6 +877,18 @@ export async function monsterAttack(
         messages.push("`💨` You dodged the attack completely with Backstep");
         debug(`${username} Backstep => 0 dmg`);
         finalMonsterDamage = 0;
+    } else if (hasPerfectParry && Math.random() < 0.2) {
+        const parried = finalMonsterDamage;
+        finalMonsterDamage = 0;
+        currentMonsterHp -= parried;
+        messages.push(
+            `\`⚔️\` Perfect Parry skill activated! You reflected \`${parried.toFixed(
+                2,
+            )}\` damage back to the ${monster.name}`,
+        );
+        debug(
+            `${username} Perfect Parry => monster HP -${parried}, finalMonsterDamage => ${finalMonsterDamage}`,
+        );
     } else if (hasParry && Math.random() < 0.2) {
         const parried = finalMonsterDamage * 0.5;
         finalMonsterDamage *= 0.5;
