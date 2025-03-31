@@ -163,12 +163,21 @@ export const domains: Record<string, Domain> = {
                     chance: 100,
                 },
                 {
-                    item: "Feather of Nascent Light",
+                    item: "Skill Token",
                     amount: 1,
-                    chance: 25,
+                    chance: 10,
                 },
                 {
-                    item: "Skill Token",
+                    item:
+                        Math.random() < 0.2
+                            ? "Thundering Poise"
+                            : Math.random() < 0.2
+                              ? "Solar Relic"
+                              : Math.random() < 0.2
+                                ? "Flowering Life"
+                                : Math.random() < 0.2
+                                  ? "Feather of Nascent Light"
+                                  : "Moment of the Pact",
                     amount: 1,
                     chance: 10,
                 },
@@ -200,12 +209,21 @@ export const domains: Record<string, Domain> = {
                     chance: 100,
                 },
                 {
-                    item: "Moment of the Pact",
+                    item: "Skill Token",
                     amount: 1,
-                    chance: 25,
+                    chance: 10,
                 },
                 {
-                    item: "Skill Token",
+                    item:
+                        Math.random() < 0.2
+                            ? "Thundering Poise"
+                            : Math.random() < 0.2
+                              ? "Solar Relic"
+                              : Math.random() < 0.2
+                                ? "Flowering Life"
+                                : Math.random() < 0.2
+                                  ? "Feather of Nascent Light"
+                                  : "Moment of the Pact",
                     amount: 1,
                     chance: 10,
                 },
