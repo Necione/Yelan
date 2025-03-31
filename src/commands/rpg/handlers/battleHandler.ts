@@ -882,7 +882,7 @@ export async function monsterAttack(
         finalMonsterDamage = 0;
         currentMonsterHp -= parried;
         messages.push(
-            `\`⚔️\` Perfect Parry skill activated! You reflected \`${parried.toFixed(
+            `\`🎆\` Perfect Parry skill activated! You reflected \`${parried.toFixed(
                 2,
             )}\` damage back to the ${monster.name}`,
         );
