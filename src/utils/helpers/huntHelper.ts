@@ -579,7 +579,7 @@ export async function generateNextHuntMonsters(
 
         let preventMutation = false;
         if (stats.activeSkills.includes("Stealth")) {
-            preventMutation = true;
+            preventMutation = Math.random() < 0.6;
         }
 
         const mutationChance = Math.min(stats.rebirths * 5, 100);

@@ -46,7 +46,7 @@ export const specialSkills = make.array<SpecialSkill>([
     {
         skillName: "Stealth",
         emoji: "🦢",
-        description: "Never encounter a mutated monster.",
+        description: "60% chance to prevent monster mutations.",
     },
     {
         skillName: "Fortress",
