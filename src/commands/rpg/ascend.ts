@@ -1,7 +1,13 @@
 import { buildCommand, type SlashCommand } from "@elara-services/botbuilder";
 import { embedComment, is, noop, snowflakes } from "@elara-services/utils";
+import { texts } from "@liyueharbor/econ";
 import { SlashCommandBuilder } from "discord.js";
-import { getUserStats, updateUserStats } from "../../services";
+import {
+    getProfileByUserId,
+    getUserStats,
+    removeBalance,
+    updateUserStats,
+} from "../../services";
 import { weapons } from "../../utils/rpgitems/weapons";
 import { getBaseName, getPrefix } from "./handlers/utils";
 
@@ -74,12 +80,23 @@ export const ascend = buildCommand<SlashCommand>({
         }
 
         const stats = await getUserStats(i.user.id);
+        const userProfile = await getProfileByUserId(i.user.id);
 
         if (!stats) {
             return r
                 .edit(
                     embedComment(
                         "No stats found for you. Please set up your profile.",
+                    ),
+                )
+                .catch(noop);
+        }
+
+        if (!userProfile) {
+            return r
+                .edit(
+                    embedComment(
+                        "No profile found for you. Please set up your profile.",
                     ),
                 )
                 .catch(noop);
@@ -97,6 +114,16 @@ export const ascend = buildCommand<SlashCommand>({
                 .edit(
                     embedComment(
                         `You need to be at least **AR 20** to ascend weapons.`,
+                    ),
+                )
+                .catch(noop);
+        }
+
+        if (userProfile.balance < 1000) {
+            return r
+                .edit(
+                    embedComment(
+                        `You need at least **1000 ${texts.c.u}** to ascend weapons.`,
                     ),
                 )
                 .catch(noop);
@@ -159,7 +186,7 @@ export const ascend = buildCommand<SlashCommand>({
         const updatedInventory = stats.inventory
             .map((item) => {
                 if (item.item === weaponName) {
-                    item.amount = Math.floor(item.amount - 10);
+                    item.amount = Math.floor(item.amount - 3);
                 }
                 return item;
             })
@@ -177,9 +204,12 @@ export const ascend = buildCommand<SlashCommand>({
             });
         }
 
-        await updateUserStats(i.user.id, {
-            inventory: { set: updatedInventory },
-        });
+        await Promise.all([
+            updateUserStats(i.user.id, {
+                inventory: { set: updatedInventory },
+            }),
+            removeBalance(i.user.id, 10000, false, `Via /ascend command`),
+        ]);
 
         return r
             .edit(

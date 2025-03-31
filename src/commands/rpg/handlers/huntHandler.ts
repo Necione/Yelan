@@ -187,7 +187,7 @@ export async function handleHunt(
         currentPlayerHp = Math.floor(currentPlayerHp * 1.25);
     }
     if (hasWrath) {
-        currentPlayerHp = Math.floor(currentPlayerHp * 0.75);
+        currentPlayerHp = Math.floor(currentPlayerHp * 0.5);
     }
     currentPlayerHp = Math.min(currentPlayerHp, stats.maxHP * 1.5);
 
@@ -490,7 +490,7 @@ export async function handleHunt(
         }
         if (hasWrath) {
             startingMessages.push(
-                `\`💢\` **SIN OF WRATH** activated. Your starting HP is reduced by __25%__`,
+                `\`💢\` **SIN OF WRATH** activated. Your starting HP is reduced by __50%__`,
             );
         }
 
@@ -505,7 +505,7 @@ export async function handleHunt(
         if (skills.has(stats, "Pride")) {
             isMonsterFirst = true;
             startingMessages.push(
-                "`🏅` **SIN OF PRIDE** activated. You will never go first, but deal __200%__ more damage after",
+                "`🏅` **SIN OF PRIDE** activated. You will never go first, but deal __150%__ more damage after",
             );
         }
 

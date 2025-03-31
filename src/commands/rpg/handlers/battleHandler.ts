@@ -245,7 +245,7 @@ export async function playerAttack(
     }
 
     if (hasWrath) {
-        let wrathMultiplier = 1.5;
+        let wrathMultiplier = 2;
         if (isFirstGreatMagic) {
             wrathMultiplier *= 2;
             messages.push(
@@ -265,7 +265,7 @@ export async function playerAttack(
     }
 
     if (skills.has(stats, "Pride")) {
-        let prideMultiplier = 2;
+        let prideMultiplier = 1.5;
         if (isFirstGreatMagic) {
             prideMultiplier *= 2;
             messages.push(

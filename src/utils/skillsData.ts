@@ -559,7 +559,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Deal 150% more DMG, start each round with 25% less HP.",
+                    "Deal 200% more DMG, start each round with 50% less HP.",
             },
         ],
         emoji: "💢",
@@ -703,7 +703,7 @@ export const skills = make.array<Skill>([
             {
                 level: 1,
                 description:
-                    "Never go first, deal 200% more damage afterwards.",
+                    "Never go first, deal 150% more damage afterwards.",
             },
         ],
         emoji: "🏅",

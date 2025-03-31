@@ -631,7 +631,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/lithic_blade.png",
         hidden: false,
     },
-    "Pro­to­type Ar­cha­ic": {
+    "Prototype Archaic": {
         name: "Prototype Archaic",
         type: "Claymore",
         sellPrice: 30,
@@ -649,7 +649,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
             "https://lh.elara.workers.dev/rpg/weapons/prototype_archaic.png",
         hidden: false,
     },
-    "Black­cliff War­bow": {
+    "Blackcliff Warbow": {
         name: "Blackcliff Warbow",
         type: "Bow",
         sellPrice: 30,
@@ -684,7 +684,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         imageURL: "https://lh.elara.workers.dev/rpg/weapons/rainslasher.png",
         hidden: false,
     },
-    "Roy­al Gri­moire": {
+    "Royal Grimoire": {
         name: "Royal Grimoire",
         type: "Catalyst",
         sellPrice: 40,
@@ -1209,7 +1209,7 @@ const baseWeapons: { [key: string]: WeaponData } = {
         name: "Crimson Moon's Semblance",
         type: "Polearm",
         sellPrice: 50,
-        attackPower: 175,
+        attackPower: 150,
         critChance: 5,
         critValue: 1.25,
         defValue: 10,
@@ -1458,7 +1458,7 @@ const prefixes: {
         chestChance: 0,
     }),
     Ancient: (weaponData) => ({
-        attackPower: weaponData.attackPower * 2,
+        attackPower: weaponData.attackPower * 1.75,
         additionalHP: weaponData.additionalHP * 1.25,
         critValue: weaponData.critValue * 1.5,
         chestChance: 0,
@@ -1475,7 +1475,7 @@ const prefixes: {
         chestChance: 0,
     }),
     Legendary: (weaponData) => ({
-        attackPower: weaponData.attackPower * 2,
+        attackPower: weaponData.attackPower * 1.8,
         additionalHP: weaponData.additionalHP * 2,
         critValue: weaponData.critValue * 2,
         defValue: weaponData.defValue * 2,
