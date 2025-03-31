@@ -154,19 +154,15 @@ export const blacksmith = createEvent({
             forgingPrefixes[Math.floor(Math.random() * forgingPrefixes.length)];
         const newWeaponName = `${newPrefix} ${baseWeaponName}`;
 
-        const added = await addItemToInventory(stats.userId, [
-            { item: newWeaponName, amount: 1 },
-        ]);
+        await updateUserStats(stats.userId, {
+            blacksmith: { set: [newWeaponName] },
+        });
 
         return message
             .edit({
                 embeds: [
                     embed.setDescription(
-                        `The blacksmith takes your weapon and coins. "I'll have your **${newWeaponName}** ready next time we meet!" ${
-                            added
-                                ? "It has been added to your inventory."
-                                : "However, your inventory is full and the item could not be added."
-                        }`,
+                        `The blacksmith takes your weapon and coins. "I'll have your **${newWeaponName}** ready next time we meet!"`,
                     ),
                 ],
                 components: [],
