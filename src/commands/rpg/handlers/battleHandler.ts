@@ -678,6 +678,20 @@ export async function monsterAttack(
     );
     debug(`${username} ${monster.name} base damage => ${monsterDamage}`);
 
+    if (monster.name === "The Physic") {
+        const reflectedDamage = Math.floor(monsterDamage * 0.5);
+        currentPlayerHp = Math.max(
+            currentPlayerHp - reflectedDamage,
+            getDeathThreshold(stats),
+        );
+        messages.push(
+            `\`🔮\` The Physic reflects \`${reflectedDamage}\` damage back to you!`,
+        );
+        debug(
+            `${username} The Physic => reflected ${reflectedDamage} damage to player`,
+        );
+    }
+
     switch (monster.mutationType) {
         case "Bloodthirsty":
             monsterDamage *= 2;

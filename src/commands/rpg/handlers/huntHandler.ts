@@ -506,6 +506,12 @@ export async function handleHunt(
             );
         }
 
+        if (monster.name === "The Physic") {
+            startingMessages.push(
+                "`⚠️` **The Physic** will reflect 50% of your damage!",
+            );
+        }
+
         if (monster.name === "The Water") {
             startingMessages.push(
                 "`⚠️` **The Water** will disarm your weapon!",
