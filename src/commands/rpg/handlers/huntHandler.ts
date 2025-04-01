@@ -506,6 +506,12 @@ export async function handleHunt(
             );
         }
 
+        if (monster.name === "The Water") {
+            startingMessages.push(
+                "`⚠️` **The Water** will disarm your weapon!",
+            );
+        }
+
         if (monster.name === "The Flint") {
             startingMessages.push(
                 "`⚠️` **The Flint** reduces all your damage by __50%__!",
