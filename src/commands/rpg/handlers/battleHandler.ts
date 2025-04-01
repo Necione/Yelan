@@ -1275,6 +1275,15 @@ export function applyAttackModifiers(
         );
     }
 
+    if (monster.name === "The Flint") {
+        attackPower *= 0.5;
+        messages.push(
+            "`💎` The Flint's hard exterior reduces your damage by __50%__",
+        );
+        debugMultipliers.push("The Flint (0.5x)");
+        debug(`${username} The Flint => Attack Power * 0.5 = ${attackPower}`);
+    }
+
     debug(
         `${username} Final Attack Power after modifiers: ${attackPower}, Multipliers applied: ${debugMultipliers.join(
             ", ",

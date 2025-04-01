@@ -147,22 +147,8 @@ export async function handleHunt(
         selectedMonsters = await generateNextHuntMonsters(stats);
     }
 
-    const bossEncounters: { [key: number]: string } = {
-        5: "Electro Hypostasis",
-        10: "Cryo Regisvine",
-        15: "Rhodeia of Loch",
-        20: "Primo Geovishap",
-    };
-    let isBossEncounter = false;
-    let bossName = "";
-
-    if (
-        bossEncounters[stats.adventureRank] &&
-        !stats.beatenBosses.includes(bossEncounters[stats.adventureRank])
-    ) {
-        isBossEncounter = true;
-        bossName = bossEncounters[stats.adventureRank];
-    }
+    const isBossEncounter = false;
+    const bossName = "";
 
     const monstersEncountered = selectedMonsters;
 
@@ -195,6 +181,11 @@ export async function handleHunt(
 
     const handleMonsterBattle = async (thread?: PublicThreadChannel<false>) => {
         const monster = monstersEncountered[currentMonsterIndex];
+        if (monster.name === "The Plant") {
+            stats.activeSkills = [];
+            stats.castQueue = [];
+        }
+
         const monsterStats = monster.getStatsForadventureRank(
             stats.adventureRank,
         );
@@ -464,7 +455,7 @@ export async function handleHunt(
         const distractionSkill = getUserSkillLevelData(stats, "Distraction");
         const hasDistraction = distractionSkill;
 
-        let isMonsterFirst: boolean;
+        let isMonsterFirst = false;
         const startingMessages = make.array<string>();
         const tauntSkill = getUserSkillLevelData(stats, "Taunt");
         const pacifistSkill = getUserSkillLevelData(stats, "Pacifist");
@@ -502,6 +493,33 @@ export async function handleHunt(
                 : Math.random() < 0.5;
         }
 
+        if (monster.name === "The Needle") {
+            isMonsterFirst = false;
+            startingMessages.push(
+                "`⚠️` **The Needle** will instantly kill you if you don't defeat it in one turn!",
+            );
+        }
+
+        if (monster.name === "The Plant") {
+            startingMessages.push(
+                "`⚠️` **The Plant** has disabled all your skills!",
+            );
+        }
+
+        if (monster.name === "The Flint") {
+            startingMessages.push(
+                "`⚠️` **The Flint** reduces all your damage by __50%__!",
+            );
+        }
+
+        if (monster.name === "The Wall") {
+            startingMessages.push("`⚠️` **The Wall** has extra high HP!");
+        }
+
+        if (monster.name === "The Tooth") {
+            startingMessages.push("`⚠️` **The Tooth** deals extra high ATK!");
+        }
+
         if (skills.has(stats, "Pride")) {
             isMonsterFirst = true;
             startingMessages.push(
@@ -531,6 +549,7 @@ export async function handleHunt(
             }
         }
         let endedByTime = false;
+
         const timeBy = get.mins(10);
         while (currentPlayerHp > deathThreshold && currentMonsterHp > 0) {
             if (Date.now() - start >= timeBy) {
@@ -594,6 +613,17 @@ export async function handleHunt(
 
                 isPlayerTurn = false;
             } else {
+                if (monster.name === "The Needle" && turnNumber > 1) {
+                    currentPlayerHp = 0;
+                    if (thread) {
+                        await sendToChannel(thread.id, {
+                            content:
+                                "`💀` **The Needle** has pierced through your defenses! Instant death!",
+                        });
+                    }
+                    break;
+                }
+
                 const monsterMessages = make.array<string>();
 
                 ({ currentPlayerHp, currentMonsterHp } = await monsterAttack(
