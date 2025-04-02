@@ -665,13 +665,6 @@ export async function monsterAttack(
         debug(`${username} ${monster.name} +${regenAmount} HP (Geo)`);
     }
 
-    if (monster.name === "The Water" && stats.equippedWeapon) {
-        await updateUserStats(stats.userId, {
-            equippedWeapon: { set: null },
-        });
-        debug(`${username} The Water => unequipped weapon`);
-    }
-
     let monsterDamage = getRandomValue(
         monsterStats.minDamage,
         monsterStats.maxDamage,

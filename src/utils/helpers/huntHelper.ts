@@ -594,7 +594,7 @@ export async function generateNextHuntMonsters(
 
         const mutationChance = Math.min(stats.rebirths * 5, 100);
         const canMutate = Math.random() * 100 < mutationChance;
-        if (canMutate && monster.group !== "Boss") {
+        if (canMutate) {
             const mutationTypes: MutationType[] = [
                 "Bloodthirsty",
                 "Strange",
