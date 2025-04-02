@@ -490,8 +490,22 @@ export async function generateNextHuntMonsters(
 ): Promise<Monster[]> {
     await initializeMonsters();
 
-    const isBossEncounter = false;
-    const bossName = "";
+    const bossEncounters: Record<number, string> = {
+        5: "Electro Hypostasis",
+        10: "Cryo Regisvine",
+        15: "Rhodeia of Loch",
+        20: "Primo Geovishap",
+    };
+    let isBossEncounter = false;
+    let bossName = "";
+
+    if (
+        bossEncounters[stats.adventureRank] &&
+        !stats.beatenBosses.includes(bossEncounters[stats.adventureRank])
+    ) {
+        isBossEncounter = true;
+        bossName = bossEncounters[stats.adventureRank];
+    }
 
     let numberOfMonsters = isBossEncounter
         ? 1
