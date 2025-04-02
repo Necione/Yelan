@@ -9,7 +9,7 @@ const cost = 200;
 
 export const oldWizard = createEvent({
     name: "oldWizard",
-    weight: 0,
+    weight: 1,
     required: {
         min: {
             rank: 20,

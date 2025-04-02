@@ -1,0 +1,34 @@
+import { MonsterElement, MonsterGroup } from "../../helpers/monsterHelper";
+
+export default {
+    startingHp: 0,
+    name: "Experimental Field Generator",
+    group: MonsterGroup.Boss,
+    element: MonsterElement.Geo,
+    minExp: 40,
+    maxExp: 50,
+    minadventurerank: 35,
+    image: "https://lh.elara.workers.dev/rpg/monsters/proto.png",
+    drops: [
+        {
+            item: "Tourbillon Device",
+            minAmount: 1,
+            maxAmount: 1,
+            chance: 100,
+        },
+    ],
+
+    critChance: 5,
+    critValue: 1.5,
+    defChance: 75,
+    defValue: 250,
+    getStatsForadventureRank(adventureRank: number) {
+        return {
+            adventureRank,
+            minHp: 87500,
+            maxHp: 87500,
+            minDamage: 900,
+            maxDamage: 1600,
+        };
+    },
+};

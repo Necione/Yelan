@@ -554,30 +554,6 @@ export async function generateNextHuntMonsters(
             if (!monster) {
                 break;
             }
-        } else if (i === numberOfMonsters - 1) {
-            const availableBosses = monsters.filter((m) => m.group === "Boss");
-            if (availableBosses.length > 0 && Math.random() < 0.5) {
-                const randomBoss =
-                    availableBosses[
-                        Math.floor(Math.random() * availableBosses.length)
-                    ];
-                monster = await getMonsterByName(randomBoss.name);
-            } else {
-                monster = await getRandomMonster(
-                    stats.adventureRank,
-                    stats.location,
-                    {
-                        startingHp: stats.hp,
-                        attackPower: stats.attackPower,
-                        critChance: stats.critChance,
-                        critValue: stats.critValue,
-                        defChance: stats.defChance,
-                        defValue: stats.defValue,
-                        maxHp: stats.maxHP,
-                        rebirths: stats.rebirths,
-                    },
-                );
-            }
         } else {
             monster = await getRandomMonster(
                 stats.adventureRank,
